@@ -1,11 +1,21 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { components } from '../../types/openapi';
 import { authApi } from '../api/authApi';
+
+export type User = components['schemas']['UserResponse'];
+
+export interface AuthState {
+  user: User | null;
+  accessToken: string | null;
+}
+
+const initialState: AuthState = { user: null, accessToken: null };
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { user: null, accessToken: null },
+  initialState,
   reducers: {
-    tokenRefreshed(state, { payload }) {
+    tokenRefreshed(state, { payload }: PayloadAction<string>) {
       state.accessToken = payload;
     },
     logout(state) {

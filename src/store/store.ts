@@ -31,3 +31,6 @@ export const store = configureStore({
       .concat(shareApi.middleware)
       .concat(errorMiddleware),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
