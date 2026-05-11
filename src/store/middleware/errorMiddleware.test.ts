@@ -1,11 +1,12 @@
 import { errorMiddleware } from './errorMiddleware';
 
 describe('errorMiddleware', () => {
-  let next, dispatchEventSpy;
+  let next: ReturnType<typeof vi.fn>;
+  let dispatchEventSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     next = vi.fn((action) => action);
-    dispatchEventSpy = vi.spyOn(window, 'dispatchEvent').mockImplementation(() => {});
+    dispatchEventSpy = vi.spyOn(window, 'dispatchEvent').mockImplementation(() => false);
   });
 
   afterEach(() => {
@@ -16,6 +17,10 @@ describe('errorMiddleware', () => {
     queryType = 'query',
     endpoint = 'someEndpoint',
     payload = {},
+  }: {
+    queryType?: string;
+    endpoint?: string;
+    payload?: unknown;
   } = {}) {
     return {
       type: 'api/executeQuery/rejected',
@@ -71,11 +76,12 @@ describe('errorMiddleware', () => {
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 describe('errorMiddleware with rejectedWithValue actions', () => {
-  let next, dispatchEventSpy;
+  let next: ReturnType<typeof vi.fn>;
+  let dispatchEventSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     next = vi.fn((action) => action);
-    dispatchEventSpy = vi.spyOn(window, 'dispatchEvent').mockImplementation(() => {});
+    dispatchEventSpy = vi.spyOn(window, 'dispatchEvent').mockImplementation(() => false);
   });
 
   afterEach(() => {
@@ -83,7 +89,15 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
   });
 
   // Helper to create an action that passes isRejectedWithValue
-  function makeRejectedWithValueAction({ queryType, endpoint, payload }) {
+  function makeRejectedWithValueAction({
+    queryType,
+    endpoint,
+    payload,
+  }: {
+    queryType: string;
+    endpoint: string;
+    payload: unknown;
+  }) {
     // isRejectedWithValue checks: hasPrefix && action.meta?.rejectedWithValue === true
     return {
       type: 'someApi/executeMutation/rejected',
@@ -146,10 +160,10 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
     const event = dispatchEventSpy.mock.calls[0][0];
     expect(event).toBeInstanceOf(CustomEvent);
     expect(event.type).toBe('rtk-api-error');
-    expect(event.detail.message).toBe('Server broke');
-    expect(event.detail.type).toBe('danger');
-    expect(event.detail.endpoint).toBe('getSubscriptionStatus');
-    expect(event.detail.status).toBe(500);
+    expect((event as CustomEvent).detail.message).toBe('Server broke');
+    expect((event as CustomEvent).detail.type).toBe('danger');
+    expect((event as CustomEvent).detail.endpoint).toBe('getSubscriptionStatus');
+    expect((event as CustomEvent).detail.status).toBe(500);
   });
 
   it('uses fallback message when detail is not a string', () => {
@@ -161,7 +175,7 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
     const middleware = errorMiddleware()(next);
     middleware(action);
     const event = dispatchEventSpy.mock.calls[0][0];
-    expect(event.detail.message).toBe('Something went wrong. Please try again.');
+    expect((event as CustomEvent).detail.message).toBe('Something went wrong. Please try again.');
   });
 
   it('uses fallback message when no data', () => {
@@ -173,6 +187,6 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
     const middleware = errorMiddleware()(next);
     middleware(action);
     const event = dispatchEventSpy.mock.calls[0][0];
-    expect(event.detail.message).toBe('Something went wrong. Please try again.');
+    expect((event as CustomEvent).detail.message).toBe('Something went wrong. Please try again.');
   });
 });
