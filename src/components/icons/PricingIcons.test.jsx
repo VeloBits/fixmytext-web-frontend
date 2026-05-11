@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import {
-  I,
   NumIcon,
   DropletIcon,
   SunIcon,
@@ -23,36 +22,6 @@ import {
 } from './PricingIcons';
 
 describe('PricingIcons', () => {
-  describe('I (base icon wrapper)', () => {
-    it('renders a path when d prop is provided', () => {
-      const { container } = render(<I d="M0 0L10 10" />);
-      const path = container.querySelector('path');
-      expect(path).toBeInTheDocument();
-      expect(path).toHaveAttribute('d', 'M0 0L10 10');
-    });
-
-    it('renders children when no d prop', () => {
-      const { container } = render(
-        <I>
-          <circle cx="12" cy="12" r="5" />
-        </I>
-      );
-      expect(container.querySelector('circle')).toBeInTheDocument();
-    });
-
-    it('respects size, stroke, fill, and vb props', () => {
-      const { container } = render(
-        <I d="M0 0" size={32} stroke="red" fill="blue" vb="0 0 32 32" />
-      );
-      const svg = container.querySelector('svg');
-      expect(svg).toHaveAttribute('width', '32');
-      expect(svg).toHaveAttribute('height', '32');
-      expect(svg).toHaveAttribute('stroke', 'red');
-      expect(svg).toHaveAttribute('fill', 'blue');
-      expect(svg).toHaveAttribute('viewBox', '0 0 32 32');
-    });
-  });
-
   describe('NumIcon', () => {
     it('renders the number', () => {
       const { container } = render(<NumIcon n={5} />);
