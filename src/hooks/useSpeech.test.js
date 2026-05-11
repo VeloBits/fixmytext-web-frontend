@@ -55,7 +55,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(() => mockRecognition);
+    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -79,7 +79,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(() => mockRecognition);
+    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -103,7 +103,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(() => mockRecognition);
+    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('', setText, showAlert));
     act(() => {
@@ -139,7 +139,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(() => mockRecognition);
+    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -163,7 +163,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(() => mockRecognition);
+    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -188,7 +188,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.webkitSpeechRecognition = vi.fn(() => mockRecognition);
+    window.webkitSpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {

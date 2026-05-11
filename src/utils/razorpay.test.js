@@ -24,7 +24,7 @@ describe('openRazorpayCheckout', () => {
 
   it('creates Razorpay instance and calls open', () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(() => ({ open: openMock }));
+    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock;
 
     openRazorpayCheckout({
@@ -53,7 +53,7 @@ describe('openRazorpayCheckout', () => {
 
   it('calls onSuccess via handler', () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(() => ({ open: openMock }));
+    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock;
 
     openRazorpayCheckout({
@@ -73,7 +73,7 @@ describe('openRazorpayCheckout', () => {
 
   it('calls onFailure on modal dismiss', () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(() => ({ open: openMock }));
+    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock;
 
     openRazorpayCheckout({
@@ -92,7 +92,7 @@ describe('openRazorpayCheckout', () => {
 
   it('uses default description when not provided', () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(() => ({ open: openMock }));
+    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock;
 
     openRazorpayCheckout({
