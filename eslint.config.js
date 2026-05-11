@@ -54,6 +54,14 @@ export default [
     },
   },
   {
+    files: ['e2e/**/*.{js,jsx}', '*.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     ignores: ['dist/', 'node_modules/', 'coverage/'],
   },
 ];

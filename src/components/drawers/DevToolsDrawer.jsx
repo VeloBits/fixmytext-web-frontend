@@ -43,47 +43,29 @@ export function JsonPathDrawer({ text, onResult, showAlert }) {
   };
 
   return (
-    <div className="tu-gen">
-      <h3 className="tu-gen-title">JSON Path Query</h3>
-      <div className="tu-gen-card">
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">JSONPath Expression</label>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field">
           <input
             type="text"
+            className="tu-fr-input"
             value={path}
             onChange={(e) => setPath(e.target.value)}
-            placeholder="$.store.book[0].title"
-            style={{
-              width: '100%',
-              padding: '8px',
-              borderRadius: '6px',
-              border: '1px solid var(--border)',
-              background: 'var(--bg-2)',
-              color: 'var(--text-1)',
-              fontFamily: 'var(--font-mono)',
-            }}
+            onKeyDown={(e) => e.key === 'Enter' && handleQuery()}
+            placeholder="JSONPath, e.g. $.store.book[0].title"
+            spellCheck={false}
+            autoFocus
           />
-          <p style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '4px' }}>
-            Examples: $.name, $.items[0], $.users[*].email
-          </p>
         </div>
-        <button
-          className="tu-gen-btn"
-          onClick={handleQuery}
-          style={{
-            width: '100%',
-            marginTop: '12px',
-            padding: '10px',
-            borderRadius: '8px',
-            background: 'var(--green)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Query
-        </button>
+        <div className="tu-fr-actions">
+          <button
+            className="tu-fr-action tu-fr-action--text"
+            onClick={handleQuery}
+            title="Query"
+          >
+            Query
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -104,12 +86,11 @@ export function MarkdownPreviewDrawer({ text }) {
     : '<p style="color: var(--text-3)">Enter Markdown in the editor to preview...</p>';
 
   return (
-    <div className="tu-gen">
-      <h3 className="tu-gen-title">Markdown Preview</h3>
-      <div className="tu-gen-card" style={{ padding: '16px' }}>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
         <div
+          className="tu-fr-field tu-fr-field--readonly"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
-          style={{ lineHeight: 1.6, color: 'var(--text-1)' }}
         />
       </div>
     </div>
@@ -134,9 +115,11 @@ export function LoremIpsumDrawer({ onResult, showAlert }) {
     } else if (type === 'sentences') {
       const sentences = LOREM.split('. ').map((s) => s.trim().replace(/\.$/, ''));
       result = Array.from({ length: count }, (_, i) => sentences[i % sentences.length] + '.').join(
-        ' '
+        '\n'
       );
     } else {
+      // One paragraph per line so the output gutter line numbers match the
+      // count (3 paragraphs → lines 1, 2, 3 — no empty rows in between).
       result = Array.from({ length: count }, () => LOREM).join('\n\n');
     }
     onResult('Lorem Ipsum', result);
@@ -144,54 +127,43 @@ export function LoremIpsumDrawer({ onResult, showAlert }) {
   };
 
   return (
-    <div className="tu-gen">
-      <h3 className="tu-gen-title">Lorem Ipsum Generator</h3>
-      <div className="tu-gen-card">
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Type</label>
-          <div className="tu-gen-options">
-            {['words', 'sentences', 'paragraphs'].map((t) => (
-              <button
-                key={t}
-                className={`tu-gen-opt${type === t ? ' tu-gen-opt--on' : ''}`}
-                onClick={() => setType(t)}
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-          </div>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Type</span>
+          {['words', 'sentences', 'paragraphs'].map((t) => (
+            <button
+              key={t}
+              className={`tu-fr-seg${type === t ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setType(t)}
+            >
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
         </div>
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Count</label>
-          <div className="tu-gen-options">
-            {[1, 3, 5, 10].map((n) => (
-              <button
-                key={n}
-                className={`tu-gen-opt${count === n ? ' tu-gen-opt--on' : ''}`}
-                onClick={() => setCount(n)}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
+      </div>
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Count</span>
+          {[1, 3, 5, 10].map((n) => (
+            <button
+              key={n}
+              className={`tu-fr-seg${count === n ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setCount(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
-        <button
-          className="tu-gen-btn"
-          onClick={handleGenerate}
-          style={{
-            width: '100%',
-            marginTop: '12px',
-            padding: '10px',
-            borderRadius: '8px',
-            background: 'var(--green)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Generate
-        </button>
+        <div className="tu-fr-actions">
+          <button
+            className="tu-fr-action tu-fr-action--text"
+            onClick={handleGenerate}
+            title="Generate"
+          >
+            Generate
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -252,40 +224,29 @@ export function SampleJsonDrawer({ onResult, showAlert }) {
   };
 
   return (
-    <div className="tu-gen">
-      <h3 className="tu-gen-title">Sample JSON Generator</h3>
-      <div className="tu-gen-card">
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Template</label>
-          <div className="tu-gen-options" style={{ flexWrap: 'wrap' }}>
-            {Object.keys(templates).map((t) => (
-              <button
-                key={t}
-                className={`tu-gen-opt${template === t ? ' tu-gen-opt--on' : ''}`}
-                onClick={() => setTemplate(t)}
-              >
-                {t.replace('_', ' ')}
-              </button>
-            ))}
-          </div>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Template</span>
+          {Object.keys(templates).map((t) => (
+            <button
+              key={t}
+              className={`tu-fr-seg${template === t ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setTemplate(t)}
+            >
+              {t.replace('_', ' ')}
+            </button>
+          ))}
         </div>
-        <button
-          className="tu-gen-btn"
-          onClick={handleGenerate}
-          style={{
-            width: '100%',
-            marginTop: '12px',
-            padding: '10px',
-            borderRadius: '8px',
-            background: 'var(--green)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Generate
-        </button>
+        <div className="tu-fr-actions">
+          <button
+            className="tu-fr-action tu-fr-action--text"
+            onClick={handleGenerate}
+            title="Generate"
+          >
+            Generate
+          </button>
+        </div>
       </div>
     </div>
   );

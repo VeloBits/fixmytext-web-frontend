@@ -220,13 +220,9 @@ const AI_TOOL_DEFINITIONS = [
     errorMsg: 'Could not expand outline.',
     toolId: 'outline_to_draft',
   },
-  {
-    handlerName: 'handleContinueWriting',
-    endpoint: ENDPOINTS.CONTINUE_WRITING,
-    label: 'Continue Writing',
-    errorMsg: 'Could not continue writing.',
-    toolId: 'continue_writing',
-  },
+  // NOTE: handleContinueWriting is implemented manually below — it splits the
+  // input into paragraphs and continues each independently so a multi-paragraph
+  // input doesn't collapse to a single continuation of only the last paragraph.
   {
     handlerName: 'handleRewriteUnique',
     endpoint: ENDPOINTS.REWRITE_UNIQUE,
@@ -507,16 +503,53 @@ export default function useAiTools(
         return;
       }
       const original = text;
+
+      // Split into chunks separated by blank lines OR single newlines so
+      // multi-line input doesn't collapse into one transformed blob (e.g.
+      // Remove Redundancy on two sentences would otherwise return one merged
+      // sentence). Each chunk is sent to the backend independently and the
+      // results are rejoined preserving the original separator pattern.
+      // We tokenize the input by walking through it and recording each
+      // non-empty content run plus the separator that follows it.
+      const tokens = [];
+      const re = /([^\n]+)(\n+|$)/g;
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        tokens.push({ content: m[1], sep: m[2] });
+      }
+
       try {
-        const data = await transformText({ endpoint, text }).unwrap();
-        setAiResult({ label, result: data.result });
+        const results = await Promise.all(
+          tokens
+            .filter((t) => t.content.trim().length > 0)
+            .map((t) => transformText({ endpoint, text: t.content }).unwrap())
+        );
+
+        // Reassemble: for each original token, substitute the AI result if
+        // the token had content, then re-append its trailing separator.
+        let i = 0;
+        const combined = tokens
+          .map((t) => {
+            if (t.content.trim().length === 0) return t.content + t.sep;
+            const out = (results[i++]?.result ?? t.content).replace(/\n+$/, '');
+            return out + t.sep;
+          })
+          .join('')
+          .replace(/\n+$/, '');
+
+        setAiResult({ label, result: combined });
         setPreviewMode('result');
         if (pushHistory)
-          pushHistory(label, original, data.result, {
+          pushHistory(label, original, combined, {
             toolId: toolId || label.toLowerCase().replace(/\s+/g, '_'),
             toolType: 'ai',
           });
-        showAlert(`${label} generated`, 'success');
+        showAlert(
+          tokens.filter((t) => t.content.trim().length > 0).length === 1
+            ? `${label} generated`
+            : `${label} generated for ${results.length} lines`,
+          'success'
+        );
       } catch (err) {
         const { message, tone } = formatToolError(
           err,
@@ -544,6 +577,46 @@ export default function useAiTools(
   }, [callAi]);
 
   // ── Parameterized handlers (require extra state / custom logic) ──
+
+  /**
+   * Continue Writing splits multi-paragraph input on blank lines and continues
+   * each paragraph independently. Without this, the backend AI sees the whole
+   * input and only continues from the last paragraph, producing a single
+   * continuation block — the user sees output for the second paragraph only.
+   */
+  const handleContinueWriting = async () => {
+    if (!text) return;
+    if (!accessToken) {
+      showAlert('Please log in to use AI tools', 'warning');
+      return;
+    }
+    const original = text;
+    const paragraphs = text.split(/\n{2,}/).filter((p) => p.trim().length > 0);
+    try {
+      const results = await Promise.all(
+        paragraphs.map((para) =>
+          transformText({ endpoint: ENDPOINTS.CONTINUE_WRITING, text: para }).unwrap()
+        )
+      );
+      const combined = results.map((d) => d.result).join('\n\n');
+      setAiResult({ label: 'Continue Writing', result: combined });
+      setPreviewMode('result');
+      if (pushHistory)
+        pushHistory('Continue Writing', original, combined, {
+          toolId: 'continue_writing',
+          toolType: 'ai',
+        });
+      showAlert(
+        paragraphs.length === 1
+          ? 'Continue Writing generated'
+          : `Continued ${paragraphs.length} paragraphs`,
+        'success'
+      );
+    } catch (err) {
+      const { message, tone } = formatToolError(err, 'Could not continue writing.');
+      showAlert(message, tone);
+    }
+  };
 
   /** @param {string} [overrideVal] - Optional format value override. */
   const handleChangeFormat = async (overrideVal) => {
@@ -794,20 +867,21 @@ export default function useAiTools(
     if (!text) return;
     const original = text;
     const target = overrideVal ?? curlTarget;
-    try {
-      let result = text;
-      const urlMatch = text.match(/curl\s+(?:.*?\s+)?['"]?(https?:\/\/[^\s'"]+)/);
+
+    // Convert one curl command (already collapsed onto a single line).
+    const convertOne = (cmd) => {
+      const urlMatch = cmd.match(/curl\s+(?:.*?\s+)?['"]?(https?:\/\/[^\s'"]+)/);
       const url = urlMatch ? urlMatch[1] : 'https://api.example.com';
-      const methodMatch = text.match(/-X\s+(\w+)/);
+      const methodMatch = cmd.match(/-X\s+(\w+)/);
       const method = methodMatch ? methodMatch[1] : 'GET';
-      const headerMatches = [...text.matchAll(/-H\s+['"]([^'"]+)['"]/g)];
+      const headerMatches = [...cmd.matchAll(/-H\s+['"]([^'"]+)['"]/g)];
       const headers = Object.fromEntries(
         headerMatches
           .map((m) => m[1].split(': ').map((s) => s.trim()))
           .filter((p) => p.length === 2)
       );
       const dataMatch =
-        text.match(/-d\s+['"]([^'"]+)['"]/) || text.match(/--data\s+['"]([^'"]+)['"]/);
+        cmd.match(/-d\s+['"]([^'"]+)['"]/) || cmd.match(/--data\s+['"]([^'"]+)['"]/);
       const body = dataMatch ? dataMatch[1] : null;
 
       if (target === 'javascript') {
@@ -815,10 +889,11 @@ export default function useAiTools(
         if (Object.keys(headers).length)
           opts.push(`  headers: ${JSON.stringify(headers, null, 4).replace(/\n/g, '\n  ')}`);
         if (body) opts.push(`  body: '${body}'`);
-        result = `fetch('${url}', {\n${opts.join(
+        return `fetch('${url}', {\n${opts.join(
           ',\n'
         )}\n})\n  .then(res => res.json())\n  .then(data => console.log(data))`;
-      } else if (target === 'python') {
+      }
+      if (target === 'python') {
         const lines = [`import requests\n`];
         if (body)
           lines.push(
@@ -833,18 +908,41 @@ export default function useAiTools(
             )})`
           );
         lines.push(`print(response.json())`);
-        result = lines.join('\n');
-      } else if (target === 'go') {
-        result = `package main\n\nimport (\n  "fmt"\n  "net/http"\n  "io/ioutil"\n)\n\nfunc main() {\n  req, _ := http.NewRequest("${method}", "${url}", nil)\n  client := &http.Client{}\n  resp, _ := client.Do(req)\n  body, _ := ioutil.ReadAll(resp.Body)\n  fmt.Println(string(body))\n}`;
-      } else if (target === 'php') {
-        result = `<?php\n$ch = curl_init('${url}');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n$response = curl_exec($ch);\ncurl_close($ch);\necho $response;\n?>`;
+        return lines.join('\n');
       }
+      if (target === 'go') {
+        return `package main\n\nimport (\n  "fmt"\n  "net/http"\n  "io/ioutil"\n)\n\nfunc main() {\n  req, _ := http.NewRequest("${method}", "${url}", nil)\n  client := &http.Client{}\n  resp, _ := client.Do(req)\n  body, _ := ioutil.ReadAll(resp.Body)\n  fmt.Println(string(body))\n}`;
+      }
+      if (target === 'php') {
+        return `<?php\n$ch = curl_init('${url}');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n$response = curl_exec($ch);\ncurl_close($ch);\necho $response;\n?>`;
+      }
+      return cmd;
+    };
+
+    try {
+      // Collapse shell line continuations (`\` followed by newline) so a
+      // single multi-line curl reads as one command, then split on every
+      // remaining line that starts a new `curl` invocation.
+      const collapsed = text.replace(/\\\s*\n/g, ' ');
+      const commands = collapsed
+        .split(/\n+/)
+        .map((l) => l.trim())
+        .filter((l) => /^curl\b/.test(l));
+
+      const cmdsToRun = commands.length > 0 ? commands : [collapsed.trim()];
+      const result = cmdsToRun.map(convertOne).join('\n\n');
+
       const label = `cURL → ${target}`;
       setAiResult({ label, result });
       setPreviewMode('result');
       if (pushHistory)
         pushHistory(label, original, result, { toolId: 'curl_to_code', toolType: 'select' });
-      showAlert(`Converted to ${target}`, 'success');
+      showAlert(
+        cmdsToRun.length === 1
+          ? `Converted to ${target}`
+          : `Converted ${cmdsToRun.length} commands to ${target}`,
+        'success'
+      );
     } catch {
       showAlert('Could not convert cURL command.', 'danger');
     }
@@ -950,6 +1048,7 @@ export default function useAiTools(
     // Simple AI handlers (factory-generated)
     ...simpleHandlers,
     // Parameterized handlers
+    handleContinueWriting,
     handleChangeFormat,
     handleChangeTone,
     handleTranslate,

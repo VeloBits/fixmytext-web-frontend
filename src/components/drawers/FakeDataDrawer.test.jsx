@@ -13,9 +13,9 @@ describe('FakeDataDrawer', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the title for fake_data_set', () => {
+  it('renders the count label for fake_data_set', () => {
     render(<FakeDataDrawer {...baseProps} />);
-    expect(screen.getByText('Fake Data Set')).toBeInTheDocument();
+    expect(screen.getByText('Count')).toBeInTheDocument();
   });
 
   it('renders count options', () => {
@@ -35,7 +35,7 @@ describe('FakeDataDrawer', () => {
 
   it('does not show format options for fake_name', () => {
     render(<FakeDataDrawer {...baseProps} activeTool={{ id: 'fake_name', label: 'Fake Names' }} />);
-    expect(screen.getByText('Fake Names')).toBeInTheDocument();
+    expect(screen.queryByText('Format')).not.toBeInTheDocument();
     expect(screen.queryByText('TEXT')).not.toBeInTheDocument();
   });
 
@@ -102,6 +102,7 @@ describe('FakeDataDrawer', () => {
 
   it('handles null activeTool', () => {
     render(<FakeDataDrawer {...baseProps} activeTool={null} />);
-    expect(screen.getByText('Fake Data Set')).toBeInTheDocument();
+    expect(screen.getByText('Count')).toBeInTheDocument();
+    expect(screen.getByText('Format')).toBeInTheDocument();
   });
 });

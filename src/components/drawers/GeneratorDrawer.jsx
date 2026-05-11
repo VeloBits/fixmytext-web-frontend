@@ -30,89 +30,59 @@ export function RandomTextDrawer({
     { label: '100', val: 100 },
     { label: '500', val: 500 },
   ];
+  const handleClick = () => {
+    const result = handleGenerateText();
+    if (result && onResult) onResult(result);
+  };
   return (
-    <div className="tu-gen">
-      <div className="tu-gen-icon">
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 20h9" />
-          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-        </svg>
-      </div>
-      <h3 className="tu-gen-title">Random Text Generator</h3>
-      <p className="tu-gen-desc">Generate lorem ipsum placeholder text</p>
-
-      <div className="tu-gen-card">
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Type</label>
-          <div className="tu-gen-options">
-            {['words', 'sentences', 'paragraphs'].map((type) => (
-              <button
-                key={type}
-                className={`tu-gen-opt${textGenType === type ? ' tu-gen-opt--on' : ''}`}
-                onClick={() => setTextGenType(type)}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Count</label>
-          <div className="tu-gen-presets">
-            {presets.map((p) => (
-              <button
-                key={p.val}
-                className={`tu-gen-preset${textGenCount === p.val ? ' tu-gen-preset--on' : ''}`}
-                onClick={() => setTextGenCount(p.val)}
-              >
-                {p.label}
-              </button>
-            ))}
-            <input
-              type="number"
-              className="tu-gen-num"
-              min="1"
-              max="10000"
-              value={textGenCount}
-              onChange={(e) =>
-                setTextGenCount(Math.min(10000, Math.max(1, Number(e.target.value))))
-              }
-            />
-          </div>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Type</span>
+          {['words', 'sentences', 'paragraphs'].map((type) => (
+            <button
+              key={type}
+              className={`tu-fr-seg${textGenType === type ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setTextGenType(type)}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
         </div>
       </div>
-
-      <button
-        className="tu-gen-btn"
-        onClick={() => {
-          const result = handleGenerateText();
-          if (result && onResult) onResult(result);
-        }}
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polygon points="5 3 19 12 5 21 5 3" />
-        </svg>
-        Generate {textGenCount} {textGenType}
-      </button>
-      <p className="tu-gen-hint">Text will appear in the editor input area</p>
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Count</span>
+          {presets.map((p) => (
+            <button
+              key={p.val}
+              className={`tu-fr-seg${textGenCount === p.val ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setTextGenCount(p.val)}
+            >
+              {p.label}
+            </button>
+          ))}
+          <input
+            type="number"
+            className="tu-fr-num"
+            min="1"
+            max="10000"
+            value={textGenCount}
+            onChange={(e) =>
+              setTextGenCount(Math.min(10000, Math.max(1, Number(e.target.value))))
+            }
+          />
+        </div>
+        <div className="tu-fr-actions">
+          <button
+            className="tu-fr-action tu-fr-action--text"
+            onClick={handleClick}
+            title="Generate"
+          >
+            Generate
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -145,115 +115,85 @@ export function PasswordDrawer({
   const presetLengths = [8, 16, 24, 32, 48, 64];
 
   return (
-    <div className="tu-gen">
-      <div className="tu-gen-icon tu-gen-icon--amber">
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-      </div>
-      <h3 className="tu-gen-title">Password Generator</h3>
-      <p className="tu-gen-desc">Create strong, random passwords</p>
-
-      <div className="tu-gen-card">
-        {/* Length */}
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Length</label>
-          <div className="tu-gen-slider-wrap">
-            <input
-              type="range"
-              className="tu-gen-slider"
-              min="4"
-              max="128"
-              value={pwdLen}
-              onChange={(e) => setPwdLen(Number(e.target.value))}
-            />
-            <input
-              type="number"
-              className="tu-gen-num"
-              min="4"
-              max="128"
-              value={pwdLen}
-              onChange={(e) => setPwdLen(Math.min(128, Math.max(4, Number(e.target.value))))}
-            />
-          </div>
-          <div className="tu-gen-presets">
-            {presetLengths.map((n) => (
-              <button
-                key={n}
-                className={`tu-gen-preset${pwdLen === n ? ' tu-gen-preset--on' : ''}`}
-                onClick={() => setPwdLen(n)}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Character sets */}
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Include</label>
-          <div className="tu-gen-charsets">
-            {charsets.map(([k, lbl, tip, sz]) => (
-              <button
-                key={k}
-                className={`tu-gen-charset${pwdOpts[k] ? ' tu-gen-charset--on' : ''}`}
-                onClick={() => setPwdOpts((o) => ({ ...o, [k]: !o[k] }))}
-                title={tip}
-              >
-                <span className="tu-gen-charset-label">{lbl}</span>
-                <span className="tu-gen-charset-count">{sz} chars</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Strength meter */}
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Strength</label>
-          <div className="tu-gen-strength">
-            <div className="tu-gen-strength-bar">
-              <div
-                className="tu-gen-strength-fill"
-                style={{ width: `${strength.pct}%`, background: strength.color }}
-              />
-            </div>
-            <span className="tu-gen-strength-label" style={{ color: strength.color }}>
-              {strength.label}
-            </span>
-          </div>
-          <div className="tu-gen-stats">
-            <span>{entropy} bits entropy</span>
-            <span>{poolSize} char pool</span>
-          </div>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Length</span>
+          <input
+            type="range"
+            className="tu-fr-slider"
+            min="4"
+            max="128"
+            value={pwdLen}
+            onChange={(e) => setPwdLen(Number(e.target.value))}
+          />
+          <input
+            type="number"
+            className="tu-fr-num"
+            min="4"
+            max="128"
+            value={pwdLen}
+            onChange={(e) => setPwdLen(Math.min(128, Math.max(4, Number(e.target.value))))}
+          />
+          {presetLengths.map((n) => (
+            <button
+              key={n}
+              className={`tu-fr-seg${pwdLen === n ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setPwdLen(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
-
-      <button className="tu-gen-btn" onClick={handleGen}>
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Include</span>
+          {charsets.map(([k, lbl, tip]) => (
+            <button
+              key={k}
+              className={`tu-fr-seg${pwdOpts[k] ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setPwdOpts((o) => ({ ...o, [k]: !o[k] }))}
+              title={tip}
+            >
+              {lbl}
+            </button>
+          ))}
+        </div>
+        <div className="tu-fr-actions">
+          <button
+            className="tu-fr-action tu-fr-action--text"
+            onClick={handleGen}
+            title="Generate Password"
+          >
+            Generate
+          </button>
+        </div>
+      </div>
+      <div className="tu-fr-status">
+        <div
+          className="tu-fr-strength-bar"
+          style={{
+            background: 'var(--bg-2)',
+            height: '4px',
+            width: '80px',
+            borderRadius: '2px',
+            overflow: 'hidden',
+          }}
         >
-          <polygon points="5 3 19 12 5 21 5 3" />
-        </svg>
-        Generate Password
-      </button>
-      <p className="tu-gen-hint">Result appears in the output panel</p>
+          <div
+            style={{
+              width: `${strength.pct}%`,
+              height: '100%',
+              background: strength.color,
+              transition: 'width 0.2s',
+            }}
+          />
+        </div>
+        <span style={{ color: strength.color, fontWeight: 600 }}>{strength.label}</span>
+        <span>· {entropy} bits</span>
+        <span>· {poolSize} char pool</span>
+      </div>
     </div>
   );
 }

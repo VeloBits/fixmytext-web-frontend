@@ -14,10 +14,11 @@ describe('JsonPathDrawer', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the title and input', () => {
+  it('renders the input and query button', () => {
     render(<JsonPathDrawer {...props} />);
-    expect(screen.getByText('JSON Path Query')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('$.store.book[0].title')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title')
+    ).toBeInTheDocument();
     expect(screen.getByText('Query')).toBeInTheDocument();
   });
 
@@ -30,7 +31,7 @@ describe('JsonPathDrawer', () => {
   it('queries valid JSON with simple path', () => {
     const json = JSON.stringify({ name: 'Alice' });
     render(<JsonPathDrawer {...props} text={json} />);
-    fireEvent.change(screen.getByPlaceholderText('$.store.book[0].title'), {
+    fireEvent.change(screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title'), {
       target: { value: '$.name' },
     });
     fireEvent.click(screen.getByText('Query'));
@@ -47,7 +48,7 @@ describe('JsonPathDrawer', () => {
   it('handles path with no match', () => {
     const json = JSON.stringify({ a: 1 });
     render(<JsonPathDrawer {...props} text={json} />);
-    fireEvent.change(screen.getByPlaceholderText('$.store.book[0].title'), {
+    fireEvent.change(screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title'), {
       target: { value: '$.missing' },
     });
     fireEvent.click(screen.getByText('Query'));
@@ -57,7 +58,7 @@ describe('JsonPathDrawer', () => {
   it('handles array index in path', () => {
     const json = JSON.stringify({ items: ['a', 'b', 'c'] });
     render(<JsonPathDrawer {...props} text={json} />);
-    fireEvent.change(screen.getByPlaceholderText('$.store.book[0].title'), {
+    fireEvent.change(screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title'), {
       target: { value: '$.items[1]' },
     });
     fireEvent.click(screen.getByText('Query'));
@@ -67,7 +68,7 @@ describe('JsonPathDrawer', () => {
   it('handles wildcard * path', () => {
     const json = JSON.stringify({ a: 1, b: 2 });
     render(<JsonPathDrawer {...props} text={json} />);
-    fireEvent.change(screen.getByPlaceholderText('$.store.book[0].title'), {
+    fireEvent.change(screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title'), {
       target: { value: '$.*' },
     });
     fireEvent.click(screen.getByText('Query'));
@@ -77,7 +78,7 @@ describe('JsonPathDrawer', () => {
   it('handles root $ path', () => {
     const json = JSON.stringify({ a: 1 });
     render(<JsonPathDrawer {...props} text={json} />);
-    fireEvent.change(screen.getByPlaceholderText('$.store.book[0].title'), {
+    fireEvent.change(screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title'), {
       target: { value: '$' },
     });
     fireEvent.click(screen.getByText('Query'));
@@ -87,13 +88,13 @@ describe('JsonPathDrawer', () => {
 
 describe('MarkdownPreviewDrawer', () => {
   it('shows placeholder when text is empty', () => {
-    render(<MarkdownPreviewDrawer text="" />);
-    expect(screen.getByText('Markdown Preview')).toBeInTheDocument();
+    const { container } = render(<MarkdownPreviewDrawer text="" />);
+    expect(container.textContent).toMatch(/Enter Markdown/);
   });
 
-  it('renders markdown text', () => {
-    render(<MarkdownPreviewDrawer text="**bold text**" />);
-    expect(screen.getByText('Markdown Preview')).toBeInTheDocument();
+  it('renders bold markdown', () => {
+    const { container } = render(<MarkdownPreviewDrawer text="**bold text**" />);
+    expect(container.querySelector('strong')).toBeTruthy();
   });
 
   it('renders headings', () => {
@@ -109,9 +110,8 @@ describe('LoremIpsumDrawer', () => {
     vi.clearAllMocks();
   });
 
-  it('renders title and type/count options', () => {
+  it('renders type/count options', () => {
     render(<LoremIpsumDrawer {...props} />);
-    expect(screen.getByText('Lorem Ipsum Generator')).toBeInTheDocument();
     expect(screen.getByText('Words')).toBeInTheDocument();
     expect(screen.getByText('Sentences')).toBeInTheDocument();
     expect(screen.getByText('Paragraphs')).toBeInTheDocument();
@@ -159,9 +159,8 @@ describe('SampleJsonDrawer', () => {
     vi.clearAllMocks();
   });
 
-  it('renders title and template options', () => {
+  it('renders template options', () => {
     render(<SampleJsonDrawer {...props} />);
-    expect(screen.getByText('Sample JSON Generator')).toBeInTheDocument();
     expect(screen.getByText('user')).toBeInTheDocument();
     expect(screen.getByText('product')).toBeInTheDocument();
     expect(screen.getByText('order')).toBeInTheDocument();

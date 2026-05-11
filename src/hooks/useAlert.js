@@ -25,6 +25,20 @@ export function useAlert() {
 
   const showAlert = useCallback(
     (message, type = 'info', options = {}) => {
+      // FastAPI 422 responses set `detail` to an array of validation-error
+      // objects. Coerce anything non-string to a readable message so React
+      // never tries to render an object as a child.
+      if (typeof message !== 'string') {
+        if (Array.isArray(message)) {
+          message = message
+            .map((m) => (typeof m === 'string' ? m : m?.msg || JSON.stringify(m)))
+            .join('; ');
+        } else if (message && typeof message === 'object') {
+          message = message.msg || message.message || JSON.stringify(message);
+        } else {
+          message = String(message);
+        }
+      }
       const key = `${type}::${message}`;
 
       // Skip if an identical message+type is already visible

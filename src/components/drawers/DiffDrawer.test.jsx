@@ -15,26 +15,14 @@ function renderDiff(props = {}) {
 }
 
 describe('DiffDrawer', () => {
-  it('renders title for char_diff', () => {
+  it('renders the compare button', () => {
     renderDiff({ activeTool: { id: 'char_diff' } });
-    expect(screen.getByText('Character Diff')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Compare' })).toBeInTheDocument();
   });
 
-  it('renders title for word_diff', () => {
+  it('uses the tool name in the placeholder', () => {
     renderDiff({ activeTool: { id: 'word_diff' } });
-    expect(screen.getByText('Word Diff')).toBeInTheDocument();
-  });
-
-  it('renders title for similarity_pct', () => {
-    renderDiff({ activeTool: { id: 'similarity_pct' } });
-    expect(screen.getByText('Similarity Score')).toBeInTheDocument();
-  });
-
-  it('renders default title for unknown', () => {
-    renderDiff({ activeTool: { id: 'unknown' } });
-    // "Compare" appears both as title and button text, so use getAllByText
-    const elements = screen.getAllByText('Compare');
-    expect(elements.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByPlaceholderText(/Word Diff/)).toBeInTheDocument();
   });
 
   it('shows warning when text is empty', () => {
@@ -56,7 +44,7 @@ describe('DiffDrawer', () => {
     const showAlert = vi.fn();
     renderDiff({ activeTool: { id: 'char_diff' }, text: 'abc', onResult, showAlert });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'axc' },
     });
     fireEvent.click(screen.getByText('Compare'));
@@ -72,7 +60,7 @@ describe('DiffDrawer', () => {
     const onResult = vi.fn();
     renderDiff({ activeTool: { id: 'word_diff' }, text: 'hello world', onResult });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'hello earth' },
     });
     fireEvent.click(screen.getByText('Compare'));
@@ -84,7 +72,7 @@ describe('DiffDrawer', () => {
     const onResult = vi.fn();
     renderDiff({ activeTool: { id: 'similarity_pct' }, text: 'hello', onResult });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'hello' },
     });
     fireEvent.click(screen.getByText('Compare'));
@@ -96,7 +84,7 @@ describe('DiffDrawer', () => {
     const onResult = vi.fn();
     renderDiff({ activeTool: { id: 'json_diff' }, text: '{"a":1}', onResult });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: '{"a":2}' },
     });
     fireEvent.click(screen.getByText('Compare'));
@@ -108,7 +96,7 @@ describe('DiffDrawer', () => {
     const showAlert = vi.fn();
     renderDiff({ activeTool: { id: 'json_diff' }, text: 'not json', showAlert });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'also not json' },
     });
     fireEvent.click(screen.getByText('Compare'));
@@ -120,7 +108,7 @@ describe('DiffDrawer', () => {
     const onResult = vi.fn();
     renderDiff({ activeTool: { id: 'list_diff' }, text: 'apple\nbanana', onResult });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'banana\ncherry' },
     });
     fireEvent.click(screen.getByText('Compare'));
@@ -132,7 +120,7 @@ describe('DiffDrawer', () => {
     const onResult = vi.fn();
     renderDiff({ activeTool: { id: 'text_overlap' }, text: 'the quick brown fox jumps', onResult });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'the quick brown dog runs' },
     });
     fireEvent.click(screen.getByText('Compare'));
@@ -147,7 +135,7 @@ describe('DiffDrawer', () => {
     const showAlert = vi.fn();
     renderDiff({ activeTool: { id: 'nonexistent' }, text: 'a', showAlert });
 
-    fireEvent.change(screen.getByPlaceholderText('Paste the second text here...'), {
+    fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'b' },
     });
     // 'Compare' appears as both title and button — click the button specifically
@@ -158,11 +146,6 @@ describe('DiffDrawer', () => {
 
   it('renders textarea for text B', () => {
     renderDiff();
-    expect(screen.getByPlaceholderText('Paste the second text here...')).toBeInTheDocument();
-  });
-
-  it('renders label for text B', () => {
-    renderDiff();
-    expect(screen.getByText('Text B (compare against)')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Paste the second text/)).toBeInTheDocument();
   });
 });

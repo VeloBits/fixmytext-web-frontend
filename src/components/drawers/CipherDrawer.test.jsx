@@ -16,54 +16,31 @@ function renderCipher(props = {}) {
 }
 
 describe('CipherDrawer', () => {
-  it('renders title for vigenere_enc', () => {
-    renderCipher({ activeTool: { id: 'vigenere_enc' } });
-    expect(screen.getByText('Vigenere Encrypt')).toBeInTheDocument();
-  });
-
-  it('renders title for aes_encrypt', () => {
-    renderCipher({ activeTool: { id: 'aes_encrypt' } });
-    expect(screen.getByText('AES-256 Encrypt')).toBeInTheDocument();
-  });
-
-  it('renders title for substitution_cipher', () => {
-    renderCipher({ activeTool: { id: 'substitution_cipher' } });
-    expect(screen.getByText('Substitution Cipher')).toBeInTheDocument();
-  });
-
-  it('renders default title for unknown tool', () => {
-    renderCipher({ activeTool: { id: 'unknown' } });
-    expect(screen.getByText('Cipher')).toBeInTheDocument();
-  });
-
-  it('renders correct label for substitution cipher', () => {
-    renderCipher({ activeTool: { id: 'substitution_cipher' } });
-    expect(screen.getByText('Substitution Alphabet (26 chars A-Z)')).toBeInTheDocument();
-  });
-
-  it('renders correct label for aes tools', () => {
-    renderCipher({ activeTool: { id: 'aes_encrypt' } });
-    expect(screen.getByText('Passphrase')).toBeInTheDocument();
-  });
-
-  it('renders correct label for other ciphers', () => {
-    renderCipher({ activeTool: { id: 'vigenere_enc' } });
-    expect(screen.getByText('Key')).toBeInTheDocument();
-  });
-
   it('renders placeholder for substitution cipher', () => {
     renderCipher({ activeTool: { id: 'substitution_cipher' } });
-    expect(screen.getByPlaceholderText('ZYXWVUTSRQPONMLKJIHGFEDCBA')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Substitution alphabet \(26 chars A–Z\)/)
+    ).toBeInTheDocument();
   });
 
   it('renders placeholder for columnar transposition', () => {
     renderCipher({ activeTool: { id: 'columnar_transposition' } });
-    expect(screen.getByPlaceholderText('e.g., ZEBRAS')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Key, e.g. ZEBRAS')).toBeInTheDocument();
   });
 
   it('renders placeholder for aes', () => {
     renderCipher({ activeTool: { id: 'aes_decrypt' } });
-    expect(screen.getByPlaceholderText('Enter a passphrase...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter a secret key here')).toBeInTheDocument();
+  });
+
+  it('renders default placeholder for unknown tool', () => {
+    renderCipher({ activeTool: { id: 'unknown' } });
+    expect(screen.getByPlaceholderText('Key, e.g. SECRET')).toBeInTheDocument();
+  });
+
+  it('uses password input type for aes tools', () => {
+    renderCipher({ activeTool: { id: 'aes_encrypt' } });
+    expect(screen.getByPlaceholderText('Enter a secret key here')).toHaveAttribute('type', 'password');
   });
 
   it('shows warning when no text', () => {
@@ -82,7 +59,7 @@ describe('CipherDrawer', () => {
 
   it('updates key input', () => {
     renderCipher();
-    const input = screen.getByPlaceholderText('e.g., SECRET');
+    const input = screen.getByPlaceholderText('Key, e.g. SECRET');
     fireEvent.change(input, { target: { value: 'MYKEY' } });
     expect(input.value).toBe('MYKEY');
   });
@@ -102,7 +79,9 @@ describe('CipherDrawer', () => {
       transformText,
     });
 
-    fireEvent.change(screen.getByPlaceholderText('e.g., SECRET'), { target: { value: 'KEY' } });
+    fireEvent.change(screen.getByPlaceholderText('Key, e.g. SECRET'), {
+      target: { value: 'KEY' },
+    });
     fireEvent.click(screen.getByText('Apply'));
 
     await vi.waitFor(() => {
@@ -119,7 +98,9 @@ describe('CipherDrawer', () => {
 
     renderCipher({ activeTool: { id: 'vigenere_enc' }, text: 'Hello', showAlert, transformText });
 
-    fireEvent.change(screen.getByPlaceholderText('e.g., SECRET'), { target: { value: 'KEY' } });
+    fireEvent.change(screen.getByPlaceholderText('Key, e.g. SECRET'), {
+      target: { value: 'KEY' },
+    });
     fireEvent.click(screen.getByText('Apply'));
 
     await vi.waitFor(() => {
@@ -131,7 +112,9 @@ describe('CipherDrawer', () => {
     const showAlert = vi.fn();
     renderCipher({ activeTool: { id: 'unknown_tool' }, text: 'Hello', showAlert });
 
-    fireEvent.change(screen.getByPlaceholderText('e.g., SECRET'), { target: { value: 'KEY' } });
+    fireEvent.change(screen.getByPlaceholderText('Key, e.g. SECRET'), {
+      target: { value: 'KEY' },
+    });
     fireEvent.click(screen.getByText('Apply'));
 
     await vi.waitFor(() => {
@@ -141,6 +124,6 @@ describe('CipherDrawer', () => {
 
   it('handles no activeTool gracefully', () => {
     renderCipher({ activeTool: null });
-    expect(screen.getByText('Cipher')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Key, e.g. SECRET')).toBeInTheDocument();
   });
 });

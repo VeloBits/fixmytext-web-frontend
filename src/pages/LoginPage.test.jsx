@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LoginPage from './LoginPage';
+import { expectNoA11yViolations } from '../test/axeHelper';
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
@@ -131,5 +132,10 @@ describe('LoginPage', () => {
         'danger'
       );
     });
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<LoginPage showAlert={showAlert} />);
+    await expectNoA11yViolations(container);
   });
 });

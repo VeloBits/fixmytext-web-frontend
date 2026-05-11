@@ -167,45 +167,27 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }) {
   };
 
   return (
-    <div className="tu-gen">
-      <h3 className="tu-gen-title">{titles[toolId] || 'Compare'}</h3>
-      <div className="tu-gen-card">
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Text B (compare against)</label>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field">
           <textarea
+            className="tu-fr-input tu-fr-input--multiline"
             value={textB}
             onChange={(e) => setTextB(e.target.value)}
-            placeholder="Paste the second text here..."
-            rows={8}
-            style={{
-              width: '100%',
-              padding: '8px',
-              borderRadius: '6px',
-              border: '1px solid var(--border)',
-              background: 'var(--bg-2)',
-              color: 'var(--text-1)',
-              resize: 'vertical',
-              fontFamily: 'inherit',
-            }}
+            placeholder={`Paste the second text to ${titles[toolId] || 'compare'}…`}
+            rows={3}
+            spellCheck={false}
           />
         </div>
-        <button
-          className="tu-gen-btn"
-          onClick={handleCompare}
-          style={{
-            width: '100%',
-            marginTop: '12px',
-            padding: '10px',
-            borderRadius: '8px',
-            background: 'var(--purple)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Compare
-        </button>
+        <div className="tu-fr-actions">
+          <button
+            className="tu-fr-action tu-fr-action--text"
+            onClick={handleCompare}
+            title="Compare"
+          >
+            Compare
+          </button>
+        </div>
       </div>
     </div>
   );

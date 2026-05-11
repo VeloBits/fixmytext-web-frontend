@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransformTextMutation } from '../../store/api/textApi';
 import { useSelector } from 'react-redux';
@@ -45,30 +45,69 @@ import useClientTools from '../../hooks/useClientTools';
 import ToolPanel from './ToolPanel';
 import ToolIcon from './ToolIcon';
 import OutputPanel from './OutputPanel';
+import ParagraphGutter from './ParagraphGutter';
+
+// Same groups OutputPanel treats as prose-style (paragraph numbering, etc.).
+const PROSE_GROUPS = new Set(['ai_writing', 'ai_content', 'language', 'cleanup', 'case', 'lines']);
 import TabBar from './TabBar';
 import DrawerPanel from '../drawers/DrawerPanel';
-import FindReplaceDrawer from '../drawers/FindReplaceDrawer';
-import CompareOutput, { CompareInput } from '../drawers/CompareDrawer';
-import { RandomTextDrawer, PasswordDrawer } from '../drawers/GeneratorDrawer';
 import FmtConfigBar from './FmtConfigBar';
-import RegexDrawer from '../drawers/RegexDrawer';
-import {
-  WrapLinesDrawer,
-  FilterLinesDrawer,
-  TruncateLinesDrawer,
-  NthLineDrawer,
-} from '../drawers/LineToolsDrawer';
-import TemplatesDrawer from '../drawers/TemplatesDrawer';
-import HistoryDrawer from '../drawers/HistoryDrawer';
-import CipherDrawer from '../drawers/CipherDrawer';
-import DiffDrawer from '../drawers/DiffDrawer';
-import FakeDataDrawer from '../drawers/FakeDataDrawer';
-import {
-  JsonPathDrawer,
-  MarkdownPreviewDrawer,
-  LoremIpsumDrawer,
-  SampleJsonDrawer,
-} from '../drawers/DevToolsDrawer';
+
+// Drawers are lazy-loaded — each only renders when its panel/tab is active,
+// so pulling them out of the main bundle has no UX cost beyond a one-shot
+// chunk fetch the first time a user opens that particular drawer.
+//
+// Named exports use the .then(m => ({ default: m.X })) shim because
+// React.lazy only understands default exports.
+const FindReplaceDrawer = lazy(() => import('../drawers/FindReplaceDrawer'));
+const CompareOutput = lazy(() => import('../drawers/CompareDrawer'));
+const CompareInput = lazy(() =>
+  import('../drawers/CompareDrawer').then((m) => ({ default: m.CompareInput }))
+);
+const RandomTextDrawer = lazy(() =>
+  import('../drawers/GeneratorDrawer').then((m) => ({ default: m.RandomTextDrawer }))
+);
+const PasswordDrawer = lazy(() =>
+  import('../drawers/GeneratorDrawer').then((m) => ({ default: m.PasswordDrawer }))
+);
+const RegexDrawer = lazy(() => import('../drawers/RegexDrawer'));
+const WrapLinesDrawer = lazy(() =>
+  import('../drawers/LineToolsDrawer').then((m) => ({ default: m.WrapLinesDrawer }))
+);
+const FilterLinesDrawer = lazy(() =>
+  import('../drawers/LineToolsDrawer').then((m) => ({ default: m.FilterLinesDrawer }))
+);
+const TruncateLinesDrawer = lazy(() =>
+  import('../drawers/LineToolsDrawer').then((m) => ({ default: m.TruncateLinesDrawer }))
+);
+const NthLineDrawer = lazy(() =>
+  import('../drawers/LineToolsDrawer').then((m) => ({ default: m.NthLineDrawer }))
+);
+const TemplatesDrawer = lazy(() => import('../drawers/TemplatesDrawer'));
+const HistoryDrawer = lazy(() => import('../drawers/HistoryDrawer'));
+const CipherDrawer = lazy(() => import('../drawers/CipherDrawer'));
+const DiffDrawer = lazy(() => import('../drawers/DiffDrawer'));
+const FakeDataDrawer = lazy(() => import('../drawers/FakeDataDrawer'));
+const JsonPathDrawer = lazy(() =>
+  import('../drawers/DevToolsDrawer').then((m) => ({ default: m.JsonPathDrawer }))
+);
+const MarkdownPreviewDrawer = lazy(() =>
+  import('../drawers/DevToolsDrawer').then((m) => ({ default: m.MarkdownPreviewDrawer }))
+);
+const LoremIpsumDrawer = lazy(() =>
+  import('../drawers/DevToolsDrawer').then((m) => ({ default: m.LoremIpsumDrawer }))
+);
+const SampleJsonDrawer = lazy(() =>
+  import('../drawers/DevToolsDrawer').then((m) => ({ default: m.SampleJsonDrawer }))
+);
+
+// Tiny wrapper so each lazy drawer call site stays a single JSX expression.
+// fallback={null} keeps the drawer slot empty during the (typically <100ms)
+// chunk fetch — drawers are user-initiated, so a flash of empty space is
+// less jarring than a spinner that disappears almost immediately.
+function LazyDrawer({ children }) {
+  return <Suspense fallback={null}>{children}</Suspense>;
+}
 import SmartSuggestions from './SmartSuggestions';
 import BottomPanel from './BottomPanel';
 import CommandPalette from '../layout/CommandPalette';
@@ -240,6 +279,7 @@ export default function TextForm(props) {
   const [workspaceTabs, setWorkspaceTabs] = useState([]);
   const [activeWorkspaceId, setActiveWorkspaceId] = useState(null);
   const [toolResults, setToolResults] = useState({}); // keyed by tab ID, not tool ID
+  const [inputScrollTop, setInputScrollTop] = useState(0);
   const aiResultSourceRef = useRef(null); // tracks which toolId/panelId produced the current ai.aiResult
   const lastTextPerTab = useRef({}); // tracks last input text per tab for debounce
   const [, setSavedTabs] = useState({});
@@ -982,10 +1022,20 @@ export default function TextForm(props) {
     (tool) => {
       if (!tool) return;
       if (tool.type === 'drawer') {
-        const tabId = `drawer-${tool.panelId}`;
+        // Panels that host multiple distinct tools get a per-tool tab so each tool
+        // keeps its own state and shows up independently in the tab strip.
+        const PER_TOOL_PANELS = new Set(['cipherdrawer', 'diffdrawer', 'fakedata']);
+        const tabId = PER_TOOL_PANELS.has(tool.panelId)
+          ? `drawer-${tool.panelId}-${tool.id}`
+          : `drawer-${tool.panelId}`;
         let isNew = false;
         setWorkspaceTabs((tabs) => {
-          if (tabs.find((t) => t.id === tabId)) return tabs;
+          const existing = tabs.find((t) => t.id === tabId);
+          if (existing) {
+            return tabs.map((t) =>
+              t.id === tabId ? { ...t, label: tool.label, icon: tool.icon, tool } : t
+            );
+          }
           isNew = true;
           return [
             ...tabs,
@@ -995,6 +1045,7 @@ export default function TextForm(props) {
               icon: tool.icon,
               type: 'drawer',
               panelId: tool.panelId,
+              tool,
             },
           ];
         });
@@ -1268,6 +1319,8 @@ export default function TextForm(props) {
               }`}
               onClick={() => handleActivityClick(tab.id)}
               data-tooltip={tab.label}
+              aria-label={tab.label}
+              aria-pressed={activeTab === tab.id && sidebarOpen}
             >
               {ACTIVITY_ICONS[tab.id] || <span>{tab.icon}</span>}
             </button>
@@ -1279,6 +1332,8 @@ export default function TextForm(props) {
             }`}
             onClick={() => handleActivityClick('_new')}
             data-tooltip="What's New"
+            aria-label="What's New"
+            aria-pressed={activeTab === '_new' && sidebarOpen}
           >
             <svg
               width="22"
@@ -1302,6 +1357,8 @@ export default function TextForm(props) {
             }`}
             onClick={() => handleActivityClick('_favourites')}
             data-tooltip="Favourites"
+            aria-label="Favourites"
+            aria-pressed={activeTab === '_favourites' && sidebarOpen}
           >
             <svg
               width="22"
@@ -1324,6 +1381,8 @@ export default function TextForm(props) {
             }`}
             onClick={() => handleActivityClick('_templates')}
             data-tooltip="Templates"
+            aria-label="Templates"
+            aria-pressed={activeTab === '_templates' && sidebarOpen}
           >
             <svg
               width="22"
@@ -1349,6 +1408,8 @@ export default function TextForm(props) {
             }`}
             onClick={() => handleActivityClick('_history')}
             data-tooltip="History"
+            aria-label="History"
+            aria-pressed={activeTab === '_history' && sidebarOpen}
           >
             <svg
               width="22"
@@ -1487,8 +1548,10 @@ export default function TextForm(props) {
               activeToolId={(() => {
                 const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                 if (ws?.type === 'tool') return ws.tool.id;
-                if (ws?.type === 'drawer')
+                if (ws?.type === 'drawer') {
+                  if (ws.tool?.id) return ws.tool.id;
                   return TOOLS.find((t) => t.panelId === ws.panelId)?.id || null;
+                }
                 return null;
               })()}
               ai={ai}
@@ -2305,9 +2368,9 @@ export default function TextForm(props) {
                           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                         </svg>
                       </div>
-                      <h3 className="tu-landing-feature-title">
+                      <h2 className="tu-landing-feature-title">
                         {TOOLS.filter((t) => t.tabs?.includes('writing')).length}+ Writing Tools
-                      </h3>
+                      </h2>
                       <p className="tu-landing-feature-desc">
                         Grammar fixes, paraphrasing, tone adjustment, summarization, proofreading,
                         and more.
@@ -2329,7 +2392,7 @@ export default function TextForm(props) {
                           <polyline points="8 6 2 12 8 18" />
                         </svg>
                       </div>
-                      <h3 className="tu-landing-feature-title">Developer Friendly</h3>
+                      <h2 className="tu-landing-feature-title">Developer Friendly</h2>
                       <p className="tu-landing-feature-desc">
                         JSON formatting, Base64 encoding, regex testing, slug generation, and code
                         utilities.
@@ -2351,7 +2414,7 @@ export default function TextForm(props) {
                           <path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z" />
                         </svg>
                       </div>
-                      <h3 className="tu-landing-feature-title">AI-Powered</h3>
+                      <h2 className="tu-landing-feature-title">AI-Powered</h2>
                       <p className="tu-landing-feature-desc">
                         Translate, rewrite in any tone, ELI5, summarize — backed by state-of-the-art
                         AI models.
@@ -2375,7 +2438,7 @@ export default function TextForm(props) {
                           <path d="M21 13v2a4 4 0 0 1-4 4H3" />
                         </svg>
                       </div>
-                      <h3 className="tu-landing-feature-title">Instant Transforms</h3>
+                      <h2 className="tu-landing-feature-title">Instant Transforms</h2>
                       <p className="tu-landing-feature-desc">
                         UPPERCASE, lowercase, title case, reverse, sort lines, remove duplicates —
                         one click away.
@@ -2390,7 +2453,7 @@ export default function TextForm(props) {
                       <div className="tu-landing-how-step">
                         <span className="tu-landing-step-num">1</span>
                         <div>
-                          <h4 className="tu-landing-how-step-title">Pick a tool</h4>
+                          <h3 className="tu-landing-how-step-title">Pick a tool</h3>
                           <p className="tu-landing-how-step-desc">
                             Browse {TOOLS.length}+ tools by category or search with Ctrl+K
                           </p>
@@ -2399,7 +2462,7 @@ export default function TextForm(props) {
                       <div className="tu-landing-how-step">
                         <span className="tu-landing-step-num">2</span>
                         <div>
-                          <h4 className="tu-landing-how-step-title">Paste or type your text</h4>
+                          <h3 className="tu-landing-how-step-title">Paste or type your text</h3>
                           <p className="tu-landing-how-step-desc">
                             The split editor shows input on the left, output on the right
                           </p>
@@ -2408,9 +2471,9 @@ export default function TextForm(props) {
                       <div className="tu-landing-how-step">
                         <span className="tu-landing-step-num">3</span>
                         <div>
-                          <h4 className="tu-landing-how-step-title">
+                          <h3 className="tu-landing-how-step-title">
                             Click Run or press Ctrl+Enter
-                          </h4>
+                          </h3>
                           <p className="tu-landing-how-step-desc">
                             Your transformed text appears instantly. Copy, export, or chain more
                             tools
@@ -2518,62 +2581,7 @@ export default function TextForm(props) {
                       : ''
                   }`}
                 >
-                  {['password', 'randtext', 'fakedata', 'loremipsum', 'samplejson'].includes(
-                    workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId
-                  ) ? (
-                    <div className="tu-gen-fullpage">
-                      {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
-                      'password' ? (
-                        <PasswordDrawer
-                          {...generators}
-                          showAlert={showAlert}
-                          onResult={(pwd) => {
-                            aiResultSourceRef.current = 'password';
-                            ai.setAiResult({ label: 'Password', result: pwd });
-                            setPreviewMode('result');
-                          }}
-                        />
-                      ) : workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
-                        'fakedata' ? (
-                        <FakeDataDrawer
-                          activeTool={workspaceTabs.find((t) => t.id === activeWorkspaceId)?.tool}
-                          onResult={(label, result) => {
-                            ai.setAiResult({ label, result });
-                            setPreviewMode('result');
-                          }}
-                          showAlert={showAlert}
-                        />
-                      ) : workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
-                        'loremipsum' ? (
-                        <LoremIpsumDrawer
-                          onResult={(label, result) => {
-                            ai.setAiResult({ label, result });
-                            setPreviewMode('result');
-                          }}
-                          showAlert={showAlert}
-                        />
-                      ) : workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
-                        'samplejson' ? (
-                        <SampleJsonDrawer
-                          onResult={(label, result) => {
-                            ai.setAiResult({ label, result });
-                            setPreviewMode('result');
-                          }}
-                          showAlert={showAlert}
-                        />
-                      ) : (
-                        <RandomTextDrawer
-                          {...generators}
-                          onResult={(txt) => {
-                            aiResultSourceRef.current = 'randtext';
-                            ai.setAiResult({ label: 'Random Text', result: txt });
-                            setPreviewMode('result');
-                          }}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <>
+                  <>
                       <div className="tu-editor-topbar">
                         <span className="tu-editor-label" title="~/FixMyText/workspace/input.txt">
                           INPUT
@@ -2742,9 +2750,11 @@ export default function TextForm(props) {
                       {/* Find & Replace bar — shown inline below toolbar */}
                       {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
                         'find' && (
-                        <FindReplaceDrawer {...findReplace} disabled={disabled} text={text} />
+                        <LazyDrawer>
+                          <FindReplaceDrawer {...findReplace} disabled={disabled} text={text} />
+                        </LazyDrawer>
                       )}
-                      {(() => {
+                      <LazyDrawer>{(() => {
                         const panelId = workspaceTabs.find(
                           (t) => t.id === activeWorkspaceId
                         )?.panelId;
@@ -2882,10 +2892,66 @@ export default function TextForm(props) {
                             );
                           case 'mdpreview':
                             return <MarkdownPreviewDrawer text={text} />;
+                          case 'password':
+                            return (
+                              <PasswordDrawer
+                                {...generators}
+                                showAlert={showAlert}
+                                onResult={(pwd) => {
+                                  aiResultSourceRef.current = 'password';
+                                  ai.setAiResult({ label: 'Password', result: pwd });
+                                  setPreviewMode('result');
+                                }}
+                              />
+                            );
+                          case 'randtext':
+                            return (
+                              <RandomTextDrawer
+                                {...generators}
+                                onResult={(txt) => {
+                                  aiResultSourceRef.current = 'randtext';
+                                  ai.setAiResult({ label: 'Random Text', result: txt });
+                                  setPreviewMode('result');
+                                }}
+                              />
+                            );
+                          case 'fakedata':
+                            return (
+                              <FakeDataDrawer
+                                activeTool={
+                                  workspaceTabs.find((t) => t.id === activeWorkspaceId)?.tool
+                                }
+                                onResult={(label, result) => {
+                                  ai.setAiResult({ label, result });
+                                  setPreviewMode('result');
+                                }}
+                                showAlert={showAlert}
+                              />
+                            );
+                          case 'loremipsum':
+                            return (
+                              <LoremIpsumDrawer
+                                onResult={(label, result) => {
+                                  ai.setAiResult({ label, result });
+                                  setPreviewMode('result');
+                                }}
+                                showAlert={showAlert}
+                              />
+                            );
+                          case 'samplejson':
+                            return (
+                              <SampleJsonDrawer
+                                onResult={(label, result) => {
+                                  ai.setAiResult({ label, result });
+                                  setPreviewMode('result');
+                                }}
+                                showAlert={showAlert}
+                              />
+                            );
                           default:
                             return null;
                         }
-                      })()}
+                      })()}</LazyDrawer>
                       {/* Formatter config bar — shown inline for formatter tools */}
                       {(() => {
                         const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
@@ -2965,11 +3031,27 @@ export default function TextForm(props) {
                         );
                       })()}
                       <div className="tu-editor-body">
-                        <div className="tu-line-numbers" ref={gutterRef}>
-                          {(text || '\n').split('\n').map((_, i) => (
-                            <span key={i}>{i + 1}</span>
-                          ))}
-                        </div>
+                        {(() => {
+                          const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
+                          const isProse =
+                            ws?.type === 'tool' && PROSE_GROUPS.has(ws.tool?.group);
+                          if (isProse) {
+                            return (
+                              <ParagraphGutter
+                                textareaRef={textareaRef}
+                                text={text}
+                                scrollTop={inputScrollTop}
+                              />
+                            );
+                          }
+                          return (
+                            <div className="tu-line-numbers" ref={gutterRef}>
+                              {(text || '\n').split('\n').map((_, i) => (
+                                <span key={i}>{i + 1}</span>
+                              ))}
+                            </div>
+                          );
+                        })()}
                         <textarea
                           ref={textareaRef}
                           className="tu-textarea"
@@ -2990,6 +3072,7 @@ export default function TextForm(props) {
                             }
                           }}
                           onScroll={(e) => {
+                            setInputScrollTop(e.target.scrollTop);
                             if (gutterRef.current) gutterRef.current.scrollTop = e.target.scrollTop;
                           }}
                           placeholder="// Start typing or paste your text here..."
@@ -3008,14 +3091,15 @@ export default function TextForm(props) {
                       {/* Compare With input (shown below main input when compare tool is active) */}
                       {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
                         'compare' && (
-                        <CompareInput
-                          compareText={compare.compareText}
-                          setCompareText={compare.setCompareText}
-                          setDiffResult={compare.setDiffResult}
-                        />
+                        <LazyDrawer>
+                          <CompareInput
+                            compareText={compare.compareText}
+                            setCompareText={compare.setCompareText}
+                            setDiffResult={compare.setDiffResult}
+                          />
+                        </LazyDrawer>
                       )}
                     </>
-                  )}
                 </div>
 
                 {/* Split resize handle */}
@@ -3032,10 +3116,12 @@ export default function TextForm(props) {
                       // Compare renders diff output directly
                       if (ws.panelId === 'compare') {
                         return (
-                          <CompareOutput
-                            diffResult={compare.diffResult}
-                            compareText={compare.compareText}
-                          />
+                          <LazyDrawer>
+                            <CompareOutput
+                              diffResult={compare.diffResult}
+                              compareText={compare.compareText}
+                            />
+                          </LazyDrawer>
                         );
                       }
                       // These render inline in input area — fall through to OutputPanel
@@ -3066,7 +3152,7 @@ export default function TextForm(props) {
                             color={DRAWERS[ws.panelId].color}
                             onClose={() => closeWorkspaceTab(activeWorkspaceId)}
                           >
-                            {renderDrawerContent()}
+                            <LazyDrawer>{renderDrawerContent()}</LazyDrawer>
                           </DrawerPanel>
                         ) : null;
                       }

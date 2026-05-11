@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
 import Navbar from './Navbar';
+import { expectNoA11yViolations } from '../../test/axeHelper';
 
 function makeStore(accessToken = null) {
   return configureStore({
@@ -175,5 +176,10 @@ describe('Navbar', () => {
         expect(screen.queryByText('Home')).not.toBeInTheDocument();
       }
     }
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = renderNavbar();
+    await expectNoA11yViolations(container);
   });
 });
