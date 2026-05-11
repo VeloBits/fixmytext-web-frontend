@@ -70,10 +70,11 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "gen:types": "openapi-typescript ../backend/openapi.json -o src/types/openapi.d.ts",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.{js,jsx}": [
+    "*.{js,jsx,ts,tsx}": [
       "eslint --fix"
     ]
   }

@@ -25,6 +25,6 @@ export default defineConfig({
         statements: 67,
       },
     },
-    include: ['src/**/*.{test,spec}.{js,jsx}'],
+    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
   },
 });
