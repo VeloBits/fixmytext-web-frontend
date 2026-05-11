@@ -4,7 +4,7 @@
 
 ## Overview
 
-The frontend defines all 200+ tools as data objects in `src/constants/tools.js`. The UI renders tools dynamically from this array. Every new tool needs an entry here.
+The frontend defines all 254 tools as data objects in `src/constants/tools.js`. The UI renders tools dynamically from this array. Every new tool needs an entry here.
 
 | Tool Type | Files to Change |
 |-----------|----------------|
@@ -41,6 +41,8 @@ File: `src/constants/tools.js`
 Add your tool object in the appropriate group section:
 
 ```javascript
+import { ENDPOINTS } from '../constants/endpoints';
+
 {
   id: 'reverse_words',
   label: 'Reverse Words',
@@ -50,7 +52,7 @@ Add your tool object in the appropriate group section:
   group: 'lines',
   tabs: ['transform'],
   type: 'api',
-  endpoint: '/api/v1/text/reverse-words',
+  endpoint: ENDPOINTS.REVERSE_WORDS,   // use ENDPOINTS.* constant, not a bare string
   successMsg: 'Words reversed!',
   keywords: ['flip', 'invert', 'word', 'order']
 }
@@ -68,15 +70,23 @@ Add your tool object in the appropriate group section:
 | `group` | string | Category key, one of the 14 groups listed above |
 | `tabs` | string[] | Which tabs show this tool, usually `['transform']` |
 | `type` | string | Tool type: `api`, `ai`, `local`, `select`, `action`, `drawer` |
-| `endpoint` | string | Backend route path. Must exactly match the FastAPI route |
+| `endpoint` | string | Backend route path — use the matching `ENDPOINTS.*` constant from `src/constants/endpoints.js` rather than a bare string literal |
 | `successMsg` | string | Toast notification after successful transformation |
 | `keywords` | string[] | Extra search terms beyond label and description |
 
 ## Step 3: Verify Endpoint Match
 
-For `api` and `ai` tools, the `endpoint` field must exactly match the backend FastAPI route:
-- Your `endpoint`: `/api/v1/text/reverse-words`
-- Backend route: `@router.post("/reverse-words")` under the `/api/v1/text` prefix
+For `api` and `ai` tools, the `endpoint` field must exactly match the backend FastAPI route. Always reference the value via an `ENDPOINTS.*` constant from `src/constants/endpoints.js` — this is the canonical source of truth and makes renaming paths a single-file change:
+
+```javascript
+// Good
+endpoint: ENDPOINTS.REVERSE_WORDS     // resolves to '/api/v1/text/reverse-words'
+
+// Avoid
+endpoint: '/api/v1/text/reverse-words'  // bare string is fragile
+```
+
+The constant maps to the same path the backend registers under `@router.post("/reverse-words")` beneath the `/api/v1/text` prefix.
 
 If the backend endpoint doesn't exist yet, see the backend repo's `docs/adding-a-tool.md`.
 
