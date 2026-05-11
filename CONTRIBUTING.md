@@ -163,7 +163,7 @@ Open `src/constants/tools.js` and add a new object to the tools array:
 
 ### Step 2: Verify the Endpoint
 
-Make sure the `endpoint` value matches the backend route exactly. For example, if the backend registers the route as `/api/v1/text/reverse-words`, the frontend `endpoint` must be `'/api/v1/text/reverse-words'`.
+Make sure the `endpoint` value matches the backend route exactly. Use the appropriate constant from `src/constants/endpoints.js` (e.g., `ENDPOINTS.REVERSE_WORDS`) rather than a bare string literal — the `ENDPOINTS` object is the single source of truth for all API paths. If the backend registers the route as `/api/v1/text/reverse-words`, the corresponding constant resolves to that same path.
 
 ### Step 3: Test
 
