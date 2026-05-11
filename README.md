@@ -39,6 +39,10 @@ docker compose --profile dev up --build
 | `npm run dev` | Start dev server on port 3000 with HMR |
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Preview production build locally |
+| `npm run test` | Run unit tests (Vitest) |
+| `npm run test:e2e` | Run Playwright end-to-end tests |
+| `npm run test:e2e:install` | Install Playwright browser (Chromium) |
+| `npm run gen:types` | Regenerate TypeScript types from `backend/openapi.json` |
 
 ## Tech Stack
 
@@ -85,7 +89,7 @@ src/
 ├── hooks/                      # 24+ custom hooks (see reference below)
 │
 ├── constants/
-│   ├── tools.js                # All 200+ tool definitions
+│   ├── tools.js                # All 254 tool definitions
 │   ├── endpoints.js            # API endpoint path constants
 │   └── routes.js               # Frontend route constants
 │
