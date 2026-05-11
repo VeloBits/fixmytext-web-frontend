@@ -87,9 +87,9 @@ export interface SubscriptionContextValue {
   activeCredits: unknown[];
   totalCredits: number;
   hasPassFor: (toolId: string) => boolean;
-  handleBuyPass: (...args: unknown[]) => unknown;
-  handleBuyCredits: (...args: unknown[]) => unknown;
-  handleSpin: (...args: unknown[]) => unknown;
+  handleBuyPass: (passId: string, toolIds?: string[]) => Promise<void>;
+  handleBuyCredits: (packId: string) => Promise<void>;
+  handleSpin: () => Promise<void>;
   passOrderLoading: boolean;
   creditOrderLoading: boolean;
   spinLoading: boolean;
@@ -112,9 +112,10 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const { showAlert } = useAlertContext();
-  const { user, isAuthenticated } = useAuth();
-  const gamification = useGamification();
-  const subscription = useSubscription({ showAlert });
+  // useAuth, useGamification, useSubscription are JS hooks — cast to typed interfaces.
+  const { user, isAuthenticated } = useAuth() as { user: User | null; isAuthenticated: boolean };
+  const gamification = useGamification() as unknown as GamificationContextValue;
+  const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 
   const value = useMemo(
     () => ({ user, isAuthenticated, gamification, subscription }),

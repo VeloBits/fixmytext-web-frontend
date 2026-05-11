@@ -14,7 +14,8 @@ export interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const themeState = useTheme();
+  // useTheme is a JS hook; cast to the typed interface we enforce here.
+  const themeState = useTheme() as ThemeContextValue;
 
   return <ThemeContext.Provider value={themeState}>{children}</ThemeContext.Provider>;
 }

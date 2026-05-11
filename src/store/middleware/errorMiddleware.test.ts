@@ -1,7 +1,13 @@
 import { errorMiddleware } from './errorMiddleware';
+import type { MiddlewareAPI, Dispatch } from 'redux';
+
+// Minimal stub for the Redux MiddlewareAPI used in middleware tests.
+// The errorMiddleware does not use the api (dispatch/getState) — it only
+// uses `next` and `action`, so a no-op stub is sufficient.
+const noopApi = { dispatch: (() => {}) as Dispatch, getState: () => ({}) } satisfies MiddlewareAPI;
 
 describe('errorMiddleware', () => {
-  let next: ReturnType<typeof vi.fn>;
+  let next: (action: unknown) => unknown;
   let dispatchEventSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
@@ -13,31 +19,10 @@ describe('errorMiddleware', () => {
     dispatchEventSpy.mockRestore();
   });
 
-  function createRejectedAction({
-    queryType = 'query',
-    endpoint = 'someEndpoint',
-    payload = {},
-  }: {
-    queryType?: string;
-    endpoint?: string;
-    payload?: unknown;
-  } = {}) {
-    return {
-      type: 'api/executeQuery/rejected',
-      error: { message: 'Rejected' },
-      payload,
-      meta: {
-        arg: { type: queryType, endpointName: endpoint },
-        rejectedWithValue: true,
-        requestStatus: 'rejected',
-      },
-    };
-  }
-
   it('passes through non-rejected actions', () => {
     const action = { type: 'some/action', payload: 'data' };
-    const middleware = errorMiddleware()(next);
-    const result = middleware(action);
+    const middleware = errorMiddleware(noopApi)(next);
+    middleware(action);
     expect(next).toHaveBeenCalledWith(action);
     expect(dispatchEventSpy).not.toHaveBeenCalled();
   });
@@ -58,7 +43,7 @@ describe('errorMiddleware', () => {
         condition: false,
       },
     };
-    const middleware = errorMiddleware()(next);
+    const middleware = errorMiddleware(noopApi)(next);
     middleware(action);
     // Since isRejectedWithValue checks for specific shape, we need the right type
     expect(next).toHaveBeenCalledWith(action);
@@ -66,17 +51,15 @@ describe('errorMiddleware', () => {
 
   it('calls next for every action', () => {
     const action = { type: 'anything' };
-    const middleware = errorMiddleware()(next);
+    const middleware = errorMiddleware(noopApi)(next);
     middleware(action);
     expect(next).toHaveBeenCalledWith(action);
   });
 });
 
 // More detailed test with the actual isRejectedWithValue check
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
 describe('errorMiddleware with rejectedWithValue actions', () => {
-  let next: ReturnType<typeof vi.fn>;
+  let next: (action: unknown) => unknown;
   let dispatchEventSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
@@ -120,7 +103,7 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
       endpoint: 'login',
       payload: { status: 400, data: { detail: 'bad' } },
     });
-    const middleware = errorMiddleware()(next);
+    const middleware = errorMiddleware(noopApi)(next);
     middleware(action);
     expect(next).toHaveBeenCalledWith(action);
     expect(dispatchEventSpy).not.toHaveBeenCalled();
@@ -142,7 +125,7 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
         endpoint: ep,
         payload: { status: 401 },
       });
-      const middleware = errorMiddleware()(next);
+      const middleware = errorMiddleware(noopApi)(next);
       middleware(action);
       expect(dispatchEventSpy).not.toHaveBeenCalled();
     }
@@ -154,7 +137,7 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
       endpoint: 'getSubscriptionStatus',
       payload: { status: 500, data: { detail: 'Server broke' } },
     });
-    const middleware = errorMiddleware()(next);
+    const middleware = errorMiddleware(noopApi)(next);
     middleware(action);
     expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
     const event = dispatchEventSpy.mock.calls[0][0];
@@ -172,7 +155,7 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
       endpoint: 'getPassCatalog',
       payload: { status: 500, data: { detail: { errors: ['a'] } } },
     });
-    const middleware = errorMiddleware()(next);
+    const middleware = errorMiddleware(noopApi)(next);
     middleware(action);
     const event = dispatchEventSpy.mock.calls[0][0];
     expect((event as CustomEvent).detail.message).toBe('Something went wrong. Please try again.');
@@ -184,7 +167,7 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
       endpoint: 'getPassCatalog',
       payload: { status: 500 },
     });
-    const middleware = errorMiddleware()(next);
+    const middleware = errorMiddleware(noopApi)(next);
     middleware(action);
     const event = dispatchEventSpy.mock.calls[0][0];
     expect((event as CustomEvent).detail.message).toBe('Something went wrong. Please try again.');
