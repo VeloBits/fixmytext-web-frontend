@@ -1,7 +1,17 @@
+import type { Mock } from 'vitest';
 import { openRazorpayCheckout, executeCheckoutFlow } from './razorpay';
+import type { RazorpayOptions, RazorpayConstructor, RazorpayPaymentResponse } from './razorpay';
+
+// Helper to extract the options passed to the Razorpay constructor mock.
+// vi.fn() mock.calls is typed as [] when no generics provided; cast is safe here.
+function getRazorpayOpts(mock: Mock): RazorpayOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (mock.mock as any).calls[0][0] as RazorpayOptions;
+}
 
 describe('openRazorpayCheckout', () => {
-  let onSuccess, onFailure;
+  let onSuccess: Mock<(response: RazorpayPaymentResponse) => void>;
+  let onFailure: Mock<(msg: string) => void>;
 
   beforeEach(() => {
     onSuccess = vi.fn();
@@ -9,7 +19,8 @@ describe('openRazorpayCheckout', () => {
   });
 
   afterEach(() => {
-    delete window.Razorpay;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).Razorpay = undefined;
   });
 
   it('calls onFailure when Razorpay is not loaded', () => {
@@ -25,7 +36,7 @@ describe('openRazorpayCheckout', () => {
   it('creates Razorpay instance and calls open', () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
-    window.Razorpay = RazorpayMock;
+    window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     openRazorpayCheckout({
       orderId: 'order_123',
@@ -42,7 +53,7 @@ describe('openRazorpayCheckout', () => {
     expect(RazorpayMock).toHaveBeenCalledTimes(1);
     expect(openMock).toHaveBeenCalledTimes(1);
 
-    const opts = RazorpayMock.mock.calls[0][0];
+    const opts = getRazorpayOpts(RazorpayMock);
     expect(opts.key).toBe('key_test');
     expect(opts.amount).toBe(1000);
     expect(opts.currency).toBe('INR');
@@ -54,7 +65,7 @@ describe('openRazorpayCheckout', () => {
   it('calls onSuccess via handler', () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
-    window.Razorpay = RazorpayMock;
+    window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     openRazorpayCheckout({
       orderId: 'o',
@@ -65,8 +76,8 @@ describe('openRazorpayCheckout', () => {
       onFailure,
     });
 
-    const opts = RazorpayMock.mock.calls[0][0];
-    const response = { razorpay_payment_id: 'pay_1' };
+    const opts = getRazorpayOpts(RazorpayMock);
+    const response = { razorpay_payment_id: 'pay_1' } as RazorpayPaymentResponse;
     opts.handler(response);
     expect(onSuccess).toHaveBeenCalledWith(response);
   });
@@ -74,7 +85,7 @@ describe('openRazorpayCheckout', () => {
   it('calls onFailure on modal dismiss', () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
-    window.Razorpay = RazorpayMock;
+    window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     openRazorpayCheckout({
       orderId: 'o',
@@ -85,7 +96,7 @@ describe('openRazorpayCheckout', () => {
       onFailure,
     });
 
-    const opts = RazorpayMock.mock.calls[0][0];
+    const opts = getRazorpayOpts(RazorpayMock);
     opts.modal.ondismiss();
     expect(onFailure).toHaveBeenCalledWith('Payment cancelled');
   });
@@ -93,7 +104,7 @@ describe('openRazorpayCheckout', () => {
   it('uses default description when not provided', () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
-    window.Razorpay = RazorpayMock;
+    window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     openRazorpayCheckout({
       orderId: 'o',
@@ -104,13 +115,20 @@ describe('openRazorpayCheckout', () => {
       onFailure,
     });
 
-    const opts = RazorpayMock.mock.calls[0][0];
+    const opts = getRazorpayOpts(RazorpayMock);
     expect(opts.description).toBe('Pass / Credits Purchase');
   });
 });
 
 describe('executeCheckoutFlow', () => {
-  let createOrder, openCheckout, verifyPayment, showAlert, navigate;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let createOrder: Mock<() => Promise<any>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let openCheckout: Mock<(params: any) => void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let verifyPayment: Mock<(r: any) => Promise<unknown>>;
+  let showAlert: Mock<(msg: string, variant: string) => void>;
+  let navigate: Mock<(path: string) => void>;
 
   beforeEach(() => {
     createOrder = vi.fn();
@@ -136,7 +154,8 @@ describe('executeCheckoutFlow', () => {
 
     expect(createOrder).toHaveBeenCalled();
     expect(openCheckout).toHaveBeenCalledTimes(1);
-    const callArgs = openCheckout.mock.calls[0][0];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
     expect(callArgs.orderId).toBe('o1');
     expect(callArgs.amount).toBe(500);
     expect(typeof callArgs.onSuccess).toBe('function');
@@ -157,7 +176,8 @@ describe('executeCheckoutFlow', () => {
       navigate,
     });
 
-    const callArgs = openCheckout.mock.calls[0][0];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
     await callArgs.onSuccess({ razorpay_payment_id: 'pay_1' });
     expect(verifyPayment).toHaveBeenCalledWith({ razorpay_payment_id: 'pay_1' });
     expect(navigate).toHaveBeenCalledWith('/success');
@@ -177,7 +197,8 @@ describe('executeCheckoutFlow', () => {
       navigate,
     });
 
-    const callArgs = openCheckout.mock.calls[0][0];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
     await callArgs.onSuccess({ razorpay_payment_id: 'pay_1' });
     expect(navigate).toHaveBeenCalledWith('/fail');
   });
@@ -195,7 +216,8 @@ describe('executeCheckoutFlow', () => {
       navigate,
     });
 
-    const callArgs = openCheckout.mock.calls[0][0];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
     callArgs.onFailure('Payment cancelled');
     expect(showAlert).toHaveBeenCalledWith('Payment cancelled', 'info');
   });
@@ -213,7 +235,8 @@ describe('executeCheckoutFlow', () => {
       navigate,
     });
 
-    const callArgs = openCheckout.mock.calls[0][0];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
     callArgs.onFailure('');
     expect(showAlert).toHaveBeenCalledWith('Payment cancelled', 'info');
   });
