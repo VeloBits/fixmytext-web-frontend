@@ -202,10 +202,10 @@ describe('useClientTools', () => {
       const result = updater({});
       const output = result['ws-1'];
 
-      expect(output).toContain('Letter Frequency Analysis (5 letters)');
-      expect(output).toContain('A: 2');
-      expect(output).toContain('B: 2');
-      expect(output).toContain('C: 1');
+      expect(output).toContain('Total letters: 5');
+      expect(output).toMatch(/A\s+2/);
+      expect(output).toMatch(/B\s+2/);
+      expect(output).toMatch(/C\s+1/);
       expect(showAlert).toHaveBeenCalledWith('Frequency analysis complete', 'success');
     });
   });

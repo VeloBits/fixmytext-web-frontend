@@ -118,6 +118,7 @@ function renderPricing(props = {}, catalogOverride) {
 }
 
 import PricingPage from './PricingPage';
+import { expectNoA11yViolations } from '../test/axeHelper';
 
 describe('PricingPage', () => {
   beforeEach(() => {
@@ -397,31 +398,20 @@ describe('PricingPage', () => {
     });
   });
 
-  it('handles keyboard Enter on pass card to open detail', () => {
+  it('opens pass detail when the Details button is activated', () => {
     renderPricing();
-    const passCard = screen.getByLabelText(/View 1-Day Single details/i);
-    fireEvent.keyDown(passCard, { key: 'Enter' });
+    // Each card exposes a real <button aria-label="View X details">Details</button>;
+    // browsers fire click on Enter/Space natively, so a single click() covers
+    // both keyboard and mouse activation paths.
+    const detailsBtn = screen.getByRole('button', { name: /View 1-Day Single details/i });
+    fireEvent.click(detailsBtn);
     expect(screen.getByText("What's included")).toBeInTheDocument();
   });
 
-  it('handles keyboard Space on pass card to open detail', () => {
+  it('opens credit detail when the Details button is activated', () => {
     renderPricing();
-    const passCard = screen.getByLabelText(/View 1-Day Single details/i);
-    fireEvent.keyDown(passCard, { key: ' ' });
-    expect(screen.getByText("What's included")).toBeInTheDocument();
-  });
-
-  it('handles keyboard Enter on credit card to open detail', () => {
-    renderPricing();
-    const creditCard = screen.getByLabelText(/View 5 Credits details/i);
-    fireEvent.keyDown(creditCard, { key: 'Enter' });
-    expect(screen.getAllByText('5 Credits').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('handles keyboard Space on credit card to open detail', () => {
-    renderPricing();
-    const creditCard = screen.getByLabelText(/View 5 Credits details/i);
-    fireEvent.keyDown(creditCard, { key: ' ' });
+    const detailsBtn = screen.getByRole('button', { name: /View 5 Credits details/i });
+    fireEvent.click(detailsBtn);
     expect(screen.getAllByText('5 Credits').length).toBeGreaterThanOrEqual(1);
   });
 
@@ -460,5 +450,10 @@ describe('PricingPage', () => {
   it('shows uses per day chip', () => {
     renderPricing();
     expect(screen.getAllByText('20 uses/day').length).toBeGreaterThan(0);
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = renderPricing();
+    await expectNoA11yViolations(container);
   });
 });

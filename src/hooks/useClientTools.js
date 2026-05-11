@@ -19,16 +19,22 @@ export default function useClientTools({
         if (/[A-Z]/.test(ch)) freq[ch] = (freq[ch] || 0) + 1;
       }
       const total = Object.values(freq).reduce((a, b) => a + b, 0);
+      if (total === 0) {
+        showAlert('No letters found to analyze', 'warning');
+        return;
+      }
       const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+      const BAR_WIDTH = 20;
+      const countWidth = String(sorted[0][1]).length;
       const lines = sorted.map(([ch, count]) => {
-        const pct = ((count / total) * 100).toFixed(1);
-        const bar = '\u2588'.repeat(Math.round(pct / 2));
-        return `${ch}: ${count} (${pct}%) ${bar}`;
+        const pct = (count / total) * 100;
+        const filled = Math.round((pct / 100) * BAR_WIDTH);
+        const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(BAR_WIDTH - filled);
+        return `${ch}  ${String(count).padStart(countWidth)}  ${bar}  ${pct.toFixed(1).padStart(5)}%`;
       });
-      const result = `Letter Frequency Analysis (${total} letters)\n${'\u2500'.repeat(
-        40
-      )}\n${lines.join('\n')}`;
+      const result = `Total letters: ${total}\n\n${lines.join('\n')}`;
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Frequency Analysis', result });
       setPreviewMode('result');
       showAlert('Frequency analysis complete', 'success');
     };
@@ -41,6 +47,7 @@ export default function useClientTools({
         const m = await import('sql-formatter');
         const result = m.format(t);
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('SQL formatted', 'success');
       } catch {
@@ -52,14 +59,15 @@ export default function useClientTools({
 
     const handleFormatXml = () => {
       const t = textRef.current;
-      if (!t) return;
+      if (!t || !t.trim()) return;
       try {
+        // XML is parsed as a single document; pretty-printed input legitimately
+        // spans many lines. Splitting per line would reject multi-line XML.
         const parser = new DOMParser();
         const doc = parser.parseFromString(t, 'text/xml');
-        const errorNode = doc.querySelector('parsererror');
-        if (errorNode) throw new Error('Invalid XML');
+        if (doc.querySelector('parsererror')) throw new Error('Invalid XML');
         const serializer = new XMLSerializer();
-        let xml = serializer.serializeToString(doc);
+        const xml = serializer.serializeToString(doc);
         let formatted = '',
           indent = 0;
         xml.split(/>\s*</).forEach((node) => {
@@ -67,8 +75,11 @@ export default function useClientTools({
           formatted += '  '.repeat(Math.max(indent, 0)) + '<' + node + '>\n';
           if (node.match(/^<?\w[^>]*[^/]$/) && !node.startsWith('?')) indent++;
         });
-        formatted = formatted.replace(/^</, '').replace(/>$/, '');
-        setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: formatted }));
+        // Trim the trailing newline first, then strip the leading `<` and the
+        // duplicated trailing `>` left over from re-wrapping the last chunk.
+        const result = formatted.replace(/\n$/, '').replace(/^</, '').replace(/>$/, '');
+        setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+        setAiResult({ label: 'XML Format', result });
         setPreviewMode('result');
         showAlert('XML formatted', 'success');
       } catch {
@@ -82,6 +93,7 @@ export default function useClientTools({
       try {
         const result = JSON.stringify(JSON.parse(t));
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('JSON minified', 'success');
       } catch {
@@ -113,6 +125,7 @@ export default function useClientTools({
         };
         const result = inferType(obj);
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('TypeScript interface generated', 'success');
       } catch {
@@ -123,75 +136,122 @@ export default function useClientTools({
     const handleUuidGen = () => {
       const uuids = Array.from({ length: 5 }, () => crypto.randomUUID()).join('\n');
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: uuids }));
+      setAiResult({ label: 'Result', result: uuids });
       setPreviewMode('result');
       showAlert('UUIDs generated', 'success');
     };
 
     const handleTimestampConvert = () => {
-      const t = (textRef.current || '').trim();
-      if (!t) return;
-      let date;
-      if (/^\d{10,13}$/.test(t)) {
-        const ts = t.length === 10 ? parseInt(t) * 1000 : parseInt(t);
-        date = new Date(ts);
-      } else {
-        date = new Date(t);
-      }
-      if (isNaN(date.getTime())) {
+      const raw = textRef.current || '';
+      if (!raw.trim()) return;
+
+      const convertOne = (input) => {
+        let date;
+        if (/^now$/i.test(input)) {
+          date = new Date();
+        } else if (/^\d{10,13}$/.test(input)) {
+          const ts = input.length === 10 ? parseInt(input) * 1000 : parseInt(input);
+          date = new Date(ts);
+        } else {
+          date = new Date(input);
+        }
+        if (isNaN(date.getTime())) return null;
+        return `Unix (s):  ${Math.floor(
+          date.getTime() / 1000
+        )}\nUnix (ms): ${date.getTime()}\nISO 8601:  ${date.toISOString()}\nUTC:       ${date.toUTCString()}\nLocal:     ${date.toLocaleString()}`;
+      };
+
+      const inputs = raw
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
+      const blocks = inputs.map((input) => {
+        const out = convertOne(input);
+        return out || `(invalid — could not parse "${input}")`;
+      });
+      const validCount = inputs.filter((input) => convertOne(input) !== null).length;
+      if (validCount === 0) {
         showAlert('Could not parse date/timestamp', 'danger');
         return;
       }
-      const result = `Unix (s):  ${Math.floor(
-        date.getTime() / 1000
-      )}\nUnix (ms): ${date.getTime()}\nISO 8601:  ${date.toISOString()}\nUTC:       ${date.toUTCString()}\nLocal:     ${date.toLocaleString()}`;
+      const result = blocks.join('\n\n');
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Timestamp Converter', result });
       setPreviewMode('result');
-      showAlert('Timestamp converted', 'success');
+      showAlert(
+        inputs.length === 1
+          ? 'Timestamp converted'
+          : `Converted ${validCount}/${inputs.length} timestamps`,
+        'success'
+      );
     };
 
     const handleColorConvert = () => {
-      const t = (textRef.current || '').trim();
-      if (!t) return;
-      let r, g, b;
-      const hexMatch = t.match(/^#?([0-9a-fA-F]{6})$/);
-      const rgbMatch = t.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-      if (hexMatch) {
-        const hex = hexMatch[1];
-        r = parseInt(hex.slice(0, 2), 16);
-        g = parseInt(hex.slice(2, 4), 16);
-        b = parseInt(hex.slice(4, 6), 16);
-      } else if (rgbMatch) {
-        r = parseInt(rgbMatch[1]);
-        g = parseInt(rgbMatch[2]);
-        b = parseInt(rgbMatch[3]);
-      } else {
+      const raw = textRef.current || '';
+      if (!raw.trim()) return;
+
+      const convertOne = (input) => {
+        let r, g, b;
+        const hexMatch = input.match(/^#?([0-9a-fA-F]{6})$/);
+        const rgbMatch = input.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+        if (hexMatch) {
+          const hex = hexMatch[1];
+          r = parseInt(hex.slice(0, 2), 16);
+          g = parseInt(hex.slice(2, 4), 16);
+          b = parseInt(hex.slice(4, 6), 16);
+        } else if (rgbMatch) {
+          r = parseInt(rgbMatch[1]);
+          g = parseInt(rgbMatch[2]);
+          b = parseInt(rgbMatch[3]);
+        } else {
+          return null;
+        }
+        const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b
+          .toString(16)
+          .padStart(2, '0')}`.toUpperCase();
+        const rn = r / 255,
+          gn = g / 255,
+          bn = b / 255;
+        const max = Math.max(rn, gn, bn),
+          min = Math.min(rn, gn, bn);
+        const l = (max + min) / 2;
+        let h = 0,
+          s = 0;
+        if (max !== min) {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6;
+          else if (max === gn) h = ((bn - rn) / d + 2) / 6;
+          else h = ((rn - gn) / d + 4) / 6;
+        }
+        return `HEX: ${hex}\nRGB: rgb(${r}, ${g}, ${b})\nHSL: hsl(${Math.round(
+          h * 360
+        )}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+      };
+
+      const inputs = raw
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+      const blocks = inputs.map((input) => {
+        const out = convertOne(input);
+        return out || '(invalid — expected HEX or RGB)';
+      });
+      const valid = blocks.filter((_, i) => convertOne(inputs[i]) !== null).length;
+      if (valid === 0) {
         showAlert('Enter a HEX (#FF5733) or RGB (rgb(255,87,51)) color', 'danger');
         return;
       }
-      const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b
-        .toString(16)
-        .padStart(2, '0')}`.toUpperCase();
-      const rn = r / 255,
-        gn = g / 255,
-        bn = b / 255;
-      const max = Math.max(rn, gn, bn),
-        min = Math.min(rn, gn, bn);
-      const l = (max + min) / 2;
-      let h = 0,
-        s = 0;
-      if (max !== min) {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6;
-        else if (max === gn) h = ((bn - rn) / d + 2) / 6;
-        else h = ((rn - gn) / d + 4) / 6;
-      }
-      const result = `HEX: ${hex}\nRGB: rgb(${r}, ${g}, ${b})\nHSL: hsl(${Math.round(
-        h * 360
-      )}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+      const result = blocks.join('\n\n');
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Color Converter', result });
       setPreviewMode('result');
-      showAlert('Color converted', 'success');
+      showAlert(
+        inputs.length === 1
+          ? 'Color converted'
+          : `Converted ${valid}/${inputs.length} colors`,
+        'success'
+      );
     };
 
     const handleUlidGen = () => {
@@ -204,55 +264,77 @@ export default function useClientTools({
         return t + r;
       }).join('\n');
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('ULIDs generated', 'success');
     };
 
     const handleCronExplain = () => {
-      const t = (textRef.current || '').trim();
-      if (!t) return;
-      const parts = t.split(/\s+/);
-      if (parts.length < 5 || parts.length > 6) {
+      const raw = textRef.current || '';
+      if (!raw.trim()) return;
+
+      const explainOne = (expr) => {
+        const parts = expr.split(/\s+/);
+        if (parts.length < 5 || parts.length > 6) return null;
+        const [min, hour, dom, month, dow] = parts;
+        const descs = [];
+        if (min === '*') descs.push('every minute');
+        else if (min.includes('/')) descs.push(`every ${min.split('/')[1]} minutes`);
+        else descs.push(`at minute ${min}`);
+        if (hour === '*') descs.push('of every hour');
+        else if (hour.includes('-')) descs.push(`during hours ${hour.replace('-', ' through ')}`);
+        else descs.push(`at ${hour}:00`);
+        if (dom !== '*') descs.push(`on day ${dom} of the month`);
+        if (month !== '*') descs.push(`in month ${month}`);
+        if (dow !== '*') {
+          const days = {
+            0: 'Sunday',
+            1: 'Monday',
+            2: 'Tuesday',
+            3: 'Wednesday',
+            4: 'Thursday',
+            5: 'Friday',
+            6: 'Saturday',
+            7: 'Sunday',
+          };
+          const dayStr = dow
+            .split(',')
+            .map((d) => {
+              if (d.includes('-')) {
+                const [s, e] = d.split('-');
+                return `${days[s] || s} through ${days[e] || e}`;
+              }
+              return days[d] || d;
+            })
+            .join(', ');
+          descs.push(`on ${dayStr}`);
+        }
+        return `${descs.join(', ')}.`;
+      };
+
+      const inputs = raw
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
+      const blocks = inputs.map((expr) => {
+        const out = explainOne(expr);
+        return out || '(invalid — expected 5 or 6 space-separated fields)';
+      });
+      const validCount = inputs.filter((expr) => explainOne(expr) !== null).length;
+      if (validCount === 0) {
         showAlert('Enter a valid cron expression (5 or 6 fields)', 'danger');
         return;
       }
-      const [min, hour, dom, month, dow] = parts;
-      const descs = [];
-      if (min === '*') descs.push('every minute');
-      else if (min.includes('/')) descs.push(`every ${min.split('/')[1]} minutes`);
-      else descs.push(`at minute ${min}`);
-      if (hour === '*') descs.push('of every hour');
-      else if (hour.includes('-')) descs.push(`during hours ${hour.replace('-', ' through ')}`);
-      else descs.push(`at ${hour}:00`);
-      if (dom !== '*') descs.push(`on day ${dom} of the month`);
-      if (month !== '*') descs.push(`in month ${month}`);
-      if (dow !== '*') {
-        const days = {
-          0: 'Sunday',
-          1: 'Monday',
-          2: 'Tuesday',
-          3: 'Wednesday',
-          4: 'Thursday',
-          5: 'Friday',
-          6: 'Saturday',
-          7: 'Sunday',
-        };
-        const dayStr = dow
-          .split(',')
-          .map((d) => {
-            if (d.includes('-')) {
-              const [s, e] = d.split('-');
-              return `${days[s] || s} through ${days[e] || e}`;
-            }
-            return days[d] || d;
-          })
-          .join(', ');
-        descs.push(`on ${dayStr}`);
-      }
-      const result = `Cron: ${t}\n\n${descs.join(', ')}.`;
+      const result = blocks.join('\n');
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Cron Explainer', result });
       setPreviewMode('result');
-      showAlert('Cron expression explained', 'success');
+      showAlert(
+        inputs.length === 1
+          ? 'Cron expression explained'
+          : `Explained ${validCount}/${inputs.length} cron expressions`,
+        'success'
+      );
     };
 
     const handleHttpHeaderParse = () => {
@@ -267,6 +349,7 @@ export default function useClientTools({
         30
       )} | ----- |\n${headers.join('\n')}`;
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('HTTP headers parsed', 'success');
     };
@@ -283,6 +366,7 @@ export default function useClientTools({
           params ? `\nQuery Parameters:\n${params}` : ''
         }`;
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('URL parsed', 'success');
       } catch {
@@ -322,6 +406,7 @@ export default function useClientTools({
         .replace(/^-|-$/g, '')
         .slice(0, 80);
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: slug }));
+      setAiResult({ label: 'Result', result: slug });
       setPreviewMode('result');
       showAlert('URL slug generated', 'success');
     };
@@ -356,6 +441,7 @@ export default function useClientTools({
         wc / sc
       ).toFixed(1)}`;
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Reading level analyzed', 'success');
     };
@@ -368,6 +454,7 @@ export default function useClientTools({
         words / 238
       )} min (238 WPM)\nSpeaking Time: ~${Math.ceil(words / 150)} min (150 WPM)\nWords: ${words}`;
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Reading time estimated', 'success');
     };
@@ -382,6 +469,7 @@ export default function useClientTools({
       const lines = t.split('\n').length;
       const result = `Characters:     ${chars}\nNo Spaces:      ${charsNoSpaces}\nWords:          ${words}\nSentences:      ${sentences}\nParagraphs:     ${paragraphs}\nLines:          ${lines}`;
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Characters counted', 'success');
     };
@@ -405,6 +493,7 @@ export default function useClientTools({
         1
       )} words\nLongest Word:      ${words.reduce((a, b) => (a.length > b.length ? a : b), '')}`;
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Text statistics computed', 'success');
     };
@@ -424,6 +513,7 @@ export default function useClientTools({
         ? dupes.map(([w, c]) => `${w}: ${c}\u00d7`).join('\n')
         : 'No duplicate words found!';
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Duplicate words found', 'success');
     };
@@ -511,6 +601,7 @@ export default function useClientTools({
             .join('\n')
         : 'No overused words detected!';
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Overused words analyzed', 'success');
     };
@@ -588,6 +679,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: convert(Math.floor(num)),
       }));
+      setAiResult({ label: 'Result', result: convert(Math.floor(num)) });
       setPreviewMode('result');
       showAlert('Number converted to words', 'success');
     };
@@ -655,6 +747,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: result.toString(),
       }));
+      setAiResult({ label: 'Result', result: result.toString() });
       setPreviewMode('result');
       showAlert('Words converted to number', 'success');
     };
@@ -687,6 +780,7 @@ export default function useClientTools({
           }
         }
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       } else {
         const roman = { M: 1000, D: 500, C: 100, L: 50, X: 10, V: 5, I: 1 };
         const upper = t.toUpperCase();
@@ -698,9 +792,10 @@ export default function useClientTools({
           else result += curr;
         }
         setToolResults((prev) => ({
-          ...prev,
-          [activeWorkspaceId]: result.toString(),
-        }));
+        ...prev,
+        [activeWorkspaceId]: result.toString(),
+      }));
+      setAiResult({ label: 'Result', result: result.toString() });
       }
       setPreviewMode('result');
       showAlert('Roman numeral converted', 'success');
@@ -714,6 +809,7 @@ export default function useClientTools({
         const dataUrl = await QRCode.toDataURL(t, { width: 300, margin: 2 });
         const result = `[QR Code Generated]\n\nData URL (paste in browser):\n${dataUrl}`;
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('QR code generated', 'success');
       } catch {
@@ -737,6 +833,7 @@ export default function useClientTools({
           .replace(/\n\n/g, '</p>\n<p>');
         html = '<p>' + html + '</p>';
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: html }));
+      setAiResult({ label: 'Result', result: html });
         setPreviewMode('result');
         showAlert('Markdown converted to HTML', 'success');
       } catch {
@@ -765,6 +862,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: `${header}\n${divider}\n${body}`,
       }));
+      setAiResult({ label: 'Result', result: `${header}\n${divider}\n${body}` });
       setPreviewMode('result');
       showAlert('Text converted to table', 'success');
     };
@@ -777,6 +875,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: emails.length ? emails.join('\n') : 'No email addresses found',
       }));
+      setAiResult({ label: 'Result', result: emails.length ? emails.join('\n') : 'No email addresses found' });
       setPreviewMode('result');
       showAlert(`Found ${emails.length} email(s)`, 'success');
     };
@@ -789,6 +888,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: urls.length ? urls.join('\n') : 'No URLs found',
       }));
+      setAiResult({ label: 'Result', result: urls.length ? urls.join('\n') : 'No URLs found' });
       setPreviewMode('result');
       showAlert(`Found ${urls.length} URL(s)`, 'success');
     };
@@ -801,6 +901,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: numbers.length ? numbers.join('\n') : 'No numbers found',
       }));
+      setAiResult({ label: 'Result', result: numbers.length ? numbers.join('\n') : 'No numbers found' });
       setPreviewMode('result');
       showAlert(`Found ${numbers.length} number(s)`, 'success');
     };
@@ -811,6 +912,7 @@ export default function useClientTools({
         Array.from(crypto.getRandomValues(new Uint8Array(21)), (b) => chars[b % 64]).join('');
       const result = Array.from({ length: 5 }, gen).join('\n');
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Nano IDs generated', 'success');
     };
@@ -821,6 +923,7 @@ export default function useClientTools({
         now.getTime() / 1000
       )}\nUnix (ms): ${now.getTime()}\nISO 8601:  ${now.toISOString()}\nRFC 2822:  ${now.toUTCString()}\nLocal:     ${now.toLocaleString()}`;
       setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
+      setAiResult({ label: 'Result', result: result });
       setPreviewMode('result');
       showAlert('Timestamps generated', 'success');
     };
@@ -844,6 +947,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: [...new Set(combos)].join('\n'),
       }));
+      setAiResult({ label: 'Result', result: [...new Set(combos)].join('\n') });
       setPreviewMode('result');
       showAlert('Usernames generated', 'success');
     };
@@ -863,6 +967,7 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: urls.join('\n'),
       }));
+      setAiResult({ label: 'Result', result: urls.join('\n') });
       setPreviewMode('result');
       showAlert('Placeholder URLs generated', 'success');
     };

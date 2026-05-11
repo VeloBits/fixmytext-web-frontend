@@ -224,7 +224,7 @@ export const TOOLS = [
   {
     id: 'sentence_case',
     label: 'Sentence Case',
-    description: 'Capitalize only the first letter of each sentence',
+    description: 'Capitalize the first letter of each sentence (adds a period if missing)',
     icon: 'Ss.',
     color: 'violet',
     group: 'case',
@@ -315,7 +315,7 @@ export const TOOLS = [
   {
     id: 'train_case',
     label: 'Train-Case',
-    description: 'Capitalize each word and join with hyphens',
+    description: 'Each word capitalized, acronyms preserved, joined with hyphens',
     icon: 'T-C',
     color: 'violet',
     group: 'case',

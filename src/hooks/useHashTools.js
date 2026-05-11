@@ -31,7 +31,9 @@ const useHashTools = ({
       const original = t;
       setLocalLoading(true);
       try {
-        const hash = await hashFn(t);
+        const hash = t.includes('\n')
+          ? (await Promise.all(t.split('\n').map((line) => hashFn(line)))).join('\n')
+          : await hashFn(t);
         setAiResult({ label, result: hash });
         setPreviewMode('result');
         pushHistory(label, original, hash, { toolId, toolType: 'local' });

@@ -192,66 +192,59 @@ export default function FakeDataDrawer({ activeTool, onResult, showAlert }) {
     showAlert(`Generated ${count} record(s)`, 'success');
   };
 
-  const titles = {
-    fake_name: 'Fake Names',
-    fake_email: 'Fake Emails',
-    fake_phone: 'Fake Phones',
-    fake_address: 'Fake Addresses',
-    fake_data_set: 'Fake Data Set',
-  };
-
+  const showFormat = toolId === 'fake_data_set';
   return (
-    <div className="tu-gen">
-      <h3 className="tu-gen-title">{titles[toolId] || 'Fake Data'}</h3>
-      <div className="tu-gen-card">
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">Count</label>
-          <div className="tu-gen-options">
-            {[5, 10, 25, 50].map((n) => (
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field tu-fr-field--segmented">
+          <span className="tu-fr-seg-label">Count</span>
+          {[5, 10, 25, 50].map((n) => (
+            <button
+              key={n}
+              className={`tu-fr-seg${count === n ? ' tu-fr-seg--on' : ''}`}
+              onClick={() => setCount(n)}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+        {!showFormat && (
+          <div className="tu-fr-actions">
+            <button
+              className="tu-fr-action tu-fr-action--text"
+              onClick={handleGenerate}
+              title="Generate"
+            >
+              Generate
+            </button>
+          </div>
+        )}
+      </div>
+      {showFormat && (
+        <div className="tu-fr-row">
+          <div className="tu-fr-field tu-fr-field--segmented">
+            <span className="tu-fr-seg-label">Format</span>
+            {['text', 'json', 'csv'].map((f) => (
               <button
-                key={n}
-                className={`tu-gen-opt${count === n ? ' tu-gen-opt--on' : ''}`}
-                onClick={() => setCount(n)}
+                key={f}
+                className={`tu-fr-seg${format === f ? ' tu-fr-seg--on' : ''}`}
+                onClick={() => setFormat(f)}
               >
-                {n}
+                {f.toUpperCase()}
               </button>
             ))}
           </div>
-        </div>
-        {toolId === 'fake_data_set' && (
-          <div className="tu-gen-section">
-            <label className="tu-gen-label">Format</label>
-            <div className="tu-gen-options">
-              {['text', 'json', 'csv'].map((f) => (
-                <button
-                  key={f}
-                  className={`tu-gen-opt${format === f ? ' tu-gen-opt--on' : ''}`}
-                  onClick={() => setFormat(f)}
-                >
-                  {f.toUpperCase()}
-                </button>
-              ))}
-            </div>
+          <div className="tu-fr-actions">
+            <button
+              className="tu-fr-action tu-fr-action--text"
+              onClick={handleGenerate}
+              title="Generate"
+            >
+              Generate
+            </button>
           </div>
-        )}
-        <button
-          className="tu-gen-btn"
-          onClick={handleGenerate}
-          style={{
-            width: '100%',
-            marginTop: '12px',
-            padding: '10px',
-            borderRadius: '8px',
-            background: 'var(--amber)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Generate
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

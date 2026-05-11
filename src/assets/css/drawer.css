@@ -364,6 +364,128 @@
   cursor: not-allowed;
 }
 
+.tu-fr-action--text {
+  width: auto;
+  padding: 0 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Multi-line textarea variant (for diff drawer's compare-against text) */
+.tu-fr-input--multiline {
+  padding-right: 8px;
+  min-height: 60px;
+  resize: vertical;
+  font-family: var(--font-mono);
+}
+
+/* Read-only preview surface (for markdown preview) */
+.tu-fr-field--readonly {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-fg);
+  border-radius: 3px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  max-height: 220px;
+  overflow: auto;
+}
+
+/* Segmented field — inline label + button group */
+.tu-fr-field--segmented {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tu-fr-seg-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 6px 0 2px;
+  white-space: nowrap;
+}
+
+.tu-fr-seg {
+  height: 26px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border: 1px solid var(--input-border);
+  border-radius: 3px;
+  color: var(--text-2);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--t);
+  white-space: nowrap;
+}
+.tu-fr-seg:hover {
+  background: var(--list-hover);
+  color: var(--text);
+}
+.tu-fr-seg--on {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Numeric input (small) within a segmented row */
+.tu-fr-num {
+  width: 56px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-fg);
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  box-sizing: border-box;
+}
+.tu-fr-num:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-glow);
+}
+
+/* Range slider for password length */
+.tu-fr-slider {
+  flex: 1;
+  min-width: 100px;
+  max-width: 200px;
+  height: 4px;
+  appearance: none;
+  background: var(--surface-2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.tu-fr-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.tu-fr-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
 /* Status bar after replace */
 .tu-fr-status {
   display: flex;

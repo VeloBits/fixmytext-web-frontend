@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SignupPage from './SignupPage';
+import { expectNoA11yViolations } from '../test/axeHelper';
 
 const mockNavigate = vi.fn();
 const mockRegister = vi.fn();
@@ -136,5 +137,10 @@ describe('SignupPage', () => {
     const toggleBtns = screen.getAllByLabelText('Show password');
     fireEvent.click(toggleBtns[1]);
     expect(confirmInput).toHaveAttribute('type', 'text');
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<SignupPage showAlert={showAlert} />);
+    await expectNoA11yViolations(container);
   });
 });

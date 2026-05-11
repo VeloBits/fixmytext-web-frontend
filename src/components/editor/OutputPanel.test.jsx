@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import OutputPanel from './OutputPanel';
+import { expectNoA11yViolations } from '../../test/axeHelper';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -284,7 +285,7 @@ describe('OutputPanel', () => {
         onOutputEdit={vi.fn()}
       />
     );
-    expect(document.querySelector('.tu-output-editable')).toBeInTheDocument();
+    expect(document.querySelector('.tu-output-row-text--editable')).toBeInTheDocument();
   });
 
   it('renders plain span for non-editable tools', () => {
@@ -755,5 +756,10 @@ describe('OutputPanel', () => {
     fireEvent.click(screen.getByTitle('Formatting options'));
     fireEvent.click(screen.getByTitle('Emoji picker'));
     expect(screen.getByTestId('emoji-picker')).toBeInTheDocument();
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<OutputPanel {...defaultProps} />);
+    await expectNoA11yViolations(container);
   });
 });

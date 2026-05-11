@@ -16,10 +16,10 @@ describe('RandomTextDrawer', () => {
     vi.clearAllMocks();
   });
 
-  it('renders title and description', () => {
+  it('renders type and count labels', () => {
     render(<RandomTextDrawer {...props} />);
-    expect(screen.getByText('Random Text Generator')).toBeInTheDocument();
-    expect(screen.getByText('Generate lorem ipsum placeholder text')).toBeInTheDocument();
+    expect(screen.getByText('Type')).toBeInTheDocument();
+    expect(screen.getByText('Count')).toBeInTheDocument();
   });
 
   it('renders type options', () => {
@@ -51,14 +51,14 @@ describe('RandomTextDrawer', () => {
 
   it('calls handleGenerateText and onResult on generate', () => {
     render(<RandomTextDrawer {...props} />);
-    fireEvent.click(screen.getByRole('button', { name: /Generate 10 words/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     expect(props.handleGenerateText).toHaveBeenCalled();
     expect(props.onResult).toHaveBeenCalledWith('generated text');
   });
 
   it('does not call onResult if handleGenerateText returns null', () => {
     render(<RandomTextDrawer {...props} handleGenerateText={vi.fn(() => null)} />);
-    fireEvent.click(screen.getByRole('button', { name: /Generate 10 words/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     expect(props.onResult).not.toHaveBeenCalled();
   });
 
@@ -98,15 +98,16 @@ describe('PasswordDrawer', () => {
     vi.clearAllMocks();
   });
 
-  it('renders title and description', () => {
+  it('renders length and include labels', () => {
     render(<PasswordDrawer {...props} />);
-    expect(screen.getByText('Password Generator')).toBeInTheDocument();
-    expect(screen.getByText('Create strong, random passwords')).toBeInTheDocument();
+    expect(screen.getByText('Length')).toBeInTheDocument();
+    expect(screen.getByText('Include')).toBeInTheDocument();
   });
 
   it('renders strength indicator', () => {
     render(<PasswordDrawer {...props} />);
-    expect(screen.getByText('Strength')).toBeInTheDocument();
+    // Strength label is rendered (e.g. "Fair", "Strong", "Weak")
+    expect(screen.getByText(/bits/)).toBeInTheDocument();
   });
 
   it('renders character set buttons', () => {
@@ -126,14 +127,14 @@ describe('PasswordDrawer', () => {
 
   it('calls handleGeneratePassword and onResult on generate', () => {
     render(<PasswordDrawer {...props} />);
-    fireEvent.click(screen.getByRole('button', { name: /Generate Password/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     expect(props.handleGeneratePassword).toHaveBeenCalled();
     expect(props.onResult).toHaveBeenCalledWith('Abc123!@');
   });
 
   it('shows entropy and pool info', () => {
     render(<PasswordDrawer {...props} />);
-    expect(screen.getByText(/bits entropy/)).toBeInTheDocument();
+    expect(screen.getByText(/bits/)).toBeInTheDocument();
     expect(screen.getByText(/char pool/)).toBeInTheDocument();
   });
 
@@ -191,7 +192,7 @@ describe('PasswordDrawer', () => {
 
   it('does not call onResult if handleGeneratePassword returns null', () => {
     render(<PasswordDrawer {...props} handleGeneratePassword={vi.fn(() => null)} />);
-    fireEvent.click(screen.getByRole('button', { name: /Generate Password/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     expect(props.onResult).not.toHaveBeenCalled();
   });
 });

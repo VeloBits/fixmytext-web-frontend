@@ -429,6 +429,23 @@
   background: #005fa3;
   transform: translateY(-1px);
 }
+.tu-pricing-card-btn--secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.tu-pricing-card-btn--secondary:hover {
+  background: rgba(0, 122, 204, 0.08);
+}
+.tu-pricing-card-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 8px;
+}
+.tu-pricing-card-actions .tu-pricing-card-btn {
+  flex: 1;
+  margin-top: 0;
+}
 
 /* ── Credit Packs ───────────────────────────────────── */
 

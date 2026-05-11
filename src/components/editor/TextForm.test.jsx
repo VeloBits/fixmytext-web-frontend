@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TextForm from './TextForm';
+import { expectNoA11yViolations } from '../../test/axeHelper';
 
 // ── Framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -803,5 +804,10 @@ describe('TextForm', () => {
     fireEvent.click(newBtn);
     // Should render the what's new panel (may show tools or "discovered all" message)
     expect(document.querySelector('.tu-tpanel')).toBeInTheDocument();
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<TextForm {...defaultProps} />);
+    await expectNoA11yViolations(container);
   });
 });

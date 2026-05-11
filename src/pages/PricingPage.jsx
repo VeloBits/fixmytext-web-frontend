@@ -381,15 +381,6 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.04 }}
                   onClick={() => setSelectedPass(p.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setSelectedPass(p.id);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`View ${p.name} details`}
                 >
                   {tag && <span className="tu-pricing-card-tag">{tag}</span>}
                   <div className="tu-pricing-card-top">
@@ -408,16 +399,30 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
                     <span className="tu-pricing-chip">{p.duration_days}d</span>
                   </div>
                   {perDay && <span className="tu-pricing-card-perday">{perDay}/day</span>}
-                  <button
-                    className="tu-pricing-card-btn"
-                    disabled={buyingId === p.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBuyPass(p.id);
-                    }}
-                  >
-                    {buyingId === p.id ? 'Loading...' : 'Buy Now'}
-                  </button>
+                  <div className="tu-pricing-card-actions">
+                    <button
+                      type="button"
+                      className="tu-pricing-card-btn tu-pricing-card-btn--secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPass(p.id);
+                      }}
+                      aria-label={`View ${p.name} details`}
+                    >
+                      Details
+                    </button>
+                    <button
+                      type="button"
+                      className="tu-pricing-card-btn"
+                      disabled={buyingId === p.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBuyPass(p.id);
+                      }}
+                    >
+                      {buyingId === p.id ? 'Loading...' : 'Buy Now'}
+                    </button>
+                  </div>
                 </motion.div>
               );
             })}
@@ -441,15 +446,6 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.05 }}
                 onClick={() => setSelectedCredit(c.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setSelectedCredit(c.id);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                aria-label={`View ${c.name} details`}
                 style={{ cursor: 'pointer' }}
               >
                 <span className="tu-pricing-credit-icon">
@@ -461,16 +457,30 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
                 <span className="tu-pricing-credit-per">
                   {formatPrice(c.price / c.credits)}/use
                 </span>
-                <button
-                  className="tu-pricing-card-btn"
-                  disabled={buyingId === c.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleBuyCredits(c.id);
-                  }}
-                >
-                  {buyingId === c.id ? '...' : 'Buy'}
-                </button>
+                <div className="tu-pricing-card-actions">
+                  <button
+                    type="button"
+                    className="tu-pricing-card-btn tu-pricing-card-btn--secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedCredit(c.id);
+                    }}
+                    aria-label={`View ${c.name} details`}
+                  >
+                    Details
+                  </button>
+                  <button
+                    type="button"
+                    className="tu-pricing-card-btn"
+                    disabled={buyingId === c.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBuyCredits(c.id);
+                    }}
+                  >
+                    {buyingId === c.id ? '...' : 'Buy'}
+                  </button>
+                </div>
               </motion.div>
             ))}
           </div>

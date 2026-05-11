@@ -176,3 +176,51 @@ See [Adding a Tool](../docs/adding-a-tool.md) for the complete guide.
 - Use Framer Motion `variants` pattern for animations
 - Keep components under 300 lines — extract logic to custom hooks
 - Handle loading and error states from RTK Query hooks
+
+## Accessibility
+
+We enforce a per-component a11y baseline using [axe-core](https://github.com/dequelabs/axe-core).
+
+### Two checkpoints
+
+1. **Dev runtime** — `src/index.jsx` dynamically imports `@axe-core/react` when `import.meta.env.DEV` is true. Violations stream to the browser console as you click around. Zero runtime cost in production (the import is tree-shaken).
+2. **Unit tests** — every component test in the baseline calls `expectNoA11yViolations(container)` (helper at [src/test/axeHelper.js](src/test/axeHelper.js)). CI fails on new violations.
+
+### Baseline scope
+
+The following components have a passing `it('has no axe violations', …)` test and must stay clean:
+
+| Component | Test file |
+|---|---|
+| `Navbar` | `src/components/layout/Navbar.test.jsx` |
+| `TextForm` | `src/components/editor/TextForm.test.jsx` |
+| `OutputPanel` | `src/components/editor/OutputPanel.test.jsx` |
+| `PricingPage` | `src/pages/PricingPage.test.jsx` |
+| `LoginPage` | `src/pages/LoginPage.test.jsx` |
+| `SignupPage` | `src/pages/SignupPage.test.jsx` |
+
+There is no `Sidebar` component in the codebase; the equivalent navigation rail lives inside `TextForm` and is covered by that test.
+
+### Rules disabled in unit tests
+
+The helper turns off two axe rules in jsdom that would produce false positives:
+
+- **`color-contrast`** — jsdom can't compute laid-out colors. Contrast is checked at runtime via `@axe-core/react` in a real browser instead.
+- **`region`** — landmark regions are an App-level concern; component-scoped tests don't render `<main>` / `<nav>` wrappers.
+
+If a test legitimately needs one of these on, pass an override: `expectNoA11yViolations(container, { region: { enabled: true } })`.
+
+### Adding axe to a new component test
+
+```js
+import { expectNoA11yViolations } from '../test/axeHelper';
+
+it('has no axe violations', async () => {
+  const { container } = render(<MyComponent {...defaultProps} />);
+  await expectNoA11yViolations(container);
+});
+```
+
+### Baseline status
+
+All six baseline components pass their axe assertions. New violations should be fixed at the markup level — do not relax the helper's rule list or skip the assertions.

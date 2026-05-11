@@ -77,6 +77,7 @@ export default memo(function OutputPanel({
   const saveBtnRef = useRef(null);
   const saveMenuRef = useRef(null);
   const editorRef = useRef(null);
+  const paragraphRefs = useRef([]);
   const emojiPickerRef = useRef(null);
   const showResult = previewMode === 'result' && aiResult;
   const showDyslexia = previewMode === 'dyslexia' && dyslexiaMode && text;
@@ -192,13 +193,6 @@ export default memo(function OutputPanel({
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [emojiPickerOpen]);
-
-  // Sync contentEditable back to state on input
-  const handleEditorInput = useCallback(() => {
-    if (editorRef.current && onOutputEdit) {
-      onOutputEdit(editorRef.current.innerText);
-    }
-  }, [onOutputEdit]);
 
   const isHtmlOutput = activeTool && HTML_OUTPUT_TOOLS.has(activeTool.id);
 
@@ -771,56 +765,93 @@ export default memo(function OutputPanel({
       )}
 
       {saveMenu}
-      <div
-        className="tu-output-body"
-        onScroll={(e) => {
-          const gutter = e.currentTarget.querySelector('.tu-line-numbers');
-          if (gutter) gutter.scrollTop = e.currentTarget.scrollTop;
-        }}
-      >
-        <div className="tu-line-numbers">
-          {(outputText || '\n').split('\n').map((_, i) => (
-            <span key={i}>{i + 1}</span>
-          ))}
-        </div>
+      <div className="tu-output-body">
         <div className="tu-output-text">
           {showResult ? (
             mdPreview || (activeTool?.type === 'ai' && hasMarkdown(aiResult.result)) ? (
-              /* Sanitized to prevent XSS from AI-generated content */
-              <div
-                className="tu-preview-markdown"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(marked.parse(aiResult.result)),
-                }}
-              />
+              <>
+                <div className="tu-line-numbers">
+                  <span>1</span>
+                </div>
+                {/* Sanitized to prevent XSS from AI-generated content */}
+                <div
+                  className="tu-preview-markdown"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(marked.parse(aiResult.result)),
+                  }}
+                />
+              </>
             ) : isEditable ? (
-              <div
-                ref={editorRef}
-                className="tu-output-editable"
-                contentEditable
-                suppressContentEditableWarning
-                onInput={handleEditorInput}
-                spellCheck={false}
-              />
+              // Render each `\n`-line as its own row with one number; blank
+              // lines render with no number so paragraph breaks stay visible
+              // but don't get counted. Each row hosts an independent
+              // contentEditable; edits are reassembled with `\n` separators.
+              (() => {
+                const lines = (aiResult.result || '').split('\n');
+                const rebuild = () => {
+                  const next = paragraphRefs.current
+                    .map((el) => (el ? el.innerText : ''))
+                    .join('\n');
+                  if (onOutputEdit) onOutputEdit(next);
+                };
+                let counter = 0;
+                return lines.map((line, i) => {
+                  const number = line.trim() ? ++counter : null;
+                  return (
+                    <div className="tu-output-row" key={i}>
+                      <span className="tu-output-row-num">{number ?? ''}</span>
+                      <span
+                        className="tu-output-row-text tu-output-row-text--editable"
+                        contentEditable
+                        suppressContentEditableWarning
+                        ref={(el) => {
+                          paragraphRefs.current[i] = el;
+                          if (el && el.innerText !== line) el.innerText = line;
+                        }}
+                        onInput={rebuild}
+                        spellCheck={false}
+                      />
+                    </div>
+                  );
+                });
+              })()
             ) : isHtmlOutput ? (
-              /* Sanitized to prevent XSS from AI-generated content */
-              <span
-                style={{ whiteSpace: 'pre-wrap' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(aiResult.result) }}
-              />
+              <>
+                <div className="tu-line-numbers">
+                  <span>1</span>
+                </div>
+                {/* Sanitized to prevent XSS from AI-generated content */}
+                <span
+                  style={{ whiteSpace: 'pre-wrap' }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(aiResult.result) }}
+                />
+              </>
             ) : (
-              <span style={{ whiteSpace: 'pre-wrap' }}>{aiResult.result}</span>
+              (aiResult.result || '').split('\n').map((line, i) => (
+                <div className="tu-output-row" key={i}>
+                  <span className="tu-output-row-num">{i + 1}</span>
+                  <span className="tu-output-row-text">{line || '​'}</span>
+                </div>
+              ))
             )
           ) : showDyslexia ? (
-            <span className="tu-dyslexia" style={{ whiteSpace: 'pre-wrap' }}>
-              {text}
-            </span>
+            (text || '').split('\n').map((line, i) => (
+              <div className="tu-output-row" key={i}>
+                <span className="tu-output-row-num">{i + 1}</span>
+                <span className="tu-output-row-text tu-dyslexia">{line || '​'}</span>
+              </div>
+            ))
           ) : showMarkdown ? (
-            /* Sanitized to prevent XSS from AI-generated content */
-            <div
-              className="tu-preview-markdown"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(text)) }}
-            />
+            <>
+              <div className="tu-line-numbers">
+                <span>1</span>
+              </div>
+              {/* Sanitized to prevent XSS from AI-generated content */}
+              <div
+                className="tu-preview-markdown"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(text)) }}
+              />
+            </>
           ) : null}
         </div>
       </div>

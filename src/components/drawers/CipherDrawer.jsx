@@ -15,7 +15,6 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
       return;
     }
 
-    // Map tool IDs to their endpoints and payload structures
     const configs = {
       vigenere_enc: { endpoint: '/api/v1/text/vigenere-encrypt', label: 'Vigenere Encrypted' },
       vigenere_dec: { endpoint: '/api/v1/text/vigenere-decrypt', label: 'Vigenere Decrypted' },
@@ -32,7 +31,6 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
 
     const config = configs[toolId];
     if (!config) {
-      // AES encryption/decryption (client-side Web Crypto API)
       if (toolId === 'aes_encrypt' || toolId === 'aes_decrypt') {
         try {
           const enc = new TextEncoder();
@@ -92,71 +90,45 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
     }
   };
 
-  const getLabel = () => {
-    if (toolId === 'substitution_cipher') return 'Substitution Alphabet (26 chars A-Z)';
-    if (toolId === 'aes_encrypt' || toolId === 'aes_decrypt') return 'Passphrase';
-    return 'Key';
-  };
-
   const getPlaceholder = () => {
-    if (toolId === 'substitution_cipher') return 'ZYXWVUTSRQPONMLKJIHGFEDCBA';
-    if (toolId === 'aes_encrypt' || toolId === 'aes_decrypt') return 'Enter a passphrase...';
-    if (toolId === 'columnar_transposition') return 'e.g., ZEBRAS';
-    return 'e.g., SECRET';
+    if (toolId === 'substitution_cipher') return 'Substitution alphabet (26 chars A–Z), e.g. ZYXWVUTSRQPONMLKJIHGFEDCBA';
+    if (toolId === 'aes_encrypt' || toolId === 'aes_decrypt') return 'Enter a secret key here';
+    if (toolId === 'columnar_transposition') return 'Key, e.g. ZEBRAS';
+    return 'Key, e.g. SECRET';
   };
 
-  const getTitle = () => {
-    const titles = {
-      vigenere_enc: 'Vigenere Encrypt',
-      vigenere_dec: 'Vigenere Decrypt',
-      playfair_enc: 'Playfair Encrypt',
-      substitution_cipher: 'Substitution Cipher',
-      columnar_transposition: 'Columnar Transposition',
-      aes_encrypt: 'AES-256 Encrypt',
-      aes_decrypt: 'AES-256 Decrypt',
-    };
-    return titles[toolId] || 'Cipher';
+  // Mask the key for all secret-key ciphers. Substitution uses a public
+  // alphabet mapping rather than a secret, so it stays visible.
+  const isPassword = toolId !== 'substitution_cipher';
+
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter') handleApply();
   };
 
   return (
-    <div className="tu-gen">
-      <h3 className="tu-gen-title">{getTitle()}</h3>
-      <div className="tu-gen-card">
-        <div className="tu-gen-section">
-          <label className="tu-gen-label">{getLabel()}</label>
+    <div className="tu-fr">
+      <div className="tu-fr-row">
+        <div className="tu-fr-field">
           <input
-            type="text"
-            className="tu-gen-input"
+            type={isPassword ? 'password' : 'text'}
+            className="tu-fr-input"
+            placeholder={getPlaceholder()}
             value={key}
             onChange={(e) => setKey(e.target.value)}
-            placeholder={getPlaceholder()}
-            style={{
-              width: '100%',
-              padding: '8px',
-              borderRadius: '6px',
-              border: '1px solid var(--border)',
-              background: 'var(--bg-2)',
-              color: 'var(--text-1)',
-            }}
+            onKeyDown={onKeyDown}
+            spellCheck={false}
+            autoFocus
           />
         </div>
-        <button
-          className="tu-gen-btn"
-          onClick={handleApply}
-          style={{
-            width: '100%',
-            marginTop: '12px',
-            padding: '10px',
-            borderRadius: '8px',
-            background: 'var(--sky)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Apply
-        </button>
+        <div className="tu-fr-actions">
+          <button
+            className="tu-fr-action tu-fr-action--text"
+            onClick={handleApply}
+            title="Apply"
+          >
+            Apply
+          </button>
+        </div>
       </div>
     </div>
   );

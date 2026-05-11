@@ -1377,6 +1377,49 @@
   min-height: 1.65em;
 }
 
+/* ── Paragraph gutter (prose tools) ─────────────────
+   Numbers are absolutely positioned at each paragraph's measured Y. The
+   mirror div is sized identically to the textarea (set inline at runtime)
+   and rendered offscreen so its layout matches but it's invisible. */
+.tu-paragraph-gutter {
+  position: relative;
+  width: 44px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--editor-bg);
+  overflow: hidden;
+}
+
+.tu-paragraph-gutter-mirror {
+  position: absolute;
+  top: 0;
+  left: -99999px;
+  visibility: hidden;
+  pointer-events: none;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tu-paragraph-gutter-numbers {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.tu-paragraph-gutter-num {
+  position: absolute;
+  right: 8px;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  font-family: var(--font-mono);
+  color: var(--editor-gutter);
+  user-select: none;
+  text-align: right;
+}
+
 /* ── Textarea ─────────────────────────────────────── */
 .tu-textarea {
   flex: 1;
@@ -1431,6 +1474,76 @@
   word-break: break-word;
   min-width: 0;
   position: relative;
+}
+
+.tu-output-text:has(> .tu-output-row) {
+  padding: 4px 0;
+  background-image: linear-gradient(to right, var(--border), var(--border));
+  background-size: 1px 100%;
+  background-position: 44px 0;
+  background-repeat: no-repeat;
+}
+
+/* Editable mode (case/cleanup/lines/etc.): place the line-number gutter as a
+   sticky left column next to the contentEditable. Without this, both children
+   render as block-level and stack vertically with the number on top. */
+.tu-output-text:has(> .tu-output-editable) {
+  display: flex;
+  align-items: stretch;
+  padding: 4px 0;
+  background-image: linear-gradient(to right, var(--border), var(--border));
+  background-size: 1px 100%;
+  background-position: 44px 0;
+  background-repeat: no-repeat;
+}
+
+.tu-output-text:has(> .tu-output-editable) > .tu-line-numbers {
+  flex: 0 0 44px;
+  padding: 0 8px 0 0;
+  border-right: none;
+  background: transparent;
+}
+
+.tu-output-text:has(> .tu-output-editable) > .tu-output-editable {
+  flex: 1 1 auto;
+  padding: 0 8px;
+  min-width: 0;
+}
+
+.tu-output-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.tu-output-row-num {
+  flex: 0 0 44px;
+  padding: 0 8px 0 0;
+  text-align: right;
+  color: var(--editor-gutter);
+  background: var(--editor-bg);
+  user-select: none;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+
+.tu-output-row-text {
+  flex: 1 1 auto;
+  padding: 0 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  min-width: 0;
+}
+
+/* Editable line rows. Match the input textarea's line-height exactly so
+   stacked rows have no extra inter-row gap — the visual spacing should
+   match the input pane line-for-line. */
+.tu-output-row-text--editable {
+  display: block;
+  outline: none;
+  cursor: text;
 }
 
 /* Editable output — contentEditable div */
