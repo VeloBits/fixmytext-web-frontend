@@ -26,7 +26,7 @@ const sr = [
 const Kl = [0x00000000, 0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xa953fd4e];
 const Kr = [0x50a28be6, 0x5c4dd124, 0x6d703ef3, 0x7a6d76e9, 0x00000000];
 
-function f(j, x, y, z) {
+function f(j: number, x: number, y: number, z: number): number {
   if (j <= 15) return x ^ y ^ z;
   if (j <= 31) return (x & y) | (~x & z);
   if (j <= 47) return (x | ~y) ^ z;
@@ -34,11 +34,11 @@ function f(j, x, y, z) {
   return x ^ (y | ~z);
 }
 
-function rotl(x, n) {
+function rotl(x: number, n: number): number {
   return (x << n) | (x >>> (32 - n));
 }
 
-export default function ripemd160(message) {
+export function ripemd160(message: string): string {
   const bytes = new TextEncoder().encode(message);
   // Pre-processing: padding
   const bitLen = bytes.length * 8;
@@ -58,7 +58,7 @@ export default function ripemd160(message) {
     h4 = 0xc3d2e1f0;
 
   for (let offset = 0; offset < padded.length; offset += 64) {
-    const w = new Array(16);
+    const w: number[] = new Array(16);
     for (let i = 0; i < 16; i++) w[i] = view.getUint32(offset + i * 4, true);
 
     let al = h0,
@@ -110,3 +110,5 @@ export default function ripemd160(message) {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
+
+export default ripemd160;
