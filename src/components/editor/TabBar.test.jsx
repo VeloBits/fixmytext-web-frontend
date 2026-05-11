@@ -9,11 +9,9 @@ vi.mock('./ToolIcon', () => ({
 // jsdom doesn't provide ResizeObserver
 const mockObserve = vi.fn();
 const mockDisconnect = vi.fn();
-globalThis.ResizeObserver = vi.fn(() => ({
-  observe: mockObserve,
-  unobserve: vi.fn(),
-  disconnect: mockDisconnect,
-}));
+globalThis.ResizeObserver = vi.fn(function () {
+  return { observe: mockObserve, unobserve: vi.fn(), disconnect: mockDisconnect };
+});
 
 describe('TabBar', () => {
   const mockTabs = [

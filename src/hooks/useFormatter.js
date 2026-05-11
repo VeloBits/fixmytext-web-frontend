@@ -64,7 +64,7 @@ export default function useFormatter(text, setLoading, showAlert, onResult) {
       if (cfg.sortImports && ['babel', 'babel-ts', 'typescript'].includes(parser)) {
         code = sortImportsAlphabetically(code);
       }
-      const formatted = prettierMod.default.format(code, {
+      const formatted = await prettierMod.default.format(code, {
         parser,
         plugins: [parserMod.default],
         tabWidth: cfg.tabWidth,
