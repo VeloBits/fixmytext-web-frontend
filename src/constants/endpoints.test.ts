@@ -7,7 +7,7 @@ describe('ENDPOINTS', () => {
   });
 
   it('all values are strings starting with /api/v1/text/', () => {
-    for (const [key, value] of Object.entries(ENDPOINTS)) {
+    for (const [, value] of Object.entries(ENDPOINTS)) {
       expect(typeof value).toBe('string');
       expect(value).toMatch(/^\/api\/v1\/text\//);
     }
