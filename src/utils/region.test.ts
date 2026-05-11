@@ -4,15 +4,15 @@ describe('detectBrowserRegion', () => {
   const origIntl = globalThis.Intl;
   const origNavigator = globalThis.navigator;
 
-  function mockTimezone(tz) {
+  function mockTimezone(tz: string): void {
     globalThis.Intl = {
       DateTimeFormat: () => ({
         resolvedOptions: () => ({ timeZone: tz }),
       }),
-    };
+    } as unknown as typeof Intl;
   }
 
-  function mockLanguage(lang) {
+  function mockLanguage(lang: string): void {
     Object.defineProperty(globalThis, 'navigator', {
       value: { language: lang },
       writable: true,
@@ -120,7 +120,7 @@ describe('detectBrowserRegion', () => {
       DateTimeFormat: () => {
         throw new Error('no');
       },
-    };
+    } as unknown as typeof Intl;
     expect(detectBrowserRegion()).toBe('');
   });
 });

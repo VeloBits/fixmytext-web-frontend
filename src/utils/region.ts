@@ -1,8 +1,11 @@
+/** Pricing region code returned by detectBrowserRegion. */
+export type BrowserRegion = 'IN' | 'US' | 'GB' | 'EU' | '';
+
 /**
  * Detect user's pricing region from browser timezone and locale.
  * Returns: 'IN', 'US', 'GB', 'EU', or '' (let server decide).
  */
-export function detectBrowserRegion() {
+export function detectBrowserRegion(): BrowserRegion {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
 
