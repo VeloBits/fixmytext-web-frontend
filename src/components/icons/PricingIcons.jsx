@@ -7,7 +7,7 @@
  * Base SVG icon wrapper. Renders a path or children inside a standardized SVG element.
  * @param {object} props - SVG attributes plus optional `d` for a single path.
  */
-export const I = ({
+const I = ({
   d,
   size = 24,
   stroke = 'currentColor',

@@ -18,6 +18,13 @@ The base URL is set via the `VITE_API_URL` environment variable (default: `http:
    - Retries the original request with the new token
    - Uses a mutex to prevent concurrent refresh calls
 
+### Additional Headers
+
+| Header | Set By | Purpose |
+|--------|--------|---------|
+| `Authorization: Bearer <token>` | `baseQuery.js` | Authenticated user identity |
+| `X-Visitor-Id` | `textApi.js` | Anonymous visitor fingerprint for server-side trial tracking (sent on every text transformation request, including for logged-in users) |
+
 ## API Slices
 
 | File | Base Path | Purpose |
