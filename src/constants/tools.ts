@@ -1,10 +1,19 @@
 import { ENDPOINTS } from './endpoints';
+import type {
+  ToolDefinition,
+  Persona,
+  UseCaseTab,
+  SmartSuggestionRule,
+  Achievement,
+  QuestTemplate,
+  LevelDefinition,
+} from '../types/tools';
 
 /* ═══════════════════════════════════════════════════════
    Tool & Category Configuration — Data-driven tool system
    ═══════════════════════════════════════════════════════ */
 
-export const PERSONAS = {
+export const PERSONAS: Record<string, Persona> = {
   writer: { label: 'Writer / Blogger', icon: 'Wr', defaultTab: 'writing' },
   student: { label: 'Student', icon: 'St', defaultTab: 'writing' },
   developer: { label: 'Developer', icon: '</>', defaultTab: 'code' },
@@ -12,7 +21,7 @@ export const PERSONAS = {
   explorer: { label: 'Just Exploring', icon: '?>', defaultTab: 'all' },
 };
 
-export const USE_CASE_TABS = [
+export const USE_CASE_TABS: UseCaseTab[] = [
   { id: 'all', label: 'All Tools', icon: '*', color: 'gray' },
   { id: 'writing', label: 'Writing', icon: 'Wr', color: 'pink' },
   { id: 'transform', label: 'Transform', icon: 'Tf', color: 'violet' },
@@ -33,7 +42,7 @@ export const USE_CASE_TABS = [
 */
 
 // Group definitions — order determines display order (like VSCode Source Control sections)
-export const TOOL_GROUPS = [
+export const TOOL_GROUPS: { id: string; label: string }[] = [
   { id: 'case', label: 'Case Transform' },
   { id: 'cleanup', label: 'Text Cleanup' },
   { id: 'lines', label: 'Lines & Sort' },
@@ -50,7 +59,7 @@ export const TOOL_GROUPS = [
   { id: 'utility', label: 'Utilities' },
 ];
 
-export const TOOLS = [
+export const TOOLS: ToolDefinition[] = [
   // ──────────────── Case Transform ────────────────
   {
     id: 'alternating_case',
@@ -3355,7 +3364,7 @@ export const TOOLS = [
 ];
 
 // ── Smart Suggestion Rules ────────────────────────────────
-export const SMART_SUGGESTION_RULES = [
+export const SMART_SUGGESTION_RULES: SmartSuggestionRule[] = [
   {
     test: (t) => {
       try {
@@ -3447,7 +3456,7 @@ export const SMART_SUGGESTION_RULES = [
 ];
 
 // ── Search Intent Mapping ────────────────────────────────
-export const SEARCH_INTENTS = [
+export const SEARCH_INTENTS: { phrases: string[]; toolIds: string[] }[] = [
   {
     phrases: ['make shorter', 'shorten', 'condense', 'reduce', 'brief'],
     toolIds: ['summarize', 'tweet_shorten'],
@@ -3667,7 +3676,7 @@ export const SEARCH_INTENTS = [
 ];
 
 // ── Achievement Definitions ────────────────────────────────
-export const ACHIEVEMENTS = [
+export const ACHIEVEMENTS: Achievement[] = [
   // Getting started
   {
     id: 'first_step',
@@ -3839,7 +3848,7 @@ export const ACHIEVEMENTS = [
 ];
 
 // ── Quest Templates ────────────────────────────────
-export const QUEST_TEMPLATES = [
+export const QUEST_TEMPLATES: QuestTemplate[] = [
   // Combo quests
   {
     id: 'combo_ai_transform',
@@ -3969,7 +3978,7 @@ export const QUEST_TEMPLATES = [
     check: (ops) => {
       if (ops.length < 3) return false;
       const r = ops.slice(-3);
-      return r[2].time - r[0].time < 60000;
+      return (r[2].time ?? 0) - (r[0].time ?? 0) < 60000;
     },
   },
   // Specific tool quests
@@ -4014,7 +4023,7 @@ export const QUEST_TEMPLATES = [
 ];
 
 // ── Level Thresholds ────────────────────────────────
-export const LEVELS = [
+export const LEVELS: LevelDefinition[] = [
   { level: 1, xp: 0, title: 'Beginner' },
   { level: 2, xp: 100, title: 'Novice' },
   { level: 3, xp: 250, title: 'Apprentice' },

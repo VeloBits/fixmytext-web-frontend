@@ -157,13 +157,30 @@ export interface SmartSuggestionRule {
   toolIds: string[];
 }
 
+/** Stats object passed to achievement condition functions. */
+export interface AchievementStats {
+  totalOps: number;
+  discoveredTools: string[];
+  sessionOps: number;
+  speedCount: number;
+  aiToolsUsed: number;
+  devToolsUsed: number;
+  languagesUsed: number;
+  streak: number;
+  totalChars: number;
+  favoritesCount: number;
+  savedPipelines: number;
+  nightOwl: boolean;
+  earlyBird: boolean;
+}
+
 /** A gamification achievement definition. */
 export interface Achievement {
   id: string;
   label: string;
   description: string;
   icon: string;
-  condition: (stats: Record<string, unknown>) => boolean;
+  condition: (stats: AchievementStats) => boolean;
 }
 
 /** An operation record used in quest check functions. */
