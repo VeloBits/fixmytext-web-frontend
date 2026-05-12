@@ -5,8 +5,21 @@ import {
   useDeleteHistoryEntryMutation,
   useClearHistoryMutation,
 } from '../../store/api/historyApi';
+import type { HistoryEntry } from '../../hooks/useHistory';
+import type { RootState } from '../../store/store';
 
-function timeAgo(ts) {
+type AlertType = 'warning' | 'danger' | 'success' | 'info';
+
+interface HistoryDrawerProps {
+  history: HistoryEntry[];
+  handleRestoreOriginal: (index: number) => void;
+  handleRestoreResult: (index: number) => void;
+  handleClearHistory: () => void;
+  setText?: (text: string) => void;
+  showAlert?: (message: string, type: AlertType) => void;
+}
+
+function timeAgo(ts: number): string {
   const s = Math.floor((Date.now() - ts) / 1000);
   if (s < 60) return `${s}s ago`;
   const m = Math.floor(s / 60);
@@ -14,7 +27,7 @@ function timeAgo(ts) {
   return `${Math.floor(m / 60)}h ago`;
 }
 
-function truncate(str, len = 60) {
+function truncate(str: string, len = 60): string {
   return str.length > len ? str.slice(0, len) + '…' : str;
 }
 
@@ -25,9 +38,9 @@ export default function HistoryDrawer({
   handleClearHistory,
   setText,
   showAlert,
-}) {
-  const { accessToken } = useSelector((s) => s.auth);
-  const [view, setView] = useState('session');
+}: HistoryDrawerProps) {
+  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const [view, setView] = useState<'session' | 'saved'>('session');
   const [page, setPage] = useState(1);
   const { data: serverHistory, isFetching } = useGetHistoryQuery(
     { page, pageSize: 25 },

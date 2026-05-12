@@ -1,3 +1,24 @@
+import type { Dispatch, SetStateAction } from 'react';
+
+interface Template {
+  name: string;
+  text: string;
+  tool_id: string | null;
+  id?: string;
+  createdAt?: string | number;
+  updatedAt?: string | number;
+}
+
+interface TemplatesDrawerProps {
+  templates: Template[];
+  templateName: string;
+  setTemplateName: Dispatch<SetStateAction<string>>;
+  handleSaveTemplate: () => void;
+  handleLoadTemplate: (index: number) => void;
+  handleDeleteTemplate: (index: number) => void;
+  disabled: boolean;
+}
+
 export default function TemplatesDrawer({
   templates,
   templateName,
@@ -6,7 +27,7 @@ export default function TemplatesDrawer({
   handleLoadTemplate,
   handleDeleteTemplate,
   disabled,
-}) {
+}: TemplatesDrawerProps) {
   return (
     <div className="tu-find-inputs">
       <div style={{ display: 'flex', gap: '0.5rem' }}>
