@@ -1,11 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type DependencyList } from 'react';
 
 const PREVIEW_DELAY = 3000;
 
+interface PreviewResult {
+  label: string;
+  result: string;
+}
+
 // ── Debounced preview hook — fires after 3s of inactivity ───────────
 
-function useDebouncedPreview(onPreview, deps, computeFn) {
-  const timerRef = useRef(null);
+function useDebouncedPreview(
+  onPreview: ((result: PreviewResult | null) => void) | undefined,
+  deps: DependencyList,
+  computeFn: () => PreviewResult | null
+) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -20,7 +29,7 @@ function useDebouncedPreview(onPreview, deps, computeFn) {
 
 // ── Match helper (shared by JS preview + badge count) ───────────────
 
-function lineMatches(line, pattern, caseSensitive, useRegex) {
+function lineMatches(line: string, pattern: string, caseSensitive: boolean, useRegex: boolean): boolean {
   if (!pattern.trim()) return false;
   if (useRegex) {
     try {
@@ -36,7 +45,7 @@ function lineMatches(line, pattern, caseSensitive, useRegex) {
 
 // ── Local preview helpers (mirror backend logic in JS) ──────────────
 
-function filterLines(text, pattern, mode, caseSensitive, useRegex) {
+function filterLines(text: string, pattern: string, mode: 'keep' | 'drop', caseSensitive: boolean, useRegex: boolean): string | null {
   if (!text || !pattern.trim()) return null;
   const lines = text.split('\n');
   const result =
@@ -46,7 +55,7 @@ function filterLines(text, pattern, mode, caseSensitive, useRegex) {
   return result.join('\n');
 }
 
-function wrapLines(text, prefix, suffix) {
+function wrapLines(text: string, prefix: string, suffix: string): string | null {
   if (!text || (!prefix && !suffix)) return null;
   return text
     .split('\n')
@@ -54,7 +63,7 @@ function wrapLines(text, prefix, suffix) {
     .join('\n');
 }
 
-function truncateLines(text, maxLen) {
+function truncateLines(text: string, maxLen: number): string | null {
   if (!text || maxLen < 5) return null;
   return text
     .split('\n')
@@ -62,10 +71,10 @@ function truncateLines(text, maxLen) {
     .join('\n');
 }
 
-function extractNthLines(text, n, offset) {
+function extractNthLines(text: string, n: number, offset: number): string | null {
   if (!text || n < 2) return null;
   const lines = text.split('\n');
-  const result = [];
+  const result: string[] = [];
   for (let i = offset; i < lines.length; i += n) result.push(lines[i]);
   return result.join('\n');
 }
@@ -158,7 +167,14 @@ const RegexIcon = () => (
 
 // ── Wrap Lines ──────────────────────────────────────────────────────
 
-export function WrapLinesDrawer({ onApply, onPreview, disabled, text = '' }) {
+interface WrapApplyArg { prefix: string; suffix: string; }
+interface WrapLinesDrawerProps {
+  onApply: (arg: WrapApplyArg) => void;
+  onPreview?: (result: PreviewResult | null) => void;
+  disabled: boolean;
+  text?: string;
+}
+export function WrapLinesDrawer({ onApply, onPreview, disabled, text = '' }: WrapLinesDrawerProps) {
   const [prefix, setPrefix] = useState('');
   const [suffix, setSuffix] = useState('');
   const lineCount = text ? text.split('\n').length : 0;
@@ -236,7 +252,15 @@ export function WrapLinesDrawer({ onApply, onPreview, disabled, text = '' }) {
 
 // ── Filter / Drop Lines (with case-sensitive + regex toggles) ───────
 
-export function FilterLinesDrawer({ onApply, onPreview, disabled, mode = 'keep', text = '' }) {
+interface FilterApplyArg { pattern: string; case_sensitive: boolean; use_regex: boolean; }
+interface FilterLinesDrawerProps {
+  onApply: (arg: FilterApplyArg) => void;
+  onPreview?: (result: PreviewResult | null) => void;
+  disabled: boolean;
+  mode?: 'keep' | 'drop';
+  text?: string;
+}
+export function FilterLinesDrawer({ onApply, onPreview, disabled, mode = 'keep', text = '' }: FilterLinesDrawerProps) {
   const [pattern, setPattern] = useState('');
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [useRegex, setUseRegex] = useState(false);
@@ -323,7 +347,14 @@ export function FilterLinesDrawer({ onApply, onPreview, disabled, mode = 'keep',
 
 // ── Truncate Lines ──────────────────────────────────────────────────
 
-export function TruncateLinesDrawer({ onApply, onPreview, disabled, text = '' }) {
+interface TruncateApplyArg { max_length: number; }
+interface TruncateLinesDrawerProps {
+  onApply: (arg: TruncateApplyArg) => void;
+  onPreview?: (result: PreviewResult | null) => void;
+  disabled: boolean;
+  text?: string;
+}
+export function TruncateLinesDrawer({ onApply, onPreview, disabled, text = '' }: TruncateLinesDrawerProps) {
   const [maxLength, setMaxLength] = useState(80);
   const overCount = useMemo(() => {
     if (!text) return 0;
@@ -379,7 +410,14 @@ export function TruncateLinesDrawer({ onApply, onPreview, disabled, text = '' })
 
 // ── Every Nth Line ──────────────────────────────────────────────────
 
-export function NthLineDrawer({ onApply, onPreview, disabled, text = '' }) {
+interface NthApplyArg { n: number; offset: number; }
+interface NthLineDrawerProps {
+  onApply: (arg: NthApplyArg) => void;
+  onPreview?: (result: PreviewResult | null) => void;
+  disabled: boolean;
+  text?: string;
+}
+export function NthLineDrawer({ onApply, onPreview, disabled, text = '' }: NthLineDrawerProps) {
   const [n, setN] = useState('');
   const [offset, setOffset] = useState('');
   const nVal = parseInt(n, 10) || 0;

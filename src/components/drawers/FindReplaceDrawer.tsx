@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, type Dispatch, type SetStateAction } from 'react';
 
-function getMatchCount(text, findText, caseSensitive, useRegex) {
+function getMatchCount(text: string, findText: string, caseSensitive: boolean, useRegex: boolean): number {
   if (!text || !findText) return 0;
   try {
     const flags = caseSensitive ? 'g' : 'gi';
@@ -10,6 +10,22 @@ function getMatchCount(text, findText, caseSensitive, useRegex) {
   } catch {
     return 0;
   }
+}
+
+interface FindReplaceDrawerProps {
+  findText: string;
+  setFindText: Dispatch<SetStateAction<string>>;
+  replaceText: string;
+  setReplaceText: Dispatch<SetStateAction<string>>;
+  findCaseSensitive: boolean;
+  setFindCaseSensitive: Dispatch<SetStateAction<boolean>>;
+  findUseRegex: boolean;
+  setFindUseRegex: Dispatch<SetStateAction<boolean>>;
+  replaceCount: number | null;
+  setReplaceCount: Dispatch<SetStateAction<number | null>>;
+  disabled: boolean;
+  handleReplaceAll: () => void;
+  text: string;
 }
 
 export default function FindReplaceDrawer({
@@ -26,7 +42,7 @@ export default function FindReplaceDrawer({
   disabled,
   handleReplaceAll,
   text,
-}) {
+}: FindReplaceDrawerProps) {
   const matchCount = useMemo(
     () => getMatchCount(text, findText, findCaseSensitive, findUseRegex),
     [text, findText, findCaseSensitive, findUseRegex]
