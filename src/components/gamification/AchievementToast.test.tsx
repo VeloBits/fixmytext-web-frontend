@@ -66,7 +66,7 @@ describe('AchievementToast', () => {
     const achievement = { icon: '⭐', label: 'Star' };
     render(<AchievementToast achievement={achievement} onDismiss={onDismiss} />);
     const overlay = screen.getByText('Achievement Unlocked!').closest('.tu-achieve-overlay');
-    fireEvent.click(overlay);
+    fireEvent.click(overlay!);
     expect(onDismiss).toHaveBeenCalled();
   });
 
@@ -75,7 +75,7 @@ describe('AchievementToast', () => {
     const achievement = { icon: '⭐', label: 'Star' };
     render(<AchievementToast achievement={achievement} onDismiss={onDismiss} />);
     const modal = screen.getByText('Achievement Unlocked!').closest('.tu-achieve-modal');
-    fireEvent.click(modal);
+    fireEvent.click(modal!);
     expect(onDismiss).not.toHaveBeenCalled();
   });
 
@@ -92,6 +92,6 @@ describe('AchievementToast', () => {
     );
     const confettiWrap = container.querySelector('.tu-achieve-confetti-wrap');
     expect(confettiWrap).toBeInTheDocument();
-    expect(confettiWrap.children.length).toBe(12);
+    expect(confettiWrap!.children.length).toBe(12);
   });
 });

@@ -1,6 +1,33 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+export interface SpinHistoryItem {
+  spin_date: string;
+  reward_type: string;
+  reward_ref: string | number;
+  iso_week?: string;
+}
+
+export interface SpinResult {
+  reward_type?: string;
+  amount?: number;
+  pass_name?: string;
+  pass_id?: string;
+  message?: string;
+  error?: string;
+}
+
+export interface SpinWheelSubscription {
+  handleSpin?: () => Promise<SpinResult | void>;
+  spinLoading?: boolean;
+  spinHistory?: SpinHistoryItem[];
+}
+
+export interface SpinWheelProps {
+  subscription: SpinWheelSubscription | null;
+  isAuthenticated: boolean;
+}
+
 const WHEEL_SEGMENTS = [
   { label: '1 Credit', color: '#4a9eff', icon: '💧' },
   { label: '3 Credits', color: '#7c5cff', icon: '💎' },
@@ -14,7 +41,11 @@ const SEGMENT_ARC = 360 / WHEEL_SEGMENTS.length; // 60 degrees each
 
 const CONFETTI_EMOJIS = ['🎉', '🎊', '✨', '⭐', '🌟', '💫', '🏆', '🔥'];
 
-function ConfettiParticle({ index }) {
+interface ConfettiParticleProps {
+  index: number;
+}
+
+function ConfettiParticle({ index }: ConfettiParticleProps) {
   const emoji = CONFETTI_EMOJIS[index % CONFETTI_EMOJIS.length];
   const { left, delay, duration, size } = useMemo(
     () => ({
@@ -45,20 +76,20 @@ function ConfettiParticle({ index }) {
   );
 }
 
-function formatRewardLabel(item) {
+function formatRewardLabel(item: SpinHistoryItem): string {
   if (item.reward_type === 'credits')
-    return `${item.reward_ref} Credit${item.reward_ref > 1 ? 's' : ''}`;
-  if (item.reward_type === 'pass') return item.reward_ref || 'Pass';
-  return item.reward_ref || 'Reward';
+    return `${item.reward_ref} Credit${Number(item.reward_ref) > 1 ? 's' : ''}`;
+  if (item.reward_type === 'pass') return String(item.reward_ref || 'Pass');
+  return String(item.reward_ref || 'Reward');
 }
 
-function formatSpinDate(dateStr) {
+function formatSpinDate(dateStr: string): string {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function hasSpunThisWeek(spinHistory) {
+function hasSpunThisWeek(spinHistory: SpinHistoryItem[] | undefined): boolean {
   if (!spinHistory || spinHistory.length === 0) return false;
   const now = new Date();
   // ISO week calculation: get the Monday of the current week
@@ -71,18 +102,18 @@ function hasSpunThisWeek(spinHistory) {
   return latestSpin >= monday;
 }
 
-function resultLabel(result) {
+function resultLabel(result: SpinResult | null): string {
   if (!result) return '';
   return (
     result.message ||
     (result.reward_type === 'credits'
-      ? `You won ${result.amount} credit${result.amount > 1 ? 's' : ''}!`
+      ? `You won ${result.amount} credit${(result.amount ?? 0) > 1 ? 's' : ''}!`
       : `You won a ${result.pass_name || 'pass'}!`)
   );
 }
 
 /** Build an SVG path for a pie segment */
-function segmentPath(index, radius) {
+function segmentPath(index: number, radius: number): string {
   const startAngle = (index * SEGMENT_ARC - 90) * (Math.PI / 180);
   const endAngle = ((index + 1) * SEGMENT_ARC - 90) * (Math.PI / 180);
   const x1 = radius + radius * Math.cos(startAngle);
@@ -93,7 +124,7 @@ function segmentPath(index, radius) {
 }
 
 /** Label position at the midpoint of a segment */
-function labelPos(index, radius) {
+function labelPos(index: number, radius: number): { x: number; y: number; rotate: number } {
   const midAngle = ((index + 0.5) * SEGMENT_ARC - 90) * (Math.PI / 180);
   const r = radius * 0.62;
   return {
@@ -104,25 +135,25 @@ function labelPos(index, radius) {
 }
 
 // Map API reward result to a WHEEL_SEGMENTS index
-function rewardToSegmentIndex(res) {
+function rewardToSegmentIndex(res: SpinResult | null): number {
   if (!res) return 0;
   if (res.reward_type === 'credits') {
-    return res.amount >= 3 ? 1 : 0; // 3 Credits or 1 Credit
+    return (res.amount ?? 0) >= 3 ? 1 : 0; // 3 Credits or 1 Credit
   }
   if (res.reward_type === 'pass') {
-    const passMap = { quick_fix: 2, tinkerer: 3, day_single: 4, day_triple: 5 };
-    return passMap[res.pass_id] ?? 2;
+    const passMap: Record<string, number> = { quick_fix: 2, tinkerer: 3, day_single: 4, day_triple: 5 };
+    return (res.pass_id != null ? passMap[res.pass_id] : undefined) ?? 2;
   }
   return 0;
 }
 
-export default function SpinWheel({ subscription, isAuthenticated }) {
+export default function SpinWheel({ subscription, isAuthenticated }: SpinWheelProps) {
   const { handleSpin, spinLoading, spinHistory } = subscription || {};
 
   const [spinning, setSpinning] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<SpinResult | null>(null);
   const [rotation, setRotation] = useState(0);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const isMounted = useRef(true);
 
   useEffect(() => {
@@ -144,8 +175,8 @@ export default function SpinWheel({ subscription, isAuthenticated }) {
 
     // Call the API and wait for animation in parallel
     const [res] = await Promise.all([
-      handleSpin(),
-      new Promise((resolve) => setTimeout(resolve, 4000)), // matches CSS transition duration
+      handleSpin() as Promise<SpinResult>,
+      new Promise<void>((resolve) => setTimeout(resolve, 4000)), // matches CSS transition duration
     ]);
 
     // Compute rotation to land on the correct segment

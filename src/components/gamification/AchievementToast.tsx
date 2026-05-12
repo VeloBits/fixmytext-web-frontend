@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const CONFETTI = ['🎉', '🎊', '✨', '⭐', '🌟', '💫', '🏆', '🔥'];
 
-function ConfettiParticle({ index }) {
+interface ConfettiParticleProps {
+  index: number;
+}
+
+function ConfettiParticle({ index }: ConfettiParticleProps) {
   const emoji = CONFETTI[index % CONFETTI.length];
   const left = 10 + Math.random() * 80;
   const delay = Math.random() * 0.6;
@@ -23,7 +27,18 @@ function ConfettiParticle({ index }) {
   );
 }
 
-export default function AchievementToast({ achievement, onDismiss }) {
+export interface AchievementDisplay {
+  icon: string;
+  label: string;
+  desc?: string;
+}
+
+export interface AchievementToastProps {
+  achievement: AchievementDisplay | null;
+  onDismiss?: () => void;
+}
+
+export default function AchievementToast({ achievement, onDismiss }: AchievementToastProps) {
   const dismiss = useCallback(() => {
     if (onDismiss) onDismiss();
   }, [onDismiss]);
@@ -38,7 +53,7 @@ export default function AchievementToast({ achievement, onDismiss }) {
   // Close on Escape
   useEffect(() => {
     if (!achievement) return;
-    const handleKey = (e) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') dismiss();
     };
     window.addEventListener('keydown', handleKey);
