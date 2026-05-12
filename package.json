@@ -71,8 +71,9 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "gen:types": "openapi-typescript ../backend/openapi.json -o src/types/openapi.d.ts",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm run typecheck:app && npm run typecheck:node && npm run typecheck:e2e",
     "prepare": "husky",
+    "typecheck:app": "tsc --noEmit",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
     "typecheck:e2e": "tsc --noEmit -p tsconfig.e2e.json"
   },
