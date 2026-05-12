@@ -1,6 +1,36 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import ToolIcon from './ToolIcon';
 
+interface WorkspaceTabTool {
+  id: string;
+  color?: string;
+}
+
+interface WorkspaceTab {
+  id: string;
+  label: string;
+  icon?: string;
+  type: 'tool' | 'drawer' | string;
+  tool?: WorkspaceTabTool;
+  panelId?: string;
+  color?: string;
+}
+
+interface SaveModalPayload {
+  tabId: string;
+  defaultName: string;
+}
+
+interface TabBarProps {
+  workspaceTabs: WorkspaceTab[];
+  activeWorkspaceId: string | null;
+  setActiveWorkspaceId: (id: string) => void;
+  setActivePanel: (panelId: string | null) => void;
+  setSaveModal: (payload: SaveModalPayload) => void;
+  closeWorkspaceTab: (id: string) => void;
+  onTabSwitch?: () => void;
+}
+
 /**
  * Workspace tab bar with horizontal scrolling and tab management.
  * Renders open workspace tabs (tool or drawer), supporting scroll arrows
@@ -23,8 +53,8 @@ export default function TabBar({
   setSaveModal,
   closeWorkspaceTab,
   onTabSwitch,
-}) {
-  const barRef = useRef(null);
+}: TabBarProps) {
+  const barRef = useRef<HTMLDivElement | null>(null);
   const [scrollState, setScrollState] = useState({ overflows: false, atStart: true, atEnd: true });
 
   const updateScroll = useCallback(() => {
@@ -90,7 +120,7 @@ export default function TabBar({
             onClick={() => {
               if (tab.id !== activeWorkspaceId) onTabSwitch?.();
               setActiveWorkspaceId(tab.id);
-              if (tab.type === 'drawer') setActivePanel(tab.panelId);
+              if (tab.type === 'drawer') setActivePanel(tab.panelId ?? null);
             }}
             title={`~/FixMyText/workspace/${tab.label}`}
           >

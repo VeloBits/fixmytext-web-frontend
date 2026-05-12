@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TabBar from './TabBar';
 
 vi.mock('./ToolIcon', () => ({
-  default: ({ icon }) => <span data-testid="tool-icon">{icon}</span>,
+  default: ({ icon }: { icon?: string }) => <span data-testid="tool-icon">{icon}</span>,
 }));
 
 // jsdom doesn't provide ResizeObserver
@@ -48,7 +48,7 @@ describe('TabBar', () => {
   it('marks active tab with active class', () => {
     render(<TabBar {...baseProps} />);
     const activeTab = screen.getByText('Uppercase').closest('.tu-tab');
-    expect(activeTab.className).toContain('tu-tab--active');
+    expect(activeTab!.className).toContain('tu-tab--active');
   });
 
   it('calls setActiveWorkspaceId on tab click', () => {
@@ -108,7 +108,7 @@ describe('TabBar', () => {
   it('handles wheel event on the tab bar', () => {
     render(<TabBar {...baseProps} />);
     const tabBar = document.querySelector('.tu-tab-bar');
-    fireEvent.wheel(tabBar, { deltaY: 100 });
+    fireEvent.wheel(tabBar!, { deltaY: 100 });
     // The wheel handler sets scrollLeft; we just verify no crash
     expect(tabBar).toBeInTheDocument();
   });

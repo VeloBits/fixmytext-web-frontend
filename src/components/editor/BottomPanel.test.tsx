@@ -1,23 +1,24 @@
 import React from 'react';
+import type { ReactNode } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import BottomPanel from './BottomPanel';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) =>
-      React.createElement(tag || 'div', props, children);
+    (tag: string) =>
+    ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) =>
+      React.createElement(tag || 'div', props as Record<string, unknown>, children);
   return {
-    motion: new Proxy({}, { get: (_, tag) => m(tag) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, tag: string) => m(tag) }),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
 
 // Mock PipelineStrip
 vi.mock('./PipelineStrip', () => ({
-  default: ({ steps, onClear }) => (
+  default: ({ steps, onClear }: { steps: Array<{ label: string }>; onClear: () => void }) => (
     <div data-testid="pipeline-strip">
       {steps.map((s, i) => (
         <span key={i}>{s.label}</span>

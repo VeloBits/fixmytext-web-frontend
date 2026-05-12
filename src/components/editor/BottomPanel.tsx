@@ -1,7 +1,47 @@
 import { useState, useMemo, memo } from 'react';
+import type { CSSProperties } from 'react';
 import PipelineStrip from './PipelineStrip';
 
-function timeAgo(ts) {
+interface PipelineStepItem {
+  toolId?: string;
+  label: string;
+  result?: string;
+  timestamp?: number;
+}
+
+interface HistoryEntry {
+  operation: string;
+  original: string;
+  result: string;
+  timestamp: number;
+}
+
+interface PipelineProps {
+  steps: PipelineStepItem[];
+  clearPipeline: () => void;
+}
+
+interface HistoryProps {
+  history: HistoryEntry[];
+  handleRestoreOriginal: (index: number) => void;
+  handleRestoreResult: (index: number) => void;
+  handleClearHistory: () => void;
+}
+
+interface GamificationProps {
+  xp?: number;
+  discoveredTools?: string[];
+}
+
+interface BottomPanelProps {
+  pipeline: PipelineProps;
+  history: HistoryProps;
+  text: string;
+  gamification?: GamificationProps | null;
+  style?: CSSProperties;
+}
+
+function timeAgo(ts: number): string {
   const s = Math.floor((Date.now() - ts) / 1000);
   if (s < 60) return `${s}s ago`;
   const m = Math.floor(s / 60);
@@ -9,7 +49,7 @@ function timeAgo(ts) {
   return `${Math.floor(m / 60)}h ago`;
 }
 
-function truncate(str, len = 80) {
+function truncate(str: string, len = 80): string {
   return str.length > len ? str.slice(0, len) + '…' : str;
 }
 
@@ -19,7 +59,7 @@ const TABS = [
   { id: 'pipeline', label: 'Pipeline', icon: '▶' },
 ];
 
-export default memo(function BottomPanel({ pipeline, history, text, gamification, style }) {
+export default memo(function BottomPanel({ pipeline, history, text, gamification, style }: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState('stats');
   const [collapsed, setCollapsed] = useState(false);
 
