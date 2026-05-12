@@ -3,6 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetPassCatalogQuery } from '../../store/api/passesApi';
 import formatPriceUtil from '../../utils/formatPrice';
+import type { SubscriptionContextValue, ToolUsage } from '../../contexts/AppContext';
+import type { ToolDefinition } from '../../types/tools';
+
+type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
+
+export interface PassPurchaseModalProps {
+  show: boolean;
+  onDismiss: () => void;
+  blockedTool: ToolDefinition | null;
+  subscription: SubscriptionContextValue;
+}
 
 const ClockIcon = () => (
   <svg
@@ -79,15 +90,16 @@ const SparkleIcon = () => (
   </svg>
 );
 
-export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscription }) {
+export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscription }: PassPurchaseModalProps) {
   const navigate = useNavigate();
   const { data: catalog } = useGetPassCatalogQuery(undefined, { skip: !show });
-  const [buyingId, setBuyingId] = useState(null);
+  const [buyingId, setBuyingId] = useState<string | null>(null);
 
   if (!show || !blockedTool) return null;
 
-  const handleBuy = async (fn, ...args) => {
-    const id = args[0];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleBuy = async (fn: (...args: any[]) => Promise<void>, ...args: any[]) => {
+    const id: string = args[0];
     setBuyingId(id);
     try {
       await fn(...args);
@@ -96,17 +108,17 @@ export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscr
     }
   };
 
-  const usage = subscription?.getToolUsage?.(blockedTool.id) || { uses: 3, max: 3 };
+  const usage: ToolUsage = subscription?.getToolUsage?.(blockedTool.id) || { uses: 3, max: 3, hasPass: false };
   const passes = catalog?.passes || [];
   const creditPacks = catalog?.credit_packs || [];
   const symbol = catalog?.passes?.[0]?.symbol || '$';
-  const currency = catalog?.passes?.[0]?.currency || 'usd';
+  const currency = (catalog?.passes?.[0]?.currency || 'usd') as SupportedCurrency;
 
   const singlePass = passes.find((p) => p.id === 'day_single');
   const triplePass = passes.find((p) => p.id === 'day_triple');
   const cheapestCredit = creditPacks[0];
 
-  const formatPrice = (price) => formatPriceUtil(price, currency, symbol);
+  const formatPrice = (price: number) => formatPriceUtil(price, currency, symbol);
   const usagePercent = Math.min((usage.uses / usage.max) * 100, 100);
 
   return (

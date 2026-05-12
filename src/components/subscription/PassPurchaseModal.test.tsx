@@ -1,6 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PassPurchaseModal from './PassPurchaseModal';
+import type { PassPurchaseModalProps } from './PassPurchaseModal';
+import type { ToolDefinition } from '../../types/tools';
+import type { SubscriptionContextValue } from '../../contexts/AppContext';
 
 vi.mock('framer-motion', () => {
   const m =
@@ -45,16 +48,16 @@ vi.mock('../../utils/formatPrice', () => ({
 }));
 
 describe('PassPurchaseModal', () => {
-  const baseProps = {
+  const baseProps: PassPurchaseModalProps = {
     show: true,
     onDismiss: vi.fn(),
-    blockedTool: { id: 'fix_grammar', label: 'Fix Grammar' },
+    blockedTool: { id: 'fix_grammar', label: 'Fix Grammar' } as ToolDefinition,
     subscription: {
-      getToolUsage: vi.fn(() => ({ uses: 3, max: 3 })),
+      getToolUsage: vi.fn(() => ({ uses: 3, max: 3, hasPass: false })),
       handleBuyPass: vi.fn(),
       handleBuyCredits: vi.fn(),
       handleUpgrade: vi.fn(),
-    },
+    } as unknown as SubscriptionContextValue,
   };
 
   beforeEach(() => {
@@ -104,7 +107,7 @@ describe('PassPurchaseModal', () => {
   it('calls onDismiss when overlay clicked', () => {
     render(<PassPurchaseModal {...baseProps} />);
     const overlay = screen.getByText('Daily Limit Reached').closest('.tu-upgrade-overlay');
-    fireEvent.click(overlay);
+    fireEvent.click(overlay!);
     expect(baseProps.onDismiss).toHaveBeenCalled();
   });
 
@@ -121,7 +124,7 @@ describe('PassPurchaseModal', () => {
   it('calls handleBuyPass when single pass option is clicked', async () => {
     render(<PassPurchaseModal {...baseProps} />);
     // Click the Day Single pass option
-    fireEvent.click(screen.getByText('Day Single').closest('div').parentElement);
+    fireEvent.click(screen.getByText('Day Single').closest('div')!.parentElement!);
     expect(baseProps.subscription.handleBuyPass).toHaveBeenCalledWith('day_single', [
       'fix_grammar',
     ]);
@@ -129,13 +132,13 @@ describe('PassPurchaseModal', () => {
 
   it('calls handleBuyCredits when credit option is clicked', async () => {
     render(<PassPurchaseModal {...baseProps} />);
-    fireEvent.click(screen.getByText('5 Credits').closest('div').parentElement);
+    fireEvent.click(screen.getByText('5 Credits').closest('div')!.parentElement!);
     expect(baseProps.subscription.handleBuyCredits).toHaveBeenCalledWith('pack_5');
   });
 
   it('calls handleUpgrade when pro upsell is clicked', () => {
     render(<PassPurchaseModal {...baseProps} />);
-    fireEvent.click(screen.getByText(/unlimited everything/).closest('div').parentElement);
+    fireEvent.click(screen.getByText(/unlimited everything/).closest('div')!.parentElement!);
     expect(baseProps.subscription.handleUpgrade).toHaveBeenCalled();
   });
 
@@ -147,7 +150,7 @@ describe('PassPurchaseModal', () => {
 
   it('calls onDismiss when Day Triple option is clicked', () => {
     render(<PassPurchaseModal {...baseProps} />);
-    fireEvent.click(screen.getByText('Day Triple').closest('div').parentElement);
+    fireEvent.click(screen.getByText('Day Triple').closest('div')!.parentElement!);
     expect(baseProps.onDismiss).toHaveBeenCalled();
   });
 });
