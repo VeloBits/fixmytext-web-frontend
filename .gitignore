@@ -33,3 +33,4 @@ logs/
 # ── AI Files ─────────────────────────────────────────────────────────
 *.ai
 .claude
+fixmytext-output.pdf
