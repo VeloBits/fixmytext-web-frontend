@@ -3,6 +3,12 @@ import { Link, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useForgotPasswordMutation } from '../store/api/authApi';
 import { ROUTES } from '../constants';
+import type { AlertLevel } from '../contexts/AlertContext';
+import type { RootState } from '../store/store';
+
+interface ForgotPasswordPageProps {
+  showAlert: (message: string, type: AlertLevel) => void;
+}
 
 function MailIcon() {
   return (
@@ -23,8 +29,8 @@ function MailIcon() {
   );
 }
 
-export default function ForgotPasswordPage({ showAlert }) {
-  const { accessToken } = useSelector((s) => s.auth);
+export default function ForgotPasswordPage({ showAlert }: ForgotPasswordPageProps) {
+  const { accessToken } = useSelector((s: RootState) => s.auth);
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const [email, setEmail] = useState('');
@@ -32,26 +38,28 @@ export default function ForgotPasswordPage({ showAlert }) {
 
   if (accessToken) return <Navigate to={ROUTES.HOME} replace />;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await forgotPassword({ email }).unwrap();
       // TODO(email): remove this dev-only fallback once the email pipeline ships.
       // The backend currently returns the raw token to unblock frontend work;
       // in prod the user will receive a link by email instead.
-      if (res?.reset_token) {
+      const resWithToken = res as { reset_token?: string };
+      if (resWithToken?.reset_token) {
         console.info(
           'DEV reset link:',
-          `${window.location.origin}${ROUTES.RESET_PASSWORD}?token=${res.reset_token}`
+          `${window.location.origin}${ROUTES.RESET_PASSWORD}?token=${resWithToken.reset_token}`
         );
       }
       setSubmitted(true);
       showAlert('If that email is registered, we have sent a reset link.', 'success');
     } catch (err) {
-      if (err?.status === 429) {
+      const apiErr = err as { status?: number; data?: { detail?: string } };
+      if (apiErr?.status === 429) {
         showAlert('Too many attempts. Please try again in a minute.', 'danger');
       } else {
-        showAlert(err?.data?.detail || 'Could not send reset link. Please try again.', 'danger');
+        showAlert(apiErr?.data?.detail || 'Could not send reset link. Please try again.', 'danger');
       }
     }
   };

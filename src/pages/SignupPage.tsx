@@ -4,10 +4,16 @@ import { useRegisterMutation } from '../store/api/authApi';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { ROUTES } from '../constants';
+import type { AlertLevel } from '../contexts/AlertContext';
+import type { RootState } from '../store/store';
 
-export default function SignupPage({ showAlert }) {
+interface SignupPageProps {
+  showAlert: (message: string, type: AlertLevel) => void;
+}
+
+export default function SignupPage({ showAlert }: SignupPageProps) {
   const navigate = useNavigate();
-  const { accessToken } = useSelector((s) => s.auth);
+  const { accessToken } = useSelector((s: RootState) => s.auth);
   const [register, { isLoading }] = useRegisterMutation();
 
   const [displayName, setDisplayName] = useState('');
@@ -19,7 +25,7 @@ export default function SignupPage({ showAlert }) {
 
   if (accessToken) return <Navigate to={ROUTES.HOME} replace />;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (password.length < 8) {
       showAlert('Password must be at least 8 characters', 'danger');
@@ -34,7 +40,8 @@ export default function SignupPage({ showAlert }) {
       showAlert('Account created successfully', 'success');
       navigate(ROUTES.HOME);
     } catch (err) {
-      showAlert(err.data?.detail || 'Registration failed. Please try again.', 'danger');
+      const apiErr = err as { data?: { detail?: string } };
+      showAlert(apiErr.data?.detail || 'Registration failed. Please try again.', 'danger');
     }
   };
 

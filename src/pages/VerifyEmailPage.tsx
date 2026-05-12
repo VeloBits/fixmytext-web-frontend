@@ -3,6 +3,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useResendVerificationMutation, useVerifyEmailMutation } from '../store/api/authApi';
 import { useSelector } from 'react-redux';
 import { ROUTES } from '../constants';
+import type { AlertLevel } from '../contexts/AlertContext';
+import type { RootState } from '../store/store';
+
+interface VerifyEmailPageProps {
+  showAlert: (message: string, type: AlertLevel) => void;
+}
 
 const STATES = {
   IDLE: 'idle',
@@ -50,11 +56,11 @@ function AlertIcon() {
   );
 }
 
-export default function VerifyEmailPage({ showAlert }) {
+export default function VerifyEmailPage({ showAlert }: VerifyEmailPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || '';
-  const { accessToken } = useSelector((s) => s.auth);
+  const { accessToken } = useSelector((s: RootState) => s.auth);
 
   const [verifyEmail, { isLoading: verifying }] = useVerifyEmailMutation();
   const [resendVerification, { isLoading: resending }] = useResendVerificationMutation();
@@ -73,9 +79,10 @@ export default function VerifyEmailPage({ showAlert }) {
         setState(STATES.SUCCESS);
         showAlert('Email verified — welcome aboard!', 'success');
       } catch (err) {
+        const apiErr = err as { data?: { detail?: string } };
         setState(STATES.FAILED);
         setErrorMessage(
-          err?.data?.detail ||
+          apiErr?.data?.detail ||
             'This verification link is invalid or has expired. Please request a new one.'
         );
       }
@@ -92,14 +99,15 @@ export default function VerifyEmailPage({ showAlert }) {
       await resendVerification().unwrap();
       showAlert('A new verification email has been sent. Check your inbox.', 'success');
     } catch (err) {
-      if (err?.status === 429) {
+      const apiErr = err as { status?: number; data?: { detail?: string } };
+      if (apiErr?.status === 429) {
         showAlert(
-          err?.data?.detail || 'Please wait a moment before requesting another email.',
+          apiErr?.data?.detail || 'Please wait a moment before requesting another email.',
           'warning'
         );
       } else {
         showAlert(
-          err?.data?.detail || 'Could not send verification email. Try again shortly.',
+          apiErr?.data?.detail || 'Could not send verification email. Try again shortly.',
           'danger'
         );
       }

@@ -5,7 +5,7 @@ import { expectNoA11yViolations } from '../test/axeHelper';
 
 const mockNavigate = vi.fn();
 const mockRegister = vi.fn();
-let mockAccessToken = null;
+let mockAccessToken: string | null = null;
 
 vi.mock('react-router-dom', () => ({
   Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
@@ -63,7 +63,7 @@ describe('SignupPage', () => {
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'john@test.com' } });
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: '123' } });
     fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: '123' } });
-    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form'));
+    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith('Password must be at least 8 characters', 'danger');
     });
@@ -77,7 +77,7 @@ describe('SignupPage', () => {
     fireEvent.change(screen.getByLabelText('Confirm Password'), {
       target: { value: 'different123' },
     });
-    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form'));
+    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith('Passwords do not match', 'danger');
     });
@@ -92,7 +92,7 @@ describe('SignupPage', () => {
     fireEvent.change(screen.getByLabelText('Confirm Password'), {
       target: { value: 'password123' },
     });
-    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form'));
+    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form')!);
     await waitFor(() => {
       expect(mockRegister).toHaveBeenCalledWith({
         email: 'john@test.com',
@@ -115,7 +115,7 @@ describe('SignupPage', () => {
     fireEvent.change(screen.getByLabelText('Confirm Password'), {
       target: { value: 'password123' },
     });
-    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form'));
+    fireEvent.submit(screen.getByText('Create Account', { selector: 'button' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith('Email taken', 'danger');
     });

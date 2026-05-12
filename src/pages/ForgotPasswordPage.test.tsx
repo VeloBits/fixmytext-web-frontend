@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ForgotPasswordPage from './ForgotPasswordPage';
 
 const mockForgotPassword = vi.fn();
-let mockAccessToken = null;
+let mockAccessToken: string | null = null;
 
 vi.mock('react-router-dom', () => ({
   Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
@@ -57,7 +57,7 @@ describe('ForgotPasswordPage', () => {
     fireEvent.change(screen.getByLabelText('Email'), {
       target: { value: 'user@example.com' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Send reset link' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Send reset link' }).closest('form')!);
     await waitFor(() => {
       expect(mockForgotPassword).toHaveBeenCalledWith({ email: 'user@example.com' });
       expect(showAlert).toHaveBeenCalledWith(
@@ -77,7 +77,7 @@ describe('ForgotPasswordPage', () => {
     fireEvent.change(screen.getByLabelText('Email'), {
       target: { value: 'spam@example.com' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Send reset link' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Send reset link' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith(
         'Too many attempts. Please try again in a minute.',
@@ -92,7 +92,7 @@ describe('ForgotPasswordPage', () => {
     fireEvent.change(screen.getByLabelText('Email'), {
       target: { value: 'user@example.com' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Send reset link' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Send reset link' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith(
         'Could not send reset link. Please try again.',

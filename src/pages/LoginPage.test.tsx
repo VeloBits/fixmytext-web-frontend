@@ -5,7 +5,7 @@ import { expectNoA11yViolations } from '../test/axeHelper';
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
-let mockAccessToken = null;
+let mockAccessToken: string | null = null;
 
 vi.mock('react-router-dom', () => ({
   Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
@@ -97,7 +97,7 @@ describe('LoginPage', () => {
     render(<LoginPage showAlert={showAlert} />);
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'pass1234' } });
-    fireEvent.submit(screen.getByText('Sign In').closest('form'));
+    fireEvent.submit(screen.getByText('Sign In').closest('form')!);
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith({
         email: 'test@example.com',
@@ -114,7 +114,7 @@ describe('LoginPage', () => {
     render(<LoginPage showAlert={showAlert} />);
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'wrong' } });
-    fireEvent.submit(screen.getByText('Sign In').closest('form'));
+    fireEvent.submit(screen.getByText('Sign In').closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith('Bad creds', 'danger');
     });
@@ -125,7 +125,7 @@ describe('LoginPage', () => {
     render(<LoginPage showAlert={showAlert} />);
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'wrong' } });
-    fireEvent.submit(screen.getByText('Sign In').closest('form'));
+    fireEvent.submit(screen.getByText('Sign In').closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith(
         'Login failed. Please check your credentials.',

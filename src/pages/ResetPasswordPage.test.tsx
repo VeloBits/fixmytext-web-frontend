@@ -4,8 +4,8 @@ import ResetPasswordPage from './ResetPasswordPage';
 
 const mockNavigate = vi.fn();
 const mockResetPassword = vi.fn();
-let mockAccessToken = null;
-let mockTokenParam = 'valid-token';
+let mockAccessToken: string | null = null;
+let mockTokenParam: string | null = 'valid-token';
 
 vi.mock('react-router-dom', () => ({
   Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
@@ -70,7 +70,7 @@ describe('ResetPasswordPage', () => {
     confirmPw.removeAttribute('minLength');
     fireEvent.change(newPw, { target: { value: 'short' } });
     fireEvent.change(confirmPw, { target: { value: 'short' } });
-    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith('Password must be at least 8 characters', 'danger');
     });
@@ -85,7 +85,7 @@ describe('ResetPasswordPage', () => {
     fireEvent.change(screen.getByLabelText('Confirm new password'), {
       target: { value: 'different1' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith('Passwords do not match', 'danger');
     });
@@ -101,7 +101,7 @@ describe('ResetPasswordPage', () => {
     fireEvent.change(screen.getByLabelText('Confirm new password'), {
       target: { value: 'brand-new-pw' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form')!);
     await waitFor(() => {
       expect(mockResetPassword).toHaveBeenCalledWith({
         token: 'valid-token',
@@ -127,7 +127,7 @@ describe('ResetPasswordPage', () => {
     fireEvent.change(screen.getByLabelText('Confirm new password'), {
       target: { value: 'brand-new-pw' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Reset password' }).closest('form')!);
     await waitFor(() => {
       expect(showAlert).toHaveBeenCalledWith('Invalid or expired reset token', 'danger');
     });

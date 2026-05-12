@@ -4,10 +4,16 @@ import { useLoginMutation } from '../store/api/authApi';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { ROUTES } from '../constants';
+import type { AlertLevel } from '../contexts/AlertContext';
+import type { RootState } from '../store/store';
 
-export default function LoginPage({ showAlert }) {
+interface LoginPageProps {
+  showAlert: (message: string, type: AlertLevel) => void;
+}
+
+export default function LoginPage({ showAlert }: LoginPageProps) {
   const navigate = useNavigate();
-  const { accessToken } = useSelector((s) => s.auth);
+  const { accessToken } = useSelector((s: RootState) => s.auth);
   const [login, { isLoading }] = useLoginMutation();
 
   const [email, setEmail] = useState('');
@@ -17,14 +23,15 @@ export default function LoginPage({ showAlert }) {
 
   if (accessToken) return <Navigate to={ROUTES.HOME} replace />;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await login({ email, password, remember_me: rememberMe }).unwrap();
       showAlert('Logged in successfully', 'success');
       navigate(ROUTES.HOME);
     } catch (err) {
-      showAlert(err.data?.detail || 'Login failed. Please check your credentials.', 'danger');
+      const apiErr = err as { data?: { detail?: string } };
+      showAlert(apiErr.data?.detail || 'Login failed. Please check your credentials.', 'danger');
     }
   };
 

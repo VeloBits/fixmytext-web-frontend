@@ -3,8 +3,18 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useResetPasswordMutation } from '../store/api/authApi';
 import { ROUTES } from '../constants';
+import type { AlertLevel } from '../contexts/AlertContext';
+import type { RootState } from '../store/store';
 
-function EyeIcon({ hidden }) {
+interface ResetPasswordPageProps {
+  showAlert: (message: string, type: AlertLevel) => void;
+}
+
+interface EyeIconProps {
+  hidden: boolean;
+}
+
+function EyeIcon({ hidden }: EyeIconProps) {
   return hidden ? (
     <svg
       width="18"
@@ -60,12 +70,12 @@ function AlertIcon() {
   );
 }
 
-export default function ResetPasswordPage({ showAlert }) {
+export default function ResetPasswordPage({ showAlert }: ResetPasswordPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || '';
 
-  const { accessToken } = useSelector((s) => s.auth);
+  const { accessToken } = useSelector((s: RootState) => s.auth);
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   const [newPassword, setNewPassword] = useState('');
@@ -85,7 +95,7 @@ export default function ResetPasswordPage({ showAlert }) {
 
   if (accessToken) return <Navigate to={ROUTES.HOME} replace />;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newPassword.length < 8) {
       showAlert('Password must be at least 8 characters', 'danger');
@@ -100,8 +110,9 @@ export default function ResetPasswordPage({ showAlert }) {
       showAlert('Password reset successfully. Please sign in.', 'success');
       navigate(ROUTES.LOGIN);
     } catch (err) {
+      const apiErr = err as { data?: { detail?: string } };
       showAlert(
-        err?.data?.detail || 'Reset link is invalid or has expired. Request a new one.',
+        apiErr?.data?.detail || 'Reset link is invalid or has expired. Request a new one.',
         'danger'
       );
     }

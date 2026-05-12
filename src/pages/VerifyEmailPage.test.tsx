@@ -6,8 +6,8 @@ import VerifyEmailPage from './VerifyEmailPage';
 const mockNavigate = vi.fn();
 const mockVerifyEmail = vi.fn();
 const mockResendVerification = vi.fn();
-let mockAccessToken = null;
-let mockTokenParam = 'valid-token';
+let mockAccessToken: string | null = null;
+let mockTokenParam: string | null = 'valid-token';
 
 vi.mock('react-router-dom', () => ({
   Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
