@@ -1,4 +1,14 @@
 import { useState } from 'react';
+import type { ToolDefinition } from '../../types/tools';
+
+type AlertType = 'warning' | 'danger' | 'success' | 'info';
+type FakeFormat = 'text' | 'json' | 'csv';
+
+interface FakeDataDrawerProps {
+  activeTool?: Pick<ToolDefinition, 'id' | 'label'> | null;
+  onResult: (label: string, result: string) => void;
+  showAlert: (message: string, type: AlertType) => void;
+}
 
 const FIRST_NAMES = [
   'James',
@@ -141,13 +151,14 @@ function genAddress() {
   )}`;
 }
 
-export default function FakeDataDrawer({ activeTool, onResult, showAlert }) {
+export default function FakeDataDrawer({ activeTool, onResult, showAlert }: FakeDataDrawerProps) {
   const [count, setCount] = useState(5);
-  const [format, setFormat] = useState('text');
+  const [format, setFormat] = useState<FakeFormat>('text');
   const toolId = activeTool?.id || 'fake_data_set';
 
+  interface FakeRecord { name: string; email: string; phone: string; address: string; }
   const handleGenerate = () => {
-    const results = [];
+    const results: (string | FakeRecord)[] = [];
     for (let i = 0; i < count; i++) {
       const name = genName();
       switch (toolId) {

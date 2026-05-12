@@ -1,7 +1,22 @@
-import { useMemo } from 'react';
+import { useMemo, type Dispatch, type SetStateAction } from 'react';
+
+type TextGenType = 'words' | 'sentences' | 'paragraphs';
+
+interface PwdOpts {
+  upper: boolean;
+  lower: boolean;
+  numbers: boolean;
+  symbols: boolean;
+}
+
+interface StrengthResult {
+  label: string;
+  color: string;
+  pct: number;
+}
 
 /* ── Password strength calculator ── */
-function getStrength(len, opts) {
+function getStrength(len: number, opts: PwdOpts): StrengthResult {
   let poolSize = 0;
   if (opts.upper) poolSize += 26;
   if (opts.lower) poolSize += 26;
@@ -16,6 +31,15 @@ function getStrength(len, opts) {
   return { label: 'Very Strong', color: '#4CAF50', pct: 100 };
 }
 
+interface RandomTextDrawerProps {
+  textGenType: TextGenType;
+  setTextGenType: Dispatch<SetStateAction<TextGenType>>;
+  textGenCount: number;
+  setTextGenCount: Dispatch<SetStateAction<number>>;
+  handleGenerateText: () => string | null;
+  onResult?: (result: string) => void;
+}
+
 export function RandomTextDrawer({
   textGenType,
   setTextGenType,
@@ -23,7 +47,7 @@ export function RandomTextDrawer({
   setTextGenCount,
   handleGenerateText,
   onResult,
-}) {
+}: RandomTextDrawerProps) {
   const presets = [
     { label: '10', val: 10 },
     { label: '50', val: 50 },
@@ -87,6 +111,15 @@ export function RandomTextDrawer({
   );
 }
 
+interface PasswordDrawerProps {
+  pwdLen: number;
+  setPwdLen: Dispatch<SetStateAction<number>>;
+  pwdOpts: PwdOpts;
+  setPwdOpts: Dispatch<SetStateAction<PwdOpts>>;
+  handleGeneratePassword: () => string | null;
+  onResult?: (result: string) => void;
+}
+
 export function PasswordDrawer({
   pwdLen,
   setPwdLen,
@@ -94,8 +127,8 @@ export function PasswordDrawer({
   setPwdOpts,
   handleGeneratePassword,
   onResult,
-}) {
-  const charsets = [
+}: PasswordDrawerProps) {
+  const charsets: [keyof PwdOpts, string, string, number][] = [
     ['upper', 'A–Z', 'Uppercase letters (A-Z)', 26],
     ['lower', 'a–z', 'Lowercase letters (a-z)', 26],
     ['numbers', '0–9', 'Digits (0-9)', 10],

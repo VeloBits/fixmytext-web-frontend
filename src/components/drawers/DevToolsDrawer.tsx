@@ -1,6 +1,17 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-export function JsonPathDrawer({ text, onResult, showAlert }) {
+type AlertType = 'warning' | 'danger' | 'success' | 'info';
+
+interface SharedDrawerProps {
+  onResult: (label: string, result: string) => void;
+  showAlert: (message: string, type: AlertType) => void;
+}
+
+interface JsonPathDrawerProps extends SharedDrawerProps {
+  text: string;
+}
+
+export function JsonPathDrawer({ text, onResult, showAlert }: JsonPathDrawerProps) {
   const [path, setPath] = useState('$');
 
   const handleQuery = () => {
@@ -71,7 +82,11 @@ export function JsonPathDrawer({ text, onResult, showAlert }) {
   );
 }
 
-export function MarkdownPreviewDrawer({ text }) {
+interface MarkdownPreviewDrawerProps {
+  text: string;
+}
+
+export function MarkdownPreviewDrawer({ text }: MarkdownPreviewDrawerProps) {
   const htmlContent = text
     ? text
         .replace(/^### (.+)$/gm, '<h3>$1</h3>')
@@ -97,9 +112,9 @@ export function MarkdownPreviewDrawer({ text }) {
   );
 }
 
-export function LoremIpsumDrawer({ onResult, showAlert }) {
+export function LoremIpsumDrawer({ onResult, showAlert }: SharedDrawerProps) {
   const [count, setCount] = useState(3);
-  const [type, setType] = useState('paragraphs');
+  const [type, setType] = useState<'words' | 'sentences' | 'paragraphs'>('paragraphs');
 
   const LOREM =
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
@@ -169,8 +184,10 @@ export function LoremIpsumDrawer({ onResult, showAlert }) {
   );
 }
 
-export function SampleJsonDrawer({ onResult, showAlert }) {
-  const [template, setTemplate] = useState('user');
+type SampleTemplate = 'user' | 'product' | 'order' | 'comment' | 'api_response';
+
+export function SampleJsonDrawer({ onResult, showAlert }: SharedDrawerProps) {
+  const [template, setTemplate] = useState<SampleTemplate>('user');
 
   const templates = {
     user: {
