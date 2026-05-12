@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useResendVerificationMutation } from '../../store/api/authApi';
+import type { RootState } from '../../store/store';
+import type { AlertLevel } from '../../contexts/AlertContext';
 
 const DISMISSAL_KEY = 'fmt:email-verify-dismissed-until';
 const NAVBAR_HEIGHT = 44; // keep in sync with the navbar's CSS height
@@ -12,7 +14,7 @@ const CHROME_VAR = '--app-chrome-offset';
  * resets the var to the navbar-only default. Uses ResizeObserver so the
  * offset stays correct when the banner reflows (e.g. the mobile stack).
  */
-function useChromeOffset(ref, isMounted) {
+function useChromeOffset(ref: React.RefObject<HTMLDivElement | null>, isMounted: boolean) {
   useLayoutEffect(() => {
     if (!isMounted || !ref.current) return undefined;
     const root = document.documentElement;
@@ -79,9 +81,13 @@ function CloseIcon() {
  * `showAlert` is required and is used to report the outcome of resend
  * requests — the banner itself stays minimal.
  */
-export default function EmailVerificationBanner({ showAlert }) {
-  const user = useSelector((s) => s.auth.user);
-  const isAuthenticated = useSelector((s) => !!s.auth.accessToken);
+export interface EmailVerificationBannerProps {
+  showAlert: (message: string, type: AlertLevel) => void;
+}
+
+export default function EmailVerificationBanner({ showAlert }: EmailVerificationBannerProps) {
+  const user = useSelector((s: RootState) => s.auth.user);
+  const isAuthenticated = useSelector((s: RootState) => !!s.auth.accessToken);
 
   const [resendVerification, { isLoading }] = useResendVerificationMutation();
   const [dismissed, setDismissed] = useState(() => {
@@ -94,8 +100,8 @@ export default function EmailVerificationBanner({ showAlert }) {
   });
   const [cooldownUntil, setCooldownUntil] = useState(0);
   const [, forceTick] = useState(0);
-  const tickRef = useRef(null);
-  const bannerRef = useRef(null);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const bannerRef = useRef<HTMLDivElement>(null);
 
   const isVisible = isAuthenticated && !!user && !user.is_email_verified && !dismissed;
   useChromeOffset(bannerRef, isVisible);
@@ -133,19 +139,20 @@ export default function EmailVerificationBanner({ showAlert }) {
       // if the user hammers the button.
       setCooldownUntil(Date.now() + 120 * 1000);
     } catch (err) {
-      if (err?.status === 429) {
+      const apiErr = err as { status?: number; data?: { detail?: string } };
+      if (apiErr?.status === 429) {
         // Parse "Please wait N seconds..." out of the backend detail when we
         // can; fall back to a two-minute lockout otherwise.
-        const match = /(\d+)\s*seconds?/.exec(err?.data?.detail || '');
+        const match = /(\d+)\s*seconds?/.exec(apiErr?.data?.detail || '');
         const waitSec = match ? Number(match[1]) : 120;
         setCooldownUntil(Date.now() + waitSec * 1000);
         showAlert(
-          err?.data?.detail || 'Please wait a bit before requesting another email.',
+          apiErr?.data?.detail || 'Please wait a bit before requesting another email.',
           'warning'
         );
       } else {
         showAlert(
-          err?.data?.detail || 'Could not send verification email. Try again shortly.',
+          apiErr?.data?.detail || 'Could not send verification email. Try again shortly.',
           'danger'
         );
       }

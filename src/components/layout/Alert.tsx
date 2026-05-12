@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import type { Alert as AlertItem, AlertLevel } from '../../contexts/AlertContext';
 
-const ICONS = {
+const ICONS: Record<AlertLevel, React.ReactElement> = {
   success: (
     <svg
       width="14"
@@ -65,7 +66,12 @@ const ICONS = {
   ),
 };
 
-function Toast({ alert, onDismiss }) {
+interface ToastProps {
+  alert: AlertItem;
+  onDismiss: (id: number) => void;
+}
+
+function Toast({ alert, onDismiss }: ToastProps) {
   const [exiting, setExiting] = useState(false);
 
   const handleDismiss = () => {
@@ -78,7 +84,7 @@ function Toast({ alert, onDismiss }) {
       className={`tu-toast tu-toast--${alert.type}${exiting ? ' tu-toast--exit' : ''}`}
       role="alert"
     >
-      <span className="tu-toast-icon">{ICONS[alert.type] || ICONS.info}</span>
+      <span className="tu-toast-icon">{ICONS[alert.type] ?? ICONS.info}</span>
       <span className="tu-toast-msg">{alert.msg}</span>
       <button className="tu-toast-close" onClick={handleDismiss} aria-label="Dismiss">
         <svg
@@ -99,7 +105,14 @@ function Toast({ alert, onDismiss }) {
   );
 }
 
-export default function Alert({ alerts = [], dismissAlert, alert: legacyAlert }) {
+export interface AlertProps {
+  alerts?: AlertItem[];
+  dismissAlert?: (id: number) => void;
+  /** @deprecated Pass alerts array instead */
+  alert?: AlertItem;
+}
+
+export default function Alert({ alerts = [], dismissAlert, alert: legacyAlert }: AlertProps) {
   // Support both new (alerts array) and old (single alert) API
   const items = alerts.length > 0 ? alerts : legacyAlert ? [legacyAlert] : [];
 
@@ -108,7 +121,7 @@ export default function Alert({ alerts = [], dismissAlert, alert: legacyAlert })
   return (
     <div className="tu-toast-wrapper" aria-live="polite">
       {items.map((a) => (
-        <Toast key={a.id ?? a.msg} alert={a} onDismiss={dismissAlert || (() => {})} />
+        <Toast key={a.id ?? a.msg} alert={a} onDismiss={dismissAlert ?? (() => {})} />
       ))}
     </div>
   );
