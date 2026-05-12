@@ -177,9 +177,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
   const [selectedCredit, setSelectedCredit] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const passes = catalog?.passes || [];
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const creditPacks = catalog?.credit_packs || [];
   const symbol = passes[0]?.symbol || '$';
   const currency = (passes[0]?.currency || 'usd') as SupportedCurrency;

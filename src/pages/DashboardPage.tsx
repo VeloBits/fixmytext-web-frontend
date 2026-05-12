@@ -96,7 +96,7 @@ export default function DashboardPage({
     if (upgrade || purchase) {
       setSearchParams({}, { replace: true });
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- runs once on mount; showAlert/subscription are stable refs
+  }, []); // intentional: runs once on mount; showAlert/subscription are stable refs
 
   const {
     data: toolStatsData,
