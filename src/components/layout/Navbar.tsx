@@ -1,16 +1,22 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import type { RootState } from '../../store/store';
+import type { AlertLevel } from '../../contexts/AlertContext';
 
-export default function Navbar(props) {
+export interface NavbarProps {
+  showAlert?: (message: string, type: AlertLevel) => void;
+}
+
+export default function Navbar({ showAlert }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { accessToken } = useSelector((s) => s.auth);
+  const { accessToken } = useSelector((s: RootState) => s.auth);
 
   const handleShare = () => {
     navigator.clipboard
       .writeText(window.location.origin)
-      .then(() => props.showAlert?.('Website link copied to clipboard!', 'success'))
-      .catch(() => props.showAlert?.('Failed to copy link', 'danger'));
+      .then(() => showAlert?.('Website link copied to clipboard!', 'success'))
+      .catch(() => showAlert?.('Failed to copy link', 'danger'));
   };
 
   return (

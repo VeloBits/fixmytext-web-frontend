@@ -1,7 +1,21 @@
 import { motion } from 'framer-motion';
 import { PERSONAS } from '../../constants/tools';
+import type { Persona } from '../../types/tools';
 
-const PERSONA_META = {
+interface PersonaMeta {
+  gradient: string;
+  accent: string;
+  tools: string[];
+  tagline: string;
+}
+
+type PersonaMetaMap = Record<string, PersonaMeta>;
+
+interface PersonaItem extends Persona, PersonaMeta {
+  id: string;
+}
+
+const PERSONA_META: PersonaMetaMap = {
   writer: {
     gradient: 'linear-gradient(135deg, #C586C0 0%, #569CD6 100%)',
     accent: '#C586C0',
@@ -34,13 +48,17 @@ const PERSONA_META = {
   },
 };
 
-const PERSONA_LIST = Object.entries(PERSONAS).map(([id, data]) => ({
+const PERSONA_LIST: PersonaItem[] = Object.entries(PERSONAS).map(([id, data]) => ({
   id,
   ...data,
-  ...PERSONA_META[id],
+  ...(PERSONA_META[id] ?? { gradient: '', accent: '', tools: [], tagline: '' }),
 }));
 
-const TypingText = ({ text }) => (
+interface TypingTextProps {
+  text: string;
+}
+
+const TypingText = ({ text }: TypingTextProps) => (
   <motion.span>
     {text.split('').map((char, i) => (
       <motion.span
@@ -62,7 +80,11 @@ const TypingText = ({ text }) => (
   </motion.span>
 );
 
-export default function OnboardingModal({ onComplete }) {
+export interface OnboardingModalProps {
+  onComplete: (personaId: string) => void;
+}
+
+export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
   return (
     <motion.div className="tu-onboard-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       {/* Floating particles */}
