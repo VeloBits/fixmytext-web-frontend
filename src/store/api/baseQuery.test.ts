@@ -16,7 +16,8 @@ const mockRawBaseQuery = vi.fn();
 
 // Capture the config object passed to fetchBaseQuery so we can call
 // prepareHeaders ourselves.
-let capturedFetchBaseQueryConfig = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let capturedFetchBaseQueryConfig: any = null;
 
 vi.mock('@reduxjs/toolkit/query/react', () => ({
   fetchBaseQuery: (config) => {
@@ -84,7 +85,8 @@ async function freshImport() {
   return mod;
 }
 
-function makeApi(accessToken = 'test-token') {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function makeApi(accessToken: string | null = 'test-token'): any {
   return {
     getState: () => ({ auth: { accessToken } }),
     dispatch: vi.fn(),
@@ -134,7 +136,7 @@ describe('createAuthBaseQuery — prepareHeaders', () => {
     const headers = new Headers();
     const api = makeApi('my-access-token');
 
-    const returned = capturedFetchBaseQueryConfig.prepareHeaders(headers, api);
+    const returned = capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(returned.get('Authorization')).toBe('Bearer my-access-token');
   });
@@ -146,7 +148,7 @@ describe('createAuthBaseQuery — prepareHeaders', () => {
     const headers = new Headers();
     const api = makeApi(null);
 
-    const returned = capturedFetchBaseQueryConfig.prepareHeaders(headers, api);
+    const returned = capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(returned.get('Authorization')).toBeNull();
   });
@@ -159,7 +161,7 @@ describe('createAuthBaseQuery — prepareHeaders', () => {
     const headers = new Headers();
     const api = makeApi('tok');
 
-    capturedFetchBaseQueryConfig.prepareHeaders(headers, api);
+    capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(extraHeaders).toHaveBeenCalledWith(headers, api);
   });
@@ -415,6 +417,8 @@ describe('baseQueryWithReauth — refresh mutex', () => {
       // First time each request is called → 401
       // After refresh → success
       if (!args._retried) {
+        // newArgs computed but not used — kept for documentation purposes
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const newArgs =
           typeof args === 'string' ? { url: args, _retried: true } : { ...args, _retried: true };
         // Store that we've retried by checking call count per url
@@ -536,7 +540,7 @@ describe('createBaseQueryWithReauth', () => {
     // Verify extraHeaders was wired into fetchBaseQuery config
     const headers = new Headers();
     const api = makeApi('tok');
-    capturedFetchBaseQueryConfig.prepareHeaders(headers, api);
+    capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(extraHeaders).toHaveBeenCalled();
   });
@@ -648,6 +652,7 @@ describe('baseQueryWithReauth — args type handling', () => {
     });
 
     // args is an object without url — should not be treated as auth endpoint
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const result = await baseQueryWithReauth({ body: 'data' }, api, {});
     expect(api.dispatch).toHaveBeenCalledWith({
       type: 'auth/tokenRefreshed',

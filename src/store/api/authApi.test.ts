@@ -50,8 +50,6 @@ describe('authApi', () => {
   });
 
   it('register endpoint builds correct query', () => {
-    const { query } = authApi.endpoints.register.initiate;
-    // We can test the endpoint definition via the endpoints object
     expect(authApi.endpoints.register).toBeDefined();
   });
 
