@@ -1,21 +1,31 @@
 import { useState, useMemo, useCallback } from 'react';
 import { TOOLS, SEARCH_INTENTS } from '../constants/tools';
+import type { ToolDefinition } from '../types/tools';
 
-export default function useToolSearch() {
+interface UseToolSearchReturn {
+  query: string;
+  setQuery: (q: string) => void;
+  results: ToolDefinition[];
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+}
+
+export default function useToolSearch(): UseToolSearchReturn {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  const results = useMemo(() => {
+  const results = useMemo((): ToolDefinition[] => {
     if (!query.trim()) return [];
 
     const q = query.toLowerCase().trim();
-    const scores = new Map();
+    const scores = new Map<string, number>();
 
     // 1. Check intent mapping first
     for (const intent of SEARCH_INTENTS) {
       for (const phrase of intent.phrases) {
         if (q.includes(phrase) || phrase.includes(q)) {
-          intent.toolIds.forEach((id) => {
+          intent.toolIds.forEach((id: string) => {
             scores.set(id, (scores.get(id) || 0) + 10);
           });
         }
@@ -45,15 +55,15 @@ export default function useToolSearch() {
       if (score > 0) scores.set(tool.id, score);
     }
 
-    return [...scores.entries()]
+    return ([...scores.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8)
       .map(([id]) => TOOLS.find((t) => t.id === id))
-      .filter(Boolean);
+      .filter(Boolean) as ToolDefinition[]);
   }, [query]);
 
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => {
+  const open = useCallback((): void => setIsOpen(true), []);
+  const close = useCallback((): void => {
     setIsOpen(false);
     setQuery('');
   }, []);

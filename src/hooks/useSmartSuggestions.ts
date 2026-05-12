@@ -1,10 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { SMART_SUGGESTION_RULES, TOOLS } from '../constants/tools';
+import type { ToolDefinition } from '../types/tools';
 
-export default function useSmartSuggestions(text) {
-  const [suggestions, setSuggestions] = useState([]);
-  const [dismissed, setDismissed] = useState(new Set());
-  const timerRef = useRef(null);
+interface UseSmartSuggestionsReturn {
+  suggestions: ToolDefinition[];
+  dismiss: (toolId: string) => void;
+  clearDismissed: () => void;
+}
+
+export default function useSmartSuggestions(text: string): UseSmartSuggestionsReturn {
+  const [suggestions, setSuggestions] = useState<ToolDefinition[]>([]);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -16,22 +23,22 @@ export default function useSmartSuggestions(text) {
 
     // Debounce detection by 500ms
     timerRef.current = setTimeout(() => {
-      const matched = new Set();
+      const matched = new Set<string>();
       for (const rule of SMART_SUGGESTION_RULES) {
         try {
           if (rule.test(text)) {
-            rule.toolIds.forEach((id) => matched.add(id));
+            rule.toolIds.forEach((id: string) => matched.add(id));
           }
         } catch {
           /* ignore rule errors */
         }
       }
 
-      const results = [...matched]
+      const results = ([...matched]
         .filter((id) => !dismissed.has(id))
         .slice(0, 4)
         .map((id) => TOOLS.find((t) => t.id === id))
-        .filter(Boolean);
+        .filter(Boolean) as ToolDefinition[]);
 
       setSuggestions(results);
     }, 500);
@@ -41,11 +48,11 @@ export default function useSmartSuggestions(text) {
     };
   }, [text, dismissed]);
 
-  const dismiss = (toolId) => {
+  const dismiss = (toolId: string): void => {
     setDismissed((prev) => new Set(prev).add(toolId));
   };
 
-  const clearDismissed = () => setDismissed(new Set());
+  const clearDismissed = (): void => setDismissed(new Set());
 
   return { suggestions, dismiss, clearDismissed };
 }
