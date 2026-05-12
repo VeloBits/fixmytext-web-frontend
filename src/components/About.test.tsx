@@ -1,9 +1,11 @@
+import React from 'react';
+import type { ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }) => {
+    div: ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) => {
       const filtered = { ...props };
       [
         'initial',
@@ -16,9 +18,9 @@ vi.mock('framer-motion', () => ({
         'viewport',
         'variants',
       ].forEach((k) => delete filtered[k]);
-      return <div {...filtered}>{children}</div>;
+      return <div {...(filtered as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
     },
-    span: ({ children, ...props }) => {
+    span: ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) => {
       const filtered = { ...props };
       [
         'initial',
@@ -31,10 +33,10 @@ vi.mock('framer-motion', () => ({
         'viewport',
         'variants',
       ].forEach((k) => delete filtered[k]);
-      return <span {...filtered}>{children}</span>;
+      return <span {...(filtered as React.HTMLAttributes<HTMLSpanElement>)}>{children}</span>;
     },
   },
-  AnimatePresence: ({ children }) => children,
+  AnimatePresence: ({ children }: { children?: ReactNode }) => children,
 }));
 
 import About from './About';

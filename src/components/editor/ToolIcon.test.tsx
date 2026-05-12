@@ -7,7 +7,7 @@ describe('ToolIcon', () => {
     const { container } = render(<ToolIcon toolId="uppercase" color="pink" />);
     const span = container.querySelector('.tu-titem-icon');
     expect(span).toBeInTheDocument();
-    expect(span.classList.contains('tu-titem-icon--pink')).toBe(true);
+    expect(span!.classList.contains('tu-titem-icon--pink')).toBe(true);
     expect(container.querySelector('svg')).toBeInTheDocument();
   });
 
@@ -15,12 +15,12 @@ describe('ToolIcon', () => {
     const { container } = render(<ToolIcon icon="AB" color="blue" toolId="unknown_tool_xyz" />);
     const span = container.querySelector('.tu-titem-icon');
     expect(span).toBeInTheDocument();
-    expect(span.textContent).toBe('AB');
+    expect(span!.textContent).toBe('AB');
   });
 
   it('renders fallback without toolId', () => {
     const { container } = render(<ToolIcon icon="Hi" />);
-    expect(container.querySelector('.tu-titem-icon').textContent).toBe('Hi');
+    expect(container.querySelector('.tu-titem-icon')!.textContent).toBe('Hi');
   });
 
   it('applies 3ch size class for 3-char icons', () => {

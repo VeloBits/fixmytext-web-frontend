@@ -1,5 +1,13 @@
+import type { SVGProps } from 'react';
+
+interface ToolIconProps {
+  icon?: string;
+  color?: string;
+  toolId?: string;
+}
+
 const S = 16; // icon size
-const p = {
+const p: SVGProps<SVGSVGElement> = {
   width: S,
   height: S,
   viewBox: '0 0 24 24',
@@ -743,7 +751,7 @@ const ICONS = {
   ),
 };
 
-export default function ToolIcon({ icon, color, toolId }) {
+export default function ToolIcon({ icon, color, toolId }: ToolIconProps) {
   const svg = toolId ? ICONS[toolId] : null;
 
   if (svg) {

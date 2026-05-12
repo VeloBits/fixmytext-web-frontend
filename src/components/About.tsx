@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { USE_CASE_TABS, TOOLS } from '../constants/tools';
+
+// Extend CSSProperties to allow CSS custom properties
+type CSSVars = CSSProperties & Record<`--${string}`, string>;
 
 const STATS = [
   { value: `${TOOLS.length}+`, label: 'Tools Available' },
@@ -103,32 +107,34 @@ const AUDIENCES = [
 
 const TECH = ['React', 'Vite', 'Redux Toolkit', 'FastAPI', 'Framer Motion', 'Prettier'];
 
+const EASE = [0.25, 0.46, 0.45, 0.94] as const;
+
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-40px' },
-  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] },
+  transition: { duration: 0.5, delay, ease: EASE },
 });
 
 const fadeLeft = (delay = 0) => ({
   initial: { opacity: 0, x: -40 },
   whileInView: { opacity: 1, x: 0 },
   viewport: { once: true, margin: '-40px' },
-  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] },
+  transition: { duration: 0.5, delay, ease: EASE },
 });
 
 const fadeRight = (delay = 0) => ({
   initial: { opacity: 0, x: 40 },
   whileInView: { opacity: 1, x: 0 },
   viewport: { once: true, margin: '-40px' },
-  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] },
+  transition: { duration: 0.5, delay, ease: EASE },
 });
 
 const scaleIn = (delay = 0) => ({
   initial: { opacity: 0, scale: 0.92 },
   whileInView: { opacity: 1, scale: 1 },
   viewport: { once: true, margin: '-40px' },
-  transition: { duration: 0.45, delay, ease: [0.25, 0.46, 0.45, 0.94] },
+  transition: { duration: 0.45, delay, ease: EASE },
 });
 
 export default function About() {
@@ -268,7 +274,7 @@ export default function About() {
           <div className="about-features">
             {FEATURES.map((f, i) => (
               <motion.div key={f.title} className="about-feature" {...scaleIn(i * 0.06)}>
-                <div className="about-feature-icon-wrap" style={{ '--feature-color': f.color }}>
+                <div className="about-feature-icon-wrap" style={{ '--feature-color': f.color } as CSSVars}>
                   <span className="about-feature-icon">{f.icon}</span>
                 </div>
                 <h3 className="about-feature-title">{f.title}</h3>
@@ -349,7 +355,7 @@ export default function About() {
               <motion.div
                 key={p.title}
                 className="about-principle"
-                style={{ '--principle-accent': p.accent }}
+                style={{ '--principle-accent': p.accent } as CSSVars}
                 {...scaleIn(i * 0.1)}
               >
                 <span className="about-principle-icon">{p.icon}</span>
