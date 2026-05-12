@@ -453,7 +453,7 @@ export function eventToBinding(
   const ctrl = (e[MOD] as boolean | undefined) || false;
   const shift = e.shiftKey || false;
   const alt = e.altKey || false;
-  let keys = e.key;
+  const keys = e.key;
 
   // Ignore bare modifier presses
   if (['Control', 'Shift', 'Alt', 'Meta'].includes(keys)) return null;

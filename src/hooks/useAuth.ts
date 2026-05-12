@@ -21,7 +21,7 @@ export function useAuth(): AuthContextValue {
         .unwrap()
         .catch(() => {});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Effect intentionally runs only once on mount (empty deps array)
   }, []);
 
   useGetMeQuery(undefined, { skip: !accessToken });
