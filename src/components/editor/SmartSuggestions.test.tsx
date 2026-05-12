@@ -59,7 +59,7 @@ describe('SmartSuggestions', () => {
       <SmartSuggestions suggestions={suggestions} onToolClick={vi.fn()} onDismiss={onDismiss} />
     );
     const dismissBtns = screen.getAllByText('\u2715');
-    fireEvent.click(dismissBtns[0]);
+    fireEvent.click(dismissBtns[0]!);
     expect(onDismiss).toHaveBeenCalledWith('uppercase');
   });
 

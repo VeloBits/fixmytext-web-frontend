@@ -50,7 +50,7 @@ describe('FakeDataDrawer', () => {
     render(<FakeDataDrawer {...baseProps} />);
     fireEvent.click(screen.getByText('JSON'));
     fireEvent.click(screen.getByText('Generate'));
-    const output = baseProps.onResult.mock.calls[0][1];
+    const output = baseProps.onResult!.mock.calls[0]![1];
     expect(() => JSON.parse(output)).not.toThrow();
   });
 
@@ -58,7 +58,7 @@ describe('FakeDataDrawer', () => {
     render(<FakeDataDrawer {...baseProps} />);
     fireEvent.click(screen.getByText('CSV'));
     fireEvent.click(screen.getByText('Generate'));
-    const output = baseProps.onResult.mock.calls[0][1];
+    const output = baseProps.onResult!.mock.calls[0]![1];
     expect(output).toContain('name,email,phone,address');
   });
 
@@ -73,7 +73,7 @@ describe('FakeDataDrawer', () => {
       <FakeDataDrawer {...baseProps} activeTool={{ id: 'fake_email', label: 'Fake Emails' }} />
     );
     fireEvent.click(screen.getByText('Generate'));
-    const output = baseProps.onResult.mock.calls[0][1];
+    const output = baseProps.onResult!.mock.calls[0]![1];
     expect(output).toContain('@');
   });
 

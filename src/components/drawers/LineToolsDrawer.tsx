@@ -74,7 +74,7 @@ function extractNthLines(text: string, n: number, offset: number): string | null
   if (!text || n < 2) return null;
   const lines = text.split('\n');
   const result: string[] = [];
-  for (let i = offset; i < lines.length; i += n) result.push(lines[i]);
+  for (let i = offset; i < lines.length; i += n) result.push(lines[i]!);
   return result.join('\n');
 }
 

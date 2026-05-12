@@ -4,15 +4,15 @@ import useSmartSuggestions from './useSmartSuggestions';
 vi.mock('../constants/tools', () => ({
   SMART_SUGGESTION_RULES: [
     {
-      test: (t) => t.includes('json'),
+      test: (t: string) => t.includes('json'),
       toolIds: ['json_fmt', 'json_yaml'],
     },
     {
-      test: (t) => t.includes('<html>'),
+      test: (t: string) => t.includes('<html>'),
       toolIds: ['strip_html', 'html_fmt'],
     },
     {
-      test: (t) => t === t.toUpperCase() && /[A-Z]/.test(t),
+      test: (t: string) => t === t.toUpperCase() && /[A-Z]/.test(t),
       toolIds: ['lowercase'],
     },
     {

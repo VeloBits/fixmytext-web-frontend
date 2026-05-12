@@ -7,18 +7,18 @@ import type { SubscriptionContextValue } from '../../contexts/AppContext';
 
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) =>
+    (tag: string) =>
+    ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
       React.createElement(tag || 'div', props, children);
   return {
-    motion: new Proxy({}, { get: (_, tag) => m(tag) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, tag) => m(tag as string) }),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => vi.fn(),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
   useParams: () => ({}),
@@ -44,7 +44,7 @@ vi.mock('../../store/api/passesApi', () => ({
 }));
 
 vi.mock('../../utils/formatPrice', () => ({
-  default: (price) => `$${(price / 100).toFixed(2)}`,
+  default: (price: number) => `$${(price / 100).toFixed(2)}`,
 }));
 
 describe('PassPurchaseModal', () => {

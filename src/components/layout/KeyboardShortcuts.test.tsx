@@ -2,19 +2,19 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }) => {
+    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const filtered = { ...props };
       ['initial', 'animate', 'exit', 'transition', 'whileTap', 'whileHover', 'variants'].forEach(
         (k) => delete filtered[k]
       );
-      return <div {...filtered}>{children}</div>;
+      return <div {...(filtered as Record<string, unknown>)}>{children}</div>;
     },
   },
-  AnimatePresence: ({ children }) => children,
+  AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 vi.mock('../../hooks/useKeyboardShortcuts', () => ({
-  formatShortcut: (sc) => {
+  formatShortcut: (sc: { ctrl?: boolean; shift?: boolean; alt?: boolean; keys?: string; key?: string }) => {
     const parts: string[] = [];
     if (sc.ctrl) parts.push('Ctrl');
     if (sc.shift) parts.push('Shift');
@@ -22,7 +22,7 @@ vi.mock('../../hooks/useKeyboardShortcuts', () => ({
     parts.push(sc.keys || sc.key || '?');
     return parts;
   },
-  eventToBinding: (e) => {
+  eventToBinding: (e: { key: string; ctrlKey?: boolean; shiftKey?: boolean; altKey?: boolean; metaKey?: boolean }) => {
     if (
       e.key === 'Escape' ||
       e.key === 'Shift' ||
@@ -125,13 +125,13 @@ describe('KeyboardShortcuts', () => {
   });
 
   it('shows customized indicator for customized shortcuts', () => {
-    renderShortcuts({ isCustomized: (id) => id === 'palette' });
+    renderShortcuts({ isCustomized: (id: string) => id === 'palette' });
     expect(screen.getByTitle('Customized')).toBeInTheDocument();
   });
 
   it('shows reset button for customized shortcut', () => {
     const resetOne = vi.fn();
-    renderShortcuts({ isCustomized: (id) => id === 'palette', resetOne });
+    renderShortcuts({ isCustomized: (id: string) => id === 'palette', resetOne });
     fireEvent.click(screen.getByTitle('Reset to default'));
     expect(resetOne).toHaveBeenCalledWith('palette');
   });
@@ -144,7 +144,7 @@ describe('KeyboardShortcuts', () => {
   it('starts recording when shortcut keys button is clicked', () => {
     renderShortcuts();
     const rebindBtns = screen.getAllByTitle('Click to rebind');
-    fireEvent.click(rebindBtns[0]);
+    fireEvent.click(rebindBtns[0]!);
     expect(screen.getByText('Press keys...')).toBeInTheDocument();
   });
 
@@ -159,7 +159,7 @@ describe('KeyboardShortcuts', () => {
   it('cancels recording when Escape is pressed while recording', () => {
     renderShortcuts();
     const rebindBtns = screen.getAllByTitle('Click to rebind');
-    fireEvent.click(rebindBtns[0]);
+    fireEvent.click(rebindBtns[0]!);
     expect(screen.getByText('Press keys...')).toBeInTheDocument();
     // Press Escape while recording — triggers cancelRecording
     fireEvent.keyDown(window, { key: 'Escape' });

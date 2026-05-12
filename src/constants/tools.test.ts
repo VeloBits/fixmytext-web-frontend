@@ -49,7 +49,7 @@ describe('USE_CASE_TABS', () => {
   });
 
   it('has an "all" tab first', () => {
-    expect(USE_CASE_TABS[0].id).toBe('all');
+    expect(USE_CASE_TABS[0]!.id).toBe('all');
   });
 });
 

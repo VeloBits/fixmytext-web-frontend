@@ -268,8 +268,8 @@ export default function CompareOutput({ diffResult, compareText }: CompareOutput
             <div className="tu-diff-output">
               {diffResult.map((d, idx) => (
                 <div key={idx} className={`tu-diff-line tu-diff-line--${d.type}`}>
-                  <span className="tu-diff-gutter">{nums[idx].left ?? ''}</span>
-                  <span className="tu-diff-gutter">{nums[idx].right ?? ''}</span>
+                  <span className="tu-diff-gutter">{nums[idx]?.left ?? ''}</span>
+                  <span className="tu-diff-gutter">{nums[idx]?.right ?? ''}</span>
                   <span className="tu-diff-marker">
                     {d.type === 'added' ? '+' : d.type === 'removed' ? '−' : ' '}
                   </span>

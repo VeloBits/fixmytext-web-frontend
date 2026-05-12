@@ -5,7 +5,7 @@ import type { GamificationContextValue, SubscriptionContextValue } from '../cont
 
 // Mock TextForm since it's a complex component
 vi.mock('../components/editor/TextForm', () => ({
-  default: (props) => <div data-testid="text-form">{JSON.stringify(Object.keys(props))}</div>,
+  default: (props: Record<string, unknown>) => <div data-testid="text-form">{JSON.stringify(Object.keys(props))}</div>,
 }));
 
 describe('Home', () => {

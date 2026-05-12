@@ -6,7 +6,7 @@
  */
 
 /** Route paths */
-export const ROUTES: Readonly<Record<string, string>> = {
+export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
   LOGIN: '/login',
@@ -17,4 +17,4 @@ export const ROUTES: Readonly<Record<string, string>> = {
   DASHBOARD: '/dashboard',
   PRICING: '/pricing',
   SHARE: '/share/:id',
-};
+} as const;

@@ -752,7 +752,7 @@ const ICONS = {
 };
 
 export default function ToolIcon({ icon, color, toolId }: ToolIconProps) {
-  const svg = toolId ? ICONS[toolId] : null;
+  const svg = toolId ? ICONS[toolId as keyof typeof ICONS] : null;
 
   if (svg) {
     return <span className={`tu-titem-icon${color ? ` tu-titem-icon--${color}` : ''}`}>{svg}</span>;

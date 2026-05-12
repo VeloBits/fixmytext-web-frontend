@@ -87,10 +87,14 @@ vi.mock('../constants/endpoints', () => ({
 import { useSelector } from 'react-redux';
 
 // vi.mock replaces useSelector with a Mock instance — cast so TS knows
-const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
+const mockUseSelector = useSelector as unknown as any;
 
 describe('useAiTools', () => {
-  let setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory;
+  let setText: any,
+      setMarkdownMode: any,
+      setPreviewMode: any,
+      showAlert: any,
+      pushHistory: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -139,7 +143,7 @@ describe('useAiTools', () => {
   it('callAi does nothing when text is empty', async () => {
     const { result } = renderAiTools('');
     await act(async () => {
-      await result.current.handleHashtags();
+      await result.current.handleHashtags!();
     });
     expect(mockTransformText).not.toHaveBeenCalled();
   });
@@ -148,7 +152,7 @@ describe('useAiTools', () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
     const { result } = renderAiTools('hello');
     await act(async () => {
-      await result.current.handleHashtags();
+      await result.current.handleHashtags!();
     });
     expect(showAlert).toHaveBeenCalledWith('Please log in to use AI tools', 'warning');
     expect(mockTransformText).not.toHaveBeenCalled();
@@ -157,7 +161,7 @@ describe('useAiTools', () => {
   it('callAi success path sets result and calls pushHistory', async () => {
     const { result } = renderAiTools('hello');
     await act(async () => {
-      await result.current.handleHashtags();
+      await result.current.handleHashtags!();
     });
     expect(mockTransformText).toHaveBeenCalledWith({ endpoint: '/hashtags', text: 'hello' });
     expect(setPreviewMode).toHaveBeenCalledWith('result');
@@ -171,7 +175,7 @@ describe('useAiTools', () => {
     });
     const { result } = renderAiTools('hello');
     await act(async () => {
-      await result.current.handleSummarize();
+      await result.current.handleSummarize!();
     });
     expect(showAlert).toHaveBeenCalledWith('Rate limited', 'warning');
   });
@@ -182,7 +186,7 @@ describe('useAiTools', () => {
     });
     const { result } = renderAiTools('hello');
     await act(async () => {
-      await result.current.handleFixGrammar();
+      await result.current.handleFixGrammar!();
     });
     expect(showAlert).toHaveBeenCalledWith('Server error', 'danger');
   });
@@ -193,7 +197,7 @@ describe('useAiTools', () => {
     });
     const { result } = renderAiTools('hello');
     await act(async () => {
-      await result.current.handleFixGrammar();
+      await result.current.handleFixGrammar!();
     });
     expect(showAlert).toHaveBeenCalledWith('Could not fix grammar. Please try again.', 'danger');
   });
@@ -294,7 +298,6 @@ describe('useAiTools', () => {
   });
 
   it('handleTranslate with autoDetectLang enabled', async () => {
-    const detectMock = vi.fn();
     mockTransformText.mockReturnValue({ unwrap: () => Promise.resolve({ result: 'output' }) });
     const { result } = renderAiTools('hello');
     await act(async () => {
@@ -529,7 +532,7 @@ describe('useAiTools', () => {
     const { result } = renderAiTools('hello');
     // First trigger an AI result
     await act(async () => {
-      await result.current.handleHashtags();
+      await result.current.handleHashtags!();
     });
     // Now accept
     act(() => {
@@ -544,7 +547,7 @@ describe('useAiTools', () => {
     });
     const { result } = renderAiTools('hello');
     await act(async () => {
-      await result.current.handleHashtags();
+      await result.current.handleHashtags!();
     });
     act(() => {
       result.current.handleAiAccept();
@@ -555,7 +558,7 @@ describe('useAiTools', () => {
   it('handleAiDismiss clears aiResult', async () => {
     const { result } = renderAiTools('hello');
     await act(async () => {
-      await result.current.handleHashtags();
+      await result.current.handleHashtags!();
     });
     act(() => {
       result.current.handleAiDismiss();
@@ -695,7 +698,7 @@ describe('useAiTools', () => {
     ];
     for (const h of handlers) {
       await act(async () => {
-        await (result.current as AiToolsWithDynamic)[h]();
+        await (result.current as AiToolsWithDynamic)[h]!();
       });
     }
     expect(mockTransformText).toHaveBeenCalledTimes(handlers.length);

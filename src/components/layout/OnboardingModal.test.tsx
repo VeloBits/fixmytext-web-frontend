@@ -2,16 +2,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }) => <div {...filterMotionProps(props)}>{children}</div>,
-    button: ({ children, ...props }) => <button {...filterMotionProps(props)}>{children}</button>,
-    span: ({ children, ...props }) => <span {...filterMotionProps(props)}>{children}</span>,
-    p: ({ children, ...props }) => <p {...filterMotionProps(props)}>{children}</p>,
+    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</div>,
+    button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <button {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</button>,
+    span: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <span {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</span>,
+    p: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <p {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</p>,
   },
-  AnimatePresence: ({ children }) => children,
+  AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 // Filter out framer-motion specific props
-function filterMotionProps(props) {
+function filterMotionProps(props: Record<string, unknown>) {
   const filtered = { ...props };
   const motionKeys = [
     'initial',

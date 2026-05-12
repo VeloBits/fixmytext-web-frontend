@@ -17,20 +17,20 @@ describe('useAlert', () => {
 
   it('showAlert adds an alert and returns its id', () => {
     const { result } = renderHook(() => useAlert());
-    let id;
+    let id = -1;
     act(() => {
       id = result.current.showAlert('hello', 'info');
     });
     expect(id).toBeGreaterThan(0);
     expect(result.current.alerts).toHaveLength(1);
-    expect(result.current.alerts[0].msg).toBe('hello');
-    expect(result.current.alerts[0].type).toBe('info');
+    expect(result.current.alerts[0]!.msg).toBe('hello');
+    expect(result.current.alerts[0]!.type).toBe('info');
     expect(result.current.alert).toBe(result.current.alerts[0]);
   });
 
   it('dismissAlert removes the alert', () => {
     const { result } = renderHook(() => useAlert());
-    let id;
+    let id = -1;
     act(() => {
       id = result.current.showAlert('bye', 'warning');
     });
@@ -81,9 +81,9 @@ describe('useAlert', () => {
 
   it('deduplicates identical message+type', () => {
     const { result } = renderHook(() => useAlert());
-    let id1, id2;
+    let id2 = -1;
     act(() => {
-      id1 = result.current.showAlert('dup', 'info');
+      result.current.showAlert('dup', 'info');
     });
     act(() => {
       id2 = result.current.showAlert('dup', 'info');
@@ -133,6 +133,6 @@ describe('useAlert', () => {
     act(() => {
       result.current.showAlert('test');
     });
-    expect(result.current.alerts[0].type).toBe('info');
+    expect(result.current.alerts[0]!.type).toBe('info');
   });
 });

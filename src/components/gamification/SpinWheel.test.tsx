@@ -3,13 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import SpinWheel from './SpinWheel';
 
 vi.mock('framer-motion', () => {
-  const m =
-    (tag) =>
-    ({ children, ...props }) =>
+    const m =
+    (tag: string) =>
+    ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
       React.createElement(tag || 'div', props, children);
   return {
-    motion: new Proxy({}, { get: (_, tag) => m(tag) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, tag) => m(tag as string) }),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });

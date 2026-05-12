@@ -13,7 +13,9 @@ vi.mock('prettier/parser-html', () => ({ default: {} }));
 vi.mock('prettier/parser-postcss', () => ({ default: {} }));
 
 describe('useFormatter', () => {
-  let setLoading, showAlert, onResult;
+  let setLoading: any,
+      showAlert: any,
+      onResult: any;
 
   beforeEach(() => {
     setLoading = vi.fn();
@@ -83,7 +85,7 @@ describe('useFormatter', () => {
   it('handles format error', async () => {
     const prettier = await import('prettier/standalone');
     // vi.mock replaces format with a mock — cast for access to mock methods
-    const mockFormat = prettier.default.format as unknown as ReturnType<typeof vi.fn>;
+    const mockFormat = prettier.default.format as unknown as any;
     mockFormat.mockImplementationOnce(() => {
       throw new Error('Parse error\ndetails');
     });
@@ -111,8 +113,8 @@ describe('useFormatter', () => {
     });
     // Prettier mock receives sorted code
     const prettier = await import('prettier/standalone');
-    const mockFmt = prettier.default.format as unknown as ReturnType<typeof vi.fn>;
-    const callArg = mockFmt.mock.calls[mockFmt.mock.calls.length - 1][0];
+    const mockFmt = prettier.default.format as unknown as any;
+    const callArg = mockFmt.mock.calls[mockFmt.mock.calls.length - 1]![0]!;
     expect(callArg.indexOf("import a from 'a'")).toBeLessThan(callArg.indexOf("import b from 'b'"));
   });
 });

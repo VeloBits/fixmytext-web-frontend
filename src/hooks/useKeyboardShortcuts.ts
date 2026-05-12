@@ -162,7 +162,7 @@ function mergeBindings(defaults: ShortcutGroup[], overrides: KeybindingOverrides
 
 function matchShortcut(e: KeyboardEvent, sc: ShortcutDef): boolean {
   const eAny = e as unknown as Record<string, boolean>;
-  const mod = sc.ctrl ? eAny[MOD] : !eAny[MOD];
+  const mod = sc.ctrl ? !!eAny[MOD] : !eAny[MOD];
   const shift = sc.shift ? e.shiftKey : !e.shiftKey;
   const alt = sc.alt ? e.altKey : !e.altKey;
   const key = e.key.toLowerCase() === sc.keys.toLowerCase();
@@ -304,8 +304,8 @@ export default function useKeyboardShortcuts(actions: KeyboardActions) {
   const isCustomized = useCallback((id: string): boolean => id in overrides, [overrides]);
 
   const handleKeyDown = useCallback(
-    (e) => {
-      const tag = e.target.tagName;
+    (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
       const isInput = tag === 'INPUT' || tag === 'SELECT';
       const isTextarea = tag === 'TEXTAREA';
       const eAny2 = e as unknown as Record<string, boolean>;

@@ -172,7 +172,7 @@ describe('Navbar', () => {
         a.textContent.includes('Sign In')
       );
       if (signInLinks.length > 0) {
-        fireEvent.click(signInLinks[0]);
+        fireEvent.click(signInLinks[0]!);
         expect(screen.queryByText('Home')).not.toBeInTheDocument();
       }
     }

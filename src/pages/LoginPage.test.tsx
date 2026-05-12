@@ -8,9 +8,9 @@ const mockLogin = vi.fn();
 let mockAccessToken: string | null = null;
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => mockNavigate,
-  Navigate: ({ to }) => <div data-testid="navigate" data-to={to} />,
+  Navigate: ({ to }: { to: string }) => <div data-testid="navigate" data-to={to} />,
 }));
 
 vi.mock('react-redux', () => ({

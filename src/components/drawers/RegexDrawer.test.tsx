@@ -94,7 +94,7 @@ describe('RegexDrawer', () => {
     // Click on the 'i' flag checkbox
     const checkboxes = screen.getAllByRole('checkbox');
     // g is index 0, i is index 1
-    fireEvent.click(checkboxes[1]);
+    fireEvent.click(checkboxes[1]!);
     expect(setRegexFlags).toHaveBeenCalled();
     expect(setRegexResult).toHaveBeenCalledWith(null);
   });

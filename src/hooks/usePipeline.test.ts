@@ -13,10 +13,10 @@ describe('usePipeline', () => {
       result.current.addStep('upper', 'Uppercase', 'HELLO');
     });
     expect(result.current.steps).toHaveLength(1);
-    expect(result.current.steps[0].toolId).toBe('upper');
-    expect(result.current.steps[0].label).toBe('Uppercase');
-    expect(result.current.steps[0].result).toBe('HELLO');
-    expect(result.current.steps[0].timestamp).toBeDefined();
+    expect(result.current.steps[0]!.toolId).toBe('upper');
+    expect(result.current.steps[0]!.label).toBe('Uppercase');
+    expect(result.current.steps[0]!.result).toBe('HELLO');
+    expect(result.current.steps[0]!.timestamp).toBeDefined();
   });
 
   it('addStep appends multiple steps', () => {

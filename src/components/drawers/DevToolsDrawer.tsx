@@ -30,11 +30,11 @@ export function JsonPathDrawer({ text, onResult, showAlert }: JsonPathDrawerProp
       for (const part of parts) {
         const arrayMatch = part.match(/^(\w+)\[(\d+|\*)\]$/);
         if (arrayMatch) {
-          current = current[arrayMatch[1]];
+          current = current[arrayMatch[1]!];
           if (arrayMatch[2] === '*') {
             // Keep as array
           } else {
-            current = current[parseInt(arrayMatch[2])];
+            current = current[parseInt(arrayMatch[2]!)];
           }
         } else if (part === '*') {
           current = Object.values(current);
@@ -124,8 +124,8 @@ export function LoremIpsumDrawer({ onResult, showAlert }: SharedDrawerProps) {
     let result;
     if (type === 'words') {
       const words: string[] = [];
-      for (let i = 0; i < count; i++) words.push(WORDS[i % WORDS.length]);
-      words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+      for (let i = 0; i < count; i++) words.push(WORDS[i % WORDS.length]!);
+      words[0] = words[0]!.charAt(0).toUpperCase() + words[0]!.slice(1);
       result = words.join(' ') + '.';
     } else if (type === 'sentences') {
       const sentences = LOREM.split('. ').map((s) => s.trim().replace(/\.$/, ''));

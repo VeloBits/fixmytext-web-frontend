@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import SharePage from './SharePage';
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => vi.fn(),
   useParams: () => ({ id: 'share123' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
@@ -32,7 +32,7 @@ vi.mock('../constants/tools', () => ({
 }));
 
 vi.mock('../components/editor/ToolIcon', () => ({
-  default: ({ icon, toolId }) => <span data-testid="tool-icon">{toolId || icon}</span>,
+  default: ({ icon, toolId }: { icon?: string; toolId?: string }) => <span data-testid="tool-icon">{toolId || icon}</span>,
 }));
 
 describe('SharePage', () => {
@@ -90,7 +90,7 @@ describe('SharePage', () => {
     Object.assign(navigator, { clipboard: { writeText } });
     render(<SharePage showAlert={showAlert} />);
     const copyBtns = screen.getAllByText('Copy to Clipboard');
-    fireEvent.click(copyBtns[0]);
+    fireEvent.click(copyBtns[0]!);
     expect(writeText).toHaveBeenCalledWith('HELLO WORLD\nLINE TWO');
     expect(showAlert).toHaveBeenCalledWith('Copied to clipboard!', 'success');
   });

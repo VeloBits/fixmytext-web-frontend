@@ -202,11 +202,11 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
   }, [creditPacks]);
 
   const activeGroupPasses = useMemo(
-    () => (GROUP_IDS[activeGroup] || []).map((id) => passMap[id]).filter(Boolean),
+    () => (GROUP_IDS[activeGroup as keyof typeof GROUP_IDS] || []).map((id) => passMap[id]).filter((p): p is PassCatalogItem => Boolean(p)),
     [activeGroup, passMap]
   );
 
-  const handleBuyPass = async (passId) => {
+  const handleBuyPass = async (passId: string) => {
     if (!accessToken) {
       showAlert?.('Sign in to purchase a pass', 'warning');
       navigate('/login');
@@ -220,7 +220,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
     }
   };
 
-  const handleBuyCredits = async (packId) => {
+  const handleBuyCredits = async (packId: string) => {
     if (!accessToken) {
       showAlert?.('Sign in to purchase credits', 'warning');
       navigate('/login');
@@ -396,7 +396,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                   {tag && <span className="tu-pricing-card-tag">{tag}</span>}
                   <div className="tu-pricing-card-top">
                     <span className="tu-pricing-card-icon">
-                      {PASS_ICONS[p.id] || <DropletIcon size={28} />}
+                      {PASS_ICONS[p.id as keyof typeof PASS_ICONS] || <DropletIcon size={28} />}
                     </span>
                     <span className="tu-pricing-card-price">{formatPrice(p.price)}</span>
                   </div>
@@ -460,7 +460,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                 style={{ cursor: 'pointer' }}
               >
                 <span className="tu-pricing-credit-icon">
-                  {CREDIT_ICONS[c.id] || <DropletIcon size={32} />}
+                  {CREDIT_ICONS[c.id as keyof typeof CREDIT_ICONS] || <DropletIcon size={32} />}
                 </span>
                 <span className="tu-pricing-credit-name">{c.name}</span>
                 <span className="tu-pricing-credit-amount">{c.credits} credits</span>
@@ -550,7 +550,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
               <div className="tu-pass-detail-left">
                 <div className="tu-pass-detail-hero">
                   <span className="tu-pass-detail-icon">
-                    {PASS_ICONS_LG[detailPass.id] || <DropletIcon size={52} />}
+                    {PASS_ICONS_LG[detailPass.id as keyof typeof PASS_ICONS_LG] || <DropletIcon size={52} />}
                   </span>
                   <h2 className="tu-pass-detail-name">{detailPass.name}</h2>
                   <span className="tu-pass-detail-price">{formatPrice(detailPass.price)}</span>
@@ -711,7 +711,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
               <div className="tu-pass-detail-left">
                 <div className="tu-pass-detail-hero">
                   <span className="tu-pass-detail-icon">
-                    {CREDIT_ICONS[detailCredit.id] || <DropletIcon size={52} />}
+                    {CREDIT_ICONS[detailCredit.id as keyof typeof CREDIT_ICONS] || <DropletIcon size={52} />}
                   </span>
                   <h2 className="tu-pass-detail-name">{detailCredit.name}</h2>
                   <span className="tu-pass-detail-price">{formatPrice(detailCredit.price)}</span>

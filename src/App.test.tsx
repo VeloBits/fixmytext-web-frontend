@@ -5,8 +5,8 @@ import { describe, it, expect, vi } from 'vitest';
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) => {
+    (tag: string) =>
+    ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const p = { ...props };
       [
         'initial',
@@ -22,31 +22,31 @@ vi.mock('framer-motion', () => {
       return React.createElement(tag || 'div', p, children);
     };
   return {
-    motion: new Proxy({}, { get: (_, t) => m(t) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, t) => m(t as string) }),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
 
 // ── react-router-dom mock ──
 vi.mock('react-router-dom', () => ({
-  BrowserRouter: ({ children }) =>
+  BrowserRouter: ({ children }: { children?: React.ReactNode }) =>
     React.createElement('div', { 'data-testid': 'router' }, children),
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/', search: '' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }) => React.createElement('a', { href: to, ...p }, children),
-  MemoryRouter: ({ children }) => children,
-  Routes: ({ children }) => React.createElement('div', { 'data-testid': 'routes' }, children),
-  Route: ({ element }) => element,
-  Navigate: ({ to }) => React.createElement('div', { 'data-testid': 'navigate', 'data-to': to }),
+  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
+  MemoryRouter: ({ children }: { children?: React.ReactNode }) => children,
+  Routes: ({ children }: { children?: React.ReactNode }) => React.createElement('div', { 'data-testid': 'routes' }, children),
+  Route: ({ element }: { element?: React.ReactNode }) => element,
+  Navigate: ({ to }: { to: string }) => React.createElement('div', { 'data-testid': 'navigate', 'data-to': to }),
 }));
 
 // ── react-redux mock ──
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(() => ({ accessToken: null })),
   useDispatch: () => vi.fn(),
-  Provider: ({ children }) => children,
+  Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 // ── hook mocks ──

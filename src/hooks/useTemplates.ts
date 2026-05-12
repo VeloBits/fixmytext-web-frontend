@@ -185,7 +185,7 @@ export default function useTemplates(
           showAlert('Failed to delete template', 'danger');
         }
       } else {
-        const name = localTemplates[idx].name;
+        const name = localTemplates[idx]!.name;
         setLocalTemplates((prev) => prev.filter((_, i) => i !== idx));
         showAlert(`Template "${name}" deleted`, 'success');
       }

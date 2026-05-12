@@ -57,7 +57,7 @@ describe('useClientTools', () => {
     const { handlers } = setup();
     expect(Object.keys(handlers).sort()).toEqual([...EXPECTED_KEYS].sort());
     for (const key of EXPECTED_KEYS) {
-      expect(typeof handlers[key]).toBe('function');
+      expect(typeof (handlers as Record<string, unknown>)[key]).toBe('function');
     }
   });
 
@@ -80,7 +80,7 @@ describe('useClientTools', () => {
         handlers.handleUuidGen();
 
         expect(setToolResults).toHaveBeenCalledTimes(1);
-        const updater = setToolResults.mock.calls[0][0];
+        const updater = setToolResults.mock.calls[0]![0]!;
         const result = updater({});
         const uuids = result['ws-1'].split('\n');
         expect(uuids).toHaveLength(5);
@@ -103,7 +103,7 @@ describe('useClientTools', () => {
       const { handlers, setToolResults, showAlert } = setup('{ "a": 1,  "b": 2 }');
       handlers.handleJsonMinify();
 
-      const updater = setToolResults.mock.calls[0][0];
+      const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});
       expect(result['ws-1']).toBe('{"a":1,"b":2}');
       expect(showAlert).toHaveBeenCalledWith('JSON minified', 'success');
@@ -124,7 +124,7 @@ describe('useClientTools', () => {
       const { handlers, setToolResults } = setup(text);
       handlers.handleCharCount();
 
-      const updater = setToolResults.mock.calls[0][0];
+      const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});
       const output = result['ws-1'];
 
@@ -141,7 +141,7 @@ describe('useClientTools', () => {
       const { handlers, setToolResults, showAlert } = setup(text);
       handlers.handleExtractEmails();
 
-      const updater = setToolResults.mock.calls[0][0];
+      const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});
       const emails = result['ws-1'].split('\n');
       expect(emails).toContain('alice@example.com');
@@ -155,7 +155,7 @@ describe('useClientTools', () => {
       const { handlers, setToolResults } = setup('#FF5733');
       handlers.handleColorConvert();
 
-      const updater = setToolResults.mock.calls[0][0];
+      const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});
       const output = result['ws-1'];
 
@@ -171,7 +171,7 @@ describe('useClientTools', () => {
       const { handlers, setToolResults, showAlert } = setup('1700000000');
       handlers.handleTimestampConvert();
 
-      const updater = setToolResults.mock.calls[0][0];
+      const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});
       const output = result['ws-1'];
 
@@ -198,7 +198,7 @@ describe('useClientTools', () => {
       const { handlers, setToolResults, showAlert } = setup('aabbc');
       handlers.handleFrequencyAnalysis();
 
-      const updater = setToolResults.mock.calls[0][0];
+      const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});
       const output = result['ws-1'];
 

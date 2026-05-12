@@ -64,7 +64,7 @@ describe('useTemplates', () => {
     localStorage.setItem('tu-templates', JSON.stringify([{ name: 'Test', text: 'content' }]));
     const { result } = renderTpl();
     expect(result.current.templates).toHaveLength(1);
-    expect(result.current.templates[0].name).toBe('Test');
+    expect(result.current.templates[0]!.name).toBe('Test');
   });
 
   it('saves template locally when not authenticated', async () => {
@@ -208,7 +208,7 @@ describe('useTemplates', () => {
     it('uses DB templates when authenticated', () => {
       const { result } = renderTpl();
       expect(result.current.templates).toHaveLength(1);
-      expect(result.current.templates[0].name).toBe('DB Tpl');
+      expect(result.current.templates[0]!.name).toBe('DB Tpl');
     });
 
     it('saves template via API create', async () => {

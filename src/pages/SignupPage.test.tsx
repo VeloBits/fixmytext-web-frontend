@@ -8,9 +8,9 @@ const mockRegister = vi.fn();
 let mockAccessToken: string | null = null;
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => mockNavigate,
-  Navigate: ({ to }) => <div data-testid="navigate" data-to={to} />,
+  Navigate: ({ to }: { to: string }) => <div data-testid="navigate" data-to={to} />,
 }));
 
 vi.mock('react-redux', () => ({
@@ -126,7 +126,7 @@ describe('SignupPage', () => {
     const passwordInput = screen.getByLabelText('Password');
     expect(passwordInput).toHaveAttribute('type', 'password');
     const toggleBtns = screen.getAllByLabelText('Show password');
-    fireEvent.click(toggleBtns[0]);
+    fireEvent.click(toggleBtns[0]!);
     expect(passwordInput).toHaveAttribute('type', 'text');
   });
 
@@ -135,7 +135,7 @@ describe('SignupPage', () => {
     const confirmInput = screen.getByLabelText('Confirm Password');
     expect(confirmInput).toHaveAttribute('type', 'password');
     const toggleBtns = screen.getAllByLabelText('Show password');
-    fireEvent.click(toggleBtns[1]);
+    fireEvent.click(toggleBtns[1]!);
     expect(confirmInput).toHaveAttribute('type', 'text');
   });
 

@@ -4,19 +4,19 @@ import AboutPage from './AboutPage';
 
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) =>
+    (tag: string) =>
+    ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
       React.createElement(tag || 'div', props, children);
   return {
-    motion: new Proxy({}, { get: (_, tag) => m(tag) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, tag) => m(tag as string) }),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
     useInView: () => true,
   };
 });
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => vi.fn(),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
   useParams: () => ({}),

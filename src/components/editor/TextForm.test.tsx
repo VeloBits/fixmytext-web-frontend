@@ -7,8 +7,8 @@ import { expectNoA11yViolations } from '../../test/axeHelper';
 // ── Framer-motion mock ──
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) => {
+    (tag: string) =>
+    ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const p = { ...props };
       [
         'initial',
@@ -24,8 +24,8 @@ vi.mock('framer-motion', () => {
       return React.createElement(tag, p, children);
     };
   return {
-    motion: new Proxy({}, { get: (_, t) => m(t) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, t) => m(t as string) }),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
@@ -34,13 +34,13 @@ vi.mock('framer-motion', () => {
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(() => ({ accessToken: null })),
   useDispatch: () => vi.fn(),
-  Provider: ({ children }) => children,
+  Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 // ── react-router-dom mock ──
 vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
-  Link: ({ children, to }) => React.createElement('a', { href: to }, children),
+  Link: ({ children, to }: { children?: React.ReactNode; to: string }) => React.createElement('a', { href: to }, children),
 }));
 
 // ── RTK Query API mocks ──
@@ -291,7 +291,7 @@ vi.mock('../../hooks/useToolSearch', () => ({
   }),
 }));
 vi.mock('../../hooks/useResize', () => ({
-  default: (dir, defaultSize) => ({
+  default: (dir: string, defaultSize: number) => ({
     size: defaultSize,
     setSize: vi.fn(),
     onMouseDown: vi.fn(),
@@ -320,7 +320,7 @@ vi.mock('../../hooks/useKeyboardShortcuts', () => ({
 
 // ── Child component mocks ──
 vi.mock('./ToolPanel', () => ({
-  default: ({ onToolClick, tools }) =>
+  default: ({ onToolClick, tools }: { onToolClick?: (t: unknown) => void; tools?: unknown[] }) =>
     React.createElement(
       'div',
       {
@@ -331,18 +331,18 @@ vi.mock('./ToolPanel', () => ({
     ),
 }));
 vi.mock('./ToolIcon', () => ({
-  default: ({ toolId }) => React.createElement('span', { 'data-testid': `icon-${toolId}` }),
+  default: ({ toolId }: { toolId?: string }) => React.createElement('span', { 'data-testid': `icon-${toolId}` }),
 }));
 vi.mock('./OutputPanel', () => ({
-  default: (props) =>
+  default: (props: Record<string, unknown>) =>
     React.createElement(
       'div',
       { 'data-testid': 'output-panel' },
-      `OutputPanel:${props.previewMode || 'none'}`
+      `OutputPanel:${(props.previewMode as string) || 'none'}`
     ),
 }));
 vi.mock('../drawers/DrawerPanel', () => ({
-  default: ({ children, title }) =>
+  default: ({ children, title }: { children?: React.ReactNode; title?: string }) =>
     React.createElement('div', { 'data-testid': 'drawer-panel' }, title, children),
 }));
 vi.mock('../drawers/FindReplaceDrawer', () => ({
@@ -415,13 +415,13 @@ Object.assign(navigator, {
 
 // ── Mock localStorage ──
 const localStorageMock = (() => {
-  let store = {};
+  let store: Record<string, string> = {};
   return {
-    getItem: vi.fn((k) => store[k] || null),
-    setItem: vi.fn((k, v) => {
+    getItem: vi.fn((k: string) => store[k] || null),
+    setItem: vi.fn((k: string, v: string) => {
       store[k] = v;
     }),
-    removeItem: vi.fn((k) => {
+    removeItem: vi.fn((k: string) => {
       delete store[k];
     }),
     clear: vi.fn(() => {
@@ -527,7 +527,7 @@ describe('TextForm', () => {
     // Click the same tab that is already active to close sidebar
     const activityBtns = document.querySelectorAll('.tu-activity-btn');
     // First btn is 'all' tab - click it to toggle
-    fireEvent.click(activityBtns[0]);
+    fireEvent.click(activityBtns[0]!);
     // After toggle, sidebar should be closed (collapsed class)
     expect(document.querySelector('.tu-forge--sidebar-collapsed')).toBeInTheDocument();
   });

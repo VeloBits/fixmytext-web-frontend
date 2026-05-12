@@ -2,7 +2,14 @@ import { renderHook, act } from '@testing-library/react';
 import useWordFrequency from './useWordFrequency';
 
 describe('useWordFrequency', () => {
-  let showAlert, setAiResult, setPreviewMode, pushHistory;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let showAlert: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setAiResult: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setPreviewMode: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      pushHistory: any;
 
   beforeEach(() => {
     showAlert = vi.fn();
@@ -40,7 +47,7 @@ describe('useWordFrequency', () => {
     });
 
     expect(setAiResult).toHaveBeenCalled();
-    const call = setAiResult.mock.calls[0][0];
+    const call = setAiResult.mock.calls[0]![0]!;
     expect(call.label).toBe('Word Frequency');
     expect(call.result).toContain('hello');
     expect(call.result).toContain('world');

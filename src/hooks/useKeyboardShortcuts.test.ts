@@ -134,7 +134,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('handles Ctrl+K keydown for palette', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: 'k',
       ctrlKey: true,
@@ -150,7 +150,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('handles Ctrl+B keydown for toggle sidebar', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: 'b',
       ctrlKey: true,
@@ -166,7 +166,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('handles Escape keydown', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: 'Escape',
       ctrlKey: false,
@@ -182,7 +182,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('handles Ctrl+Enter for run tool', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: 'Enter',
       ctrlKey: true,
@@ -198,7 +198,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('handles Alt+1 for tab navigation', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: '1',
       ctrlKey: false,
@@ -214,7 +214,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('handles Ctrl+] for next tab', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: ']',
       ctrlKey: true,
@@ -230,7 +230,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('handles Ctrl+Shift+U for tool_uppercase', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: 'u',
       ctrlKey: true,
@@ -246,7 +246,7 @@ describe('useKeyboardShortcuts', () => {
   });
 
   it('ignores keydown in INPUT without modifier', () => {
-    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    renderHook(() => useKeyboardShortcuts(actions));
     const event = new KeyboardEvent('keydown', {
       key: 'a',
       ctrlKey: false,
@@ -313,7 +313,7 @@ describe('detectConflicts', () => {
       ctrl: true,
     });
     expect(conflicts.length).toBeGreaterThan(0);
-    expect(conflicts[0].id).toBe('toggle_sidebar');
+    expect(conflicts[0]!.id).toBe('toggle_sidebar');
   });
 
   it('returns empty when no conflicts', () => {

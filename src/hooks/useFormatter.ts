@@ -50,11 +50,11 @@ const parserImports: Record<ParserKey, () => Promise<{ default: unknown }>> = {
 const sortImportsAlphabetically = (code: string): string => {
   const lines = code.split('\n');
   let i = 0;
-  while (i < lines.length && lines[i].trim() === '') i++;
+  while (i < lines.length && lines[i]!.trim() === '') i++;
   const start = i;
   const importLines: string[] = [];
-  while (i < lines.length && /^\s*import\s/.test(lines[i])) {
-    importLines.push(lines[i]);
+  while (i < lines.length && /^\s*import\s/.test(lines[i]!)) {
+    importLines.push(lines[i]!);
     i++;
   }
   if (importLines.length < 2) return code;

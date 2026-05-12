@@ -108,7 +108,7 @@ export default function KeyboardShortcuts({
     }
   }, [isOpen]);
 
-  const startRecording = useCallback((id) => {
+  const startRecording = useCallback((id: string) => {
     setRecordingId(id);
     setPendingBinding(null);
     setConflict(null);
@@ -163,7 +163,7 @@ export default function KeyboardShortcuts({
       const conflicts = detectConflicts(groups ?? DEFAULT_SHORTCUT_GROUPS, recordingId, binding);
       if (conflicts.length > 0) {
         setPendingBinding(binding);
-        setConflict(conflicts[0]);
+        setConflict(conflicts[0] ?? null);
         return;
       }
 

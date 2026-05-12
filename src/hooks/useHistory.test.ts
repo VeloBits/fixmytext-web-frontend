@@ -43,9 +43,9 @@ describe('useHistory', () => {
       result.current.pushHistory('Uppercase', 'hello', 'HELLO');
     });
     expect(result.current.history).toHaveLength(1);
-    expect(result.current.history[0].operation).toBe('Uppercase');
-    expect(result.current.history[0].original).toBe('hello');
-    expect(result.current.history[0].result).toBe('HELLO');
+    expect(result.current.history[0]!.operation).toBe('Uppercase');
+    expect(result.current.history[0]!.original).toBe('hello');
+    expect(result.current.history[0]!.result).toBe('HELLO');
   });
 
   it('handleRestoreOriginal sets text to original', () => {

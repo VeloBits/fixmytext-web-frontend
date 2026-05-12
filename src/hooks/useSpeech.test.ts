@@ -123,8 +123,8 @@ describe('useSpeech', () => {
       results: {
         0: result1,
         length: 1,
-        [Symbol.iterator]: function* () {
-          for (let i = 0; i < this.length; i++) yield this[i];
+        [Symbol.iterator]: function* (this: { length: number; [key: number]: unknown }): Generator<unknown> {
+          for (let i = 0; i < this.length; i++) yield (this as Record<number, unknown>)[i];
         },
       },
     };

@@ -65,12 +65,12 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }: Di
         );
         for (let i = 1; i <= a.length; i++)
           for (let j = 1; j <= b.length; j++)
-            matrix[i][j] = Math.min(
-              matrix[i - 1][j] + 1,
-              matrix[i][j - 1] + 1,
-              matrix[i - 1][j - 1] + (a[i - 1] !== b[j - 1] ? 1 : 0)
+            matrix[i]![j] = Math.min(
+              matrix[i - 1]![j]! + 1,
+              matrix[i]![j - 1]! + 1,
+              matrix[i - 1]![j - 1]! + (a[i - 1] !== b[j - 1] ? 1 : 0)
             );
-        const dist = matrix[a.length][b.length];
+        const dist = matrix[a.length]![b.length]!
         const maxLen = Math.max(a.length, b.length);
         const similarity = ((1 - dist / maxLen) * 100).toFixed(1);
         onResult(
@@ -183,7 +183,7 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }: Di
             className="tu-fr-input tu-fr-input--multiline"
             value={textB}
             onChange={(e) => setTextB(e.target.value)}
-            placeholder={`Paste the second text to ${titles[toolId] || 'compare'}…`}
+            placeholder={`Paste the second text to ${titles[toolId as keyof typeof titles] || 'compare'}…`}
             rows={3}
             spellCheck={false}
           />

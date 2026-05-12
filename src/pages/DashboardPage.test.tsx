@@ -6,8 +6,8 @@ import type { GamificationContextValue, SubscriptionContextValue, User } from '.
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) => {
+    (tag: string) =>
+    ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const p = { ...props };
       [
         'initial',
@@ -23,8 +23,8 @@ vi.mock('framer-motion', () => {
       return React.createElement(tag || 'div', p, children);
     };
   return {
-    motion: new Proxy({}, { get: (_, t) => m(t) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, t) => m(t as string) }),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
@@ -35,14 +35,14 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/dashboard', search: '' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }) => React.createElement('a', { href: to, ...p }, children),
+  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
 }));
 
 // ── react-redux mock ──
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(() => ({ accessToken: null })),
   useDispatch: () => vi.fn(),
-  Provider: ({ children }) => children,
+  Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 // ── API mocks ──
@@ -63,7 +63,7 @@ vi.mock('../components/gamification/SpinWheel', () => ({
 
 // ── formatPrice mock ──
 vi.mock('../utils/formatPrice', () => ({
-  default: (price) => `$${price}`,
+  default: (price: number) => `$${price}`,
 }));
 
 import DashboardPage from './DashboardPage';
@@ -205,7 +205,7 @@ describe('DashboardPage', () => {
     const achButtons = screen.getAllByText('Achievements');
     // The nav button is the one inside <nav>
     const navBtn = achButtons.find((el) => el.closest('nav'));
-    fireEvent.click(navBtn || achButtons[0]);
+    fireEvent.click(navBtn || achButtons[0]!);
     expect(screen.getByText(/of .* unlocked/i)).toBeInTheDocument();
   });
 
@@ -213,7 +213,7 @@ describe('DashboardPage', () => {
     renderDash();
     const favButtons = screen.getAllByText('Favorites');
     const navBtn = favButtons.find((el) => el.closest('nav'));
-    fireEvent.click(navBtn || favButtons[0]);
+    fireEvent.click(navBtn || favButtons[0]!);
     expect(screen.getByText('0 tools favorited')).toBeInTheDocument();
   });
 
@@ -286,7 +286,7 @@ describe('DashboardPage', () => {
     renderDash();
     const favButtons = screen.getAllByText('Favorites');
     const navBtn = favButtons.find((el) => el.closest('nav'));
-    fireEvent.click(navBtn || favButtons[0]);
+    fireEvent.click(navBtn || favButtons[0]!);
     expect(screen.getByText('No favorites yet')).toBeInTheDocument();
   });
 
@@ -410,7 +410,7 @@ describe('DashboardPage', () => {
     renderDash();
     fireEvent.click(screen.getByText('Profile'));
     // Click a persona button
-    const writerBtn = screen.getAllByText(/Writer/i)[0];
+    const writerBtn = screen.getAllByText(/Writer/i)[0]!;
     fireEvent.click(writerBtn);
     expect(defaultGamification.setPersona).toHaveBeenCalled();
   });
@@ -422,7 +422,7 @@ describe('DashboardPage', () => {
     renderDash({ gamification });
     const favButtons = screen.getAllByText('Favorites');
     const navBtn = favButtons.find((el) => el.closest('nav'));
-    fireEvent.click(navBtn || favButtons[0]);
+    fireEvent.click(navBtn || favButtons[0]!);
     // There should be a remove-from-favorites button (the heart)
     const heartBtn = screen.getByTitle('Remove from favorites');
     fireEvent.click(heartBtn);
@@ -442,7 +442,7 @@ describe('DashboardPage', () => {
     renderDash();
     fireEvent.click(screen.getByText('Subscription'));
     const upgradeBtns = screen.getAllByText(/Upgrade to Pro/i);
-    fireEvent.click(upgradeBtns[0]);
+    fireEvent.click(upgradeBtns[0]!);
     expect(defaultSubscription.handleUpgrade).toHaveBeenCalled();
   });
 

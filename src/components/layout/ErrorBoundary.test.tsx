@@ -3,13 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ErrorBoundary from './ErrorBoundary';
 
 // Component that throws
-function ThrowingChild({ shouldThrow }) {
+function ThrowingChild({ shouldThrow }: { shouldThrow?: boolean }) {
   if (shouldThrow) throw new Error('Test error message');
   return <div>Child content</div>;
 }
 
 describe('ErrorBoundary', () => {
-  let consoleSpy;
+  let consoleSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});

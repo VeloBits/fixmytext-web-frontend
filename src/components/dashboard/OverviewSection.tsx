@@ -170,7 +170,7 @@ export default function OverviewSection({
                   <div className="tu-dash-tool-bar-wrap">
                     <div
                       className="tu-dash-tool-bar"
-                      style={{ width: `${(tool.count / topTools[0].count) * 100}%` }}
+                      style={{ width: `${(tool.count / topTools[0]!.count) * 100}%` }}
                     />
                   </div>
                   <span className="tu-dash-tool-count">{tool.count}x</span>
@@ -192,7 +192,7 @@ export default function OverviewSection({
                   <div className="tu-dash-tool-bar-wrap">
                     <div
                       className="tu-dash-tool-bar tu-dash-tool-bar--cat"
-                      style={{ width: `${(cat.count / categoryUsage[0].count) * 100}%` }}
+                      style={{ width: `${(cat.count / categoryUsage[0]!.count) * 100}%` }}
                     />
                   </div>
                   <span className="tu-dash-tool-count">{cat.count}</span>

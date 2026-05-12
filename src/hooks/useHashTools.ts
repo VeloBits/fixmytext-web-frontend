@@ -72,7 +72,7 @@ const useHashTools = ({
       }
       const bytes = new TextEncoder().encode(text);
       let crc = 0xffffffff;
-      for (let i = 0; i < bytes.length; i++) crc = table[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+      for (let i = 0; i < bytes.length; i++) crc = table[(crc ^ bytes[i]!) & 0xff]! ^ (crc >>> 8);
       return ((crc ^ 0xffffffff) >>> 0).toString(16).padStart(8, '0');
     };
 
@@ -82,7 +82,7 @@ const useHashTools = ({
       let a = 1,
         b = 0;
       for (let i = 0; i < bytes.length; i++) {
-        a = (a + bytes[i]) % 65521;
+        a = (a + bytes[i]!) % 65521;
         b = (b + a) % 65521;
       }
       return ((b << 16) | a).toString(16).padStart(8, '0');
@@ -93,7 +93,7 @@ const useHashTools = ({
       const bytes = new TextEncoder().encode(text);
       let hash = 0x811c9dc5;
       for (let i = 0; i < bytes.length; i++) {
-        hash ^= bytes[i];
+        hash ^= bytes[i]!;
         hash = Math.imul(hash, 0x01000193);
       }
       return (hash >>> 0).toString(16).padStart(8, '0');

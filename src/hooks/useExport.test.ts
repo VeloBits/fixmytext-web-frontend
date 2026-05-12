@@ -2,8 +2,10 @@ import { renderHook, act } from '@testing-library/react';
 import useExport from './useExport';
 
 describe('useExport', () => {
-  let setLoading, showAlert;
-  let mockCreateObjectURL, mockRevokeObjectURL;
+  let setLoading: any,
+      showAlert: any;
+  let mockCreateObjectURL: any,
+      mockRevokeObjectURL: any;
 
   beforeEach(() => {
     vi.clearAllMocks();

@@ -270,7 +270,6 @@ export default memo(function ToolPanel({
 
   // Group tools — each group contains tools sorted alphabetically
   // Favorites are pinned at the top as their own group
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const favorites = gamification?.favorites || [];
   const groupedTools = useMemo(() => {
     const groups: { id: string; label: string; tools: ToolDefinition[] }[] = [];
@@ -298,13 +297,13 @@ export default memo(function ToolPanel({
 
     // Sort each group's tools alphabetically
     for (const gid of Object.keys(groupMap)) {
-      groupMap[gid].sort((a, b) => a.label.localeCompare(b.label));
+      groupMap[gid]!.sort((a, b) => a.label.localeCompare(b.label));
     }
 
     // Maintain TOOL_GROUPS order, then add any ungrouped
     for (const g of TOOL_GROUPS) {
-      if (groupMap[g.id]?.length > 0) {
-        groups.push({ id: g.id, label: g.label, tools: groupMap[g.id] });
+      if ((groupMap[g.id]?.length ?? 0) > 0) {
+        groups.push({ id: g.id, label: g.label, tools: groupMap[g.id]! });
         delete groupMap[g.id];
       }
     }

@@ -128,17 +128,17 @@ const STATES = [
 ];
 const DOMAINS = ['example.com', 'test.org', 'mail.com', 'inbox.net', 'demo.io'];
 
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function pick(arr: string[]): string {
+  return arr[Math.floor(Math.random() * arr.length)] ?? '';
 }
-function randInt(min, max) {
+function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function genName() {
   return `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`;
 }
-function genEmail(name) {
+function genEmail(name: string) {
   const [f, l] = (name || genName()).toLowerCase().split(' ');
   return `${f}.${l}${randInt(1, 99)}@${pick(DOMAINS)}`;
 }

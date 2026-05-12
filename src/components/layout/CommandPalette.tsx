@@ -36,7 +36,7 @@ export default function CommandPalette({ search, onToolClick }: CommandPalettePr
     if (item) item.scrollIntoView({ block: 'nearest' });
   }, [activeIdx]);
 
-  const handleSelect = (tool) => {
+  const handleSelect = (tool: ToolDefinition) => {
     onToolClick(tool);
     search.close();
   };

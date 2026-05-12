@@ -98,7 +98,7 @@ function hasSpunThisWeek(spinHistory: SpinHistoryItem[] | undefined): boolean {
   monday.setDate(now.getDate() - day + 1);
   monday.setHours(0, 0, 0, 0);
 
-  const latestSpin = new Date(spinHistory[0].spin_date);
+  const latestSpin = new Date(spinHistory[0]!.spin_date);
   return latestSpin >= monday;
 }
 

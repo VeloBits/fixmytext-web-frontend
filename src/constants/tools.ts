@@ -3978,7 +3978,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     check: (ops) => {
       if (ops.length < 3) return false;
       const r = ops.slice(-3);
-      return (r[2].time ?? 0) - (r[0].time ?? 0) < 60000;
+      return (r[2]!.time ?? 0) - (r[0]!.time ?? 0) < 60000;
     },
   },
   // Specific tool quests

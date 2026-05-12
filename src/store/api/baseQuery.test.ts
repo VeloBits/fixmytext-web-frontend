@@ -19,16 +19,27 @@ const mockRawBaseQuery = vi.fn();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let capturedFetchBaseQueryConfig: any = null;
 
+interface MockBaseQueryResult {
+  error?: unknown;
+  data?: unknown;
+}
+
+interface MockRetryOptions {
+  maxRetries: number;
+  retryCondition: (error: unknown, args: unknown, meta: { attempt: number }) => boolean;
+  [key: string]: unknown;
+}
+
 vi.mock('@reduxjs/toolkit/query/react', () => ({
-  fetchBaseQuery: (config) => {
+  fetchBaseQuery: (config: Record<string, unknown>) => {
     capturedFetchBaseQueryConfig = config;
     return mockRawBaseQuery;
   },
-  retry: (baseQueryFn, options) => {
+  retry: (baseQueryFn: (args: unknown, api: unknown, extra: unknown) => Promise<MockBaseQueryResult>, options: MockRetryOptions) => {
     // Expose the retry wrapper so we can test retryCondition directly.
     // Simulate retry behaviour: call baseQueryFn, and if it returns an error
     // that satisfies retryCondition, call it again up to maxRetries times.
-    const wrapped = async (args, api, extraOptions) => {
+    const wrapped = async (args: unknown, api: unknown, extraOptions: unknown) => {
       let attempt = 1;
       let result = await baseQueryFn(args, api, extraOptions);
 
@@ -58,12 +69,12 @@ async function freshImport() {
   vi.resetModules();
   // Re-apply the mock (resetModules drops it)
   vi.mock('@reduxjs/toolkit/query/react', () => ({
-    fetchBaseQuery: (config) => {
+    fetchBaseQuery: (config: Record<string, unknown>) => {
       capturedFetchBaseQueryConfig = config;
       return mockRawBaseQuery;
     },
-    retry: (baseQueryFn, options) => {
-      const wrapped = async (args, api, extraOptions) => {
+    retry: (baseQueryFn: (args: unknown, api: unknown, extra: unknown) => Promise<MockBaseQueryResult>, options: MockRetryOptions) => {
+      const wrapped = async (args: unknown, api: unknown, extraOptions: unknown) => {
         let attempt = 1;
         let result = await baseQueryFn(args, api, extraOptions);
         while (
@@ -403,7 +414,7 @@ describe('baseQueryWithReauth — refresh mutex', () => {
     let refreshCallCount = 0;
 
     // Use a deferred promise for the refresh so we can control timing
-    let resolveRefresh;
+    let resolveRefresh: ((value: unknown) => void) | undefined;
     const refreshDeferred = new Promise((r) => {
       resolveRefresh = r;
     });
@@ -435,7 +446,7 @@ describe('baseQueryWithReauth — refresh mutex', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     // Resolve the single refresh
-    resolveRefresh({ data: { access_token: 'fresh' } });
+    resolveRefresh?.({ data: { access_token: 'fresh' } });
 
     await Promise.all([p1, p2]);
 

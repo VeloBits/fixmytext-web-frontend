@@ -50,7 +50,7 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
       },
     };
 
-    const config = configs[toolId];
+    const config = configs[toolId as keyof typeof configs];
     if (!config) {
       if (toolId === 'aes_encrypt' || toolId === 'aes_decrypt') {
         try {

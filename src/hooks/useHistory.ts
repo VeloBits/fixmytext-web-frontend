@@ -70,13 +70,13 @@ export default function useHistory(
   );
 
   const handleRestoreOriginal = (idx: number): void => {
-    setText(history[idx].original);
-    showAlert(`Restored original from "${history[idx].operation}"`, 'success');
+    setText(history[idx]!.original);
+    showAlert(`Restored original from "${history[idx]!.operation}"`, 'success');
   };
 
   const handleRestoreResult = (idx: number): void => {
-    setText(history[idx].result);
-    showAlert(`Restored result of "${history[idx].operation}"`, 'success');
+    setText(history[idx]!.result);
+    showAlert(`Restored result of "${history[idx]!.operation}"`, 'success');
   };
 
   const handleUndo = useCallback(() => {

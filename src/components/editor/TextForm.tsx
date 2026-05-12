@@ -16,6 +16,7 @@ import {
   USE_CASE_TABS,
   ACHIEVEMENTS,
 } from '../../constants/tools';
+import type { ToolDefinition } from '../../types/tools';
 import { ENDPOINTS } from '../../constants/endpoints';
 import { ROUTES } from '../../constants';
 
@@ -330,7 +331,7 @@ export default function TextForm(props: TextFormProps) {
   const activeTabIdRef = useRef<string | null>(null);
   activeTabIdRef.current = activeWorkspaceId;
   const text = (activeWorkspaceId ? toolTexts[activeWorkspaceId] : '') || '';
-  const setText = useCallback((valOrFn) => {
+  const setText = useCallback((valOrFn: string | ((prev: string) => string)) => {
     const tabId = activeTabIdRef.current;
     if (!tabId) return;
     setToolTexts((prev) => {
@@ -412,7 +413,7 @@ export default function TextForm(props: TextFormProps) {
   const subscription = props.subscription;
 
   // ── Persistent history (server-side) ─────────────────────
-  const { accessToken } = useSelector((s: Record<string, { accessToken: string | null }>) => s.auth);
+  const accessToken = useSelector((s: Record<string, { accessToken: string | null } | undefined>) => s.auth?.accessToken ?? null);
   const [historyView, setHistoryView] = useState('session'); // 'session' | 'saved'
   const [historyPage, setHistoryPage] = useState(1);
   const { data: serverHistory, isFetching: historyFetching } = useGetHistoryQuery(
@@ -502,7 +503,7 @@ export default function TextForm(props: TextFormProps) {
   // Sync panel sizes to server when authenticated (debounced)
   const panelSizeSyncTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const syncPanelSizes = useCallback(
-    (updates) => {
+    (updates: Record<string, number>) => {
       if (!accessToken) return;
       clearTimeout(panelSizeSyncTimer.current);
       panelSizeSyncTimer.current = setTimeout(() => {
@@ -643,7 +644,7 @@ export default function TextForm(props: TextFormProps) {
     navigator.clipboard.readText().then((t) => {
       setText((prev) => prev + t);
       const ws = workspaceTabs.find((tab) => tab.id === activeWorkspaceId);
-      if (ws?.type === 'tool') setTimeout(() => executeToolAction(ws.tool), 150);
+      if (ws?.type === 'tool') setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
     });
     showAlert('Pasted from clipboard', 'success');
   };
@@ -651,7 +652,7 @@ export default function TextForm(props: TextFormProps) {
     navigator.clipboard.readText().then((t) => {
       setText(t);
       const ws = workspaceTabs.find((tab) => tab.id === activeWorkspaceId);
-      if (ws?.type === 'tool') setTimeout(() => executeToolAction(ws.tool), 150);
+      if (ws?.type === 'tool') setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
     });
     showAlert('Cleared and pasted', 'success');
   };
@@ -931,7 +932,7 @@ export default function TextForm(props: TextFormProps) {
 
   // ── Open a tool as a workspace tab ──────────────────────
   const openToolTab = useCallback(
-    (tool) => {
+    (tool: ToolDefinition) => {
       if (!tool) return;
       const tabId = `tool-${tool.id}`;
       let isNew = false;
@@ -958,7 +959,7 @@ export default function TextForm(props: TextFormProps) {
   );
 
   // ── Open tool by ID and seed with content (used by templates) ──
-  const openToolById = useCallback((toolId, content) => {
+  const openToolById = useCallback((toolId: string | null, content: string) => {
     const tool = toolId ? TOOLS.find((t) => t.id === toolId) : null;
     if (!tool) {
       // No tool_id or tool not found — load into current tab if open, otherwise open a generic tab
@@ -967,7 +968,8 @@ export default function TextForm(props: TextFormProps) {
         setToolTexts((prev) => ({ ...prev, [activeId]: content }));
       } else {
         // No tab open — pick the first non-drawer, non-action tool as a generic text holder
-        const fallback = TOOLS.find((t) => t.type === 'api' && t.group === 'case') || TOOLS[0];
+         
+        const fallback = TOOLS.find((t) => t.type === 'api' && t.group === 'case') ?? TOOLS[0]!;
         const tabId = `tool-${fallback.id}`;
         setWorkspaceTabs((tabs) => {
           if (tabs.find((t) => t.id === tabId)) return tabs;
@@ -1011,7 +1013,7 @@ export default function TextForm(props: TextFormProps) {
 
   // ── Execute a tool ──
   const executeToolAction = useCallback(
-    (tool) => {
+    (tool: ToolDefinition) => {
       if (!tool) return;
       if (!trial.checkTrial()) return;
 
@@ -1024,7 +1026,7 @@ export default function TextForm(props: TextFormProps) {
       aiResultSourceRef.current = tool.id;
 
       if (tool.type === 'api') {
-        callApi(tool.endpoint, tool.successMsg, { toolId: tool.id, toolType: tool.type }).then(
+        callApi(tool.endpoint!, tool.successMsg ?? '', { toolId: tool.id, toolType: tool.type }).then(
           (res) => {
             if (res?.success) pipeline.addStep(tool.id, tool.label, res.result ?? '');
             if (subscription?.refetchStatus) subscription.refetchStatus();
@@ -1033,17 +1035,17 @@ export default function TextForm(props: TextFormProps) {
       } else if (
         tool.type === 'ai' ||
         tool.type === 'local' ||
-        tool.type === 'action' ||
         tool.type === 'select'
       ) {
-        const handler = handlerMap[tool.handlerKey];
+        const handler = tool.handlerKey ? (handlerMap[tool.handlerKey as keyof typeof handlerMap] as ((val?: string | null) => unknown) | undefined) : undefined;
         if (handler) {
           // For select tools, pass the freshly-clicked value from the ref to avoid stale closure
           const freshVal = selectValueRef.current;
           selectValueRef.current = null;
           const result = handler(freshVal);
-          if (result && typeof result.then === 'function') {
-            result.then(() => {
+          const resultAsPromise = result as { then?: (fn: () => void) => void } | null;
+          if (resultAsPromise && typeof resultAsPromise.then === 'function') {
+            resultAsPromise.then(() => {
               pipeline.addStep(tool.id, tool.label, "");
               if (subscription?.refetchStatus) subscription.refetchStatus();
             });
@@ -1053,7 +1055,7 @@ export default function TextForm(props: TextFormProps) {
           }
         }
       } else if (tool.type === 'drawer') {
-        togglePanel(tool.panelId);
+        togglePanel(tool.panelId!);
       }
     },
     [text, gamification?.recordToolUse, trial.checkTrial, subscription?.checkToolAccess]
@@ -1061,15 +1063,16 @@ export default function TextForm(props: TextFormProps) {
 
   // ── Unified tool click handler ──────────────────────────
   const handleToolClick = useCallback(
-    (tool) => {
+    (tool: ToolDefinition) => {
       if (!tool) return;
       if (tool.type === 'drawer') {
         // Panels that host multiple distinct tools get a per-tool tab so each tool
         // keeps its own state and shows up independently in the tab strip.
         const PER_TOOL_PANELS = new Set(['cipherdrawer', 'diffdrawer', 'fakedata']);
-        const tabId = PER_TOOL_PANELS.has(tool.panelId)
-          ? `drawer-${tool.panelId}-${tool.id}`
-          : `drawer-${tool.panelId}`;
+        const panelId = tool.panelId ?? '';
+        const tabId = PER_TOOL_PANELS.has(panelId)
+          ? `drawer-${panelId}-${tool.id}`
+          : `drawer-${panelId}`;
         let isNew = false;
         setWorkspaceTabs((tabs) => {
           const existing = tabs.find((t) => t.id === tabId);
@@ -1086,24 +1089,27 @@ export default function TextForm(props: TextFormProps) {
               label: tool.label,
               icon: tool.icon,
               type: 'drawer',
-              panelId: tool.panelId,
+              panelId: panelId,
               tool,
             },
           ];
         });
         // Reset compare state on fresh open so user starts with empty text
-        if (isNew && tool.panelId === 'compare') {
+        if (isNew && panelId === 'compare') {
           setToolTexts((prev) => ({ ...prev, [tabId]: '' }));
           compare.setCompareText('');
           compare.setDiffResult(null);
         }
         setActiveWorkspaceId(tabId);
-        setActivePanel(tool.panelId);
+        setActivePanel(panelId);
         gamification?.recordToolUse(tool.id, text.length);
-      } else if (tool.type === 'action') {
-        executeToolAction(tool);
       } else {
-        openToolTab(tool);
+        // api, ai, local, select → open as workspace tab; action is handled via executeToolAction
+        if (tool.type === 'api' || tool.type === 'ai' || tool.type === 'local' || tool.type === 'select') {
+          openToolTab(tool);
+        } else {
+          executeToolAction(tool);
+        }
       }
     },
     [openToolTab, executeToolAction, text, gamification?.recordToolUse]
@@ -1144,7 +1150,7 @@ export default function TextForm(props: TextFormProps) {
     }
 
     const timer = setTimeout(() => {
-      executeToolAction(ws.tool);
+      if (ws.tool) executeToolAction(ws.tool as ToolDefinition);
     }, 2000);
     return () => clearTimeout(timer);
   }, [text, activeWorkspaceId]);
@@ -1158,7 +1164,7 @@ export default function TextForm(props: TextFormProps) {
     const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
     if (!ws || ws.type !== 'tool') return;
     if (!ws.tool || !['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)) return;
-    const timer = setTimeout(() => executeToolAction(ws.tool), 300);
+    const timer = setTimeout(() => { if (ws.tool) executeToolAction(ws.tool as ToolDefinition); }, 300);
     return () => clearTimeout(timer);
   }, [formatter.fmtCfg]);
 
@@ -1190,7 +1196,7 @@ export default function TextForm(props: TextFormProps) {
     },
     runActiveTool: () => {
       const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-      if (ws?.type === 'tool') executeToolAction(ws.tool);
+      if (ws?.type === 'tool' && ws.tool) executeToolAction(ws.tool as ToolDefinition);
     },
     saveTemplate: () => {
       if (activeWorkspaceId) {
@@ -1212,31 +1218,31 @@ export default function TextForm(props: TextFormProps) {
       }
     },
     clearPaste: () => handleClearPaste(),
-    goToTab: (idx) => {
+    goToTab: (idx: number) => {
       if (idx === 8) {
         const last = workspaceTabs[workspaceTabs.length - 1];
         if (last) setActiveWorkspaceId(last.id);
       } else if (workspaceTabs[idx]) {
-        setActiveWorkspaceId(workspaceTabs[idx].id);
+        setActiveWorkspaceId(workspaceTabs[idx]!.id);
       }
     },
     nextTab: () => {
       if (workspaceTabs.length === 0) return;
       const idx = workspaceTabs.findIndex((t) => t.id === activeWorkspaceId);
       const next = (idx + 1) % workspaceTabs.length;
-      setActiveWorkspaceId(workspaceTabs[next].id);
+      setActiveWorkspaceId(workspaceTabs[next]!.id);
     },
     prevTab: () => {
       if (workspaceTabs.length === 0) return;
       const idx = workspaceTabs.findIndex((t) => t.id === activeWorkspaceId);
       const prev = (idx - 1 + workspaceTabs.length) % workspaceTabs.length;
-      setActiveWorkspaceId(workspaceTabs[prev].id);
+      setActiveWorkspaceId(workspaceTabs[prev]!.id);
     },
-    runTool: (tool) => handleToolClick(tool),
+    runTool: (tool: ToolDefinition) => handleToolClick(tool),
   };
   // Stable proxy object — never changes identity, always delegates to latest ref
   const keyboardActions = useMemo(() => {
-    const proxy = {};
+    const proxy: Record<string, (...args: unknown[]) => unknown> = {};
     const keys = [
       'openPalette',
       'toggleSidebar',
@@ -1331,7 +1337,7 @@ export default function TextForm(props: TextFormProps) {
   };
 
   // Activity bar tab click — toggles sidebar
-  const handleActivityClick = (tabId) => {
+  const handleActivityClick = (tabId: string) => {
     if (activeTab === tabId && sidebarOpen) {
       setSidebarOpen(false);
     } else {
@@ -1602,9 +1608,9 @@ export default function TextForm(props: TextFormProps) {
           {/* Favourites panel */}
           {activeTab === '_favourites' &&
             (() => {
-              const favTools = (gamification?.favorites || [])
-                .map((id) => TOOLS.find((t) => t.id === id))
-                .filter(Boolean);
+              const favTools = ((gamification?.favorites as string[]) || [])
+                .map((id: string) => TOOLS.find((t) => t.id === id))
+                .filter(Boolean) as ToolDefinition[];
               return (
                 <div className="tu-tpanel">
                   {favTools.length === 0 ? (
@@ -2169,10 +2175,10 @@ export default function TextForm(props: TextFormProps) {
                       </h3>
                       <div className="tu-landing-badge-row">
                         {gamification?.achievements?.length > 0 ? (
-                          gamification?.achievements
+                          (gamification?.achievements as string[])
                             .slice(-6)
                             .reverse()
-                            .map((aid) => {
+                            .map((aid: string) => {
                               const ach = ACHIEVEMENTS.find((a) => a.id === aid);
                               return ach ? (
                                 <span
@@ -2203,10 +2209,10 @@ export default function TextForm(props: TextFormProps) {
                       </h3>
                       <div className="tu-landing-tool-grid">
                         {((gamification?.favorites?.length ?? 0) > 0
-                          ? (gamification?.favorites ?? [])
+                          ? ((gamification?.favorites ?? []) as string[])
                               .slice(0, 8)
-                              .map((id) => TOOLS.find((t) => t.id === id))
-                              .filter(Boolean)
+                              .map((id: string) => TOOLS.find((t) => t.id === id))
+                              .filter((t): t is ToolDefinition => Boolean(t))
                           : [
                               'fix_grammar',
                               'paraphrase',
@@ -2217,8 +2223,8 @@ export default function TextForm(props: TextFormProps) {
                               'word_count',
                               'find_replace',
                             ]
-                              .map((id) => TOOLS.find((t) => t.id === id))
-                              .filter(Boolean)
+                              .map((id: string) => TOOLS.find((t) => t.id === id))
+                              .filter((t): t is ToolDefinition => Boolean(t))
                         ).map((tool) => (
                           <button
                             key={tool.id}
@@ -2797,7 +2803,7 @@ export default function TextForm(props: TextFormProps) {
                         const panelId = workspaceTabs.find(
                           (t) => t.id === activeWorkspaceId
                         )?.panelId;
-                        const onPreview = (result) => {
+                        const onPreview = (result: { label: string; result: string } | null) => {
                           if (result) {
                             ai.setAiResult(result);
                             setPreviewMode('result');
@@ -3017,7 +3023,7 @@ export default function TextForm(props: TextFormProps) {
                       {(() => {
                         const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                         if (ws?.type !== 'tool' || ws.tool?.type !== 'select') return null;
-                        const tool = ws.tool;
+                        const tool = ws.tool as ToolDefinition;
                         const currentVal = (tool.selectKey ? (ai as Record<string, unknown>)[tool.selectKey] : undefined) || tool.options?.[0]?.[0];
                         return (
                           <div className="tu-fmtbar">
@@ -3113,8 +3119,8 @@ export default function TextForm(props: TextFormProps) {
                           onPaste={() => {
                             // After paste, auto-run the active tool with minimal delay
                             const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-                            if (ws?.type === 'tool') {
-                              setTimeout(() => executeToolAction(ws.tool), 150);
+                            if (ws?.type === 'tool' && ws.tool) {
+                              setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
                             }
                           }}
                           onScroll={(e) => {
@@ -3193,10 +3199,11 @@ export default function TextForm(props: TextFormProps) {
                       ) {
                         // fall through to OutputPanel below
                       } else {
-                        return ws.panelId && DRAWERS[ws.panelId] ? (
+                        const drawerDef = ws.panelId ? DRAWERS[ws.panelId as keyof typeof DRAWERS] : undefined;
+                        return ws.panelId && drawerDef ? (
                           <DrawerPanel
-                            title={DRAWERS[ws.panelId].title}
-                            color={DRAWERS[ws.panelId].color}
+                            title={drawerDef.title}
+                            color={drawerDef.color}
                             onClose={() => closeWorkspaceTab(activeWorkspaceId!)}
                           >
                             <LazyDrawer>{renderDrawerContent()}</LazyDrawer>

@@ -552,7 +552,7 @@ export default function useAiTools(
       const re = /([^\n]+)(\n+|$)/g;
       let m;
       while ((m = re.exec(text)) !== null) {
-        tokens.push({ content: m[1], sep: m[2] });
+        tokens.push({ content: m[1]!, sep: m[2] ?? '' });
       }
 
       try {
@@ -908,18 +908,18 @@ export default function useAiTools(
     // Convert one curl command (already collapsed onto a single line).
     const convertOne = (cmd: string): string => {
       const urlMatch = cmd.match(/curl\s+(?:.*?\s+)?['"]?(https?:\/\/[^\s'"]+)/);
-      const url = urlMatch ? urlMatch[1] : 'https://api.example.com';
+      const url = urlMatch ? (urlMatch[1] ?? 'https://api.example.com') : 'https://api.example.com';
       const methodMatch = cmd.match(/-X\s+(\w+)/);
-      const method = methodMatch ? methodMatch[1] : 'GET';
+      const method = methodMatch ? (methodMatch[1] ?? 'GET') : 'GET';
       const headerMatches = [...cmd.matchAll(/-H\s+['"]([^'"]+)['"]/g)];
       const headers = Object.fromEntries(
         headerMatches
-          .map((m) => m[1].split(': ').map((s) => s.trim()))
+          .map((m) => (m[1] ?? '').split(': ').map((s) => s.trim()))
           .filter((p) => p.length === 2)
       );
       const dataMatch =
         cmd.match(/-d\s+['"]([^'"]+)['"]/) || cmd.match(/--data\s+['"]([^'"]+)['"]/);
-      const body = dataMatch ? dataMatch[1] : null;
+      const body = dataMatch ? (dataMatch[1] ?? null) : null;
 
       if (target === 'javascript') {
         const opts = [`  method: '${method}'`];

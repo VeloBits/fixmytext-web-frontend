@@ -151,9 +151,9 @@ export default memo(function OutputPanel({
 
   useEffect(() => {
     if (!saveMenuOpen) return;
-    const handleClick = (e) => {
-      if (saveMenuRef.current?.contains(e.target)) return;
-      if (saveBtnRef.current?.contains(e.target)) return;
+    const handleClick = (e: MouseEvent) => {
+      if (saveMenuRef.current?.contains(e.target as Node)) return;
+      if (saveBtnRef.current?.contains(e.target as Node)) return;
       setSaveMenuOpen(false);
     };
     document.addEventListener('mousedown', handleClick);
@@ -211,7 +211,7 @@ export default memo(function OutputPanel({
 
   // fontSize via execCommand only supports 1-7, so we use a workaround:
   // apply fontSize 1 as a marker, then find the generated <font size="1"> and replace with inline style
-  const applyFontSize = useCallback((px) => {
+  const applyFontSize = useCallback((px: string) => {
     editorRef.current?.focus();
     document.execCommand('fontSize', false, '1');
     const el = editorRef.current;
@@ -232,8 +232,8 @@ export default memo(function OutputPanel({
   // Close emoji picker on outside click
   useEffect(() => {
     if (!emojiPickerOpen) return;
-    const handleClick = (e) => {
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
+    const handleClick = (e: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
         setEmojiPickerOpen(false);
       }
     };

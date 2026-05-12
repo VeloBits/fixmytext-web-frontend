@@ -114,7 +114,7 @@ describe('useHashTools', () => {
 
     expect(Object.keys(result.current).sort()).toEqual([...EXPECTED_KEYS].sort());
     for (const key of EXPECTED_KEYS) {
-      expect(typeof result.current[key]).toBe('function');
+      expect(typeof (result.current as Record<string, unknown>)[key]).toBe('function');
     }
   });
 
@@ -151,8 +151,8 @@ describe('useHashTools', () => {
 
       expect(fakeDigest).toHaveBeenCalled();
       const digestCalls = fakeDigest.mock.calls as unknown[][];
-      expect(digestCalls[0][0]).toBe('SHA-256');
-      expect((digestCalls[0][1] as { constructor: { name: string } }).constructor.name).toBe('Uint8Array');
+      expect(digestCalls[0]![0]).toBe('SHA-256');
+      expect((digestCalls[0]![1] as { constructor: { name: string } }).constructor.name).toBe('Uint8Array');
       expect(deps.setLocalLoading).toHaveBeenCalledWith(true);
       expect(deps.setAiResult).toHaveBeenCalledWith({
         label: 'SHA-256 Hash',
@@ -235,7 +235,7 @@ describe('useHashTools', () => {
         const deps = makeDeps('');
         const { result } = renderHook(() => useHashTools(deps));
 
-        await result.current[handlerName]();
+        await (result.current as Record<string, () => Promise<void>>)[handlerName]!();
 
         expect(deps.setLocalLoading).not.toHaveBeenCalled();
         expect(deps.setAiResult).not.toHaveBeenCalled();

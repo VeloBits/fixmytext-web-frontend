@@ -57,7 +57,7 @@ describe('HistoryDrawer', () => {
     const history = [{ operation: 'Test', original: 'in', result: 'out', timestamp: Date.now() }];
     render(<HistoryDrawer {...baseProps} history={history} />);
     const restoreInputBtns = screen.getAllByText('Restore Input');
-    fireEvent.click(restoreInputBtns[0]);
+    fireEvent.click(restoreInputBtns[0]!);
     expect(baseProps.handleRestoreOriginal).toHaveBeenCalledWith(0);
   });
 
@@ -103,7 +103,7 @@ describe('HistoryDrawer', () => {
     const history = [{ operation: 'Test', original: 'in', result: 'out', timestamp: Date.now() }];
     render(<HistoryDrawer {...baseProps} history={history} />);
     const restoreOutputBtns = screen.getAllByText('Restore Output');
-    fireEvent.click(restoreOutputBtns[0]);
+    fireEvent.click(restoreOutputBtns[0]!);
     expect(baseProps.handleRestoreResult).toHaveBeenCalledWith(0);
   });
 
@@ -134,7 +134,7 @@ describe('HistoryDrawer', () => {
     fireEvent.click(screen.getByText('All History'));
     expect(screen.getByText('Uppercase')).toBeInTheDocument();
     const restoreInputBtns = screen.getAllByText('Restore Input');
-    fireEvent.click(restoreInputBtns[0]);
+    fireEvent.click(restoreInputBtns[0]!);
     expect(baseProps.setText).toHaveBeenCalledWith('hello');
     expect(baseProps.showAlert).toHaveBeenCalled();
   });

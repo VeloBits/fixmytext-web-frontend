@@ -97,7 +97,7 @@ export function useAlert(): AlertContextValue {
   );
 
   // Backwards compatibility: expose `alert` as the latest alert (for components still using old API)
-  const alert = alerts.length > 0 ? alerts[alerts.length - 1] : null;
+  const alert = alerts.length > 0 ? (alerts[alerts.length - 1] ?? null) : null;
 
   return { alert, alerts, showAlert, dismissAlert };
 }

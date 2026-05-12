@@ -2,22 +2,22 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }) => {
+    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const filtered = { ...props };
       ['initial', 'animate', 'exit', 'transition', 'whileTap', 'whileHover', 'variants'].forEach(
         (k) => delete filtered[k]
       );
-      return <div {...filtered}>{children}</div>;
+      return <div {...(filtered as Record<string, unknown>)}>{children}</div>;
     },
-    button: ({ children, ...props }) => {
+    button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const filtered = { ...props };
       ['initial', 'animate', 'exit', 'transition', 'whileTap', 'whileHover', 'variants'].forEach(
         (k) => delete filtered[k]
       );
-      return <button {...filtered}>{children}</button>;
+      return <button {...(filtered as Record<string, unknown>)}>{children}</button>;
     },
   },
-  AnimatePresence: ({ children }) => children,
+  AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 import CommandPalette from './CommandPalette';
@@ -122,7 +122,7 @@ describe('CommandPalette', () => {
     fireEvent.keyDown(palette, { key: 'ArrowDown' });
     // Second item should become active
     const items = document.querySelectorAll('.tu-palette-item');
-    expect(items[1].className).toContain('tu-palette-item--active');
+    expect(items[1]!.className).toContain('tu-palette-item--active');
   });
 
   it('handles Enter key to select active result', () => {
@@ -157,7 +157,7 @@ describe('CommandPalette', () => {
     ];
     render(<CommandPalette search={makeSearch({ results })} onToolClick={vi.fn()} />);
     const items = document.querySelectorAll('.tu-palette-item');
-    fireEvent.mouseEnter(items[1]);
-    expect(items[1].className).toContain('tu-palette-item--active');
+    fireEvent.mouseEnter(items[1]!);
+    expect(items[1]!.className).toContain('tu-palette-item--active');
   });
 });

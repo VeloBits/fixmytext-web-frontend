@@ -3,7 +3,7 @@
  * Used with RTK Query's transformText mutation.
  */
 
-export const ENDPOINTS: Readonly<Record<string, string>> = {
+export const ENDPOINTS = {
   // Transform
   UPPERCASE: '/api/v1/text/uppercase',
   LOWERCASE: '/api/v1/text/lowercase',
@@ -206,4 +206,4 @@ export const ENDPOINTS: Readonly<Record<string, string>> = {
   GENERATE_TITLE: '/api/v1/text/generate-title',
   REFACTOR_PROMPT: '/api/v1/text/refactor-prompt',
   CHANGE_FORMAT: '/api/v1/text/change-format',
-};
+} as const;

@@ -68,14 +68,14 @@ describe('FmtConfigBar', () => {
   it('changes indent setting', () => {
     const setFmtCfg = vi.fn();
     render(<FmtConfigBar toolId="js_fmt" fmtCfg={defaultCfg} setFmtCfg={setFmtCfg} />);
-    fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: '4' } });
+    fireEvent.change(screen.getAllByRole('combobox')[0]!, { target: { value: '4' } });
     expect(setFmtCfg).toHaveBeenCalled();
   });
 
   it('changes to tabs', () => {
     const setFmtCfg = vi.fn();
     render(<FmtConfigBar toolId="js_fmt" fmtCfg={defaultCfg} setFmtCfg={setFmtCfg} />);
-    fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: 'tabs' } });
+    fireEvent.change(screen.getAllByRole('combobox')[0]!, { target: { value: 'tabs' } });
     expect(setFmtCfg).toHaveBeenCalled();
   });
 

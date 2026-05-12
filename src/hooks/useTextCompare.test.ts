@@ -2,7 +2,8 @@ import { renderHook, act } from '@testing-library/react';
 import useTextCompare from './useTextCompare';
 
 describe('useTextCompare', () => {
-  let showAlert;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let showAlert: any;
 
   beforeEach(() => {
     showAlert = vi.fn();

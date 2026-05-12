@@ -190,7 +190,7 @@ describe('usePasses', () => {
     await act(async () => {
       await result.current.handleBuyPass('sprint_pass', ['tool_a']);
     });
-    const callArg = mocks.mockExecuteCheckoutFlow.mock.calls[0][0];
+    const callArg = mocks.mockExecuteCheckoutFlow.mock.calls[0]![0]!;
     expect(callArg).toHaveProperty('createOrder');
     expect(callArg).toHaveProperty('openCheckout');
     expect(callArg).toHaveProperty('verifyPayment');
@@ -203,7 +203,7 @@ describe('usePasses', () => {
     await act(async () => {
       await result.current.handleBuyCredits('credits_5');
     });
-    const callArg = mocks.mockExecuteCheckoutFlow.mock.calls[0][0];
+    const callArg = mocks.mockExecuteCheckoutFlow.mock.calls[0]![0]!;
     expect(callArg).toHaveProperty('createOrder');
     expect(callArg).toHaveProperty('openCheckout');
     expect(callArg).toHaveProperty('verifyPayment');

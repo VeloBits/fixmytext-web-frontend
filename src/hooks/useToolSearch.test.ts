@@ -46,7 +46,7 @@ describe('useToolSearch', () => {
       result.current.setQuery('uppercase');
     });
     expect(result.current.results.length).toBeGreaterThan(0);
-    expect(result.current.results[0].id).toBe('upper');
+    expect(result.current.results[0]!.id).toBe('upper');
   });
 
   it('finds tool by keyword', () => {
@@ -70,7 +70,7 @@ describe('useToolSearch', () => {
     act(() => {
       result.current.setQuery('make uppercase');
     });
-    expect(result.current.results[0].id).toBe('upper');
+    expect(result.current.results[0]!.id).toBe('upper');
   });
 
   it('open sets isOpen to true', () => {
@@ -101,7 +101,7 @@ describe('useToolSearch', () => {
     act(() => {
       result.current.setQuery('lowercase');
     });
-    expect(result.current.results[0].id).toBe('lower');
+    expect(result.current.results[0]!.id).toBe('lower');
   });
 
   it('limits results to 8', () => {

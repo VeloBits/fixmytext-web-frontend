@@ -2,14 +2,15 @@ import { renderHook, act } from '@testing-library/react';
 import useGenerators from './useGenerators';
 
 describe('useGenerators', () => {
-  let setText, showAlert;
+  let setText: any,
+      showAlert: any;
 
   beforeEach(() => {
     setText = vi.fn();
     showAlert = vi.fn();
     // Mock crypto.getRandomValues
     vi.stubGlobal('crypto', {
-      getRandomValues: (arr) => {
+      getRandomValues: (arr: number[]) => {
         for (let i = 0; i < arr.length; i++) arr[i] = i * 7 + 3;
         return arr;
       },
@@ -30,12 +31,11 @@ describe('useGenerators', () => {
 
   it('generates random words', () => {
     const { result } = renderHook(() => useGenerators(setText, showAlert));
-    let res;
     act(() => {
-      res = result.current.handleGenerateText();
+      result.current.handleGenerateText();
     });
     expect(setText).toHaveBeenCalled();
-    const words = setText.mock.calls[0][0].split(' ');
+    const words = setText.mock.calls[0]![0]!.split(' ');
     expect(words.length).toBe(50);
     expect(showAlert).toHaveBeenCalledWith('Random text generated', 'success');
   });
@@ -51,7 +51,7 @@ describe('useGenerators', () => {
     act(() => {
       result.current.handleGenerateText();
     });
-    const text = setText.mock.calls[0][0];
+    const text = setText.mock.calls[0]![0]!;
     // Sentences end with periods
     expect(text).toContain('.');
     expect(showAlert).toHaveBeenCalledWith('Random text generated', 'success');
@@ -68,18 +68,18 @@ describe('useGenerators', () => {
     act(() => {
       result.current.handleGenerateText();
     });
-    const text = setText.mock.calls[0][0];
+    const text = setText.mock.calls[0]![0]!;
     expect(text).toContain('\n\n');
   });
 
   it('generates a password with all character types', () => {
     const { result } = renderHook(() => useGenerators(setText, showAlert));
-    let pwd;
+    let pwd: string | undefined;
     act(() => {
       pwd = result.current.handleGeneratePassword();
     });
     expect(pwd).toBeDefined();
-    expect(pwd.length).toBe(16);
+    expect(pwd!.length).toBe(16);
     expect(result.current.generatedPwd).toBe(pwd);
     expect(showAlert).toHaveBeenCalledWith('Password generated', 'success');
   });
@@ -100,10 +100,10 @@ describe('useGenerators', () => {
     act(() => {
       result.current.setPwdLen(8);
     });
-    let pwd;
+    let pwd: string | undefined;
     act(() => {
       pwd = result.current.handleGeneratePassword();
     });
-    expect(pwd.length).toBe(8);
+    expect(pwd!.length).toBe(8);
   });
 });

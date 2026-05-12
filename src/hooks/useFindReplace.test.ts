@@ -2,7 +2,8 @@ import { renderHook, act } from '@testing-library/react';
 import useFindReplace from './useFindReplace';
 
 describe('useFindReplace', () => {
-  let setText, showAlert, text;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let setText: any, showAlert: any, text: string;
 
   beforeEach(() => {
     text = 'Hello world hello World';

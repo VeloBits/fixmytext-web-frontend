@@ -74,7 +74,7 @@ export default function ParagraphGutter({ textareaRef, text, scrollTop }: Paragr
       .map((el, i) => ({
         idx: i,
         top: el.offsetTop,
-        nonBlank: lines[i].trim().length > 0,
+        nonBlank: (lines[i] ?? '').trim().length > 0,
       }))
       .filter((p) => p.nonBlank);
     setPositions(measured);

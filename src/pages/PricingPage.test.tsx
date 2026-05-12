@@ -6,8 +6,8 @@ import type { SubscriptionContextValue } from '../contexts/AppContext';
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) => {
+    (tag: string) =>
+    ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const p = { ...props };
       [
         'initial',
@@ -23,8 +23,8 @@ vi.mock('framer-motion', () => {
       return React.createElement(tag || 'div', p, children);
     };
   return {
-    motion: new Proxy({}, { get: (_, t) => m(t) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, t) => m(t as string) }),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
@@ -35,15 +35,15 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/pricing', search: '' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }) => React.createElement('a', { href: to, ...p }, children),
+  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
 }));
 
 // ── react-redux mock ──
 const mockUseSelector = vi.fn();
 vi.mock('react-redux', () => ({
-  useSelector: (fn) => mockUseSelector(fn),
+  useSelector: (fn: (state: unknown) => unknown) => mockUseSelector(fn),
   useDispatch: () => vi.fn(),
-  Provider: ({ children }) => children,
+  Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 // ── hooks mock ──
@@ -59,7 +59,7 @@ vi.mock('../store/api/passesApi', () => ({
 
 // ── formatPrice mock ──
 vi.mock('../utils/formatPrice', () => ({
-  default: (price) => `$${price}`,
+  default: (price: number) => `$${price}`,
 }));
 
 const samplePass = {
@@ -231,7 +231,7 @@ describe('PricingPage', () => {
   it('calls handleBuyPass when Buy Now is clicked', async () => {
     renderPricing();
     const buyBtns = screen.getAllByText('Buy Now');
-    fireEvent.click(buyBtns[0]);
+    fireEvent.click(buyBtns[0]!);
     await waitFor(() => {
       expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalled();
     });
@@ -317,7 +317,7 @@ describe('PricingPage', () => {
       .getAllByRole('button')
       .filter((b) => b.className.includes('tu-pass-detail-close'));
     if (closeBtns.length > 0) {
-      fireEvent.click(closeBtns[0]);
+      fireEvent.click(closeBtns[0]!);
     }
   });
 
@@ -399,7 +399,7 @@ describe('PricingPage', () => {
     const buyNowBtns = screen
       .getAllByRole('button')
       .filter((b) => b.textContent.includes('Buy Now'));
-    fireEvent.click(buyNowBtns[buyNowBtns.length - 1]);
+    fireEvent.click(buyNowBtns[buyNowBtns.length - 1]!);
     await waitFor(() => {
       expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalled();
     });

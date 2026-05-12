@@ -39,7 +39,7 @@ export default function useClientTools({
       }
       const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
       const BAR_WIDTH = 20;
-      const countWidth = String(sorted[0][1]).length;
+      const countWidth = String(sorted[0]?.[1] ?? 0).length;
       const lines = sorted.map(([ch, count]) => {
         const pct = (count / total) * 100;
         const filled = Math.round((pct / 100) * BAR_WIDTH);
@@ -120,7 +120,7 @@ export default function useClientTools({
       if (!t) return;
       try {
         const obj = JSON.parse(t);
-        const inferType = (val, name = 'Root', depth = 0) => {
+        const inferType = (val: unknown, name = 'Root', depth = 0): string => {
           if (val === null) return 'null';
           if (Array.isArray(val)) {
             if (val.length === 0) return 'any[]';
@@ -128,7 +128,7 @@ export default function useClientTools({
             return itemType.includes('{') ? `${name}Item[]` : `${itemType}[]`;
           }
           if (typeof val === 'object') {
-            const fields = Object.entries(val).map(([k, v]) => {
+            const fields = Object.entries(val as Record<string, unknown>).map(([k, v]) => {
               const type = inferType(v, k.charAt(0).toUpperCase() + k.slice(1), depth + 1);
               return `  ${k}: ${type}`;
             });
@@ -159,7 +159,7 @@ export default function useClientTools({
       const raw = textRef.current || '';
       if (!raw.trim()) return;
 
-      const convertOne = (input) => {
+      const convertOne = (input: string) => {
         let date;
         if (/^now$/i.test(input)) {
           date = new Date();
@@ -204,19 +204,19 @@ export default function useClientTools({
       const raw = textRef.current || '';
       if (!raw.trim()) return;
 
-      const convertOne = (input) => {
+      const convertOne = (input: string) => {
         let r, g, b;
         const hexMatch = input.match(/^#?([0-9a-fA-F]{6})$/);
         const rgbMatch = input.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
         if (hexMatch) {
-          const hex = hexMatch[1];
+          const hex = hexMatch[1]!;
           r = parseInt(hex.slice(0, 2), 16);
           g = parseInt(hex.slice(2, 4), 16);
           b = parseInt(hex.slice(4, 6), 16);
         } else if (rgbMatch) {
-          r = parseInt(rgbMatch[1]);
-          g = parseInt(rgbMatch[2]);
-          b = parseInt(rgbMatch[3]);
+          r = parseInt(rgbMatch[1]!);
+          g = parseInt(rgbMatch[2]!);
+          b = parseInt(rgbMatch[3]!);
         } else {
           return null;
         }
@@ -251,7 +251,7 @@ export default function useClientTools({
         const out = convertOne(input);
         return out || '(invalid — expected HEX or RGB)';
       });
-      const valid = blocks.filter((_, i) => convertOne(inputs[i]) !== null).length;
+      const valid = blocks.filter((_, i) => convertOne(inputs[i] ?? '') !== null).length;
       if (valid === 0) {
         showAlert('Enter a HEX (#FF5733) or RGB (rgb(255,87,51)) color', 'danger');
         return;
@@ -290,7 +290,8 @@ export default function useClientTools({
       const explainOne = (expr: string): string | null => {
         const parts = expr.split(/\s+/);
         if (parts.length < 5 || parts.length > 6) return null;
-        const [min, hour, dom, month, dow] = parts;
+         
+        const [min, hour, dom, month, dow] = parts as [string, string, string, string, string];
         const descs: string[] = [];
         if (min === '*') descs.push('every minute');
         else if (min.includes('/')) descs.push(`every ${min.split('/')[1]} minutes`);
@@ -315,10 +316,10 @@ export default function useClientTools({
             .split(',')
             .map((d) => {
               if (d.includes('-')) {
-                const [s, e] = d.split('-');
-                return `${days[s] || s} through ${days[e] || e}`;
+                const [s, e] = d.split('-') as [string, string];
+                return `${days[s as unknown as keyof typeof days] || s} through ${days[e as unknown as keyof typeof days] || e}`;
               }
-              return days[d] || d;
+              return days[d as unknown as keyof typeof days] || d;
             })
             .join(', ');
           descs.push(`on ${dayStr}`);
@@ -657,7 +658,7 @@ export default function useClientTools({
         'eighty',
         'ninety',
       ];
-      const convert = (n) => {
+      const convert = (n: number): string => {
         if (n === 0) return 'zero';
         if (n < 0) return 'negative ' + convert(-n);
         let result = '';
@@ -745,11 +746,11 @@ export default function useClientTools({
         current = 0;
       for (const w of words) {
         if (w === 'and') continue;
-        if (map[w] !== undefined) current += map[w];
+        if (map[w as keyof typeof map] !== undefined) current += map[w as keyof typeof map]!;
         else if (w === 'hundred') current *= 100;
-        else if (multipliers[w]) {
-          result += current * (multipliers[w] / (w === 'hundred' ? 1 : 1));
-          current *= multipliers[w];
+        else if (multipliers[w as keyof typeof multipliers]) {
+          result += current * (multipliers[w as keyof typeof multipliers]! / (w === 'hundred' ? 1 : 1));
+          current *= multipliers[w as keyof typeof multipliers]!;
           if (w !== 'hundred') {
             result += current;
             current = 0;
@@ -800,8 +801,8 @@ export default function useClientTools({
         const upper = t.toUpperCase();
         let result = 0;
         for (let i = 0; i < upper.length; i++) {
-          const curr = roman[upper[i]],
-            next = roman[upper[i + 1]];
+          const curr = roman[upper[i] as keyof typeof roman],
+            next = roman[upper[i + 1] as keyof typeof roman];
           if (next && curr < next) result -= curr;
           else result += curr;
         }
@@ -859,14 +860,14 @@ export default function useClientTools({
       const t = textRef.current;
       if (!t) return;
       const lines = t.split('\n').filter((l) => l.trim());
-      const sep = lines[0].includes('\t') ? '\t' : ',';
+      const sep = lines[0]!.includes('\t') ? '\t' : ',';
       const rows = lines.map((l) => l.split(sep).map((c) => c.trim()));
       if (rows.length < 2) {
         showAlert('Need at least a header + 1 data row', 'danger');
         return;
       }
-      const widths = rows[0].map((_, i) => Math.max(...rows.map((r) => (r[i] || '').length)));
-      const header = '| ' + rows[0].map((c, i) => c.padEnd(widths[i])).join(' | ') + ' |';
+      const widths = rows[0]!.map((_, i) => Math.max(...rows.map((r) => (r[i] ?? '').length)));
+      const header = '| ' + rows[0]!.map((c, i) => c.padEnd(widths[i] ?? 0)).join(' | ') + ' |';
       const divider = '| ' + widths.map((w) => '-'.repeat(w)).join(' | ') + ' |';
       const body = rows
         .slice(1)
@@ -948,13 +949,13 @@ export default function useClientTools({
       const combos = [
         words.join('_'),
         words.join('.'),
-        words[0] + '_' + Math.floor(Math.random() * 999),
+        (words[0] ?? '') + '_' + Math.floor(Math.random() * 999),
         words.join('') + Math.floor(Math.random() * 99),
-        words[0][0] + '_' + (words[1] || words[0]) + '_' + Math.floor(Math.random() * 99),
-        words.map((w) => w[0]).join('') + '_' + Math.floor(Math.random() * 9999),
-        words[0] + '.codes',
-        'the_' + words[0],
-        words[0] + '_dev',
+        (words[0]?.[0] ?? '') + '_' + (words[1] ?? words[0] ?? '') + '_' + Math.floor(Math.random() * 99),
+        words.map((w) => w[0] ?? '').join('') + '_' + Math.floor(Math.random() * 9999),
+        (words[0] ?? '') + '.codes',
+        'the_' + (words[0] ?? ''),
+        (words[0] ?? '') + '_dev',
         words.reverse().join('_'),
       ];
       setToolResults((prev) => ({
@@ -995,7 +996,7 @@ export default function useClientTools({
         const cleaned = t.trim().replace(/\s+/g, '');
         const parts = cleaned.split('.');
         if (parts.length !== 3) throw new Error('Invalid JWT: expected 3 dot-separated parts');
-        const decode = (s, label) => {
+        const decode = (s: string, label: string) => {
           if (!/^[A-Za-z0-9_-]+$/.test(s)) throw new Error(`Invalid characters in JWT ${label}`);
           const padded = s + '='.repeat((4 - (s.length % 4)) % 4);
           let binary;
@@ -1011,8 +1012,8 @@ export default function useClientTools({
             throw new Error(`JWT ${label} is not valid JSON`);
           }
         };
-        const header = decode(parts[0], 'header');
-        const payload = decode(parts[1], 'payload');
+        const header = decode(parts[0]!, 'header');
+        const payload = decode(parts[1]!, 'payload');
         const result = `=== HEADER ===\n${JSON.stringify(
           header,
           null,

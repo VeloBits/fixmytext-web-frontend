@@ -28,12 +28,12 @@ const LOREM =
     ' '
   );
 
-const randWord = () => LOREM[Math.floor(Math.random() * LOREM.length)];
+const randWord = (): string => LOREM[Math.floor(Math.random() * LOREM.length)] ?? '';
 
 const randSentence = () => {
   const len = 6 + Math.floor(Math.random() * 10);
   const words = Array.from({ length: len }, randWord);
-  words[0] = words[0][0].toUpperCase() + words[0].slice(1);
+  words[0] = words[0]![0]!.toUpperCase() + words[0]!.slice(1);
   return words.join(' ') + '.';
 };
 

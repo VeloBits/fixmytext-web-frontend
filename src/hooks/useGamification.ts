@@ -68,11 +68,12 @@ function pickDailyQuest(completed: string[] = []): QuestTemplate {
   const pool = available.length > 0 ? available : (QUEST_TEMPLATES as QuestTemplate[]);
   const day = (Date.now() / 86400000) | 0;
   const hash = (day * 2654435761) >>> 0;
-  return pool[hash % pool.length];
+  // pool is always non-empty (either available or QUEST_TEMPLATES)
+  return pool[hash % pool.length]!;
 }
 
 function getLevel(xp: number): LevelDefinition {
-  let lvl = (LEVELS as LevelDefinition[])[0];
+  let lvl = (LEVELS as LevelDefinition[])[0]!;
   for (const l of LEVELS as LevelDefinition[]) {
     if (xp >= l.xp) lvl = l;
     else break;

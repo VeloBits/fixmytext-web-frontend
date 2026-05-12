@@ -10,9 +10,9 @@ let mockAccessToken: string | null = null;
 let mockTokenParam: string | null = 'valid-token';
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => mockNavigate,
-  useSearchParams: () => [{ get: (k) => (k === 'token' ? mockTokenParam : null) }, vi.fn()],
+  useSearchParams: () => [{ get: (k: string) => (k === 'token' ? mockTokenParam : null) }, vi.fn()],
 }));
 
 vi.mock('react-redux', () => ({

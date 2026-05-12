@@ -158,21 +158,21 @@ describe('PasswordDrawer', () => {
   it('calls setPwdLen when number input changed', () => {
     render(<PasswordDrawer {...props} />);
     // The number input is second input element
-    const numInput = screen.getAllByRole('spinbutton')[0];
+    const numInput = screen.getAllByRole('spinbutton')[0]!;
     fireEvent.change(numInput, { target: { value: '24' } });
     expect(props.setPwdLen).toHaveBeenCalledWith(24);
   });
 
   it('clamps number input to max 128', () => {
     render(<PasswordDrawer {...props} />);
-    const numInput = screen.getAllByRole('spinbutton')[0];
+    const numInput = screen.getAllByRole('spinbutton')[0]!;
     fireEvent.change(numInput, { target: { value: '999' } });
     expect(props.setPwdLen).toHaveBeenCalledWith(128);
   });
 
   it('clamps number input to min 4', () => {
     render(<PasswordDrawer {...props} />);
-    const numInput = screen.getAllByRole('spinbutton')[0];
+    const numInput = screen.getAllByRole('spinbutton')[0]!;
     fireEvent.change(numInput, { target: { value: '1' } });
     expect(props.setPwdLen).toHaveBeenCalledWith(4);
   });

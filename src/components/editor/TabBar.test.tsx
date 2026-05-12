@@ -85,7 +85,7 @@ describe('TabBar', () => {
   it('calls setSaveModal when save button clicked', () => {
     render(<TabBar {...baseProps} />);
     const saveBtns = screen.getAllByLabelText('Save tab to templates');
-    fireEvent.click(saveBtns[0]);
+    fireEvent.click(saveBtns[0]!);
     expect(baseProps.setSaveModal).toHaveBeenCalledWith({
       tabId: 'tab-1',
       defaultName: 'Uppercase',

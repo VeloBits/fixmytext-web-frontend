@@ -211,7 +211,7 @@ describe('ToolPanel', () => {
     const gamification = { favorites: [], toggleFavorite };
     render(<ToolPanel {...defaultProps} gamification={gamification} />);
     const favBtns = document.querySelectorAll('.tu-titem-fav');
-    fireEvent.click(favBtns[0]);
+    fireEvent.click(favBtns[0]!);
     expect(toggleFavorite).toHaveBeenCalled();
   });
 
