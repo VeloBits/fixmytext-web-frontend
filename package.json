@@ -37,6 +37,9 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^25.6.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.6",
     "axe-core": "^4.11.4",
@@ -49,6 +52,8 @@
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.4",
     "openapi-typescript": "^7.13.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3",
     "vite": "^8.0.12",
     "vitest": "^4.1.6",
     "vitest-axe": "^0.1.0"
@@ -65,10 +70,11 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "gen:types": "openapi-typescript ../backend/openapi.json -o src/types/openapi.d.ts",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.{js,jsx}": [
+    "*.{js,jsx,ts,tsx}": [
       "eslint --fix"
     ]
   }
