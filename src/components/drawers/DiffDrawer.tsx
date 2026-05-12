@@ -1,6 +1,16 @@
 import { useState } from 'react';
+import type { ToolDefinition } from '../../types/tools';
 
-export default function DiffDrawer({ activeTool, text, onResult, showAlert }) {
+type AlertType = 'warning' | 'danger' | 'success' | 'info';
+
+interface DiffDrawerProps {
+  activeTool?: Pick<ToolDefinition, 'id' | 'label'> | null;
+  text: string;
+  onResult: (label: string, result: string) => void;
+  showAlert: (message: string, type: AlertType) => void;
+}
+
+export default function DiffDrawer({ activeTool, text, onResult, showAlert }: DiffDrawerProps) {
   const [textB, setTextB] = useState('');
   const toolId = activeTool?.id || 'char_diff';
 
@@ -74,8 +84,8 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }) {
         try {
           const objA = JSON.parse(text),
             objB = JSON.parse(textB);
-          const diffs = [];
-          const compare = (a, b, path = '') => {
+          const diffs: string[] = [];
+          const compare = (a: Record<string, unknown>, b: Record<string, unknown>, path = '') => {
             const allKeys = new Set([...Object.keys(a || {}), ...Object.keys(b || {})]);
             for (const key of allKeys) {
               const p = path ? `${path}.${key}` : key;
@@ -120,9 +130,9 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }) {
       }
       case 'text_overlap': {
         // Find shared 3+ word phrases
-        const getPhrasesSet = (txt) => {
+        const getPhrasesSet = (txt: string) => {
           const words = txt.split(/\s+/);
-          const phrases = new Set();
+          const phrases = new Set<string>();
           for (let len = 3; len <= Math.min(8, words.length); len++)
             for (let i = 0; i <= words.length - len; i++)
               phrases.add(

@@ -1,11 +1,24 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, type Dispatch, type SetStateAction } from 'react';
+
+type DiffType = 'same' | 'added' | 'removed';
+
+interface DiffEntry {
+  type: DiffType;
+  line: string;
+}
+
+interface CompareInputProps {
+  compareText: string;
+  setCompareText: Dispatch<SetStateAction<string>>;
+  setDiffResult: Dispatch<SetStateAction<DiffEntry[] | null>>;
+}
 
 /**
  * CompareInput — Renders in the LEFT panel (below the main input textarea).
  * A second editor for the "compare with" text.
  */
-export function CompareInput({ compareText, setCompareText, setDiffResult }) {
-  const gutterRef = useRef(null);
+export function CompareInput({ compareText, setCompareText, setDiffResult }: CompareInputProps) {
+  const gutterRef = useRef<HTMLDivElement>(null);
   const lines = (compareText || '\n').split('\n');
   const words = compareText ? compareText.split(/\s+/).filter(Boolean).length : 0;
   const chars = compareText ? compareText.length : 0;
@@ -93,7 +106,7 @@ export function CompareInput({ compareText, setCompareText, setDiffResult }) {
             setDiffResult(null);
           }}
           onScroll={(e) => {
-            if (gutterRef.current) gutterRef.current.scrollTop = e.target.scrollTop;
+            if (gutterRef.current) gutterRef.current.scrollTop = (e.target as HTMLTextAreaElement).scrollTop;
           }}
           placeholder="// Paste or type the text to compare with..."
           spellCheck={false}
@@ -103,12 +116,17 @@ export function CompareInput({ compareText, setCompareText, setDiffResult }) {
   );
 }
 
+interface CompareOutputProps {
+  diffResult: DiffEntry[] | null;
+  compareText: string;
+}
+
 /**
  * CompareOutput — Renders in the RIGHT panel (output area).
  * Shows the diff results.
  */
-export default function CompareOutput({ diffResult, compareText }) {
-  const [viewMode, setViewMode] = useState('inline');
+export default function CompareOutput({ diffResult, compareText }: CompareOutputProps) {
+  const [viewMode, setViewMode] = useState<'inline' | 'side'>('inline');
 
   const added = diffResult ? diffResult.filter((d) => d.type === 'added').length : 0;
   const removed = diffResult ? diffResult.filter((d) => d.type === 'removed').length : 0;
@@ -137,7 +155,10 @@ export default function CompareOutput({ diffResult, compareText }) {
   // Build side-by-side lines
   const buildSideLines = () => {
     if (!diffResult) return [];
-    const lines = [];
+    type SideCellType = 'same' | 'added' | 'removed' | 'empty';
+    interface SideCell { num: number | null; text: string; type: SideCellType; }
+    interface SideRow { left: SideCell; right: SideCell; }
+    const lines: SideRow[] = [];
     let leftNum = 0,
       rightNum = 0;
     for (const d of diffResult) {
