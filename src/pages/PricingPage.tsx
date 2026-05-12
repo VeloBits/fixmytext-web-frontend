@@ -5,6 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGetPassCatalogQuery } from '../store/api/passesApi';
 import useSubscription from '../hooks/useSubscription';
 import formatPriceUtil from '../utils/formatPrice';
+import type { AlertLevel } from '../contexts/AlertContext';
+import type { SubscriptionContextValue } from '../contexts/AppContext';
+import type { RootState } from '../store/store';
+import type { components } from '../types/openapi';
+
+type PassCatalogItem = components['schemas']['PassCatalogItem'];
+type CreditPackItem = components['schemas']['CreditPackItem'];
+type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
 
 // SVG icons extracted to a shared module for reusability
 import {
@@ -131,7 +139,7 @@ const CREDIT_ICONS = {
   credits_150: <BarrelIcon size={32} />,
 };
 
-function getValueTag(pass) {
+function getValueTag(pass: PassCatalogItem): string | null {
   if (pass.id === 'day_all') return 'Best Day Deal';
   if (pass.id === 'sprint_all') return 'Popular';
   if (pass.id === 'monthly_all') return 'Best Monthly';
@@ -140,7 +148,10 @@ function getValueTag(pass) {
   return null;
 }
 
-function getPerDayPrice(pass, formatPrice) {
+function getPerDayPrice(
+  pass: PassCatalogItem,
+  formatPrice: (price: number, decimals?: number) => string
+): string | null {
   if (pass.duration_days <= 1) return null;
   return formatPrice(pass.price / pass.duration_days);
 }
@@ -149,33 +160,35 @@ function getPerDayPrice(pass, formatPrice) {
  * Pricing page component.
  * Displays Pro subscription, pass catalog grouped by category, and credit packs.
  * Supports detail modals for individual passes and credit packs.
- *
- * @param {object} props
- * @param {function} props.showAlert - Alert notification callback.
- * @param {object} [props.subscription] - Subscription hook state (falls back to internal hook).
  */
-export default function PricingPage({ showAlert, subscription: subProp }) {
+interface PricingPageProps {
+  showAlert?: (message: string, type: AlertLevel) => void;
+  subscription?: SubscriptionContextValue;
+}
+
+export default function PricingPage({ showAlert, subscription: subProp }: PricingPageProps) {
   const navigate = useNavigate();
-  const { accessToken } = useSelector((s) => s.auth);
-  const fallbackSub = useSubscription({ showAlert });
+  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const fallbackSub = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
   const subscription = subProp || fallbackSub;
   const { data: catalog, isLoading, error: catalogError } = useGetPassCatalogQuery();
   const [activeGroup, setActiveGroup] = useState('day');
-  const [selectedPass, setSelectedPass] = useState(null);
-  const [selectedCredit, setSelectedCredit] = useState(null);
-  const [buyingId, setBuyingId] = useState(null);
+  const [selectedPass, setSelectedPass] = useState<string | null>(null);
+  const [selectedCredit, setSelectedCredit] = useState<string | null>(null);
+  const [buyingId, setBuyingId] = useState<string | null>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const passes = catalog?.passes || [];
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const creditPacks = catalog?.credit_packs || [];
   const symbol = passes[0]?.symbol || '$';
-  const currency = passes[0]?.currency || 'usd';
+  const currency = (passes[0]?.currency || 'usd') as SupportedCurrency;
 
-  const formatPrice = (price, decimals) => formatPriceUtil(price, currency, symbol, decimals);
+  const formatPrice = (price: number, decimals?: number) =>
+    formatPriceUtil(price, currency, symbol, decimals);
 
   const passMap = useMemo(() => {
-    const m = {};
+    const m: Record<string, PassCatalogItem> = {};
     passes.forEach((p) => {
       m[p.id] = p;
     });
@@ -183,7 +196,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
   }, [passes]);
 
   const creditMap = useMemo(() => {
-    const m = {};
+    const m: Record<string, CreditPackItem> = {};
     creditPacks.forEach((c) => {
       m[c.id] = c;
     });
@@ -228,7 +241,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
 
   return (
     <div className="tu-pricing">
-      {/* ── Sticky top bar ── */}
+      {/* -- Sticky top bar -- */}
       <div className="tu-pricing-topbar">
         <button className="tu-pricing-back" onClick={() => navigate('/')}>
           <svg
@@ -250,7 +263,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
       </div>
 
       <div className="tu-pricing-inner">
-        {/* ── Hero ── */}
+        {/* -- Hero -- */}
         <div className="tu-pricing-hero">
           <h1 className="tu-pricing-title">Simple, Flexible Pricing</h1>
           <p className="tu-pricing-subtitle">
@@ -264,7 +277,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
           </div>
         </div>
 
-        {/* ── Pro Card ── */}
+        {/* -- Pro Card -- */}
         <motion.div
           className="tu-pricing-pro"
           initial={{ opacity: 0, y: 20 }}
@@ -325,12 +338,12 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
           </div>
         </motion.div>
 
-        {/* ── Divider ── */}
+        {/* -- Divider -- */}
         <div className="tu-pricing-divider">
           <span>Or pick a pass</span>
         </div>
 
-        {/* ── Category Tabs ── */}
+        {/* -- Category Tabs -- */}
         <div className="tu-pricing-tabs">
           {PASS_GROUPS.map((g) => (
             <button
@@ -349,7 +362,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
           {PASS_GROUPS.find((g) => g.key === activeGroup)?.desc}
         </p>
 
-        {/* ── Pass Grid ── */}
+        {/* -- Pass Grid -- */}
         {catalogError ? (
           <div className="tu-pricing-loading">
             <p style={{ color: 'var(--text-muted)', marginBottom: 12 }}>Failed to load passes.</p>
@@ -429,7 +442,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
           </motion.div>
         )}
 
-        {/* ── Credit Packs ── */}
+        {/* -- Credit Packs -- */}
         <div className="tu-pricing-section">
           <div className="tu-pricing-section-header">
             <h3 className="tu-pricing-section-title">Credit Packs</h3>
@@ -486,7 +499,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
           </div>
         </div>
 
-        {/* ── Free Tier ── */}
+        {/* -- Free Tier -- */}
         <div className="tu-pricing-free">
           <div className="tu-pricing-free-icon">
             <GiftIcon size={32} />
@@ -501,7 +514,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
         </div>
       </div>
 
-      {/* ── Pass Detail Drawer ── */}
+      {/* -- Pass Detail Drawer -- */}
       <AnimatePresence>
         {detailPass && (
           <motion.div
@@ -535,7 +548,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
                 </svg>
               </button>
 
-              {/* ── Left Column: Hero + Stats + CTA ── */}
+              {/* -- Left Column: Hero + Stats + CTA -- */}
               <div className="tu-pass-detail-left">
                 <div className="tu-pass-detail-hero">
                   <span className="tu-pass-detail-icon">
@@ -585,7 +598,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
                 <p className="tu-pass-detail-footer">Secure payment via Razorpay</p>
               </div>
 
-              {/* ── Right Column: Details ── */}
+              {/* -- Right Column: Details -- */}
               <div className="tu-pass-detail-right">
                 <div className="tu-pass-detail-section">
                   <h4>What&apos;s included</h4>
@@ -662,7 +675,7 @@ export default function PricingPage({ showAlert, subscription: subProp }) {
         )}
       </AnimatePresence>
 
-      {/* ── Credit Detail Modal ── */}
+      {/* -- Credit Detail Modal -- */}
       <AnimatePresence>
         {detailCredit && (
           <motion.div

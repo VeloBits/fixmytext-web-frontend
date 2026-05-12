@@ -2,6 +2,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '../constants/tools';
 import { useGetToolStatsQuery } from '../store/api/userDataApi';
+import type { AlertLevel } from '../contexts/AlertContext';
+import type {
+  GamificationContextValue,
+  SubscriptionContextValue,
+  User,
+} from '../contexts/AppContext';
 
 // Extracted dashboard section components
 import OverviewSection from '../components/dashboard/OverviewSection';
@@ -12,12 +18,19 @@ import AchievementsSection from '../components/dashboard/AchievementsSection';
 import FavoritesSection from '../components/dashboard/FavoritesSection';
 import HistorySection from '../components/dashboard/HistorySection';
 
-/**
- * Section component lookup map.
- * Each key maps to a React component that renders that dashboard section.
- * @type {Record<string, React.ComponentType>}
- */
-const SECTIONS_MAP = {
+interface DashboardPageProps {
+  gamification: GamificationContextValue;
+  user: User | null;
+  isAuthenticated: boolean;
+  showAlert: (message: string, type: AlertLevel) => void;
+  mode: string;
+  setMode: (mode: string) => void;
+  subscription: SubscriptionContextValue;
+}
+
+/** Section component lookup map. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const SECTIONS_MAP: Record<string, React.ComponentType<any>> = {
   overview: OverviewSection,
   subscription: SubscriptionSection,
   rewards: RewardsSection,
@@ -32,15 +45,6 @@ const SECTIONS_MAP = {
  * Serves as the orchestrator for all dashboard sections (overview, subscription,
  * rewards, profile, achievements, favorites, history). Manages sidebar navigation
  * and section-level state while delegating rendering to extracted section components.
- *
- * @param {object} props
- * @param {object} props.gamification - Gamification hook state.
- * @param {object|null} props.user - Current user object.
- * @param {boolean} props.isAuthenticated - Whether user is authenticated.
- * @param {function} props.showAlert - Alert notification callback.
- * @param {string} props.mode - Current theme mode.
- * @param {function} props.setMode - Theme mode setter.
- * @param {object} props.subscription - Subscription hook state.
  */
 export default function DashboardPage({
   gamification,
@@ -50,7 +54,7 @@ export default function DashboardPage({
   mode,
   setMode,
   subscription,
-}) {
+}: DashboardPageProps) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState(() => {
@@ -74,7 +78,7 @@ export default function DashboardPage({
       setActiveSection('subscription');
       showAlert(
         'Payment received but verification failed. Please contact support if your plan is not active.',
-        'error'
+        'danger'
       );
     } else if (upgrade === 'cancelled') {
       setActiveSection('subscription');
@@ -86,7 +90,7 @@ export default function DashboardPage({
       setActiveSection('subscription');
       showAlert(
         'Payment received but verification failed. Please contact support if your purchase is not reflected.',
-        'error'
+        'danger'
       );
     }
     if (upgrade || purchase) {
@@ -125,7 +129,7 @@ export default function DashboardPage({
   // Category usage
   const categoryUsage = useMemo(() => {
     if (!g?.toolsUsed) return [];
-    const cats = {};
+    const cats: Record<string, number> = {};
     Object.entries(g.toolsUsed).forEach(([id, count]) => {
       const tool = TOOLS.find((t) => t.id === id);
       if (tool?.tabs) {
@@ -152,7 +156,8 @@ export default function DashboardPage({
   ];
 
   // Build props for the active section component
-  const sectionProps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sectionProps: Record<string, any> = {
     g,
     level,
     nextLevel,

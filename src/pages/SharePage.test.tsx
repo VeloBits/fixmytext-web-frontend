@@ -16,7 +16,12 @@ const mockShareData = {
   created_at: '2025-01-15T10:00:00Z',
 };
 
-let mockQueryResult = { data: mockShareData, isLoading: false, error: null };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockQueryResult: { data: typeof mockShareData | null; isLoading: boolean; error: any } = {
+  data: mockShareData,
+  isLoading: false,
+  error: null,
+};
 
 vi.mock('../store/api/shareApi', () => ({
   useGetShareQuery: () => mockQueryResult,
@@ -35,7 +40,7 @@ describe('SharePage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockQueryResult = { data: mockShareData, isLoading: false, error: null };
+    mockQueryResult = { data: mockShareData, isLoading: false, error: null as null };
   });
 
   it('renders share page with data', () => {
@@ -58,7 +63,7 @@ describe('SharePage', () => {
     const { container } = render(<SharePage showAlert={showAlert} />);
     const gutter = container.querySelector('.sh-card-gutter');
     expect(gutter).toBeInTheDocument();
-    expect(gutter.children.length).toBe(2); // 2 lines
+    expect(gutter!.children.length).toBe(2); // 2 lines
   });
 
   it('shows loading state', () => {

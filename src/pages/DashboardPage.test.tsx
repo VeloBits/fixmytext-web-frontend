@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { GamificationContextValue, SubscriptionContextValue, User } from '../contexts/AppContext';
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -85,7 +86,7 @@ const defaultGamification = {
   persona: 'writer',
   setPersona: vi.fn(),
   toggleFavorite: vi.fn(),
-};
+} as unknown as GamificationContextValue;
 
 const defaultSubscription = {
   isPro: false,
@@ -97,15 +98,17 @@ const defaultSubscription = {
   handleBuyCredits: vi.fn(),
   handleCancelSubscription: vi.fn(),
   refetchStatus: vi.fn(),
-};
+} as unknown as SubscriptionContextValue;
 
 const defaultUser = {
+  id: 'test-id',
   display_name: 'Alice',
   email: 'alice@example.com',
   is_email_verified: true,
-};
+  subscription_tier: 'free',
+} as User;
 
-function renderDash(props = {}) {
+function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
       gamification={defaultGamification}
@@ -398,7 +401,7 @@ describe('DashboardPage', () => {
     renderDash();
     fireEvent.click(screen.getByText('Profile'));
     fireEvent.click(screen.getByTitle('Edit name'));
-    const input = screen.getByPlaceholderText('Display name');
+    const input = screen.getByPlaceholderText('Display name') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Bob' } });
     expect(input.value).toBe('Bob');
   });

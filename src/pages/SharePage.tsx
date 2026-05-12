@@ -3,14 +3,19 @@ import { useParams } from 'react-router-dom';
 import { useGetShareQuery } from '../store/api/shareApi';
 import { TOOLS } from '../constants/tools';
 import ToolIcon from '../components/editor/ToolIcon';
+import type { AlertLevel } from '../contexts/AlertContext';
 
-export default function SharePage({ showAlert }) {
-  const { id } = useParams();
-  const { data, isLoading, error } = useGetShareQuery(id);
+interface SharePageProps {
+  showAlert?: (message: string, type: AlertLevel) => void;
+}
+
+export default function SharePage({ showAlert }: SharePageProps) {
+  const { id } = useParams<{ id: string }>();
+  const { data, isLoading, error } = useGetShareQuery(id ?? '');
   const [copied, setCopied] = useState(false);
 
-  const { tool, createdDate, lines, words, chars } = useMemo(() => {
-    if (!data) return {};
+  const derived = useMemo(() => {
+    if (!data) return null;
     return {
       tool: TOOLS.find((t) => t.id === data.tool_id),
       createdDate: new Date(data.created_at).toLocaleDateString('en-US', {
@@ -24,6 +29,8 @@ export default function SharePage({ showAlert }) {
     };
   }, [data]);
 
+  const { tool, createdDate, lines, words, chars } = derived ?? {};
+
   if (isLoading) {
     return (
       <div className="sh-page">
@@ -36,7 +43,7 @@ export default function SharePage({ showAlert }) {
   }
 
   if (error) {
-    const expired = error.status === 410;
+    const expired = 'status' in error && error.status === 410;
     return (
       <div className="sh-page">
         <div className="sh-state">
@@ -68,6 +75,8 @@ export default function SharePage({ showAlert }) {
       </div>
     );
   }
+
+  if (!data || !lines) return null;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(data.output_text);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { SubscriptionContextValue } from '../contexts/AppContext';
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -94,18 +95,24 @@ const sampleCredit = {
   currency: 'usd',
 };
 
-const defaultSubscription = {
-  isPro: false,
-  upgradeLoading: false,
-  cancelLoading: false,
-  totalCredits: 0,
+const defaultSubscriptionMocks = {
   handleUpgrade: vi.fn(),
   handleBuyPass: vi.fn().mockResolvedValue({}),
   handleBuyCredits: vi.fn().mockResolvedValue({}),
   handleCancelSubscription: vi.fn(),
 };
+const defaultSubscription = {
+  isPro: false,
+  upgradeLoading: false,
+  cancelLoading: false,
+  totalCredits: 0,
+  ...defaultSubscriptionMocks,
+} as unknown as SubscriptionContextValue;
 
-function renderPricing(props = {}, catalogOverride) {
+function renderPricing(
+  props: Record<string, unknown> = {},
+  catalogOverride?: Record<string, unknown>
+) {
   mockUseSelector.mockReturnValue({ accessToken: 'token123' });
   mockCatalogQuery.mockReturnValue(
     catalogOverride ?? {
@@ -123,9 +130,9 @@ import { expectNoA11yViolations } from '../test/axeHelper';
 describe('PricingPage', () => {
   beforeEach(() => {
     mockNavigate.mockReset();
-    defaultSubscription.handleUpgrade.mockReset();
-    defaultSubscription.handleBuyPass.mockResolvedValue({});
-    defaultSubscription.handleBuyCredits.mockResolvedValue({});
+    defaultSubscriptionMocks.handleUpgrade.mockReset();
+    defaultSubscriptionMocks.handleBuyPass.mockResolvedValue({});
+    defaultSubscriptionMocks.handleBuyCredits.mockResolvedValue({});
   });
 
   // ── Basic render ──
@@ -177,7 +184,7 @@ describe('PricingPage', () => {
   it('calls handleUpgrade when Upgrade to Pro is clicked', () => {
     renderPricing();
     fireEvent.click(screen.getByText('Upgrade to Pro'));
-    expect(defaultSubscription.handleUpgrade).toHaveBeenCalled();
+    expect(defaultSubscriptionMocks.handleUpgrade).toHaveBeenCalled();
   });
 
   it('navigates to login if not authenticated when upgrading', () => {
@@ -226,7 +233,7 @@ describe('PricingPage', () => {
     const buyBtns = screen.getAllByText('Buy Now');
     fireEvent.click(buyBtns[0]);
     await waitFor(() => {
-      expect(defaultSubscription.handleBuyPass).toHaveBeenCalled();
+      expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalled();
     });
   });
 
@@ -259,7 +266,7 @@ describe('PricingPage', () => {
     renderPricing();
     fireEvent.click(screen.getByText('Buy'));
     await waitFor(() => {
-      expect(defaultSubscription.handleBuyCredits).toHaveBeenCalled();
+      expect(defaultSubscriptionMocks.handleBuyCredits).toHaveBeenCalled();
     });
   });
 
@@ -394,7 +401,7 @@ describe('PricingPage', () => {
       .filter((b) => b.textContent.includes('Buy Now'));
     fireEvent.click(buyNowBtns[buyNowBtns.length - 1]);
     await waitFor(() => {
-      expect(defaultSubscription.handleBuyPass).toHaveBeenCalled();
+      expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalled();
     });
   });
 

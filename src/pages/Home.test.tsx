@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import Home from './Home';
+import type { GamificationContextValue, SubscriptionContextValue } from '../contexts/AppContext';
 
 // Mock TextForm since it's a complex component
 vi.mock('../components/editor/TextForm', () => ({
@@ -13,10 +14,10 @@ describe('Home', () => {
       mode: 'dark',
       setMode: vi.fn(),
       showAlert: vi.fn(),
-      gamification: {},
+      gamification: {} as unknown as GamificationContextValue,
       user: null,
       isAuthenticated: false,
-      subscription: {},
+      subscription: {} as unknown as SubscriptionContextValue,
     };
     const { getByTestId } = render(<Home {...props} />);
     expect(getByTestId('text-form')).toBeInTheDocument();

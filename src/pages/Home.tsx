@@ -1,4 +1,19 @@
 import TextForm from '../components/editor/TextForm';
+import type {
+  GamificationContextValue,
+  SubscriptionContextValue,
+  User,
+} from '../contexts/AppContext';
+
+interface HomeProps {
+  mode: string;
+  setMode: (mode: string) => void;
+  showAlert: (message: string, type: string) => void;
+  gamification: GamificationContextValue;
+  user: User | null;
+  isAuthenticated: boolean;
+  subscription: SubscriptionContextValue;
+}
 
 export default function Home({
   mode,
@@ -8,7 +23,7 @@ export default function Home({
   user,
   isAuthenticated,
   subscription,
-}) {
+}: HomeProps) {
   return (
     <TextForm
       mode={mode}
