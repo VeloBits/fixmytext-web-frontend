@@ -3,6 +3,51 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { USE_CASE_TABS, TOOL_GROUPS } from '../../constants/tools';
 import ToolIcon from './ToolIcon';
+import type { ToolDefinition } from '../../types/tools';
+
+interface TooltipState {
+  text: string;
+  top: number;
+  left: number;
+}
+
+interface GamificationState {
+  favorites?: string[];
+  toggleFavorite?: (id: string) => void;
+}
+
+interface ToolItemProps {
+  tool: ToolDefinition;
+  disabled: boolean;
+  onClick: () => void;
+  isFavorite: boolean | undefined;
+  onToggleFavorite?: (id: string) => void;
+  isActive: boolean;
+  isSuggested: boolean;
+  onHover: (text: string, rect: DOMRect) => void;
+  onLeave: () => void;
+}
+
+interface GroupHeaderProps {
+  label: string;
+  count: number;
+  collapsed: boolean;
+  onToggle: () => void;
+  pinned: boolean;
+}
+
+interface ToolPanelProps {
+  tools: ToolDefinition[];
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
+  onToolClick: (tool: ToolDefinition) => void;
+  disabled: boolean;
+  gamification?: GamificationState | null;
+  activeToolId?: string | null;
+  hideTabs?: boolean;
+  viewMode?: string;
+  suggestedToolIds?: string[];
+}
 
 function ToolPanelItem({
   tool,
@@ -14,10 +59,10 @@ function ToolPanelItem({
   isSuggested,
   onHover,
   onLeave,
-}) {
+}: ToolItemProps) {
   const [hovered, setHovered] = useState(false);
-  const isDisabled = disabled && tool.type !== 'drawer' && tool.type !== 'action';
-  const itemRef = useRef(null);
+  const isDisabled = disabled && tool.type !== 'drawer' && (tool.type as string) !== 'action';
+  const itemRef = useRef<HTMLDivElement | null>(null);
 
   const handleClick = () => {
     if (isDisabled) return;
@@ -68,7 +113,7 @@ function ToolPanelItem({
 }
 
 /* ── Collapsible group header (VSCode Source Control style) ── */
-function GroupHeader({ label, count, collapsed, onToggle, pinned }) {
+function GroupHeader({ label, count, collapsed, onToggle, pinned }: GroupHeaderProps) {
   return (
     <button
       className={`tu-group-header${collapsed ? ' tu-group-header--collapsed' : ''}${
@@ -124,9 +169,9 @@ function ToolGridCard({
   isSuggested,
   onHover,
   onLeave,
-}) {
-  const isDisabled = disabled && tool.type !== 'drawer' && tool.type !== 'action';
-  const cardRef = useRef(null);
+}: ToolItemProps) {
+  const isDisabled = disabled && tool.type !== 'drawer' && (tool.type as string) !== 'action';
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
   const handleClick = () => {
     if (isDisabled) return;
@@ -179,15 +224,15 @@ export default memo(function ToolPanel({
   hideTabs,
   viewMode = 'list',
   suggestedToolIds = [],
-}) {
-  const [tooltip, setTooltip] = useState(null);
-  const [collapsedGroups, setCollapsedGroups] = useState({});
+}: ToolPanelProps) {
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
-  const toggleGroup = useCallback((groupId) => {
+  const toggleGroup = useCallback((groupId: string) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   }, []);
 
-  const handleHover = useCallback((text, rect) => {
+  const handleHover = useCallback((text: string, rect: DOMRect) => {
     const tooltipWidth = 280;
     const tooltipHeight = 40;
     const gap = 8;
@@ -208,10 +253,10 @@ export default memo(function ToolPanel({
 
   // Count tools per tab
   const tabCounts = useMemo(() => {
-    const counts = { all: tools.length };
+    const counts: Record<string, number> = { all: tools.length };
     for (const tab of USE_CASE_TABS) {
       if (!counts[tab.id]) {
-        counts[tab.id] = tools.filter((t) => t.tabs?.includes(tab.id)).length;
+        counts[tab.id] = tools.filter((t) => t.tabs?.includes(tab.id as import('../../types/tools').ToolTab)).length;
       }
     }
     return counts;
@@ -220,7 +265,7 @@ export default memo(function ToolPanel({
   // Filter tools by active tab
   const filteredTools = useMemo(() => {
     if (activeTab === 'all') return [...tools].sort((a, b) => a.label.localeCompare(b.label));
-    return tools.filter((t) => t.tabs?.includes(activeTab));
+    return tools.filter((t) => t.tabs?.includes(activeTab as import('../../types/tools').ToolTab));
   }, [tools, activeTab]);
 
   // Group tools — each group contains tools sorted alphabetically
@@ -228,8 +273,8 @@ export default memo(function ToolPanel({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const favorites = gamification?.favorites || [];
   const groupedTools = useMemo(() => {
-    const groups = [];
-    const groupMap = {};
+    const groups: { id: string; label: string; tools: ToolDefinition[] }[] = [];
+    const groupMap: Record<string, ToolDefinition[]> = {};
 
     // Collect pinned favorites from the filtered set
     const pinnedTools =

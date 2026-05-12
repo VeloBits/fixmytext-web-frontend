@@ -1,14 +1,16 @@
 import React from 'react';
+import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import OutputPanel from './OutputPanel';
+import type { ToolDefinition } from '../../types/tools';
 import { expectNoA11yViolations } from '../../test/axeHelper';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) => {
+    (tag: string) =>
+    ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) => {
       const p = { ...props };
       [
         'initial',
@@ -21,11 +23,11 @@ vi.mock('framer-motion', () => {
         'viewport',
         'variants',
       ].forEach((k) => delete p[k]);
-      return React.createElement(tag, p, children);
+      return React.createElement(tag, p as Record<string, unknown>, children);
     };
   return {
-    motion: new Proxy({}, { get: (_, t) => m(t) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, t: string) => m(t) }),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
@@ -64,8 +66,8 @@ global.speechSynthesis = {
   speaking: false,
   cancel: vi.fn(),
   speak: vi.fn(),
-};
-global.SpeechSynthesisUtterance = vi.fn();
+} as unknown as SpeechSynthesis;
+global.SpeechSynthesisUtterance = vi.fn() as unknown as typeof SpeechSynthesisUtterance;
 
 const defaultProps = {
   aiResult: null,
@@ -95,7 +97,7 @@ describe('OutputPanel', () => {
 
   it('shows "Start typing" hint when activeTool is set but no result', () => {
     render(
-      <OutputPanel {...defaultProps} activeTool={{ id: 'test', label: 'Test', group: 'case' }} />
+      <OutputPanel {...defaultProps} activeTool={{ id: 'test', label: 'Test', group: 'case' } as unknown as ToolDefinition} />
     );
     expect(screen.getByText('Start typing — output updates automatically')).toBeInTheDocument();
   });
@@ -275,7 +277,7 @@ describe('OutputPanel', () => {
       },
     });
     const aiResult = { label: 'Fixed', result: 'Editable text' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' };
+    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -290,7 +292,7 @@ describe('OutputPanel', () => {
 
   it('renders plain span for non-editable tools', () => {
     const aiResult = { label: 'Encoded', result: 'SGVsbG8=' };
-    const activeTool = { id: 'base64', label: 'Base64', group: 'encoding', type: 'api' };
+    const activeTool = { id: 'base64', label: 'Base64', group: 'encoding', type: 'api' } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -310,17 +312,17 @@ describe('OutputPanel', () => {
   });
 
   it('cancels TTS when already speaking', () => {
-    global.speechSynthesis.speaking = true;
+    (global.speechSynthesis as unknown as Record<string, unknown>).speaking = true;
     const aiResult = { label: 'Fixed', result: 'Hello World' };
     render(<OutputPanel {...defaultProps} previewMode="result" aiResult={aiResult} />);
     fireEvent.click(screen.getByTitle('Read output aloud'));
     expect(global.speechSynthesis.cancel).toHaveBeenCalled();
-    global.speechSynthesis.speaking = false;
+    (global.speechSynthesis as unknown as Record<string, unknown>).speaking = false;
   });
 
   it('clicks Share button and calls createShare', async () => {
     const aiResult = { label: 'Fixed', result: 'Hello World' };
-    const activeTool = { id: 'uppercase', label: 'Uppercase' };
+    const activeTool = { id: 'uppercase', label: 'Uppercase' } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -425,7 +427,7 @@ describe('OutputPanel', () => {
       },
     });
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' };
+    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -455,7 +457,7 @@ describe('OutputPanel', () => {
     // jsdom doesn't implement execCommand, add stub
     document.execCommand = vi.fn(() => true);
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' };
+    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -482,7 +484,7 @@ describe('OutputPanel', () => {
     });
     document.execCommand = vi.fn(() => true);
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' };
+    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -510,7 +512,7 @@ describe('OutputPanel', () => {
     });
     const onOutputEdit = vi.fn();
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' };
+    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -537,7 +539,7 @@ describe('OutputPanel', () => {
     ...defaultProps,
     previewMode: 'result',
     aiResult: { label: 'Paraphrased', result: 'Hello World' },
-    activeTool: { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' },
+    activeTool: { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition,
     onOutputEdit,
   });
 
@@ -738,7 +740,7 @@ describe('OutputPanel', () => {
     render(<OutputPanel {...editableProps()} />);
     fireEvent.click(screen.getByTitle('Formatting options'));
     const colorInput = screen.getByTitle('Text color').querySelector('input[type="color"]');
-    fireEvent.change(colorInput, { target: { value: '#ff0000' } });
+    fireEvent.change(colorInput!, { target: { value: '#ff0000' } });
     expect(document.execCommand).toHaveBeenCalledWith('foreColor', false, '#ff0000');
   });
 

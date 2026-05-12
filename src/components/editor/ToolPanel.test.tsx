@@ -1,13 +1,15 @@
 import React from 'react';
+import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ToolPanel from './ToolPanel';
+import type { ToolDefinition } from '../../types/tools';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) => {
+    (tag: string) =>
+    ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) => {
       const p = { ...props };
       [
         'initial',
@@ -20,18 +22,18 @@ vi.mock('framer-motion', () => {
         'viewport',
         'variants',
       ].forEach((k) => delete p[k]);
-      return React.createElement(tag, p, children);
+      return React.createElement(tag, p as Record<string, unknown>, children);
     };
   return {
-    motion: new Proxy({}, { get: (_, t) => m(t) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, t: string) => m(t) }),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
 
 // Mock ToolIcon
 vi.mock('./ToolIcon', () => ({
-  default: ({ toolId }) => React.createElement('span', { 'data-testid': `tool-icon-${toolId}` }),
+  default: ({ toolId }: { toolId?: string }) => React.createElement('span', { 'data-testid': `tool-icon-${toolId}` }),
 }));
 
 // Sample tools for testing
@@ -76,7 +78,7 @@ const sampleTools = [
     tabs: ['all', 'encode'],
     type: 'api',
   },
-];
+] as unknown as ToolDefinition[];
 
 const defaultProps = {
   tools: sampleTools,
@@ -140,7 +142,7 @@ describe('ToolPanel', () => {
         tabs: ['transform'],
         type: 'api',
       },
-    ];
+    ] as unknown as ToolDefinition[];
     render(<ToolPanel {...defaultProps} tools={writingTools} activeTab="writing" />);
     expect(screen.getByText('Fix Grammar')).toBeInTheDocument();
     expect(screen.queryByText('UPPERCASE')).not.toBeInTheDocument();
@@ -222,7 +224,7 @@ describe('ToolPanel', () => {
     render(<ToolPanel {...defaultProps} activeTab="all" />);
     // Click on Case Transform header to collapse
     const header = screen.getByText('Case Transform');
-    fireEvent.click(header.closest('button'));
+    fireEvent.click(header.closest('button')!);
     // After collapse, UPPERCASE tool should not be visible in list items
     // collapsed groups hide the items container
     expect(document.querySelector('.tu-group-header--collapsed')).toBeInTheDocument();
@@ -275,7 +277,7 @@ describe('ToolPanel', () => {
         type: 'drawer',
         panelId: 'find',
       },
-    ];
+    ] as unknown as ToolDefinition[];
     render(<ToolPanel {...defaultProps} tools={tools} disabled={true} />);
     expect(document.querySelector('.tu-titem--disabled')).not.toBeInTheDocument();
   });

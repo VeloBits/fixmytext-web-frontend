@@ -5,6 +5,46 @@ import DOMPurify from 'dompurify';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useCreateShareMutation } from '../../store/api/shareApi';
+import type { ToolDefinition } from '../../types/tools';
+
+interface AiResult {
+  label: string;
+  result: string;
+}
+
+interface SpeechHook {
+  handleTts?: () => void;
+}
+
+interface ExportTools {
+  handleDownloadTxt: () => void;
+  handleDownloadPdf: () => void;
+  handleDownloadDocx: () => void;
+  handleDownloadJson: () => void;
+  handleDownloadCsv: () => void;
+  handleDownloadMd: () => void;
+  setOutputText?: (text: string) => void;
+}
+
+interface EmojiData {
+  native: string;
+}
+
+interface OutputPanelProps {
+  aiResult: AiResult | null;
+  hasMarkdown: (text: string) => boolean;
+  previewMode: string | null;
+  showAlert: (msg: string, type: string) => void;
+  text: string;
+  dyslexiaMode: boolean;
+  markdownMode: boolean;
+  speech: SpeechHook;
+  onDyslexiaToggle: () => void;
+  activeTool: ToolDefinition | null;
+  loading: boolean;
+  exportTools: ExportTools | null;
+  onOutputEdit: ((text: string) => void) | null;
+}
 
 const TEXT_INTENSIVE_GROUPS = ['ai_writing', 'ai_content', 'language', 'cleanup', 'case', 'lines'];
 const HTML_OUTPUT_TOOLS = new Set(['strikethrough']);
@@ -67,18 +107,18 @@ export default memo(function OutputPanel({
   loading,
   exportTools,
   onOutputEdit,
-}) {
+}: OutputPanelProps) {
   const [createShare, { isLoading: isSharing }] = useCreateShareMutation();
   const [saveMenuOpen, setSaveMenuOpen] = useState(false);
   const [mdPreview, setMdPreview] = useState(false);
   const [formatOpen, setFormatOpen] = useState(false);
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
-  const saveBtnRef = useRef(null);
-  const saveMenuRef = useRef(null);
-  const editorRef = useRef(null);
-  const paragraphRefs = useRef([]);
-  const emojiPickerRef = useRef(null);
+  const saveBtnRef = useRef<HTMLButtonElement | null>(null);
+  const saveMenuRef = useRef<HTMLDivElement | null>(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const paragraphRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const emojiPickerRef = useRef<HTMLDivElement | null>(null);
   const showResult = previewMode === 'result' && aiResult;
   const showDyslexia = previewMode === 'dyslexia' && dyslexiaMode && text;
   const showMarkdown = previewMode === 'markdown' && markdownMode && text;
@@ -157,9 +197,9 @@ export default memo(function OutputPanel({
   };
 
   // ── Rich text commands (contentEditable) ──
-  const execCmd = useCallback((cmd, value = null) => {
+  const execCmd = useCallback((cmd: string, value: string | null = null) => {
     editorRef.current?.focus();
-    document.execCommand(cmd, false, value);
+    document.execCommand(cmd, false, value ?? undefined);
   }, []);
 
   // fontSize via execCommand only supports 1-7, so we use a workaround:
@@ -169,14 +209,14 @@ export default memo(function OutputPanel({
     document.execCommand('fontSize', false, '1');
     const el = editorRef.current;
     if (!el) return;
-    const fonts = el.querySelectorAll('font[size="1"]');
+    const fonts = el.querySelectorAll<HTMLElement>('font[size="1"]');
     fonts.forEach((f) => {
       f.removeAttribute('size');
       f.style.fontSize = px;
     });
   }, []);
 
-  const insertEmoji = useCallback((emojiData) => {
+  const insertEmoji = useCallback((emojiData: EmojiData) => {
     editorRef.current?.focus();
     document.execCommand('insertText', false, emojiData.native);
     setEmojiPickerOpen(false);
@@ -220,7 +260,7 @@ export default memo(function OutputPanel({
         <button
           className="tu-save-menu-item"
           onClick={() => {
-            exportTools.handleDownloadTxt();
+            exportTools!.handleDownloadTxt();
             setSaveMenuOpen(false);
           }}
         >
@@ -230,7 +270,7 @@ export default memo(function OutputPanel({
         <button
           className="tu-save-menu-item"
           onClick={() => {
-            exportTools.handleDownloadPdf();
+            exportTools!.handleDownloadPdf();
             setSaveMenuOpen(false);
           }}
         >
@@ -240,7 +280,7 @@ export default memo(function OutputPanel({
         <button
           className="tu-save-menu-item"
           onClick={() => {
-            exportTools.handleDownloadDocx();
+            exportTools!.handleDownloadDocx();
             setSaveMenuOpen(false);
           }}
         >
@@ -250,7 +290,7 @@ export default memo(function OutputPanel({
         <button
           className="tu-save-menu-item"
           onClick={() => {
-            exportTools.handleDownloadJson();
+            exportTools!.handleDownloadJson();
             setSaveMenuOpen(false);
           }}
         >
@@ -260,7 +300,7 @@ export default memo(function OutputPanel({
         <button
           className="tu-save-menu-item"
           onClick={() => {
-            exportTools.handleDownloadCsv();
+            exportTools!.handleDownloadCsv();
             setSaveMenuOpen(false);
           }}
         >
@@ -270,7 +310,7 @@ export default memo(function OutputPanel({
         <button
           className="tu-save-menu-item"
           onClick={() => {
-            exportTools.handleDownloadMd();
+            exportTools!.handleDownloadMd();
             setSaveMenuOpen(false);
           }}
         >
@@ -777,7 +817,7 @@ export default memo(function OutputPanel({
                 <div
                   className="tu-preview-markdown"
                   dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(marked.parse(aiResult.result)),
+                    __html: DOMPurify.sanitize(marked.parse(aiResult.result) as string),
                   }}
                 />
               </>
@@ -849,7 +889,7 @@ export default memo(function OutputPanel({
               {/* Sanitized to prevent XSS from AI-generated content */}
               <div
                 className="tu-preview-markdown"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(text)) }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(text) as string) }}
               />
             </>
           ) : null}
