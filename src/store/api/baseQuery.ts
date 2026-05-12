@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import {
   fetchBaseQuery,
   retry,
@@ -6,7 +7,6 @@ import {
   type FetchBaseQueryError,
   type FetchBaseQueryMeta,
 } from '@reduxjs/toolkit/query/react';
-/// <reference types="vite/client" />
 import type { RootState } from '../store';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -131,5 +131,6 @@ function retryCondition(_error: any, _args: any, { attempt }: { attempt: number 
 
 export const baseQueryWithRetry = retry(baseQueryWithReauth, {
   maxRetries: 2,
-  retryCondition,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  retryCondition: retryCondition as any,
 }) as RtkBaseQuery & { _retryOptions?: { maxRetries: number; retryCondition: (...args: unknown[]) => boolean } };
