@@ -1,15 +1,40 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+import type { RefObject } from 'react';
+
+/** Direction of resize dragging */
+type ResizeDirection = 'horizontal' | 'vertical';
+
+/** Unit for the size value */
+type ResizeUnit = 'px' | 'percent';
+
+interface ResizeOptions {
+  min?: number;
+  max?: number;
+  storageKey?: string;
+  unit?: ResizeUnit;
+  containerRef?: RefObject<HTMLElement>;
+}
+
+interface UseResizeReturn {
+  size: number;
+  onMouseDown: (e: React.MouseEvent) => void;
+  setSize: Dispatch<SetStateAction<number>>;
+}
 
 /**
  * useResize — drag-to-resize hook
- * @param {'horizontal'|'vertical'} direction
- * @param {number} initial — initial size (px or %)
- * @param {object} opts — { min, max, storageKey, unit: 'px'|'percent', containerRef }
+ * @param direction - 'horizontal' or 'vertical'
+ * @param initial - initial size (px or %)
+ * @param opts - { min, max, storageKey, unit: 'px'|'percent', containerRef }
  */
-export default function useResize(direction, initial, opts = {}) {
+export default function useResize(
+  direction: ResizeDirection,
+  initial: number,
+  opts: ResizeOptions = {}
+): UseResizeReturn {
   const { min = 100, max = 800, storageKey, unit = 'px', containerRef } = opts;
 
-  const [size, setSize] = useState(() => {
+  const [size, setSize] = useState<number>(() => {
     if (storageKey) {
       const saved = localStorage.getItem(storageKey);
       if (saved) return Math.max(min, Math.min(max, Number(saved)));
@@ -24,7 +49,7 @@ export default function useResize(direction, initial, opts = {}) {
   sizeRef.current = size;
 
   const onMouseDown = useCallback(
-    (e) => {
+    (e: React.MouseEvent): void => {
       e.preventDefault();
       dragging.current = true;
       startPos.current = direction === 'horizontal' ? e.clientX : e.clientY;
@@ -36,7 +61,7 @@ export default function useResize(direction, initial, opts = {}) {
   );
 
   useEffect(() => {
-    const onMouseMove = (e) => {
+    const onMouseMove = (e: MouseEvent): void => {
       if (!dragging.current) return;
 
       if (unit === 'percent' && containerRef?.current) {
@@ -53,7 +78,7 @@ export default function useResize(direction, initial, opts = {}) {
       }
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (): void => {
       if (!dragging.current) return;
       dragging.current = false;
       document.body.style.cursor = '';
