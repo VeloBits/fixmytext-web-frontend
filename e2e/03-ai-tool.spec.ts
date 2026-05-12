@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { registerVerifiedUser } from './helpers.js';
+import { registerVerifiedUser } from './helpers';
 
 test('AI tool (Summarize) returns backend response (AI_BACKEND=fake)', async ({
   page,

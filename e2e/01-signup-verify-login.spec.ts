@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { uniqueEmail, apiPost } from './helpers.js';
+import { uniqueEmail, apiPost } from './helpers';
 
 test('signup → verify email via link → login', async ({ page, request }) => {
   const email = uniqueEmail();

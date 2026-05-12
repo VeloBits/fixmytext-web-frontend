@@ -4,7 +4,7 @@ import {
   apiPost,
   registerVerifiedUser,
   razorpaySignature,
-} from './helpers.js';
+} from './helpers';
 
 /**
  * Purchases a pass end-to-end against the backend with PAYMENTS_BACKEND=fake.

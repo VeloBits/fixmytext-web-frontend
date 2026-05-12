@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "@playwright/test"],
+    "lib": ["ES2022", "DOM"],
+    "noEmit": true
+  },
+  "include": ["e2e/**/*"],
+  "exclude": ["node_modules", "dist", "coverage"]
+}

@@ -49,6 +49,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^17.6.0",
     "husky": "9.1.7",
+    "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.4",
     "openapi-typescript": "^7.13.0",
@@ -71,7 +72,9 @@
     "test:e2e:install": "playwright install --with-deps chromium",
     "gen:types": "openapi-typescript ../backend/openapi.json -o src/types/openapi.d.ts",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
+    "typecheck:e2e": "tsc --noEmit -p tsconfig.e2e.json"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
