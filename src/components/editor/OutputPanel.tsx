@@ -34,6 +34,7 @@ interface OutputPanelProps {
   aiResult: AiResult | null;
   hasMarkdown: (text: string) => boolean;
   previewMode: string | null;
+  setPreviewMode?: (mode: string | null) => void;
   showAlert: (msg: string, type: string) => void;
   text: string;
   dyslexiaMode: boolean;
@@ -44,6 +45,8 @@ interface OutputPanelProps {
   loading: boolean;
   exportTools: ExportTools | null;
   onOutputEdit: ((text: string) => void) | null;
+  onAiAccept?: () => void;
+  onAiDismiss?: () => void;
 }
 
 const TEXT_INTENSIVE_GROUPS = ['ai_writing', 'ai_content', 'language', 'cleanup', 'case', 'lines'];
@@ -107,6 +110,12 @@ export default memo(function OutputPanel({
   loading,
   exportTools,
   onOutputEdit,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onAiAccept: _onAiAccept,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onAiDismiss: _onAiDismiss,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setPreviewMode: _setPreviewMode,
 }: OutputPanelProps) {
   const [createShare, { isLoading: isSharing }] = useCreateShareMutation();
   const [saveMenuOpen, setSaveMenuOpen] = useState(false);

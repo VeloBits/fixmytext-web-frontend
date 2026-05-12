@@ -535,14 +535,14 @@ describe('TextForm', () => {
   it('opens settings menu when avatar button is clicked', () => {
     render(<TextForm {...defaultProps} />);
     const avatarBtn = document.querySelector('.tu-activity-avatar');
-    fireEvent.click(avatarBtn);
+    fireEvent.click(avatarBtn!);
     expect(document.querySelector('.tu-settings-menu')).toBeInTheDocument();
   });
 
   it('shows Sign In option in settings menu for unauthenticated users', () => {
     render(<TextForm {...defaultProps} />);
     const avatarBtn = document.querySelector('.tu-activity-avatar');
-    fireEvent.click(avatarBtn);
+    fireEvent.click(avatarBtn!);
     expect(screen.getByText('Sign In')).toBeInTheDocument();
   });
 
@@ -554,23 +554,23 @@ describe('TextForm', () => {
     };
     render(<TextForm {...props} />);
     const avatarBtn = document.querySelector('.tu-activity-avatar');
-    fireEvent.click(avatarBtn);
+    fireEvent.click(avatarBtn!);
     expect(screen.getByText('Sign Out')).toBeInTheDocument();
   });
 
   it('shows theme toggle in settings menu', () => {
     render(<TextForm {...defaultProps} />);
     const avatarBtn = document.querySelector('.tu-activity-avatar');
-    fireEvent.click(avatarBtn);
+    fireEvent.click(avatarBtn!);
     expect(screen.getByText('Light Theme')).toBeInTheDocument();
   });
 
   it('closes settings menu when backdrop is clicked', () => {
     render(<TextForm {...defaultProps} />);
     const avatarBtn = document.querySelector('.tu-activity-avatar');
-    fireEvent.click(avatarBtn);
+    fireEvent.click(avatarBtn!);
     expect(document.querySelector('.tu-settings-menu')).toBeInTheDocument();
-    fireEvent.click(document.querySelector('.tu-settings-backdrop'));
+    fireEvent.click(document.querySelector('.tu-settings-backdrop')!);
     expect(document.querySelector('.tu-settings-menu')).not.toBeInTheDocument();
   });
 
@@ -582,13 +582,13 @@ describe('TextForm', () => {
     };
     render(<TextForm {...props} />);
     const avatar = document.querySelector('.tu-activity-avatar-letter');
-    expect(avatar.textContent).toBe('B');
+    expect(avatar!.textContent).toBe('B');
   });
 
   it('shows G as default avatar letter when not authenticated', () => {
     render(<TextForm {...defaultProps} />);
     const avatar = document.querySelector('.tu-activity-avatar-letter');
-    expect(avatar.textContent).toBe('G');
+    expect(avatar!.textContent).toBe('G');
   });
 
   it('renders bottom panel when workspace tab is active', () => {
@@ -646,7 +646,7 @@ describe('TextForm', () => {
   it('collapses sidebar when close button is clicked', () => {
     render(<TextForm {...defaultProps} />);
     const closeBtn = document.querySelector('.tu-sidebar-header-btn[title="Close sidebar"]');
-    fireEvent.click(closeBtn);
+    fireEvent.click(closeBtn!);
     expect(document.querySelector('.tu-forge--sidebar-collapsed')).toBeInTheDocument();
   });
 
@@ -671,21 +671,21 @@ describe('TextForm', () => {
     render(<TextForm {...defaultProps} />);
     // Click the favourites button (heart icon button)
     const favBtn = document.querySelector('.tu-activity-btn[data-tooltip="Favourites"]');
-    fireEvent.click(favBtn);
+    fireEvent.click(favBtn!);
     expect(screen.getByText(/No favourite tools yet/)).toBeInTheDocument();
   });
 
   it('switches to templates panel when templates activity button is clicked', () => {
     render(<TextForm {...defaultProps} />);
     const templatesBtn = document.querySelector('.tu-activity-btn[data-tooltip="Templates"]');
-    fireEvent.click(templatesBtn);
+    fireEvent.click(templatesBtn!);
     expect(screen.getByPlaceholderText('Template name...')).toBeInTheDocument();
   });
 
   it('switches to history panel when history activity button is clicked', () => {
     render(<TextForm {...defaultProps} />);
     const historyBtn = document.querySelector('.tu-activity-btn[data-tooltip="History"]');
-    fireEvent.click(historyBtn);
+    fireEvent.click(historyBtn!);
     expect(screen.getByText('No operations yet')).toBeInTheDocument();
   });
 
@@ -793,7 +793,7 @@ describe('TextForm', () => {
     };
     render(<TextForm {...props} />);
     const avatarBtn = document.querySelector('.tu-activity-avatar');
-    fireEvent.click(avatarBtn);
+    fireEvent.click(avatarBtn!);
     expect(screen.getByText('Upgrade to Pro')).toBeInTheDocument();
   });
 
@@ -801,7 +801,7 @@ describe('TextForm', () => {
     const gamification = { ...defaultGamification, discoveredTools: [] };
     render(<TextForm {...defaultProps} gamification={gamification} />);
     const newBtn = document.querySelector('.tu-activity-btn[data-tooltip="What\'s New"]');
-    fireEvent.click(newBtn);
+    fireEvent.click(newBtn!);
     // Should render the what's new panel (may show tools or "discovered all" message)
     expect(document.querySelector('.tu-tpanel')).toBeInTheDocument();
   });

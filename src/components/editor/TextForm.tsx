@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransformTextMutation } from '../../store/api/textApi';
 import { useSelector } from 'react-redux';
@@ -105,7 +105,7 @@ const SampleJsonDrawer = lazy(() =>
 // fallback={null} keeps the drawer slot empty during the (typically <100ms)
 // chunk fetch — drawers are user-initiated, so a flash of empty space is
 // less jarring than a spinner that disappears almost immediately.
-function LazyDrawer({ children }) {
+function LazyDrawer({ children }: { children: ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>;
 }
 import SmartSuggestions from './SmartSuggestions';
@@ -249,6 +249,46 @@ const DRAWERS = {
 
 /* Tab bar component extracted to ./TabBar.jsx */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface WorkspaceTab {
+  id: string;
+  label: string;
+  icon?: string;
+  type: string;
+  tool?: {
+    id: string;
+    color?: string;
+    type?: string;
+    label?: string;
+    icon?: string;
+    endpoint?: string;
+    successMsg?: string;
+    selectKey?: string;
+    setterKey?: string;
+    options?: Array<[string, string]>;
+    panelId?: string;
+    handlerKey?: string;
+    group?: string;
+    [key: string]: any;
+  };
+  panelId?: string;
+  color?: string;
+  [key: string]: any;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyRecord = Record<string, any>;
+
+interface TextFormProps {
+  showAlert: (msg: string, type: string) => void;
+  gamification: AnyRecord | null;
+  user: AnyRecord | null;
+  isAuthenticated: boolean;
+  mode: string;
+  setMode: (mode: string) => void;
+  subscription?: AnyRecord | null;
+}
+
 /**
  * Main editor orchestrator component.
  * Manages workspace tabs, tool execution, text state per tab, drawer panels,
@@ -264,31 +304,31 @@ const DRAWERS = {
  * @param {function} props.setMode - Theme mode setter.
  * @param {object} props.subscription - Subscription hook state.
  */
-export default function TextForm(props) {
-  const [toolTexts, setToolTexts] = useState({});
+export default function TextForm(props: TextFormProps) {
+  const [toolTexts, setToolTexts] = useState<Record<string, string>>({});
   const [dyslexiaMode, setDyslexiaMode] = useState(false);
   const [markdownMode, setMarkdownMode] = useState(false);
   const { activePanel, setActivePanel, togglePanel } = useDrawerState();
-  const [previewMode, setPreviewMode] = useState(null);
-  const [activeTab, setActiveTab] = useState(null);
+  const [previewMode, setPreviewMode] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [toolViewMode, setToolViewMode] = useState(
     () => localStorage.getItem('fmx_tool_view') || 'grid'
   );
-  const [workspaceTabs, setWorkspaceTabs] = useState([]);
-  const [activeWorkspaceId, setActiveWorkspaceId] = useState(null);
-  const [toolResults, setToolResults] = useState({}); // keyed by tab ID, not tool ID
+  const [workspaceTabs, setWorkspaceTabs] = useState<WorkspaceTab[]>([]);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
+  const [toolResults, setToolResults] = useState<Record<string, unknown>>({}); // keyed by tab ID, not tool ID
   const [inputScrollTop, setInputScrollTop] = useState(0);
-  const aiResultSourceRef = useRef(null); // tracks which toolId/panelId produced the current ai.aiResult
-  const lastTextPerTab = useRef({}); // tracks last input text per tab for debounce
-  const [, setSavedTabs] = useState({});
-  const [saveModal, setSaveModal] = useState(null); // { tabId, defaultName }
+  const aiResultSourceRef = useRef<string | null>(null); // tracks which toolId/panelId produced the current ai.aiResult
+  const lastTextPerTab = useRef<Record<string, string>>({}); // tracks last input text per tab for debounce
+  const [, setSavedTabs] = useState<Record<string, boolean>>({});
+  const [saveModal, setSaveModal] = useState<{ tabId: string; defaultName: string } | null>(null); // { tabId, defaultName }
 
   // Per-tool text: derived from the active workspace tab
-  const activeTabIdRef = useRef(null);
+  const activeTabIdRef = useRef<string | null>(null);
   activeTabIdRef.current = activeWorkspaceId;
-  const text = toolTexts[activeWorkspaceId] || '';
+  const text = (activeWorkspaceId ? toolTexts[activeWorkspaceId] : '') || '';
   const setText = useCallback((valOrFn) => {
     const tabId = activeTabIdRef.current;
     if (!tabId) return;
@@ -300,9 +340,9 @@ export default function TextForm(props) {
     // Mark as unsaved when text changes
     setSavedTabs((prev) => (prev[tabId] ? { ...prev, [tabId]: false } : prev));
   }, []);
-  const sharedTextRef = useRef(null);
-  const pendingAutoRun = useRef(null);
-  const selectValueRef = useRef(null); // holds the freshly-clicked value for select tools
+  const sharedTextRef = useRef<string | null>(null);
+  const pendingAutoRun = useRef<import('../../types/tools').ToolDefinition | null>(null);
+  const selectValueRef = useRef<string | null>(null); // holds the freshly-clicked value for select tools
 
   const showAlert = props.showAlert;
   const navigate = useNavigate();
@@ -342,11 +382,15 @@ export default function TextForm(props) {
     setPreviewMode,
     showAlert,
     history.pushHistory
-  );
+  ) as ReturnType<typeof useAiTools> & Record<string, unknown>;
   const speech = useSpeech(text, setText, showAlert);
   const exportTools = useExport(setLocalLoading, showAlert);
   const regex = useRegexTester(text, showAlert);
-  const templateHelpersRef = useRef({ getActiveToolId: () => null, openToolById: () => {} });
+  const templateHelpersRef = useRef<{
+    getActiveToolId: () => string | null;
+    openToolById: (toolId: string | null, text: string) => void;
+    renameActiveTab: (name: string) => void;
+  }>({ getActiveToolId: () => null, openToolById: () => {}, renameActiveTab: () => {} });
   const templates = useTemplates(text, setText, showAlert, {
     getActiveToolId: () => templateHelpersRef.current.getActiveToolId(),
     openToolById: (toolId, content) => templateHelpersRef.current.openToolById(toolId, content),
@@ -367,7 +411,7 @@ export default function TextForm(props) {
   const subscription = props.subscription;
 
   // ── Persistent history (server-side) ─────────────────────
-  const { accessToken } = useSelector((s) => s.auth);
+  const { accessToken } = useSelector((s: Record<string, { accessToken: string | null }>) => s.auth);
   const [historyView, setHistoryView] = useState('session'); // 'session' | 'saved'
   const [historyPage, setHistoryPage] = useState(1);
   const { data: serverHistory, isFetching: historyFetching } = useGetHistoryQuery(
@@ -411,11 +455,11 @@ export default function TextForm(props) {
   }, [accessToken]);
 
   // Resizable panels
-  const splitRef = useRef(null);
-  const gutterRef = useRef(null);
-  const textRef = useRef(text);
+  const splitRef = useRef<HTMLElement>(null);
+  const gutterRef = useRef<HTMLElement>(null);
+  const textRef = useRef<string>(text);
   textRef.current = text;
-  const textareaRef = useRef(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // ── Extracted tool hooks (must be after textRef is defined) ──
   const hashTools = useHashTools({
@@ -428,11 +472,11 @@ export default function TextForm(props) {
   });
   const clientTools = useClientTools({
     textRef,
-    setToolResults,
+    setToolResults: setToolResults as (fn: (prev: Record<string, string>) => Record<string, string>) => void,
     setPreviewMode,
     setLocalLoading,
     showAlert,
-    activeWorkspaceId,
+    activeWorkspaceId: activeWorkspaceId ?? '',
     setAiResult: ai.setAiResult,
     pushHistory: history.pushHistory,
   });
@@ -446,7 +490,7 @@ export default function TextForm(props) {
     max: 80,
     storageKey: 'fmx_split_pct',
     unit: 'percent',
-    containerRef: splitRef,
+    containerRef: splitRef as unknown as import('react').RefObject<HTMLElement>,
   });
   const bottomResize = useResize('vertical', 200, {
     min: 80,
@@ -455,7 +499,7 @@ export default function TextForm(props) {
   });
 
   // Sync panel sizes to server when authenticated (debounced)
-  const panelSizeSyncTimer = useRef(null);
+  const panelSizeSyncTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const syncPanelSizes = useCallback(
     (updates) => {
       if (!accessToken) return;
@@ -482,7 +526,7 @@ export default function TextForm(props) {
   // Set default tab from persona
   useEffect(() => {
     if (gamification?.persona && !activeTab) {
-      setActiveTab(PERSONAS[gamification.persona]?.defaultTab || 'all');
+      setActiveTab(PERSONAS[(gamification?.persona as string)]?.defaultTab || 'all');
     }
   }, [gamification?.persona, activeTab]);
 
@@ -497,20 +541,20 @@ export default function TextForm(props) {
       const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
       if (!ws) return;
       // Only persist if this result belongs to the active tab
-      const expectedSource = ws.type === 'tool' ? ws.tool.id : ws.panelId;
+      const expectedSource = ws.type === 'tool' ? ws.tool?.id : ws.panelId;
       if (aiResultSourceRef.current === expectedSource) {
-        setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: ai.aiResult }));
+        setToolResults((prev) => ({ ...prev, [activeWorkspaceId as string]: ai.aiResult }));
       }
     }
   }, [ai.aiResult, activeWorkspaceId, workspaceTabs]);
 
-  const closeWorkspaceTab = (tabId) => {
+  const closeWorkspaceTab = (tabId: string) => {
     setWorkspaceTabs((tabs) => {
       const remaining = tabs.filter((t) => t.id !== tabId);
       if (activeWorkspaceId === tabId) {
         const newActive = remaining.length > 0 ? remaining[remaining.length - 1] : null;
         setActiveWorkspaceId(newActive?.id || null);
-        setActivePanel(newActive?.type === 'drawer' ? newActive.panelId : null);
+        setActivePanel(newActive?.type === 'drawer' ? (newActive.panelId ?? null) : null);
       }
       return remaining;
     });
@@ -546,39 +590,39 @@ export default function TextForm(props) {
   }, []);
 
   // ── Generic API handler (RTK Query) ─────────────────────
-  const callApi = async (endpoint, successMsg, toolMeta) => {
+  const callApi = async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
     const t = textRef.current;
     if (!t) return;
     const original = t;
     try {
       const data = await transformText({ endpoint, text: t }).unwrap();
-      if (toolMeta?.toolId) aiResultSourceRef.current = toolMeta.toolId;
+      if (toolMeta?.toolId) aiResultSourceRef.current = toolMeta.toolId as string;
       ai.setAiResult({ label: successMsg, result: data.result });
       setPreviewMode('result');
       history.pushHistory(successMsg, original, data.result, toolMeta);
       showAlert(successMsg, 'success');
       return { success: true, result: data.result };
     } catch (err) {
-      showAlert(err.data?.detail || 'Something went wrong. Please try again.', 'danger');
+      showAlert((err as { data?: { detail?: string } }).data?.detail || 'Something went wrong. Please try again.', 'danger');
       return { success: false };
     }
   };
 
   // ── Generic API handler with extra params (for drawer tools) ──
-  const callApiWithParams = async (endpoint, successMsg, extraParams, toolMeta) => {
+  const callApiWithParams = async (endpoint: string, successMsg: string, extraParams: Record<string, unknown>, toolMeta?: Record<string, unknown>) => {
     const t = textRef.current;
     if (!t) return;
     const original = t;
     try {
       const data = await transformText({ endpoint, text: t, ...extraParams }).unwrap();
-      if (toolMeta?.toolId) aiResultSourceRef.current = toolMeta.toolId;
+      if (toolMeta?.toolId) aiResultSourceRef.current = toolMeta.toolId as string;
       ai.setAiResult({ label: successMsg, result: data.result });
       setPreviewMode('result');
       history.pushHistory(successMsg, original, data.result, toolMeta);
       showAlert(successMsg, 'success');
       return { success: true, result: data.result };
     } catch (err) {
-      showAlert(err.data?.detail || 'Something went wrong. Please try again.', 'danger');
+      showAlert((err as { data?: { detail?: string } }).data?.detail || 'Something went wrong. Please try again.', 'danger');
       return { success: false };
     }
   };
@@ -893,7 +937,7 @@ export default function TextForm(props) {
       setWorkspaceTabs((tabs) => {
         if (tabs.find((t) => t.id === tabId)) return tabs;
         isNew = true;
-        return [...tabs, { id: tabId, label: tool.label, icon: tool.icon, type: 'tool', tool }];
+        return [...tabs, { id: tabId, label: tool.label, icon: tool.icon, type: 'tool', tool } as unknown as WorkspaceTab];
       });
       // Seed new tab: only from URL shared text, otherwise start empty
       if (isNew) {
@@ -929,7 +973,7 @@ export default function TextForm(props) {
           if (tabs.find((t) => t.id === tabId)) return tabs;
           return [
             ...tabs,
-            { id: tabId, label: fallback.label, icon: fallback.icon, type: 'tool', tool: fallback },
+            { id: tabId, label: fallback.label, icon: fallback.icon, type: 'tool', tool: fallback as unknown as WorkspaceTab['tool'] } as WorkspaceTab,
           ];
         });
         setToolTexts((prev) => ({ ...prev, [tabId]: content }));
@@ -940,7 +984,7 @@ export default function TextForm(props) {
     const tabId = `tool-${tool.id}`;
     setWorkspaceTabs((tabs) => {
       if (tabs.find((t) => t.id === tabId)) return tabs;
-      return [...tabs, { id: tabId, label: tool.label, icon: tool.icon, type: 'tool', tool }];
+      return [...tabs, { id: tabId, label: tool.label, icon: tool.icon, type: 'tool', tool } as unknown as WorkspaceTab];
     });
     setToolTexts((prev) => ({ ...prev, [tabId]: content }));
     setActiveWorkspaceId(tabId);
@@ -955,7 +999,7 @@ export default function TextForm(props) {
   templateHelpersRef.current = {
     getActiveToolId: () => {
       const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-      return ws?.type === 'tool' ? ws.tool.id : null;
+      return ws?.type === 'tool' ? (ws.tool?.id ?? null) : null;
     },
     openToolById,
     renameActiveTab: (name) => {
@@ -975,7 +1019,7 @@ export default function TextForm(props) {
       // Unified tool access check (all tool types: ai, api, local, action, select)
       if (subscription?.checkToolAccess && !subscription.checkToolAccess(tool)) return;
 
-      gamification.recordToolUse(tool.id, (textRef.current || '').length);
+      gamification?.recordToolUse(tool.id, (textRef.current || '').length);
 
       // Stamp the source so the persistence effect knows which tool produced the result
       aiResultSourceRef.current = tool.id;
@@ -983,7 +1027,7 @@ export default function TextForm(props) {
       if (tool.type === 'api') {
         callApi(tool.endpoint, tool.successMsg, { toolId: tool.id, toolType: tool.type }).then(
           (res) => {
-            if (res?.success) pipeline.addStep(tool.id, tool.label, res.result);
+            if (res?.success) pipeline.addStep(tool.id, tool.label, res.result ?? '');
             if (subscription?.refetchStatus) subscription.refetchStatus();
           }
         );
@@ -1001,11 +1045,11 @@ export default function TextForm(props) {
           const result = handler(freshVal);
           if (result && typeof result.then === 'function') {
             result.then(() => {
-              pipeline.addStep(tool.id, tool.label);
+              pipeline.addStep(tool.id, tool.label, "");
               if (subscription?.refetchStatus) subscription.refetchStatus();
             });
           } else {
-            pipeline.addStep(tool.id, tool.label);
+            pipeline.addStep(tool.id, tool.label, "");
             if (subscription?.refetchStatus) subscription.refetchStatus();
           }
         }
@@ -1014,7 +1058,7 @@ export default function TextForm(props) {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [text, gamification.recordToolUse, trial.checkTrial, subscription?.checkToolAccess]
+    [text, gamification?.recordToolUse, trial.checkTrial, subscription?.checkToolAccess]
   );
 
   // ── Unified tool click handler ──────────────────────────
@@ -1057,7 +1101,7 @@ export default function TextForm(props) {
         }
         setActiveWorkspaceId(tabId);
         setActivePanel(tool.panelId);
-        gamification.recordToolUse(tool.id, text.length);
+        gamification?.recordToolUse(tool.id, text.length);
       } else if (tool.type === 'action') {
         executeToolAction(tool);
       } else {
@@ -1065,7 +1109,7 @@ export default function TextForm(props) {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [openToolTab, executeToolAction, text, gamification.recordToolUse]
+    [openToolTab, executeToolAction, text, gamification?.recordToolUse]
   );
 
   // ── Auto-run tool on first open (when text was seeded) ──
@@ -1117,7 +1161,7 @@ export default function TextForm(props) {
     if (!activeWorkspaceId || !text || loading) return;
     const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
     if (!ws || ws.type !== 'tool') return;
-    if (!['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)) return;
+    if (!ws.tool || !['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)) return;
     const timer = setTimeout(() => executeToolAction(ws.tool), 300);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1126,7 +1170,7 @@ export default function TextForm(props) {
   // ── Keyboard Shortcuts (power-user hotkeys) ─────────────
   // Use a ref so the keydown handler always sees the latest closures
   // without triggering re-registration on every render.
-  const kbActionsRef = useRef(null);
+  const kbActionsRef = useRef<Record<string, unknown> | null>(null);
   kbActionsRef.current = {
     openPalette: () => (search.isOpen ? search.close() : search.open()),
     toggleSidebar: () => setSidebarOpen((o) => !o),
@@ -1166,7 +1210,7 @@ export default function TextForm(props) {
     undo: () => history.handleUndo(),
     redo: () => history.handleRedo(),
     copyOutput: () => {
-      const result = toolResults[activeWorkspaceId] || ai.aiResult;
+      const result = ((activeWorkspaceId ? toolResults[activeWorkspaceId] : undefined) || ai.aiResult) as { result?: string } | null;
       if (result?.result) {
         navigator.clipboard.writeText(result.result);
         showAlert('Output copied', 'success');
@@ -1217,7 +1261,7 @@ export default function TextForm(props) {
       'runTool',
     ];
     keys.forEach((k) => {
-      proxy[k] = (...args) => kbActionsRef.current[k]?.(...args);
+      proxy[k] = (...args: unknown[]) => (kbActionsRef.current as Record<string, (...a: unknown[]) => unknown>)?.[k]?.(...args);
     });
     return proxy;
   }, []);
@@ -1453,7 +1497,7 @@ export default function TextForm(props) {
                 <span className="tu-sidebar-header-count">
                   {activeTab === 'all'
                     ? TOOLS.length
-                    : TOOLS.filter((t) => t.tabs?.includes(activeTab)).length}
+                    : TOOLS.filter((t) => t.tabs?.includes(activeTab as import('../../types/tools').ToolTab)).length}
                 </span>
               )}
             </span>
@@ -1541,20 +1585,19 @@ export default function TextForm(props) {
             <ToolPanel
               tools={TOOLS}
               activeTab={activeTab}
-              onTabChange={setActiveTab}
+              onTabChange={(tabId) => setActiveTab(tabId)}
               onToolClick={handleToolClick}
               disabled={loading}
               gamification={gamification}
               activeToolId={(() => {
                 const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-                if (ws?.type === 'tool') return ws.tool.id;
+                if (ws?.type === 'tool') return ws.tool?.id ?? null;
                 if (ws?.type === 'drawer') {
                   if (ws.tool?.id) return ws.tool.id;
                   return TOOLS.find((t) => t.panelId === ws.panelId)?.id || null;
                 }
                 return null;
               })()}
-              ai={ai}
               hideTabs
               viewMode={toolViewMode}
               suggestedToolIds={suggestions.suggestions.map((t) => t.id)}
@@ -1707,7 +1750,7 @@ export default function TextForm(props) {
                       <span className="tu-sidebar-panel-item-icon">📄</span>
                       <span className="tu-sidebar-panel-item-name">{tpl.name}</span>
                       <span className="tu-sidebar-panel-item-meta">
-                        {new Date(tpl.updatedAt).toLocaleDateString()}
+                        {new Date(tpl.updatedAt as string).toLocaleDateString()}
                       </span>
                       <button
                         className="tu-sidebar-panel-item-del"
@@ -1922,14 +1965,14 @@ export default function TextForm(props) {
             {/* Level + XP */}
             <div className="tu-sf-row tu-sf-level">
               <span className="tu-sf-level-icon">⚡</span>
-              <span className="tu-sf-label">Lv.{gamification.level?.level || 1}</span>
-              <span className="tu-sf-sublabel">{gamification.level?.title || 'Beginner'}</span>
-              <span className="tu-sf-value">{gamification.xp || 0} XP</span>
+              <span className="tu-sf-label">Lv.{gamification?.level?.level || 1}</span>
+              <span className="tu-sf-sublabel">{gamification?.level?.title || 'Beginner'}</span>
+              <span className="tu-sf-value">{gamification?.xp || 0} XP</span>
             </div>
             <div className="tu-sf-xp-track">
               <div
                 className="tu-sf-xp-fill"
-                style={{ width: `${gamification.xpProgress || 0}%` }}
+                style={{ width: `${gamification?.xpProgress || 0}%` }}
               />
             </div>
 
@@ -1953,25 +1996,25 @@ export default function TextForm(props) {
             {/* Streak + Discovery */}
             <div className="tu-sf-stats">
               <div className="tu-sf-stat" title="Daily streak">
-                🔥 <b>{gamification.streak?.current || 0}</b> streak
+                🔥 <b>{gamification?.streak?.current || 0}</b> streak
               </div>
               <div className="tu-sf-stat" title="Tools discovered">
-                🧭 <b>{gamification.discoveredTools?.length || 0}</b>/{TOOLS.length}
+                🧭 <b>{gamification?.discoveredTools?.length || 0}</b>/{TOOLS.length}
               </div>
             </div>
 
             {/* Daily Quest */}
-            {gamification.dailyQuest?.id && (
+            {gamification?.dailyQuest?.id && (
               <div
                 className={`tu-sf-quest${
-                  gamification.dailyQuest.completed ? ' tu-sf-quest--done' : ''
+                  gamification?.dailyQuest.completed ? ' tu-sf-quest--done' : ''
                 }`}
               >
                 <span className="tu-sf-quest-icon">
-                  {gamification.dailyQuest.completed ? '✅' : '📋'}
+                  {gamification?.dailyQuest.completed ? '✅' : '📋'}
                 </span>
                 <span className="tu-sf-quest-text">
-                  {QUEST_TEMPLATES.find((q) => q.id === gamification.dailyQuest.id)?.text ||
+                  {QUEST_TEMPLATES.find((q) => q.id === gamification?.dailyQuest.id)?.text ||
                     'Daily Quest'}
                 </span>
               </div>
@@ -2045,12 +2088,12 @@ export default function TextForm(props) {
                       <div className="tu-landing-xp-track">
                         <div
                           className="tu-landing-xp-fill"
-                          style={{ width: `${Math.min(gamification.xpProgress || 0, 100)}%` }}
+                          style={{ width: `${Math.min(gamification?.xpProgress || 0, 100)}%` }}
                         />
                       </div>
                       <span className="tu-landing-xp-label">
-                        {gamification.xp || 0} / {gamification.nextLevel.xp} XP to{' '}
-                        {gamification.nextLevel.title}
+                        {gamification?.xp || 0} / {gamification?.nextLevel.xp} XP to{' '}
+                        {gamification?.nextLevel.title}
                       </span>
                     </div>
                   )}
@@ -2066,14 +2109,14 @@ export default function TextForm(props) {
                       {gamification?.dailyQuest?.id ? (
                         (() => {
                           const quest = QUEST_TEMPLATES.find(
-                            (q) => q.id === gamification.dailyQuest.id
+                            (q) => q.id === gamification?.dailyQuest.id
                           );
                           return quest ? (
                             <div className="tu-landing-quest-body">
                               <p className="tu-landing-quest-text">{quest.text}</p>
                               <div className="tu-landing-quest-footer">
                                 <span className="tu-landing-quest-xp">+{quest.xp} XP</span>
-                                {gamification.dailyQuest.completed ? (
+                                {gamification?.dailyQuest.completed ? (
                                   <span className="tu-landing-quest-done">Completed!</span>
                                 ) : (
                                   <span className="tu-landing-quest-pending">In progress</span>
@@ -2131,7 +2174,7 @@ export default function TextForm(props) {
                       </h3>
                       <div className="tu-landing-badge-row">
                         {gamification?.achievements?.length > 0 ? (
-                          gamification.achievements
+                          gamification?.achievements
                             .slice(-6)
                             .reverse()
                             .map((aid) => {
@@ -2165,7 +2208,7 @@ export default function TextForm(props) {
                       </h3>
                       <div className="tu-landing-tool-grid">
                         {(gamification?.favorites?.length > 0
-                          ? gamification.favorites
+                          ? gamification?.favorites
                               .slice(0, 8)
                               .map((id) => TOOLS.find((t) => t.id === id))
                               .filter(Boolean)
@@ -2204,7 +2247,7 @@ export default function TextForm(props) {
                       </h3>
                       <div className="tu-landing-tool-grid">
                         {(() => {
-                          const used = gamification?.toolsUsed || {};
+                          const used = (gamification?.toolsUsed || {}) as Record<string, number>;
                           const sorted = Object.entries(used)
                             .sort((a, b) => b[1] - a[1])
                             .slice(0, 8);
@@ -2567,7 +2610,7 @@ export default function TextForm(props) {
           {activeWorkspaceId && (
             <>
               <div
-                ref={splitRef}
+                ref={splitRef as unknown as import('react').Ref<HTMLDivElement>}
                 className="tu-editor-split"
                 style={{
                   gridTemplateColumns: `${splitResize.size}fr 4px ${100 - splitResize.size}fr`,
@@ -2892,18 +2935,21 @@ export default function TextForm(props) {
                             );
                           case 'mdpreview':
                             return <MarkdownPreviewDrawer text={text} />;
-                          case 'password':
+                          case 'password': {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            const PwdDrawer = PasswordDrawer as any;
                             return (
-                              <PasswordDrawer
+                              <PwdDrawer
                                 {...generators}
                                 showAlert={showAlert}
-                                onResult={(pwd) => {
+                                onResult={(pwd: string) => {
                                   aiResultSourceRef.current = 'password';
                                   ai.setAiResult({ label: 'Password', result: pwd });
                                   setPreviewMode('result');
                                 }}
                               />
                             );
+                          }
                           case 'randtext':
                             return (
                               <RandomTextDrawer
@@ -2956,7 +3002,7 @@ export default function TextForm(props) {
                       {(() => {
                         const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                         const fmtToolId =
-                          ws?.type === 'tool' &&
+                          ws?.type === 'tool' && ws.tool &&
                           ['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)
                             ? ws.tool.id
                             : null;
@@ -2964,16 +3010,16 @@ export default function TextForm(props) {
                           <FmtConfigBar
                             toolId={fmtToolId}
                             fmtCfg={formatter.fmtCfg}
-                            setFmtCfg={formatter.setFmtCfg}
+                            setFmtCfg={(updater) => formatter.setFmtCfg(updater(formatter.fmtCfg))}
                           />
                         ) : null;
                       })()}
                       {/* Select tool options bar (Format, Tone, Translate, Translit) */}
                       {(() => {
                         const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-                        if (ws?.type !== 'tool' || ws.tool.type !== 'select') return null;
+                        if (ws?.type !== 'tool' || ws.tool?.type !== 'select') return null;
                         const tool = ws.tool;
-                        const currentVal = ai[tool.selectKey] || tool.options?.[0]?.[0];
+                        const currentVal = (tool.selectKey ? (ai as Record<string, unknown>)[tool.selectKey] : undefined) || tool.options?.[0]?.[0];
                         return (
                           <div className="tu-fmtbar">
                             <span className="tu-fmtbar-lang">{tool.label}</span>
@@ -3012,14 +3058,15 @@ export default function TextForm(props) {
                               </>
                             )}
                             <span className="tu-fmtbar-sep" />
-                            {tool.options.map(([val, label]) => (
+                            {(tool.options || []).map(([val, label]) => (
                               <button
                                 key={val}
                                 className={`tu-fmtbar-opt${
                                   currentVal === val ? ' tu-fmtbar-opt--on' : ''
                                 }`}
                                 onClick={() => {
-                                  if (ai[tool.setterKey]) ai[tool.setterKey](val);
+                                  const setter = tool.setterKey ? (ai as Record<string, unknown>)[tool.setterKey] : null;
+                                  if (typeof setter === 'function') setter(val);
                                   selectValueRef.current = val;
                                   executeToolAction(tool);
                                 }}
@@ -3034,7 +3081,7 @@ export default function TextForm(props) {
                         {(() => {
                           const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                           const isProse =
-                            ws?.type === 'tool' && PROSE_GROUPS.has(ws.tool?.group);
+                            ws?.type === 'tool' && !!ws.tool?.group && PROSE_GROUPS.has(ws.tool.group);
                           if (isProse) {
                             return (
                               <ParagraphGutter
@@ -3045,7 +3092,7 @@ export default function TextForm(props) {
                             );
                           }
                           return (
-                            <div className="tu-line-numbers" ref={gutterRef}>
+                            <div className="tu-line-numbers" ref={gutterRef as unknown as import('react').Ref<HTMLDivElement>}>
                               {(text || '\n').split('\n').map((_, i) => (
                                 <span key={i}>{i + 1}</span>
                               ))}
@@ -3072,8 +3119,9 @@ export default function TextForm(props) {
                             }
                           }}
                           onScroll={(e) => {
-                            setInputScrollTop(e.target.scrollTop);
-                            if (gutterRef.current) gutterRef.current.scrollTop = e.target.scrollTop;
+                            const ta = e.target as HTMLTextAreaElement;
+                            setInputScrollTop(ta.scrollTop);
+                            if (gutterRef.current) gutterRef.current.scrollTop = ta.scrollTop;
                           }}
                           placeholder="// Start typing or paste your text here..."
                           style={{
@@ -3142,15 +3190,15 @@ export default function TextForm(props) {
                           'fakedata',
                           'loremipsum',
                           'samplejson',
-                        ].includes(ws.panelId)
+                        ].includes(ws.panelId ?? '')
                       ) {
                         // fall through to OutputPanel below
                       } else {
-                        return DRAWERS[ws.panelId] ? (
+                        return ws.panelId && DRAWERS[ws.panelId] ? (
                           <DrawerPanel
                             title={DRAWERS[ws.panelId].title}
                             color={DRAWERS[ws.panelId].color}
-                            onClose={() => closeWorkspaceTab(activeWorkspaceId)}
+                            onClose={() => closeWorkspaceTab(activeWorkspaceId!)}
                           >
                             <LazyDrawer>{renderDrawerContent()}</LazyDrawer>
                           </DrawerPanel>
@@ -3163,11 +3211,10 @@ export default function TextForm(props) {
                       'fakedata',
                       'loremipsum',
                       'samplejson',
-                    ].includes(ws?.panelId);
+                    ].includes(ws?.panelId ?? '');
                     // Each tab's result is stored independently by tab ID
-                    const tabResult = toolResults[activeWorkspaceId] || null;
-                    const displayResult =
-                      tabResult || (isNoInputDrawer ? ai.aiResult : text ? ai.aiResult : null);
+                    const tabResult = (activeWorkspaceId ? toolResults[activeWorkspaceId] : null) as import('../../hooks/useAiTools').AiResult | null;
+                    const displayResult = (tabResult || (isNoInputDrawer ? ai.aiResult : text ? ai.aiResult : null)) as import('../../hooks/useAiTools').AiResult | null;
                     return (
                       <OutputPanel
                         aiResult={displayResult || null}
@@ -3196,7 +3243,7 @@ export default function TextForm(props) {
                         onAiDismiss={() => {
                           setToolResults((prev) => {
                             const next = { ...prev };
-                            delete next[activeWorkspaceId];
+                            if (activeWorkspaceId) delete next[activeWorkspaceId];
                             return next;
                           });
                           ai.setAiResult(null);
@@ -3211,17 +3258,17 @@ export default function TextForm(props) {
                         speech={speech}
                         onDyslexiaToggle={handleDyslexiaMode}
                         activeTool={
-                          ws?.type === 'tool'
+                          (ws?.type === 'tool'
                             ? ws.tool
                             : ws?.type === 'drawer'
                             ? TOOLS.find((t) => t.panelId === ws.panelId) || null
-                            : null
+                            : null) as import('../../types/tools').ToolDefinition | null
                         }
                         loading={loading}
                         exportTools={exportTools}
                         onOutputEdit={(newText) => {
-                          const updated = { ...displayResult, result: newText };
-                          setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: updated }));
+                          const updated = { label: displayResult?.label ?? '', ...displayResult, result: newText };
+                          if (activeWorkspaceId) setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: updated }));
                           ai.setAiResult(updated);
                         }}
                       />
@@ -3383,7 +3430,7 @@ export default function TextForm(props) {
 
       {/* Floating overlays */}
       <AnimatePresence>
-        {gamification.xpGain && (
+        {gamification?.xpGain && (
           <motion.div
             className="tu-xp-float"
             initial={{ opacity: 1, y: 0 }}
@@ -3391,7 +3438,7 @@ export default function TextForm(props) {
             exit={{ opacity: 0 }}
             transition={{ duration: 1.5, ease: 'easeOut' }}
           >
-            +{gamification.xpGain} XP
+            +{gamification?.xpGain} XP
           </motion.div>
         )}
       </AnimatePresence>
@@ -3400,7 +3447,7 @@ export default function TextForm(props) {
         (() => {
           const SaveModal = () => {
             const [name, setName] = useState(saveModal.defaultName);
-            const inputRef = useRef(null);
+            const inputRef = useRef<HTMLInputElement | null>(null);
             useEffect(() => {
               inputRef.current?.focus();
               inputRef.current?.select();
@@ -3408,7 +3455,7 @@ export default function TextForm(props) {
             const handleSave = () => {
               if (!name.trim()) return;
               const ws = workspaceTabs.find((t) => t.id === saveModal.tabId);
-              const toolId = ws?.type === 'tool' ? ws.tool.id : null;
+              const toolId = ws?.type === 'tool' ? (ws.tool?.id ?? null) : null;
               templates.saveDirectly(name.trim(), toolTexts[saveModal.tabId] || '', toolId);
               setSavedTabs((prev) => ({ ...prev, [saveModal.tabId]: true }));
               // Rename the tab to the template name
@@ -3477,8 +3524,8 @@ export default function TextForm(props) {
         })()}
 
       <AchievementToast
-        achievement={gamification.newAchievement}
-        onDismiss={gamification.dismissAchievement}
+        achievement={gamification?.newAchievement}
+        onDismiss={gamification?.dismissAchievement}
       />
       <CommandPalette search={search} onToolClick={handleToolClick} />
       <KeyboardShortcuts
