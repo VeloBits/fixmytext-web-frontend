@@ -1,18 +1,37 @@
 import { TOOLS, ACHIEVEMENTS, LEVELS, QUEST_TEMPLATES } from '../../constants/tools';
+import type { GamificationContextValue } from '../../contexts/AppContext';
+import type { LevelDefinition } from '../../types/tools';
+
+export interface TopTool {
+  id: string;
+  icon: string;
+  label: string;
+  count: number;
+}
+
+export interface CategoryUsage {
+  id: string;
+  icon: string;
+  label: string;
+  count: number;
+}
+
+interface OverviewSectionProps {
+  g: GamificationContextValue;
+  level: LevelDefinition;
+  nextLevel: LevelDefinition;
+  xpProgress: number;
+  topTools: TopTool[];
+  categoryUsage: CategoryUsage[];
+  setActiveSection: (section: string) => void;
+  toolStatsError?: unknown;
+  refetchToolStats?: () => void;
+}
 
 /**
  * Dashboard overview section.
  * Shows user XP/level, stats grid, daily quest, top tools, category breakdown,
  * and recent achievements at a glance.
- *
- * @param {object} props
- * @param {object} props.g - Gamification state from useGamification hook.
- * @param {object} props.level - Current level object.
- * @param {object} props.nextLevel - Next level object.
- * @param {number} props.xpProgress - XP progress percentage toward next level.
- * @param {Array} props.topTools - Top used tools with counts.
- * @param {Array} props.categoryUsage - Category usage stats.
- * @param {function} props.setActiveSection - Callback to switch dashboard section.
  */
 export default function OverviewSection({
   g,
@@ -24,14 +43,14 @@ export default function OverviewSection({
   setActiveSection,
   toolStatsError,
   refetchToolStats,
-}) {
+}: OverviewSectionProps) {
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Overview</h2>
       <p className="tu-dash-subtitle">Your FixMyText journey at a glance</p>
 
       {/* Error state for tool stats */}
-      {toolStatsError && (
+      {Boolean(toolStatsError) && (
         <div className="error-state" style={{ padding: '12px 16px', marginBottom: 16 }}>
           <p>Failed to load tool statistics</p>
           <button onClick={refetchToolStats}>Retry</button>

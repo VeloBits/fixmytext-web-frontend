@@ -1,23 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { PERSONAS } from '../../constants/tools';
 import { useResendVerificationMutation } from '../../store/api/authApi';
+import type { GamificationContextValue, User } from '../../contexts/AppContext';
+import type { AlertLevel } from '../../contexts/AlertContext';
+import type { Persona } from '../../types/tools';
+
+
+interface ProfileSectionProps {
+  user: User | null;
+  isAuthenticated: boolean;
+  g: GamificationContextValue;
+  mode: string;
+  setMode: (mode: string) => void;
+  showAlert: (msg: string, type?: AlertLevel) => void;
+}
 
 /**
  * Dashboard profile section.
  * Allows editing display name, selecting persona, and toggling theme.
- *
- * @param {object} props
- * @param {object|null} props.user - Current user object.
- * @param {boolean} props.isAuthenticated - Whether the user is authenticated.
- * @param {object} props.g - Gamification state from useGamification hook.
- * @param {string} props.mode - Current theme mode ('light' or 'dark').
- * @param {function} props.setMode - Callback to set theme mode.
- * @param {function} props.showAlert - Callback to display alert notifications.
  */
-export default function ProfileSection({ user, isAuthenticated, g, mode, setMode, showAlert }) {
+export default function ProfileSection({ user, isAuthenticated, g, mode, setMode, showAlert }: ProfileSectionProps) {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(user?.display_name || '');
-  const nameRef = useRef(null);
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const [resendVerification, { isLoading: resending }] = useResendVerificationMutation();
   const [cooldownUntil, setCooldownUntil] = useState(0);
@@ -49,17 +54,18 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
       showAlert('Verification email sent. Check your inbox and spam folder.', 'success');
       setCooldownUntil(Date.now() + 120 * 1000);
     } catch (err) {
-      if (err?.status === 429) {
-        const match = /(\d+)\s*seconds?/.exec(err?.data?.detail || '');
+      const e = err as { status?: number; data?: { detail?: string } };
+      if (e?.status === 429) {
+        const match = /(\d+)\s*seconds?/.exec(e?.data?.detail || '');
         const waitSec = match ? Number(match[1]) : 120;
         setCooldownUntil(Date.now() + waitSec * 1000);
         showAlert(
-          err?.data?.detail || 'Please wait a bit before requesting another email.',
+          e?.data?.detail || 'Please wait a bit before requesting another email.',
           'warning'
         );
       } else {
         showAlert(
-          err?.data?.detail || 'Could not send verification email. Try again shortly.',
+          e?.data?.detail || 'Could not send verification email. Try again shortly.',
           'danger'
         );
       }
@@ -226,16 +232,17 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
             <button
               key={key}
               className={`tu-dash-persona-card${
-                g?.persona === key ? ' tu-dash-persona-card--active' : ''
+                // persona is stored as a string key in practice
+                (g?.persona as unknown as string) === key ? ' tu-dash-persona-card--active' : ''
               }`}
               onClick={() => {
-                g.setPersona(key);
+                g.setPersona(key as unknown as Persona);
                 showAlert(`Persona changed to ${p.label}`, 'success');
               }}
             >
               <span className="tu-dash-persona-icon">{p.icon}</span>
               <span className="tu-dash-persona-label">{p.label}</span>
-              {g?.persona === key && <span className="tu-dash-persona-check">✓</span>}
+              {(g?.persona as unknown as string) === key && <span className="tu-dash-persona-check">✓</span>}
             </button>
           ))}
         </div>

@@ -1,14 +1,17 @@
 import { TOOLS } from '../../constants/tools';
+import type { GamificationContextValue } from '../../contexts/AppContext';
+import type { QuestOp } from '../../types/tools';
+
+interface HistorySectionProps {
+  g: GamificationContextValue;
+  recentOps: QuestOp[];
+}
 
 /**
  * Dashboard usage history section.
  * Shows session timeline, discovered tools progress grid, and usage stats.
- *
- * @param {object} props
- * @param {object} props.g - Gamification state from useGamification hook.
- * @param {Array} props.recentOps - Array of recent session operations.
  */
-export default function HistorySection({ g, recentOps }) {
+export default function HistorySection({ g, recentOps }: HistorySectionProps) {
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Usage History</h2>
@@ -36,7 +39,7 @@ export default function HistorySection({ g, recentOps }) {
                     {op.tab && <span className="tu-dash-history-tab">{op.tab}</span>}
                   </span>
                   <span className="tu-dash-history-time">
-                    {new Date(op.time).toLocaleTimeString()}
+                    {op.time != null ? new Date(op.time).toLocaleTimeString() : ''}
                   </span>
                 </div>
               );

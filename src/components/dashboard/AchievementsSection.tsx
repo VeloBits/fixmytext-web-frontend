@@ -1,13 +1,15 @@
 import { ACHIEVEMENTS } from '../../constants/tools';
+import type { GamificationContextValue } from '../../contexts/AppContext';
+
+interface AchievementsSectionProps {
+  g: GamificationContextValue;
+}
 
 /**
  * Dashboard achievements section.
  * Displays all achievements with unlock progress and status.
- *
- * @param {object} props
- * @param {object} props.g - Gamification state from useGamification hook.
  */
-export default function AchievementsSection({ g }) {
+export default function AchievementsSection({ g }: AchievementsSectionProps) {
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Achievements</h2>

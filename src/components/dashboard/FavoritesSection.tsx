@@ -1,13 +1,15 @@
 import { TOOLS } from '../../constants/tools';
+import type { GamificationContextValue } from '../../contexts/AppContext';
+
+interface FavoritesSectionProps {
+  g: GamificationContextValue;
+}
 
 /**
  * Dashboard favorites section.
  * Lists all favorited tools with option to remove from favorites.
- *
- * @param {object} props
- * @param {object} props.g - Gamification state from useGamification hook.
  */
-export default function FavoritesSection({ g }) {
+export default function FavoritesSection({ g }: FavoritesSectionProps) {
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Favorites</h2>

@@ -1,14 +1,16 @@
 import SpinWheel from '../gamification/SpinWheel';
+import type { SubscriptionContextValue } from '../../contexts/AppContext';
+
+interface RewardsSectionProps {
+  subscription: SubscriptionContextValue;
+  isAuthenticated: boolean;
+}
 
 /**
  * Dashboard rewards section.
  * Shows the weekly spin wheel for earning free rewards.
- *
- * @param {object} props
- * @param {object} props.subscription - Subscription state from useSubscription hook.
- * @param {boolean} props.isAuthenticated - Whether the user is authenticated.
  */
-export default function RewardsSection({ subscription, isAuthenticated }) {
+export default function RewardsSection({ subscription, isAuthenticated }: RewardsSectionProps) {
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Weekly Rewards</h2>

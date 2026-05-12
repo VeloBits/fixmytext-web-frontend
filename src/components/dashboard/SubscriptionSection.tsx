@@ -2,45 +2,54 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useGetPassCatalogQuery } from '../../store/api/passesApi';
 import formatPriceUtil from '../../utils/formatPrice';
+import type { SubscriptionContextValue } from '../../contexts/AppContext';
+import type { AlertLevel } from '../../contexts/AlertContext';
+import type { NavigateFunction } from 'react-router-dom';
 
-const PRO_PRICES = { inr: '₹399', usd: '$5', gbp: '£4', eur: '€4.50' };
+type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
+
+const PRO_PRICES: Record<SupportedCurrency, string> = { inr: '₹399', usd: '$5', gbp: '£4', eur: '€4.50' };
 const POPULAR_PASS_IDS = ['day_single', 'day_triple', 'day_all', 'sprint_all'];
+
+interface SubscriptionSectionProps {
+  subscription: SubscriptionContextValue;
+  showAlert: (msg: string, type?: AlertLevel) => void;
+  navigate: NavigateFunction;
+  isAuthenticated: boolean;
+}
 
 /**
  * Dashboard subscription section.
  * Shows current plan, Pro upgrade card, popular passes, and credit balance.
- *
- * @param {object} props
- * @param {object} props.subscription - Subscription state from useSubscription hook.
- * @param {function} props.showAlert - Callback to display alert notifications.
- * @param {function} props.navigate - React Router navigate function.
- * @param {boolean} props.isAuthenticated - Whether the user is authenticated.
  */
 export default function SubscriptionSection({
   subscription,
   showAlert,
   navigate,
   isAuthenticated,
-}) {
+}: SubscriptionSectionProps) {
   const {
     data: catalog,
     isLoading: catalogLoading,
     error: catalogError,
     refetch,
   } = useGetPassCatalogQuery();
-  const [buyingId, setBuyingId] = useState(null);
+  const [buyingId, setBuyingId] = useState<string | null>(null);
 
   const passes = useMemo(() => catalog?.passes || [], [catalog?.passes]);
   const symbol = passes[0]?.symbol || '$';
-  const currency = passes[0]?.currency || 'usd';
-  const formatPrice = (price) => formatPriceUtil(price, currency, symbol);
+  const currency = (passes[0]?.currency || 'usd') as SupportedCurrency;
+  const formatPrice = (price: number) => formatPriceUtil(price, currency, symbol);
 
   const popularPasses = useMemo(
-    () => POPULAR_PASS_IDS.map((id) => passes.find((p) => p.id === id)).filter(Boolean),
+    () =>
+      POPULAR_PASS_IDS.map((id) => passes.find((p) => p.id === id)).filter(
+        (p): p is NonNullable<typeof p> => p != null
+      ),
     [passes]
   );
 
-  const handleBuy = async (type, id, toolIds = []) => {
+  const handleBuy = async (type: string, id: string, toolIds: string[] = []) => {
     if (!isAuthenticated) {
       showAlert?.('Sign in to purchase', 'warning');
       navigate('/login');

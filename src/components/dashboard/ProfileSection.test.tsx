@@ -1,6 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProfileSection from './ProfileSection';
+import type { GamificationContextValue, User } from '../../contexts/AppContext';
 
 const mockResendVerification = vi.fn();
 
@@ -14,11 +15,16 @@ vi.mock('../../constants/tools', () => ({
   },
 }));
 
-function renderProfile({ user, isAuthenticated = true } = {}) {
-  const g = { persona: 'writer', setPersona: vi.fn() };
+interface RenderProfileOptions {
+  user?: Partial<User> | null;
+  isAuthenticated?: boolean;
+}
+
+function renderProfile({ user, isAuthenticated = true }: RenderProfileOptions = {}) {
+  const g = { persona: 'writer', setPersona: vi.fn() } as unknown as GamificationContextValue;
   return render(
     <ProfileSection
-      user={user}
+      user={(user ?? null) as User | null}
       isAuthenticated={isAuthenticated}
       g={g}
       mode="dark"
@@ -29,15 +35,13 @@ function renderProfile({ user, isAuthenticated = true } = {}) {
 }
 
 describe('ProfileSection — email verification', () => {
-  const showAlert = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('shows "Verified" badge for verified users and omits the verify card', () => {
     renderProfile({
-      user: { email: 'a@b.c', display_name: 'A', is_email_verified: true },
+      user: { email: 'a@b.c', display_name: 'A', is_email_verified: true } as Partial<User>,
     });
     expect(screen.getByText('Verified')).toBeInTheDocument();
     expect(screen.queryByText('Verify your email')).not.toBeInTheDocument();
@@ -49,7 +53,7 @@ describe('ProfileSection — email verification', () => {
         email: 'new@example.com',
         display_name: 'New',
         is_email_verified: false,
-      },
+      } as Partial<User>,
     });
     expect(screen.getByText('Not verified')).toBeInTheDocument();
     expect(screen.getByText('Verify your email')).toBeInTheDocument();
@@ -73,12 +77,12 @@ describe('ProfileSection — email verification', () => {
       email: 'x@example.com',
       display_name: 'X',
       is_email_verified: false,
-    };
+    } as User;
     render(
       <ProfileSection
         user={user}
         isAuthenticated
-        g={{ persona: 'writer', setPersona: vi.fn() }}
+        g={{ persona: 'writer', setPersona: vi.fn() } as unknown as GamificationContextValue}
         mode="dark"
         setMode={vi.fn()}
         showAlert={showAlertLocal}
@@ -115,9 +119,9 @@ describe('ProfileSection — email verification', () => {
           email: 'x@example.com',
           display_name: 'X',
           is_email_verified: false,
-        }}
+        } as User}
         isAuthenticated
-        g={{ persona: 'writer', setPersona: vi.fn() }}
+        g={{ persona: 'writer', setPersona: vi.fn() } as unknown as GamificationContextValue}
         mode="dark"
         setMode={vi.fn()}
         showAlert={showAlertLocal}
