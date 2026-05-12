@@ -1,16 +1,26 @@
 import React from 'react';
 
-export default class ErrorBoundary extends React.Component {
-  constructor(props) {
+export interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: React.ErrorInfo | null;
+}
+
+export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { error: null, errorInfo: null };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
-    return { error };
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+    return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('React Error Boundary:', error, errorInfo);
     this.setState({ errorInfo });
   }
@@ -20,11 +30,11 @@ export default class ErrorBoundary extends React.Component {
   };
 
   handleReset = () => {
-    this.setState({ error: null, errorInfo: null });
+    this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
   render() {
-    if (this.state.error) {
+    if (this.state.hasError) {
       return (
         <div style={styles.page}>
           <div style={styles.card}>
