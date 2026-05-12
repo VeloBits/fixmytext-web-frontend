@@ -59,7 +59,7 @@ describe('CipherDrawer', () => {
 
   it('updates key input', () => {
     renderCipher();
-    const input = screen.getByPlaceholderText('Key, e.g. SECRET');
+    const input = screen.getByPlaceholderText('Key, e.g. SECRET') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'MYKEY' } });
     expect(input.value).toBe('MYKEY');
   });

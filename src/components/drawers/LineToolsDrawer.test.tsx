@@ -52,7 +52,7 @@ describe('FilterLinesDrawer', () => {
     onApply: vi.fn(),
     onPreview: vi.fn(),
     disabled: false,
-    mode: 'keep',
+    mode: 'keep' as const,
     text: 'apple\nbanana\napricot',
   };
 

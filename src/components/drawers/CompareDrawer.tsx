@@ -1,8 +1,8 @@
 import { useState, useRef, type Dispatch, type SetStateAction } from 'react';
 
-type DiffType = 'same' | 'added' | 'removed';
+export type DiffType = 'same' | 'added' | 'removed';
 
-interface DiffEntry {
+export interface DiffEntry {
   type: DiffType;
   line: string;
 }

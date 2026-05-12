@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import type { ToolDefinition } from '../../types/tools';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 
@@ -15,7 +14,7 @@ interface TransformResult {
 }
 
 interface CipherDrawerProps {
-  activeTool?: Pick<ToolDefinition, 'id' | 'label'> | null;
+  activeTool?: { id: string; label?: string } | null;
   text: string;
   onResult: (label: string, result: string) => void;
   showAlert: (message: string, type: AlertType) => void;

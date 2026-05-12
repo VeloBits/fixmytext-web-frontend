@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import CompareOutput, { CompareInput } from './CompareDrawer';
+import type { DiffEntry } from './CompareDrawer';
 
 describe('CompareInput', () => {
   it('renders label and stats', () => {
@@ -55,7 +56,7 @@ describe('CompareInput', () => {
     const { container } = render(
       <CompareInput compareText={'line1\nline2'} setCompareText={vi.fn()} setDiffResult={vi.fn()} />
     );
-    const gutter = container.querySelector('.tu-line-numbers');
+    const gutter = container.querySelector('.tu-line-numbers') as HTMLElement;
     expect(gutter).toBeInTheDocument();
     expect(gutter.children.length).toBeGreaterThan(0);
   });
@@ -68,7 +69,7 @@ describe('CompareInput', () => {
         setDiffResult={vi.fn()}
       />
     );
-    const textarea = container.querySelector('.tu-textarea');
+    const textarea = container.querySelector('.tu-textarea') as HTMLElement;
     const gutter = container.querySelector('.tu-line-numbers');
     fireEvent.scroll(textarea, { target: { scrollTop: 50 } });
     expect(gutter).toBeInTheDocument();
@@ -100,7 +101,7 @@ describe('CompareOutput', () => {
   });
 
   it('renders inline diff results', () => {
-    const diffResult = [
+    const diffResult: DiffEntry[] = [
       { type: 'same', line: 'Hello' },
       { type: 'removed', line: 'world' },
       { type: 'added', line: 'earth' },
@@ -111,7 +112,7 @@ describe('CompareOutput', () => {
   });
 
   it('shows added/removed/same counts', () => {
-    const diffResult = [
+    const diffResult: DiffEntry[] = [
       { type: 'same', line: 'a' },
       { type: 'removed', line: 'b' },
       { type: 'added', line: 'c' },
@@ -121,7 +122,7 @@ describe('CompareOutput', () => {
   });
 
   it('switches to side-by-side view', () => {
-    const diffResult = [
+    const diffResult: DiffEntry[] = [
       { type: 'same', line: 'Hello' },
       { type: 'removed', line: 'old' },
       { type: 'added', line: 'new' },
@@ -133,7 +134,7 @@ describe('CompareOutput', () => {
   });
 
   it('can switch back to inline view', () => {
-    const diffResult = [{ type: 'same', line: 'Hello' }];
+    const diffResult: DiffEntry[] = [{ type: 'same', line: 'Hello' }];
     render(<CompareOutput diffResult={diffResult} compareText="test" />);
     fireEvent.click(screen.getByText('Side by Side'));
     fireEvent.click(screen.getByText('Inline'));

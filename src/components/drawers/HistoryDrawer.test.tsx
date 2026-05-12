@@ -1,6 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryDrawer from './HistoryDrawer';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyMock = any;
 
 // Mock redux
 vi.mock('react-redux', () => ({
@@ -74,7 +76,7 @@ describe('HistoryDrawer', () => {
 
   it('shows session/saved tabs when authenticated', async () => {
     const { useSelector } = await import('react-redux');
-    useSelector.mockReturnValue({ accessToken: 'token123' });
+    vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     render(<HistoryDrawer {...baseProps} />);
     expect(screen.getByText('Session')).toBeInTheDocument();
     expect(screen.getByText('All History')).toBeInTheDocument();
@@ -82,7 +84,7 @@ describe('HistoryDrawer', () => {
 
   it('switches to All History view when authenticated', async () => {
     const { useSelector } = await import('react-redux');
-    useSelector.mockReturnValue({ accessToken: 'token123' });
+    vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     render(<HistoryDrawer {...baseProps} />);
     fireEvent.click(screen.getByText('All History'));
     expect(screen.getByText(/0 total operations/i)).toBeInTheDocument();
@@ -90,7 +92,7 @@ describe('HistoryDrawer', () => {
 
   it('switches back to Session view when Session button clicked', async () => {
     const { useSelector } = await import('react-redux');
-    useSelector.mockReturnValue({ accessToken: 'token123' });
+    vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     render(<HistoryDrawer {...baseProps} />);
     fireEvent.click(screen.getByText('All History'));
     fireEvent.click(screen.getByText('Session'));
@@ -108,8 +110,8 @@ describe('HistoryDrawer', () => {
   it('shows saved history items and calls setText/showAlert on restore', async () => {
     const { useSelector } = await import('react-redux');
     const { useGetHistoryQuery } = await import('../../store/api/historyApi');
-    useSelector.mockReturnValue({ accessToken: 'token123' });
-    useGetHistoryQuery.mockReturnValue({
+    vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    (vi.mocked(useGetHistoryQuery) as AnyMock).mockReturnValue({
       data: {
         total: 1,
         items: [
@@ -143,9 +145,9 @@ describe('HistoryDrawer', () => {
       '../../store/api/historyApi'
     );
     const mockDelete = vi.fn().mockReturnValue({ unwrap: () => Promise.resolve() });
-    useDeleteHistoryEntryMutation.mockReturnValue([mockDelete, {}]);
-    useSelector.mockReturnValue({ accessToken: 'token123' });
-    useGetHistoryQuery.mockReturnValue({
+    (vi.mocked(useDeleteHistoryEntryMutation) as AnyMock).mockReturnValue([mockDelete, {}]);
+    vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    (vi.mocked(useGetHistoryQuery) as AnyMock).mockReturnValue({
       data: {
         total: 1,
         items: [
@@ -176,9 +178,9 @@ describe('HistoryDrawer', () => {
       '../../store/api/historyApi'
     );
     const mockClear = vi.fn().mockReturnValue({ unwrap: () => Promise.resolve() });
-    useClearHistoryMutation.mockReturnValue([mockClear, {}]);
-    useSelector.mockReturnValue({ accessToken: 'token123' });
-    useGetHistoryQuery.mockReturnValue({
+    (vi.mocked(useClearHistoryMutation) as AnyMock).mockReturnValue([mockClear, {}]);
+    vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    (vi.mocked(useGetHistoryQuery) as AnyMock).mockReturnValue({
       data: {
         total: 1,
         items: [

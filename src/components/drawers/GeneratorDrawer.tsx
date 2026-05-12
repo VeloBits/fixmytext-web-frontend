@@ -63,7 +63,7 @@ export function RandomTextDrawer({
       <div className="tu-fr-row">
         <div className="tu-fr-field tu-fr-field--segmented">
           <span className="tu-fr-seg-label">Type</span>
-          {['words', 'sentences', 'paragraphs'].map((type) => (
+          {(['words', 'sentences', 'paragraphs'] as const).map((type) => (
             <button
               key={type}
               className={`tu-fr-seg${textGenType === type ? ' tu-fr-seg--on' : ''}`}

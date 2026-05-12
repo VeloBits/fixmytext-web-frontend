@@ -123,7 +123,7 @@ export function LoremIpsumDrawer({ onResult, showAlert }: SharedDrawerProps) {
   const handleGenerate = () => {
     let result;
     if (type === 'words') {
-      const words = [];
+      const words: string[] = [];
       for (let i = 0; i < count; i++) words.push(WORDS[i % WORDS.length]);
       words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
       result = words.join(' ') + '.';
@@ -146,7 +146,7 @@ export function LoremIpsumDrawer({ onResult, showAlert }: SharedDrawerProps) {
       <div className="tu-fr-row">
         <div className="tu-fr-field tu-fr-field--segmented">
           <span className="tu-fr-seg-label">Type</span>
-          {['words', 'sentences', 'paragraphs'].map((t) => (
+          {(['words', 'sentences', 'paragraphs'] as const).map((t) => (
             <button
               key={t}
               className={`tu-fr-seg${type === t ? ' tu-fr-seg--on' : ''}`}
@@ -245,7 +245,7 @@ export function SampleJsonDrawer({ onResult, showAlert }: SharedDrawerProps) {
       <div className="tu-fr-row">
         <div className="tu-fr-field tu-fr-field--segmented">
           <span className="tu-fr-seg-label">Template</span>
-          {Object.keys(templates).map((t) => (
+          {(Object.keys(templates) as SampleTemplate[]).map((t) => (
             <button
               key={t}
               className={`tu-fr-seg${template === t ? ' tu-fr-seg--on' : ''}`}

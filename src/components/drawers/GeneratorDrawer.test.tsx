@@ -4,7 +4,7 @@ import { RandomTextDrawer, PasswordDrawer } from './GeneratorDrawer';
 
 describe('RandomTextDrawer', () => {
   const props = {
-    textGenType: 'words',
+    textGenType: 'words' as const,
     setTextGenType: vi.fn(),
     textGenCount: 10,
     setTextGenCount: vi.fn(),

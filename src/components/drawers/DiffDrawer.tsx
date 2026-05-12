@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import type { ToolDefinition } from '../../types/tools';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 
 interface DiffDrawerProps {
-  activeTool?: Pick<ToolDefinition, 'id' | 'label'> | null;
+  activeTool?: { id: string; label?: string } | null;
   text: string;
   onResult: (label: string, result: string) => void;
   showAlert: (message: string, type: AlertType) => void;
@@ -25,7 +24,7 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }: Di
         // Character-level diff
         const maxLen = Math.max(text.length, textB.length);
         let diff = 0;
-        const lines = [];
+        const lines: string[] = [];
         for (let i = 0; i < maxLen; i++) {
           const a = text[i] || '',
             b = textB[i] || '';
@@ -46,7 +45,7 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }: Di
         // Word-level diff
         const wordsA = text.split(/\s+/),
           wordsB = textB.split(/\s+/);
-        const lines = [];
+        const lines: string[] = [];
         const maxLen = Math.max(wordsA.length, wordsB.length);
         for (let i = 0; i < maxLen; i++) {
           const a = wordsA[i] || '',
@@ -92,7 +91,7 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }: Di
               if (!(key in (a || {}))) diffs.push(`+ ${p}: ${JSON.stringify(b[key])}`);
               else if (!(key in (b || {}))) diffs.push(`- ${p}: ${JSON.stringify(a[key])}`);
               else if (typeof a[key] === 'object' && typeof b[key] === 'object')
-                compare(a[key], b[key], p);
+                compare(a[key] as Record<string, unknown>, b[key] as Record<string, unknown>, p);
               else if (JSON.stringify(a[key]) !== JSON.stringify(b[key]))
                 diffs.push(`~ ${p}: ${JSON.stringify(a[key])} → ${JSON.stringify(b[key])}`);
             }
