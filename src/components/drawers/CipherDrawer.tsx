@@ -1,6 +1,28 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import type { ToolDefinition } from '../../types/tools';
 
-export default function CipherDrawer({ activeTool, text, onResult, showAlert, transformText }) {
+type AlertType = 'warning' | 'danger' | 'success' | 'info';
+
+interface TransformArg {
+  endpoint: string;
+  text: string;
+  key?: string;
+  mapping?: string;
+}
+
+interface TransformResult {
+  result: string;
+}
+
+interface CipherDrawerProps {
+  activeTool?: Pick<ToolDefinition, 'id' | 'label'> | null;
+  text: string;
+  onResult: (label: string, result: string) => void;
+  showAlert: (message: string, type: AlertType) => void;
+  transformText: (arg: TransformArg) => { unwrap: () => Promise<TransformResult> };
+}
+
+export default function CipherDrawer({ activeTool, text, onResult, showAlert, transformText }: CipherDrawerProps) {
   const [key, setKey] = useState('');
 
   const toolId = activeTool?.id || '';
@@ -86,7 +108,8 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
       onResult(config.label, data.result);
       showAlert(`${config.label}`, 'success');
     } catch (err) {
-      showAlert(err.data?.detail || 'Cipher operation failed', 'danger');
+      const apiErr = err as { data?: { detail?: string } };
+      showAlert(apiErr.data?.detail || 'Cipher operation failed', 'danger');
     }
   };
 
@@ -101,7 +124,7 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
   // alphabet mapping rather than a secret, so it stays visible.
   const isPassword = toolId !== 'substitution_cipher';
 
-  const onKeyDown = (e) => {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') handleApply();
   };
 

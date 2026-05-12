@@ -1,3 +1,27 @@
+import type { Dispatch, SetStateAction } from 'react';
+
+interface RegexMatch {
+  match: string;
+  index: number;
+  groups: string[];
+}
+
+interface RegexResult {
+  matches: RegexMatch[];
+  total: number;
+}
+
+interface RegexDrawerProps {
+  regexPattern: string;
+  setRegexPattern: Dispatch<SetStateAction<string>>;
+  regexFlags: string;
+  setRegexFlags: Dispatch<SetStateAction<string>>;
+  regexResult: RegexResult | null;
+  setRegexResult: Dispatch<SetStateAction<RegexResult | null>>;
+  disabled: boolean;
+  handleRegexTest: () => void;
+}
+
 export default function RegexDrawer({
   regexPattern,
   setRegexPattern,
@@ -7,7 +31,7 @@ export default function RegexDrawer({
   setRegexResult,
   disabled,
   handleRegexTest,
-}) {
+}: RegexDrawerProps) {
   return (
     <div className="tu-find-inputs">
       <input
