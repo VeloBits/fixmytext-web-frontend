@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import type { AlertType, AlertItem } from '../../hooks/useAlert';
 
 import Alert from './Alert';
 
@@ -44,7 +45,7 @@ describe('Alert', () => {
   });
 
   it('renders info icon for unknown type', () => {
-    const alerts = [{ id: 1, msg: 'Unknown', type: 'unknown_type' as unknown as import('../../hooks/useAlert').AlertType }];
+    const alerts = [{ id: 1, msg: 'Unknown', type: 'unknown_type' as unknown as AlertType }];
     render(<Alert alerts={alerts} dismissAlert={vi.fn()} />);
     expect(screen.getByText('Unknown')).toBeInTheDocument();
   });
@@ -68,7 +69,7 @@ describe('Alert', () => {
   });
 
   it('uses msg as key when id is not provided', () => {
-    const alerts = [{ msg: 'No id alert', type: 'info' as const } as import('../../hooks/useAlert').AlertItem];
+    const alerts = [{ msg: 'No id alert', type: 'info' as const } as AlertItem];
     render(<Alert alerts={alerts} dismissAlert={vi.fn()} />);
     expect(screen.getByText('No id alert')).toBeInTheDocument();
   });

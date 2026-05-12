@@ -87,13 +87,19 @@ vi.mock('../constants/endpoints', () => ({
 import { useSelector } from 'react-redux';
 
 // vi.mock replaces useSelector with a Mock instance — cast so TS knows
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockUseSelector = useSelector as unknown as any;
 
 describe('useAiTools', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setText: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setMarkdownMode: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setPreviewMode: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       showAlert: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pushHistory: any;
 
   beforeEach(() => {

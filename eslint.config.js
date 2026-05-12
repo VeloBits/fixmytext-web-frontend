@@ -69,7 +69,8 @@ export default [
     files: ['**/*.{ts,tsx}'],
     extends: [...tseslint.configs.recommended],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
   }),

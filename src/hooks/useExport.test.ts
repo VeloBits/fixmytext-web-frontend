@@ -2,9 +2,13 @@ import { renderHook, act } from '@testing-library/react';
 import useExport from './useExport';
 
 describe('useExport', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setLoading: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       showAlert: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockCreateObjectURL: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockRevokeObjectURL: any;
 
   beforeEach(() => {

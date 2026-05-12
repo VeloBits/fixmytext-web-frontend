@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { USE_CASE_TABS, TOOL_GROUPS } from '../../constants/tools';
 import ToolIcon from './ToolIcon';
-import type { ToolDefinition } from '../../types/tools';
+import type { ToolDefinition, ToolTab } from '../../types/tools';
 
 interface TooltipState {
   text: string;
@@ -256,7 +256,7 @@ export default memo(function ToolPanel({
     const counts: Record<string, number> = { all: tools.length };
     for (const tab of USE_CASE_TABS) {
       if (!counts[tab.id]) {
-        counts[tab.id] = tools.filter((t) => t.tabs?.includes(tab.id as import('../../types/tools').ToolTab)).length;
+        counts[tab.id] = tools.filter((t) => t.tabs?.includes(tab.id as ToolTab)).length;
       }
     }
     return counts;
@@ -265,7 +265,7 @@ export default memo(function ToolPanel({
   // Filter tools by active tab
   const filteredTools = useMemo(() => {
     if (activeTab === 'all') return [...tools].sort((a, b) => a.label.localeCompare(b.label));
-    return tools.filter((t) => t.tabs?.includes(activeTab as import('../../types/tools').ToolTab));
+    return tools.filter((t) => t.tabs?.includes(activeTab as ToolTab));
   }, [tools, activeTab]);
 
   // Group tools — each group contains tools sorted alphabetically

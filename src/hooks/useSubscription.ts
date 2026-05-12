@@ -24,8 +24,9 @@ const ALWAYS_FREE_IDS = new Set([
   'save_json',
 ]);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 interface UseSubscriptionOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- variadic showAlert accepts any alert params
   showAlert?: (...args: any[]) => unknown;
 }
 

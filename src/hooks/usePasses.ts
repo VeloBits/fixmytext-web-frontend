@@ -19,8 +19,9 @@ type ActiveCredit = components['schemas']['ActiveCredit'];
 type SpinHistoryItem = components['schemas']['SpinHistoryItem'];
 type SpinResult = components['schemas']['SpinResult'];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 interface UsePassesOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- variadic showAlert accepts any alert params
   showAlert?: (...args: any[]) => unknown;
 }
 

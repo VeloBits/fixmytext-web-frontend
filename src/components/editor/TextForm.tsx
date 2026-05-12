@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense, type ReactNode, type Ref, type RefObject } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransformTextMutation } from '../../store/api/textApi';
 import { useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ import {
   USE_CASE_TABS,
   ACHIEVEMENTS,
 } from '../../constants/tools';
-import type { ToolDefinition } from '../../types/tools';
+import type { ToolDefinition, ToolTab } from '../../types/tools';
 import { ENDPOINTS } from '../../constants/endpoints';
 import { ROUTES } from '../../constants';
 
@@ -25,7 +25,7 @@ import useFindReplace from '../../hooks/useFindReplace';
 import useTextCompare from '../../hooks/useTextCompare';
 import useGenerators from '../../hooks/useGenerators';
 import useFormatter from '../../hooks/useFormatter';
-import useAiTools from '../../hooks/useAiTools';
+import useAiTools, { type AiResult } from '../../hooks/useAiTools';
 import useSpeech from '../../hooks/useSpeech';
 import useExport from '../../hooks/useExport';
 import useRegexTester from '../../hooks/useRegexTester';
@@ -343,7 +343,7 @@ export default function TextForm(props: TextFormProps) {
     setSavedTabs((prev) => (prev[tabId] ? { ...prev, [tabId]: false } : prev));
   }, []);
   const sharedTextRef = useRef<string | null>(null);
-  const pendingAutoRun = useRef<import('../../types/tools').ToolDefinition | null>(null);
+  const pendingAutoRun = useRef<ToolDefinition | null>(null);
   const selectValueRef = useRef<string | null>(null); // holds the freshly-clicked value for select tools
 
   const showAlert = props.showAlert;
@@ -492,7 +492,7 @@ export default function TextForm(props: TextFormProps) {
     max: 80,
     storageKey: 'fmx_split_pct',
     unit: 'percent',
-    containerRef: splitRef as unknown as import('react').RefObject<HTMLElement>,
+    containerRef: splitRef as unknown as RefObject<HTMLElement>,
   });
   const bottomResize = useResize('vertical', 200, {
     min: 80,
@@ -1498,7 +1498,7 @@ export default function TextForm(props: TextFormProps) {
                 <span className="tu-sidebar-header-count">
                   {activeTab === 'all'
                     ? TOOLS.length
-                    : TOOLS.filter((t) => t.tabs?.includes(activeTab as import('../../types/tools').ToolTab)).length}
+                    : TOOLS.filter((t) => t.tabs?.includes(activeTab as ToolTab)).length}
                 </span>
               )}
             </span>
@@ -2611,7 +2611,7 @@ export default function TextForm(props: TextFormProps) {
           {activeWorkspaceId && (
             <>
               <div
-                ref={splitRef as unknown as import('react').Ref<HTMLDivElement>}
+                ref={splitRef as unknown as Ref<HTMLDivElement>}
                 className="tu-editor-split"
                 style={{
                   gridTemplateColumns: `${splitResize.size}fr 4px ${100 - splitResize.size}fr`,
@@ -3097,7 +3097,7 @@ export default function TextForm(props: TextFormProps) {
                             );
                           }
                           return (
-                            <div className="tu-line-numbers" ref={gutterRef as unknown as import('react').Ref<HTMLDivElement>}>
+                            <div className="tu-line-numbers" ref={gutterRef as unknown as Ref<HTMLDivElement>}>
                               {(text || '\n').split('\n').map((_, i) => (
                                 <span key={i}>{i + 1}</span>
                               ))}
@@ -3219,8 +3219,8 @@ export default function TextForm(props: TextFormProps) {
                       'samplejson',
                     ].includes(ws?.panelId ?? '');
                     // Each tab's result is stored independently by tab ID
-                    const tabResult = (activeWorkspaceId ? toolResults[activeWorkspaceId] : null) as import('../../hooks/useAiTools').AiResult | null;
-                    const displayResult = (tabResult || (isNoInputDrawer ? ai.aiResult : text ? ai.aiResult : null)) as import('../../hooks/useAiTools').AiResult | null;
+                    const tabResult = (activeWorkspaceId ? toolResults[activeWorkspaceId] : null) as AiResult | null;
+                    const displayResult = (tabResult || (isNoInputDrawer ? ai.aiResult : text ? ai.aiResult : null)) as AiResult | null;
                     return (
                       <OutputPanel
                         aiResult={displayResult || null}
@@ -3268,7 +3268,7 @@ export default function TextForm(props: TextFormProps) {
                             ? ws.tool
                             : ws?.type === 'drawer'
                             ? TOOLS.find((t) => t.panelId === ws.panelId) || null
-                            : null) as import('../../types/tools').ToolDefinition | null
+                            : null) as ToolDefinition | null
                         }
                         loading={loading}
                         exportTools={exportTools}

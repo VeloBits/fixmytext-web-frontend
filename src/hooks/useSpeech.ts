@@ -53,6 +53,7 @@ export default function useSpeech(
     recognition.onresult = (e: any) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const transcript = Array.from(e.results as any[])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- SpeechRecognitionResult lacks stable DOM typings
         .map((r: any) => r[0].transcript)
         .join(' ');
       setText((prev) => (prev ? prev + ' ' + transcript : transcript));

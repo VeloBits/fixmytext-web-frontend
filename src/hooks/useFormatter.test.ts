@@ -13,8 +13,11 @@ vi.mock('prettier/parser-html', () => ({ default: {} }));
 vi.mock('prettier/parser-postcss', () => ({ default: {} }));
 
 describe('useFormatter', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setLoading: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       showAlert: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onResult: any;
 
   beforeEach(() => {
@@ -85,6 +88,7 @@ describe('useFormatter', () => {
   it('handles format error', async () => {
     const prettier = await import('prettier/standalone');
     // vi.mock replaces format with a mock — cast for access to mock methods
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockFormat = prettier.default.format as unknown as any;
     mockFormat.mockImplementationOnce(() => {
       throw new Error('Parse error\ndetails');
@@ -113,6 +117,7 @@ describe('useFormatter', () => {
     });
     // Prettier mock receives sorted code
     const prettier = await import('prettier/standalone');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockFmt = prettier.default.format as unknown as any;
     const callArg = mockFmt.mock.calls[mockFmt.mock.calls.length - 1]![0]!;
     expect(callArg.indexOf("import a from 'a'")).toBeLessThan(callArg.indexOf("import b from 'b'"));
