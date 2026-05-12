@@ -1,6 +1,6 @@
-import { TOOLS } from '../../constants/tools';
-import type { GamificationContextValue } from '../../contexts/AppContext';
-import type { QuestOp } from '../../types/tools';
+import { TOOLS } from '@/constants/tools';
+import type { GamificationContextValue } from '@/contexts/AppContext';
+import type { QuestOp } from '@/types/tools';
 
 interface HistorySectionProps {
   g: GamificationContextValue;

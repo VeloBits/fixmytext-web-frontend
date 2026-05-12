@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useResetPasswordMutation } from '../store/api/authApi';
-import { ROUTES } from '../constants';
-import type { AlertLevel } from '../contexts/AlertContext';
-import type { RootState } from '../store/store';
+import { useResetPasswordMutation } from '@/store/api/authApi';
+import { ROUTES } from '@/constants';
+import type { AlertLevel } from '@/contexts/AlertContext';
+import type { RootState } from '@/store/store';
 
 interface ResetPasswordPageProps {
   showAlert: (message: string, type: AlertLevel) => void;

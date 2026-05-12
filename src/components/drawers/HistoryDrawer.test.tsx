@@ -11,7 +11,7 @@ vi.mock('react-redux', () => ({
 }));
 
 // Mock RTK Query hooks
-vi.mock('../../store/api/historyApi', () => ({
+vi.mock('@/store/api/historyApi', () => ({
   useGetHistoryQuery: vi.fn(() => ({ data: null, isFetching: false })),
   useDeleteHistoryEntryMutation: vi.fn(() => [vi.fn(), {}]),
   useClearHistoryMutation: vi.fn(() => [vi.fn(), {}]),

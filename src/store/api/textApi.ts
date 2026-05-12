@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import type { components } from '../../types/openapi';
+import type { components } from '@/types/openapi';
 import { createBaseQueryWithReauth } from './baseQuery';
-import { getVisitorId } from '../../hooks/useFingerprint';
+import { getVisitorId } from '@/hooks/useFingerprint';
 
 type TextResponse = components['schemas']['TextResponse'];
 

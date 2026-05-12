@@ -1,4 +1,4 @@
-vi.mock('../../hooks/useFingerprint', () => ({
+vi.mock('@/hooks/useFingerprint', () => ({
   getVisitorId: vi.fn(() => 'test-visitor-id'),
 }));
 

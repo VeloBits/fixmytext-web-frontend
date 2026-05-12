@@ -19,7 +19,7 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
-vi.mock('../../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
 }));
 

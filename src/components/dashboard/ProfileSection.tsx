@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { PERSONAS } from '../../constants/tools';
-import { useResendVerificationMutation } from '../../store/api/authApi';
-import type { GamificationContextValue, User } from '../../contexts/AppContext';
-import type { AlertLevel } from '../../contexts/AlertContext';
-import type { Persona } from '../../types/tools';
+import { PERSONAS } from '@/constants/tools';
+import { useResendVerificationMutation } from '@/store/api/authApi';
+import type { GamificationContextValue, User } from '@/contexts/AppContext';
+import type { AlertLevel } from '@/contexts/AlertContext';
+import type { Persona } from '@/types/tools';
 
 
 interface ProfileSectionProps {

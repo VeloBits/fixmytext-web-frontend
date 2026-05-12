@@ -5,13 +5,13 @@ const mockRefresh = vi.fn();
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
-vi.mock('../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useRefreshMutation: () => [mockRefresh],
   useGetMeQuery: vi.fn(),
 }));
 
 import { useSelector } from 'react-redux';
-import { useGetMeQuery } from '../store/api/authApi';
+import { useGetMeQuery } from '@/store/api/authApi';
 
 // vi.mock replaces these with Mock instances — cast so TS knows
 const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;

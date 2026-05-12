@@ -1,15 +1,15 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProfileSection from './ProfileSection';
-import type { GamificationContextValue, User } from '../../contexts/AppContext';
+import type { GamificationContextValue, User } from '@/contexts/AppContext';
 
 const mockResendVerification = vi.fn();
 
-vi.mock('../../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
 }));
 
-vi.mock('../../constants/tools', () => ({
+vi.mock('@/constants/tools', () => ({
   PERSONAS: {
     writer: { label: 'Writer', icon: 'W' },
   },

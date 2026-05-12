@@ -9,7 +9,7 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn((fn) => fn({ auth: { accessToken: null } })),
 }));
 
-vi.mock('../store/api/historyApi', () => ({
+vi.mock('@/store/api/historyApi', () => ({
   useRecordOperationMutation: () => [mockRecordOperation],
   useClearHistoryMutation: () => [mockClearHistoryApi],
 }));

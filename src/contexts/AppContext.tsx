@@ -1,17 +1,17 @@
 import { createContext, useContext, useMemo } from 'react';
 import type React from 'react';
-import { useAuth } from '../hooks/useAuth';
-import useGamification from '../hooks/useGamification';
-import useSubscription from '../hooks/useSubscription';
+import { useAuth } from '@/hooks/useAuth';
+import useGamification from '@/hooks/useGamification';
+import useSubscription from '@/hooks/useSubscription';
 import { useAlertContext } from './AlertContext';
-import type { components } from '../types';
+import type { components } from '@/types';
 import type {
   Persona,
   Achievement,
   LevelDefinition,
   QuestOp,
   ToolDefinition,
-} from '../types/tools';
+} from '@/types/tools';
 
 // ── User ─────────────────────────────────────────────────────────────────────
 

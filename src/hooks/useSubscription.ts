@@ -6,11 +6,11 @@ import {
   useCreateProCheckoutMutation,
   useVerifyProPaymentMutation,
   useCancelSubscriptionMutation,
-} from '../store/api/subscriptionApi';
+} from '@/store/api/subscriptionApi';
 import usePasses from './usePasses';
-import { openRazorpayCheckout, executeCheckoutFlow } from '../utils/razorpay';
-import type { RootState } from '../store/store';
-import type { ToolDefinition } from '../types/tools';
+import { openRazorpayCheckout, executeCheckoutFlow } from '@/utils/razorpay';
+import type { RootState } from '@/store/store';
+import type { ToolDefinition } from '@/types/tools';
 
 const ALWAYS_FREE_IDS = new Set([
   'find_replace',

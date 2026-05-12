@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useForgotPasswordMutation } from '../store/api/authApi';
-import { ROUTES } from '../constants';
-import type { AlertLevel } from '../contexts/AlertContext';
-import type { RootState } from '../store/store';
+import { useForgotPasswordMutation } from '@/store/api/authApi';
+import { ROUTES } from '@/constants';
+import type { AlertLevel } from '@/contexts/AlertContext';
+import type { RootState } from '@/store/store';
 
 interface ForgotPasswordPageProps {
   showAlert: (message: string, type: AlertLevel) => void;

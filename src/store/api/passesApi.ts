@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import type { components } from '../../types/openapi';
+import type { components } from '@/types/openapi';
 import { baseQueryWithReauth } from './baseQuery';
-import { BROWSER_REGION } from '../../utils/region';
+import { BROWSER_REGION } from '@/utils/region';
 
 type CatalogResponse = components['schemas']['CatalogResponse'];
 type ActiveResponse = components['schemas']['ActiveResponse'];

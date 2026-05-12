@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import useToolSearch from './useToolSearch';
 
 // Mock TOOLS and SEARCH_INTENTS
-vi.mock('../constants/tools', () => ({
+vi.mock('@/constants/tools', () => ({
   TOOLS: [
     {
       id: 'upper',

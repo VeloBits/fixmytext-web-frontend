@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { GamificationContextValue, SubscriptionContextValue, User } from '../contexts/AppContext';
+import type { GamificationContextValue, SubscriptionContextValue, User } from '@/contexts/AppContext';
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -46,23 +46,23 @@ vi.mock('react-redux', () => ({
 }));
 
 // ── API mocks ──
-vi.mock('../store/api/passesApi', () => ({
+vi.mock('@/store/api/passesApi', () => ({
   useGetPassCatalogQuery: () => ({ data: null, isLoading: false, error: null }),
 }));
-vi.mock('../store/api/userDataApi', () => ({
+vi.mock('@/store/api/userDataApi', () => ({
   useGetToolStatsQuery: () => ({ data: null, isLoading: false }),
 }));
-vi.mock('../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useResendVerificationMutation: () => [vi.fn(), { isLoading: false }],
 }));
 
 // ── SpinWheel mock ──
-vi.mock('../components/gamification/SpinWheel', () => ({
+vi.mock('@/components/gamification/SpinWheel', () => ({
   default: () => React.createElement('div', { 'data-testid': 'spin-wheel' }, 'SpinWheel'),
 }));
 
 // ── formatPrice mock ──
-vi.mock('../utils/formatPrice', () => ({
+vi.mock('@/utils/formatPrice', () => ({
   default: (price: number) => `$${price}`,
 }));
 

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { USE_CASE_TABS, TOOLS } from '../constants/tools';
+import { USE_CASE_TABS, TOOLS } from '@/constants/tools';
 
 // Extend CSSProperties to allow CSS custom properties
 type CSSVars = CSSProperties & Record<`--${string}`, string>;

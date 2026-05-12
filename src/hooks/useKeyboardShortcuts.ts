@@ -1,9 +1,9 @@
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { TOOLS } from '../constants/tools';
-import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '../store/api/userDataApi';
-import type { RootState } from '../store/store';
-import type { ToolDefinition } from '../types/tools';
+import { TOOLS } from '@/constants/tools';
+import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@/store/api/userDataApi';
+import type { RootState } from '@/store/store';
+import type { ToolDefinition } from '@/types/tools';
 
 /* ═══════════════════════════════════════════════════════
    useKeyboardShortcuts — Customizable power-user hotkeys

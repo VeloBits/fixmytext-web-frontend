@@ -20,12 +20,12 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
-vi.mock('../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useVerifyEmailMutation: () => [mockVerifyEmail, { isLoading: false }],
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
 }));
 
-vi.mock('../constants', () => ({
+vi.mock('@/constants', () => ({
   ROUTES: { HOME: '/', LOGIN: '/login', VERIFY_EMAIL: '/verify-email' },
 }));
 

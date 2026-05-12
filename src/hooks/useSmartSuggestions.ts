@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { SMART_SUGGESTION_RULES, TOOLS } from '../constants/tools';
-import type { ToolDefinition } from '../types/tools';
+import { SMART_SUGGESTION_RULES, TOOLS } from '@/constants/tools';
+import type { ToolDefinition } from '@/types/tools';
 
 interface UseSmartSuggestionsReturn {
   suggestions: ToolDefinition[];

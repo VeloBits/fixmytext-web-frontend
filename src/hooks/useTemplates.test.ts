@@ -8,7 +8,7 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
-vi.mock('../store/api/userDataApi', () => ({
+vi.mock('@/store/api/userDataApi', () => ({
   useGetTemplatesQuery: vi.fn(() => ({ data: undefined })),
   useCreateTemplateMutation: () => [mockApiCreate],
   useUpdateTemplateMutation: () => [mockApiUpdate],
@@ -16,7 +16,7 @@ vi.mock('../store/api/userDataApi', () => ({
 }));
 
 import { useSelector } from 'react-redux';
-import { useGetTemplatesQuery } from '../store/api/userDataApi';
+import { useGetTemplatesQuery } from '@/store/api/userDataApi';
 import useTemplates from './useTemplates';
 
 const mockUseSelector = vi.mocked(useSelector);

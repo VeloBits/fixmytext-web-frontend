@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetPassCatalogQuery } from '../../store/api/passesApi';
-import formatPriceUtil from '../../utils/formatPrice';
-import type { SubscriptionContextValue, ToolUsage } from '../../contexts/AppContext';
-import type { ToolDefinition } from '../../types/tools';
+import { useGetPassCatalogQuery } from '@/store/api/passesApi';
+import formatPriceUtil from '@/utils/formatPrice';
+import type { SubscriptionContextValue, ToolUsage } from '@/contexts/AppContext';
+import type { ToolDefinition } from '@/types/tools';
 
 type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
 

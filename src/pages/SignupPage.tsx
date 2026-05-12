@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRegisterMutation } from '../store/api/authApi';
+import { useRegisterMutation } from '@/store/api/authApi';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { ROUTES } from '../constants';
-import type { AlertLevel } from '../contexts/AlertContext';
-import type { RootState } from '../store/store';
+import { ROUTES } from '@/constants';
+import type { AlertLevel } from '@/contexts/AlertContext';
+import type { RootState } from '@/store/store';
 
 interface SignupPageProps {
   showAlert: (message: string, type: AlertLevel) => void;

@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { components } from '../../types/openapi';
-import { authApi } from '../api/authApi';
+import type { components } from '@/types/openapi';
+import { authApi } from '@/store/api/authApi';
 
 export type User = components['schemas']['UserResponse'];
 

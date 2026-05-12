@@ -1,9 +1,9 @@
-import TextForm from '../components/editor/TextForm';
+import TextForm from '@/components/editor/TextForm';
 import type {
   GamificationContextValue,
   SubscriptionContextValue,
   User,
-} from '../contexts/AppContext';
+} from '@/contexts/AppContext';
 
 interface HomeProps {
   mode: string;

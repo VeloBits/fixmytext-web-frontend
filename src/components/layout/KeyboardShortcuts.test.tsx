@@ -13,7 +13,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
-vi.mock('../../hooks/useKeyboardShortcuts', () => ({
+vi.mock('@/hooks/useKeyboardShortcuts', () => ({
   formatShortcut: (sc: { ctrl?: boolean; shift?: boolean; alt?: boolean; keys?: string; key?: string }) => {
     const parts: string[] = [];
     if (sc.ctrl) parts.push('Ctrl');

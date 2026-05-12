@@ -9,7 +9,7 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
-vi.mock('../store/api/userDataApi', () => ({
+vi.mock('@/store/api/userDataApi', () => ({
   useGetGamificationQuery: vi.fn(() => ({ data: undefined })),
   useUpdateGamificationMutation: () => [mockSyncToDb],
   useUpdatePreferencesMutation: () => [mockSyncPrefs],

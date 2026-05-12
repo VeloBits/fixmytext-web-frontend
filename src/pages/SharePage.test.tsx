@@ -23,15 +23,15 @@ let mockQueryResult: { data: typeof mockShareData | null; isLoading: boolean; er
   error: null,
 };
 
-vi.mock('../store/api/shareApi', () => ({
+vi.mock('@/store/api/shareApi', () => ({
   useGetShareQuery: () => mockQueryResult,
 }));
 
-vi.mock('../constants/tools', () => ({
+vi.mock('@/constants/tools', () => ({
   TOOLS: [{ id: 'uppercase', label: 'Uppercase', icon: 'AA', color: 'pink' }],
 }));
 
-vi.mock('../components/editor/ToolIcon', () => ({
+vi.mock('@/components/editor/ToolIcon', () => ({
   default: ({ icon, toolId }: { icon?: string; toolId?: string }) => <span data-testid="tool-icon">{toolId || icon}</span>,
 }));
 

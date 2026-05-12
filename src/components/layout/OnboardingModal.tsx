@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { PERSONAS } from '../../constants/tools';
-import type { Persona } from '../../types/tools';
+import { PERSONAS } from '@/constants/tools';
+import type { Persona } from '@/types/tools';
 
 interface PersonaMeta {
   gradient: string;

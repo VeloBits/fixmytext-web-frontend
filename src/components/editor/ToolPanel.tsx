@@ -1,9 +1,9 @@
 import { useState, useRef, useCallback, useMemo, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { USE_CASE_TABS, TOOL_GROUPS } from '../../constants/tools';
+import { USE_CASE_TABS, TOOL_GROUPS } from '@/constants/tools';
 import ToolIcon from './ToolIcon';
-import type { ToolDefinition, ToolTab } from '../../types/tools';
+import type { ToolDefinition, ToolTab } from '@/types/tools';
 
 interface TooltipState {
   text: string;

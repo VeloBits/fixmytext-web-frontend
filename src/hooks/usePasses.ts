@@ -1,18 +1,18 @@
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { BROWSER_REGION } from '../utils/region';
+import { BROWSER_REGION } from '@/utils/region';
 import {
   useGetActivePassesQuery,
   useCreatePassOrderMutation,
   useCreateCreditOrderMutation,
   useVerifyPaymentMutation,
   useSpinWheelMutation,
-} from '../store/api/passesApi';
-import { useGetSpinHistoryQuery } from '../store/api/userDataApi';
-import { openRazorpayCheckout, executeCheckoutFlow } from '../utils/razorpay';
-import type { RootState } from '../store/store';
-import type { components } from '../types/openapi';
+} from '@/store/api/passesApi';
+import { useGetSpinHistoryQuery } from '@/store/api/userDataApi';
+import { openRazorpayCheckout, executeCheckoutFlow } from '@/utils/razorpay';
+import type { RootState } from '@/store/store';
+import type { components } from '@/types/openapi';
 
 type ActivePass = components['schemas']['ActivePass'];
 type ActiveCredit = components['schemas']['ActiveCredit'];

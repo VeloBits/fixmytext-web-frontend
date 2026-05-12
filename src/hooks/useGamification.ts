@@ -10,21 +10,21 @@ import {
   useRemoveFavoriteMutation,
   useGetDiscoveredToolsQuery,
   useGetPipelinesQuery,
-} from '../store/api/userDataApi';
-import { TOOLS, ACHIEVEMENTS, QUEST_TEMPLATES, LEVELS } from '../constants/tools';
-import type { RootState } from '../store/store';
+} from '@/store/api/userDataApi';
+import { TOOLS, ACHIEVEMENTS, QUEST_TEMPLATES, LEVELS } from '@/constants/tools';
+import type { RootState } from '@/store/store';
 import type {
   Achievement,
   LevelDefinition,
   QuestOp,
   QuestTemplate,
   Persona,
-} from '../types/tools';
+} from '@/types/tools';
 import type {
   GamificationContextValue,
   GamificationStreak,
   GamificationDailyQuest,
-} from '../contexts/AppContext';
+} from '@/contexts/AppContext';
 
 // localStorage is a read-cache for pre-auth display speed only — never the source of truth.
 const STORAGE_KEY = 'fmx_gamification';

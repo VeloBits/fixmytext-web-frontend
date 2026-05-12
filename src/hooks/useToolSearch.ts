@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import { TOOLS, SEARCH_INTENTS } from '../constants/tools';
-import type { ToolDefinition } from '../types/tools';
+import { TOOLS, SEARCH_INTENTS } from '@/constants/tools';
+import type { ToolDefinition } from '@/types/tools';
 
 interface UseToolSearchReturn {
   query: string;

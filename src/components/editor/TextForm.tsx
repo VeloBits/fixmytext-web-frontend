@@ -1,46 +1,46 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense, type ReactNode, type Ref, type RefObject } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransformTextMutation } from '../../store/api/textApi';
+import { useTransformTextMutation } from '@/store/api/textApi';
 import { useSelector } from 'react-redux';
-import { useLogoutMutation } from '../../store/api/authApi';
+import { useLogoutMutation } from '@/store/api/authApi';
 import {
   useGetHistoryQuery,
   useDeleteHistoryEntryMutation,
   useClearHistoryMutation,
-} from '../../store/api/historyApi';
-import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '../../store/api/userDataApi';
+} from '@/store/api/historyApi';
+import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@/store/api/userDataApi';
 import {
   TOOLS,
   PERSONAS,
   QUEST_TEMPLATES,
   USE_CASE_TABS,
   ACHIEVEMENTS,
-} from '../../constants/tools';
-import type { ToolDefinition, ToolTab } from '../../types/tools';
-import { ENDPOINTS } from '../../constants/endpoints';
-import { ROUTES } from '../../constants';
+} from '@/constants/tools';
+import type { ToolDefinition, ToolTab } from '@/types/tools';
+import { ENDPOINTS } from '@/constants/endpoints';
+import { ROUTES } from '@/constants';
 
 // Hooks
-import useFindReplace from '../../hooks/useFindReplace';
-import useTextCompare from '../../hooks/useTextCompare';
-import useGenerators from '../../hooks/useGenerators';
-import useFormatter from '../../hooks/useFormatter';
-import useAiTools, { type AiResult } from '../../hooks/useAiTools';
-import useSpeech from '../../hooks/useSpeech';
-import useExport from '../../hooks/useExport';
-import useRegexTester from '../../hooks/useRegexTester';
-import useTemplates from '../../hooks/useTemplates';
-import useHistory from '../../hooks/useHistory';
-import useWordFrequency from '../../hooks/useWordFrequency';
-import usePipeline from '../../hooks/usePipeline';
-import useSmartSuggestions from '../../hooks/useSmartSuggestions';
-import useToolSearch from '../../hooks/useToolSearch';
-import useResize from '../../hooks/useResize';
-import useTrialLimit from '../../hooks/useTrialLimit';
-import useDrawerState from '../../hooks/useDrawerState';
-import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts';
-import useHashTools from '../../hooks/useHashTools';
-import useClientTools from '../../hooks/useClientTools';
+import useFindReplace from '@/hooks/useFindReplace';
+import useTextCompare from '@/hooks/useTextCompare';
+import useGenerators from '@/hooks/useGenerators';
+import useFormatter from '@/hooks/useFormatter';
+import useAiTools, { type AiResult } from '@/hooks/useAiTools';
+import useSpeech from '@/hooks/useSpeech';
+import useExport from '@/hooks/useExport';
+import useRegexTester from '@/hooks/useRegexTester';
+import useTemplates from '@/hooks/useTemplates';
+import useHistory from '@/hooks/useHistory';
+import useWordFrequency from '@/hooks/useWordFrequency';
+import usePipeline from '@/hooks/usePipeline';
+import useSmartSuggestions from '@/hooks/useSmartSuggestions';
+import useToolSearch from '@/hooks/useToolSearch';
+import useResize from '@/hooks/useResize';
+import useTrialLimit from '@/hooks/useTrialLimit';
+import useDrawerState from '@/hooks/useDrawerState';
+import useKeyboardShortcuts from '@/hooks/useKeyboardShortcuts';
+import useHashTools from '@/hooks/useHashTools';
+import useClientTools from '@/hooks/useClientTools';
 
 // Components
 import ToolPanel from './ToolPanel';
@@ -51,7 +51,7 @@ import ParagraphGutter from './ParagraphGutter';
 // Same groups OutputPanel treats as prose-style (paragraph numbering, etc.).
 const PROSE_GROUPS = new Set(['ai_writing', 'ai_content', 'language', 'cleanup', 'case', 'lines']);
 import TabBar from './TabBar';
-import DrawerPanel from '../drawers/DrawerPanel';
+import DrawerPanel from '@/components/drawers/DrawerPanel';
 import FmtConfigBar from './FmtConfigBar';
 
 // Drawers are lazy-loaded — each only renders when its panel/tab is active,
@@ -111,9 +111,9 @@ function LazyDrawer({ children }: { children: ReactNode }) {
 }
 import SmartSuggestions from './SmartSuggestions';
 import BottomPanel from './BottomPanel';
-import CommandPalette from '../layout/CommandPalette';
-import KeyboardShortcuts from '../layout/KeyboardShortcuts';
-import AchievementToast from '../gamification/AchievementToast';
+import CommandPalette from '@/components/layout/CommandPalette';
+import KeyboardShortcuts from '@/components/layout/KeyboardShortcuts';
+import AchievementToast from '@/components/gamification/AchievementToast';
 
 import { motion, AnimatePresence } from 'framer-motion';
 

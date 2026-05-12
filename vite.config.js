@@ -1,5 +1,9 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const CHUNK_MAP = {
   'vendor-export': ['jspdf', 'docx'],
@@ -26,6 +30,11 @@ function manualChunks(id) {
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
   server: { port: 3000, host: true },
   preview: { port: 3000 },
   build: {

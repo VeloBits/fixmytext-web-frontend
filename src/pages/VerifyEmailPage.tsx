@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useResendVerificationMutation, useVerifyEmailMutation } from '../store/api/authApi';
+import { useResendVerificationMutation, useVerifyEmailMutation } from '@/store/api/authApi';
 import { useSelector } from 'react-redux';
-import { ROUTES } from '../constants';
-import type { AlertLevel } from '../contexts/AlertContext';
-import type { RootState } from '../store/store';
+import { ROUTES } from '@/constants';
+import type { AlertLevel } from '@/contexts/AlertContext';
+import type { RootState } from '@/store/store';
 
 interface VerifyEmailPageProps {
   showAlert: (message: string, type: AlertLevel) => void;
