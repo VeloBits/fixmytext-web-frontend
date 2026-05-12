@@ -5,15 +5,22 @@
  */
 import { useState, useCallback } from 'react';
 
-export default function useDrawerState() {
-  const [activePanel, setActivePanel] = useState(null);
+export interface DrawerStateValue {
+  activePanel: string | null;
+  setActivePanel: (panel: string | null) => void;
+  togglePanel: (panel: string) => void;
+  closePanel: () => void;
+}
+
+export default function useDrawerState(): DrawerStateValue {
+  const [activePanel, setActivePanel] = useState<string | null>(null);
 
   const togglePanel = useCallback(
-    (panel) => setActivePanel((prev) => (prev === panel ? null : panel)),
+    (panel: string): void => setActivePanel((prev) => (prev === panel ? null : panel)),
     []
   );
 
-  const closePanel = useCallback(() => setActivePanel(null), []);
+  const closePanel = useCallback((): void => setActivePanel(null), []);
 
   return { activePanel, setActivePanel, togglePanel, closePanel };
 }

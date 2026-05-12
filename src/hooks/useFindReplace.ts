@@ -1,13 +1,32 @@
 import { useState } from 'react';
+import type { AlertType } from './useAlert';
 
-export default function useFindReplace(text, setText, showAlert) {
+export interface FindReplaceValue {
+  findText: string;
+  setFindText: (v: string) => void;
+  replaceText: string;
+  setReplaceText: (v: string) => void;
+  findCaseSensitive: boolean;
+  setFindCaseSensitive: (v: boolean) => void;
+  findUseRegex: boolean;
+  setFindUseRegex: (v: boolean) => void;
+  replaceCount: number | null;
+  setReplaceCount: (v: number | null) => void;
+  handleReplaceAll: () => void;
+}
+
+export default function useFindReplace(
+  text: string,
+  setText: (t: string) => void,
+  showAlert: (msg: string, type: AlertType) => void
+): FindReplaceValue {
   const [findText, setFindText] = useState('');
   const [replaceText, setReplaceText] = useState('');
   const [findCaseSensitive, setFindCaseSensitive] = useState(false);
   const [findUseRegex, setFindUseRegex] = useState(false);
-  const [replaceCount, setReplaceCount] = useState(null);
+  const [replaceCount, setReplaceCount] = useState<number | null>(null);
 
-  const handleReplaceAll = () => {
+  const handleReplaceAll = (): void => {
     if (!findText) {
       showAlert('Enter a search term', 'danger');
       return;
@@ -28,7 +47,8 @@ export default function useFindReplace(text, setText, showAlert) {
         count ? 'success' : 'info'
       );
     } catch (err) {
-      showAlert('Invalid regex: ' + err.message, 'danger');
+      const msg = err instanceof Error ? err.message : String(err);
+      showAlert('Invalid regex: ' + msg, 'danger');
     }
   };
 

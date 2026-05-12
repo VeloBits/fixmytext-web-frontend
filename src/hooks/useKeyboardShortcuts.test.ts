@@ -24,14 +24,18 @@ vi.mock('../constants/tools', () => ({
 }));
 
 import { useSelector } from 'react-redux';
+import type { KeyboardActions } from './useKeyboardShortcuts';
+
+// vi.mock replaces useSelector — cast so TS knows
+const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
 
 describe('useKeyboardShortcuts', () => {
-  let actions;
+  let actions: KeyboardActions;
 
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    useSelector.mockReturnValue(null);
+    mockUseSelector.mockReturnValue(null);
     actions = {
       openPalette: vi.fn(),
       toggleSidebar: vi.fn(),
@@ -70,7 +74,7 @@ describe('useKeyboardShortcuts', () => {
     const palette = result.current.groups
       .flatMap((g) => g.shortcuts)
       .find((s) => s.id === 'palette');
-    expect(palette.keys).toBe('p');
+    expect(palette!.keys).toBe('p');
   });
 
   it('updateBinding persists a custom binding', () => {
@@ -375,7 +379,7 @@ describe('eventToBinding', () => {
     const e = { key: 'k', ctrlKey: true, shiftKey: false, altKey: false, metaKey: false };
     const binding = eventToBinding(e);
     expect(binding).toBeTruthy();
-    expect(binding.keys).toBe('k');
+    expect(binding!.keys).toBe('k');
   });
 
   it('returns null for bare modifier press', () => {

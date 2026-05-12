@@ -2,10 +2,54 @@ import { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { TOOLS } from '../constants/tools';
 import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '../store/api/userDataApi';
+import type { RootState } from '../store/store';
+import type { ToolDefinition } from '../types/tools';
 
 /* ═══════════════════════════════════════════════════════
    useKeyboardShortcuts — Customizable power-user hotkeys
    ═══════════════════════════════════════════════════════ */
+
+export interface ShortcutDef {
+  keys: string;
+  ctrl?: boolean;
+  shift?: boolean;
+  alt?: boolean;
+  label: string;
+  id: string;
+}
+
+export interface ShortcutGroup {
+  group: string;
+  shortcuts: ShortcutDef[];
+}
+
+export interface ShortcutBinding {
+  keys: string;
+  ctrl?: boolean;
+  shift?: boolean;
+  alt?: boolean;
+}
+
+export type KeybindingOverrides = Record<string, ShortcutBinding>;
+
+export interface KeyboardActions {
+  openPalette?: () => void;
+  toggleSidebar?: () => void;
+  toggleSettings?: () => void;
+  onEscape?: () => void;
+  runActiveTool?: () => void;
+  saveTemplate?: () => void;
+  closeActiveTab?: () => void;
+  clearText?: () => void;
+  undo?: () => void;
+  redo?: () => void;
+  copyOutput?: () => void;
+  clearPaste?: () => void;
+  goToTab?: (idx: number) => void;
+  nextTab?: () => void;
+  prevTab?: () => void;
+  runTool?: (tool: ToolDefinition) => void;
+}
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
 const MOD = isMac ? 'metaKey' : 'ctrlKey';
@@ -13,7 +57,7 @@ const STORAGE_KEY = 'fmx_keybindings';
 
 // ── Default shortcut definitions ──────────────────────
 
-export const DEFAULT_SHORTCUT_GROUPS = [
+export const DEFAULT_SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     group: 'General',
     shortcuts: [
@@ -75,16 +119,16 @@ export const DEFAULT_SHORTCUT_GROUPS = [
 
 // ── Persistence helpers ───────────────────────────────
 
-function loadCustomBindings() {
+function loadCustomBindings(): KeybindingOverrides {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    return raw ? (JSON.parse(raw) as KeybindingOverrides) : {};
   } catch {
     return {};
   }
 }
 
-function saveCustomBindings(overrides) {
+function saveCustomBindings(overrides: KeybindingOverrides): void {
   try {
     if (Object.keys(overrides).length === 0) {
       localStorage.removeItem(STORAGE_KEY);
@@ -97,7 +141,7 @@ function saveCustomBindings(overrides) {
 }
 
 // Merge defaults with overrides: { [id]: { keys, ctrl?, shift?, alt? } }
-function mergeBindings(defaults, overrides) {
+function mergeBindings(defaults: ShortcutGroup[], overrides: KeybindingOverrides): ShortcutGroup[] {
   return defaults.map((group) => ({
     ...group,
     shortcuts: group.shortcuts.map((sc) => {
@@ -116,8 +160,9 @@ function mergeBindings(defaults, overrides) {
 
 // ── Matching ──────────────────────────────────────────
 
-function matchShortcut(e, sc) {
-  const mod = sc.ctrl ? e[MOD] : !e[MOD];
+function matchShortcut(e: KeyboardEvent, sc: ShortcutDef): boolean {
+  const eAny = e as unknown as Record<string, boolean>;
+  const mod = sc.ctrl ? eAny[MOD] : !eAny[MOD];
   const shift = sc.shift ? e.shiftKey : !e.shiftKey;
   const alt = sc.alt ? e.altKey : !e.altKey;
   const key = e.key.toLowerCase() === sc.keys.toLowerCase();
@@ -126,8 +171,8 @@ function matchShortcut(e, sc) {
 
 // ── Conflict detection ────────────────────────────────
 
-function bindingKey(sc) {
-  const parts = [];
+function bindingKey(sc: ShortcutBinding | ShortcutDef): string {
+  const parts: string[] = [];
   if (sc.ctrl) parts.push('ctrl');
   if (sc.shift) parts.push('shift');
   if (sc.alt) parts.push('alt');
@@ -135,9 +180,13 @@ function bindingKey(sc) {
   return parts.join('+');
 }
 
-export function detectConflicts(groups, editingId, candidate) {
+export function detectConflicts(
+  groups: ShortcutGroup[],
+  editingId: string,
+  candidate: ShortcutBinding
+): ShortcutDef[] {
   const candidateKey = bindingKey(candidate);
-  const conflicts = [];
+  const conflicts: ShortcutDef[] = [];
   for (const g of groups) {
     for (const sc of g.shortcuts) {
       if (sc.id === editingId) continue;
@@ -151,11 +200,11 @@ export function detectConflicts(groups, editingId, candidate) {
 
 // ── Hook ──────────────────────────────────────────────
 
-export default function useKeyboardShortcuts(actions) {
+export default function useKeyboardShortcuts(actions: KeyboardActions) {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [overrides, setOverrides] = useState(loadCustomBindings);
 
-  const accessToken = useSelector((s) => s.auth.accessToken);
+  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
   const isAuthenticated = !!accessToken;
   const hydrated = useRef(false);
 
@@ -166,7 +215,7 @@ export default function useKeyboardShortcuts(actions) {
   useEffect(() => {
     if (uiSettings && !hydrated.current) {
       hydrated.current = true;
-      const dbBindings = uiSettings.keybindings || {};
+      const dbBindings = (uiSettings as { keybindings?: KeybindingOverrides }).keybindings || {};
       if (Object.keys(dbBindings).length > 0) {
         setOverrides(dbBindings);
         saveCustomBindings(dbBindings);
@@ -188,7 +237,7 @@ export default function useKeyboardShortcuts(actions) {
 
   // Persist override for a single shortcut (localStorage + DB when authenticated)
   const updateBinding = useCallback(
-    (id, binding) => {
+    (id: string, binding: ShortcutBinding): void => {
       setOverrides((prev) => {
         const defaultSc = DEFAULT_SHORTCUT_GROUPS.flatMap((g) => g.shortcuts).find(
           (s) => s.id === id
@@ -235,7 +284,7 @@ export default function useKeyboardShortcuts(actions) {
   }, [isAuthenticated, updateUiSettings]);
 
   const resetOne = useCallback(
-    (id) => {
+    (id: string): void => {
       setOverrides((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -252,14 +301,15 @@ export default function useKeyboardShortcuts(actions) {
   );
 
   // Check if a shortcut has been customized
-  const isCustomized = useCallback((id) => id in overrides, [overrides]);
+  const isCustomized = useCallback((id: string): boolean => id in overrides, [overrides]);
 
   const handleKeyDown = useCallback(
     (e) => {
       const tag = e.target.tagName;
       const isInput = tag === 'INPUT' || tag === 'SELECT';
       const isTextarea = tag === 'TEXTAREA';
-      const hasModifier = e[MOD] || e.altKey;
+      const eAny2 = e as unknown as Record<string, boolean>;
+      const hasModifier = eAny2[MOD] || e.altKey;
 
       if (!hasModifier && e.key !== 'Escape') {
         if (isInput || isTextarea) return;
@@ -376,8 +426,8 @@ export default function useKeyboardShortcuts(actions) {
 
 // ── Display helper ────────────────────────────────────
 
-export function formatShortcut(sc) {
-  const parts = [];
+export function formatShortcut(sc: ShortcutBinding & { label?: string; id?: string }): string[] {
+  const parts: string[] = [];
   if (sc.ctrl) parts.push(isMac ? '⌘' : 'Ctrl');
   if (sc.shift) parts.push(isMac ? '⇧' : 'Shift');
   if (sc.alt) parts.push(isMac ? '⌥' : 'Alt');
@@ -397,8 +447,10 @@ export function formatShortcut(sc) {
 }
 
 // Parse a keydown event into a binding object
-export function eventToBinding(e) {
-  const ctrl = e[MOD] || false;
+export function eventToBinding(
+  e: { key: string; ctrlKey?: boolean; shiftKey?: boolean; altKey?: boolean; metaKey?: boolean } & Record<string, unknown>
+): ShortcutBinding | null {
+  const ctrl = (e[MOD] as boolean | undefined) || false;
   const shift = e.shiftKey || false;
   const alt = e.altKey || false;
   let keys = e.key;
