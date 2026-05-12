@@ -1,5 +1,32 @@
+import type { FormatterConfig } from '../../hooks/useFormatter';
+
+interface FmtConfigBarProps {
+  toolId: string;
+  fmtCfg: FormatterConfig;
+  setFmtCfg: (updater: (prev: FormatterConfig) => FormatterConfig) => void;
+}
+
+interface ToggleProps {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  tooltip: string;
+}
+
 // Which settings are relevant per parser/tool
-const TOOL_SETTINGS = {
+const TOOL_SETTINGS: Record<string, {
+  label: string;
+  indent?: boolean;
+  semi?: boolean;
+  singleQuote?: boolean;
+  trailingComma?: boolean;
+  bracketSpacing?: boolean;
+  arrowParens?: boolean;
+  jsxSingleQuote?: boolean;
+  sortImports?: boolean;
+  bracketSameLine?: boolean;
+  htmlWhitespace?: boolean;
+}> = {
   js_fmt: {
     label: 'JavaScript',
     indent: true,
@@ -67,7 +94,7 @@ const PRESETS = {
   },
 };
 
-function Toggle({ checked, onChange, label, tooltip }) {
+function Toggle({ checked, onChange, label, tooltip }: ToggleProps) {
   return (
     <button
       className={`tu-fmtbar-opt${checked ? ' tu-fmtbar-opt--on' : ''}`}
@@ -79,11 +106,11 @@ function Toggle({ checked, onChange, label, tooltip }) {
   );
 }
 
-export default function FmtConfigBar({ toolId, fmtCfg, setFmtCfg }) {
+export default function FmtConfigBar({ toolId, fmtCfg, setFmtCfg }: FmtConfigBarProps) {
   const spec = TOOL_SETTINGS[toolId];
   if (!spec) return null;
 
-  const set = (patch) => setFmtCfg((c) => ({ ...c, ...patch }));
+  const set = (patch: Partial<FormatterConfig>) => setFmtCfg((c) => ({ ...c, ...patch }));
   const hasPresets = spec.semi || spec.trailingComma;
 
   return (

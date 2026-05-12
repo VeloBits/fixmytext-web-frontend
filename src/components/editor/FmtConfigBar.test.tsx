@@ -13,6 +13,8 @@ describe('FmtConfigBar', () => {
     arrowParens: 'always',
     jsxSingleQuote: false,
     sortImports: true,
+    bracketSameLine: false,
+    htmlWhitespaceSensitivity: 'css',
   };
 
   it('returns null for unknown toolId', () => {
@@ -95,18 +97,18 @@ describe('FmtConfigBar', () => {
     const setFmtCfg = vi.fn();
     render(<FmtConfigBar toolId="js_fmt" fmtCfg={defaultCfg} setFmtCfg={setFmtCfg} />);
     // Find the trailing comma select
-    const selects = screen.getAllByRole('combobox');
+    const selects = screen.getAllByRole('combobox') as HTMLSelectElement[];
     const trailingSelect = selects.find((s) => s.value === 'es5');
-    fireEvent.change(trailingSelect, { target: { value: 'all' } });
+    fireEvent.change(trailingSelect!, { target: { value: 'all' } });
     expect(setFmtCfg).toHaveBeenCalled();
   });
 
   it('changes arrow parens select', () => {
     const setFmtCfg = vi.fn();
     render(<FmtConfigBar toolId="js_fmt" fmtCfg={defaultCfg} setFmtCfg={setFmtCfg} />);
-    const selects = screen.getAllByRole('combobox');
+    const selects = screen.getAllByRole('combobox') as HTMLSelectElement[];
     const arrowSelect = selects.find((s) => s.value === 'always');
-    fireEvent.change(arrowSelect, { target: { value: 'avoid' } });
+    fireEvent.change(arrowSelect!, { target: { value: 'avoid' } });
     expect(setFmtCfg).toHaveBeenCalled();
   });
 
@@ -160,9 +162,9 @@ describe('FmtConfigBar', () => {
         setFmtCfg={setFmtCfg}
       />
     );
-    const selects = screen.getAllByRole('combobox');
+    const selects = screen.getAllByRole('combobox') as HTMLSelectElement[];
     const whitespaceSelect = selects.find((s) => s.value === 'css');
-    fireEvent.change(whitespaceSelect, { target: { value: 'strict' } });
+    fireEvent.change(whitespaceSelect!, { target: { value: 'strict' } });
     expect(setFmtCfg).toHaveBeenCalled();
   });
 

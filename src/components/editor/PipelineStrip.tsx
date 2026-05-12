@@ -1,6 +1,18 @@
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function PipelineStrip({ steps, onClear }) {
+interface PipelineStepItem {
+  toolId?: string;
+  label: string;
+  result?: string;
+  timestamp?: number;
+}
+
+interface PipelineStripProps {
+  steps: PipelineStepItem[] | null;
+  onClear: () => void;
+}
+
+export default function PipelineStrip({ steps, onClear }: PipelineStripProps) {
   if (!steps || steps.length === 0) return null;
 
   return (
