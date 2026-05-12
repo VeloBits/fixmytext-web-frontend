@@ -5,22 +5,31 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetPreferencesQuery, useUpdatePreferencesMutation } from '../store/api/userDataApi';
+import type { RootState } from '../store/store';
+
+/** Light or dark theme mode — mirrors ThemeContext.ThemeMode */
+type ThemeMode = 'light' | 'dark';
+
+interface ThemeContextValue {
+  mode: ThemeMode;
+  setMode: (newMode: ThemeMode) => void;
+}
 
 const MODE_KEY = 'fmx_theme_mode';
 
-function applyMode(mode) {
+function applyMode(mode: ThemeMode): void {
   if (mode === 'dark') document.body.classList.add('dark');
   else document.body.classList.remove('dark');
 }
 
-export function useTheme() {
-  const [mode, setModeState] = useState(() => {
-    const saved = localStorage.getItem(MODE_KEY) || 'dark';
+export function useTheme(): ThemeContextValue {
+  const [mode, setModeState] = useState<ThemeMode>(() => {
+    const saved = (localStorage.getItem(MODE_KEY) || 'dark') as ThemeMode;
     applyMode(saved);
     return saved;
   });
 
-  const accessToken = useSelector((s) => s.auth.accessToken);
+  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
   const isAuthenticated = !!accessToken;
   const hydrated = useRef(false);
 
@@ -31,11 +40,13 @@ export function useTheme() {
   useEffect(() => {
     if (prefs && !hydrated.current) {
       hydrated.current = true;
-      if (prefs.theme && prefs.theme !== mode) {
-        setModeState(prefs.theme);
-        applyMode(prefs.theme);
+      // prefs.theme comes from the API as a string; cast to ThemeMode
+      const dbMode = prefs.theme as ThemeMode | undefined;
+      if (dbMode && dbMode !== mode) {
+        setModeState(dbMode);
+        applyMode(dbMode);
         // Keep localStorage as offline cache only
-        localStorage.setItem(MODE_KEY, prefs.theme);
+        localStorage.setItem(MODE_KEY, dbMode);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,7 +58,7 @@ export function useTheme() {
   }, [isAuthenticated]);
 
   const setMode = useCallback(
-    (newMode) => {
+    (newMode: ThemeMode): void => {
       setModeState(newMode);
       applyMode(newMode);
       if (isAuthenticated) {

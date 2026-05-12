@@ -9,6 +9,8 @@ import {
 } from '../store/api/subscriptionApi';
 import usePasses from './usePasses';
 import { openRazorpayCheckout, executeCheckoutFlow } from '../utils/razorpay';
+import type { RootState } from '../store/store';
+import type { ToolDefinition } from '../types/tools';
 
 const ALWAYS_FREE_IDS = new Set([
   'find_replace',
@@ -22,12 +24,22 @@ const ALWAYS_FREE_IDS = new Set([
   'save_json',
 ]);
 
-export default function useSubscription({ showAlert } = {}) {
-  const { accessToken } = useSelector((s) => s.auth);
+interface UseSubscriptionOptions {
+  showAlert?: (msg: string, variant: string) => void;
+}
+
+interface ToolUsage {
+  uses: number;
+  max: number;
+  hasPass: boolean;
+}
+
+export default function useSubscription({ showAlert }: UseSubscriptionOptions = {}) {
+  const { accessToken } = useSelector((s: RootState) => s.auth);
   const isAuthenticated = !!accessToken;
   const navigate = useNavigate();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [blockedTool, setBlockedTool] = useState(null);
+  const [blockedTool, setBlockedTool] = useState<ToolDefinition | null>(null);
 
   const { data: status, refetch: refetchStatus } = useGetSubscriptionStatusQuery(undefined, {
     skip: !isAuthenticated,
@@ -41,14 +53,15 @@ export default function useSubscription({ showAlert } = {}) {
 
   const tier = status?.tier || 'free';
   const isPro = tier === 'pro';
-  const toolUsesToday = status?.tool_uses_today || {};
+  // tool_uses_today is { [key: string]: unknown } from openapi; cast to Record<string, number>
+  const toolUsesToday = (status?.tool_uses_today || {}) as Record<string, number>;
   const dailyLoginBonus = status?.daily_login_bonus || false;
   const region = status?.region || '';
   const freeUsesPerTool = status?.free_uses_per_tool ?? 3;
 
   // Unified tool access check
   const checkToolAccess = useCallback(
-    (tool) => {
+    (tool: ToolDefinition | null | undefined): boolean => {
       if (!tool) return true;
       if (ALWAYS_FREE_IDS.has(tool.id) || tool.type === 'drawer') return true;
       if (!isAuthenticated) return true;
@@ -76,13 +89,13 @@ export default function useSubscription({ showAlert } = {}) {
     ]
   );
 
-  const dismissUpgradeModal = useCallback(() => {
+  const dismissUpgradeModal = useCallback((): void => {
     setShowUpgradeModal(false);
     setBlockedTool(null);
   }, []);
 
   // Upgrade to Pro via Razorpay order (one-time payment)
-  const handleUpgrade = useCallback(async () => {
+  const handleUpgrade = useCallback(async (): Promise<void> => {
     await executeCheckoutFlow({
       createOrder: () => createProCheckout().unwrap(),
       openCheckout: ({
@@ -96,15 +109,16 @@ export default function useSubscription({ showAlert } = {}) {
         onFailure,
       }) =>
         openRazorpayCheckout({
-          orderId: order_id,
-          amount,
-          currency,
-          keyId: key_id,
-          userEmail: user_email,
-          userName: user_name,
+          orderId: order_id as string | undefined,
+          amount: amount as number | undefined,
+          currency: currency as string | undefined,
+          keyId: key_id as string | undefined,
+          userEmail: user_email as string | undefined,
+          userName: user_name as string | undefined,
           description: 'Pro — Unlimited Access',
-          onSuccess,
-          onFailure,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onSuccess: onSuccess as any,
+          onFailure: onFailure as ((msg: string) => void) | undefined,
         }),
       verifyPayment: (response) =>
         verifyProPayment({
@@ -121,18 +135,19 @@ export default function useSubscription({ showAlert } = {}) {
   }, [createProCheckout, verifyProPayment, showAlert, navigate]);
 
   // Cancel Pro subscription
-  const handleCancelSubscription = useCallback(async () => {
+  const handleCancelSubscription = useCallback(async (): Promise<void> => {
     try {
       await cancelSub().unwrap();
       refetchStatus();
     } catch (err) {
-      showAlert?.(err?.data?.detail || 'Failed to cancel subscription', 'danger');
+      const apiErr = err as { data?: { detail?: string } } | null;
+      showAlert?.(apiErr?.data?.detail || 'Failed to cancel subscription', 'danger');
     }
   }, [cancelSub, refetchStatus, showAlert]);
 
   // Get usage info for a specific tool
   const getToolUsage = useCallback(
-    (toolId) => {
+    (toolId: string): ToolUsage => {
       if (isPro) return { uses: 0, max: Infinity, hasPass: false };
       const uses = toolUsesToday[toolId] || 0;
       const maxFree = freeUsesPerTool + (dailyLoginBonus ? 1 : 0);
@@ -143,7 +158,7 @@ export default function useSubscription({ showAlert } = {}) {
     [isPro, toolUsesToday, dailyLoginBonus, freeUsesPerTool, passes.hasPassFor]
   );
 
-  const refetchAll = useCallback(() => {
+  const refetchAll = useCallback((): void => {
     refetchStatus();
     passes.refetchPasses();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -11,9 +11,36 @@ import {
 } from '../store/api/passesApi';
 import { useGetSpinHistoryQuery } from '../store/api/userDataApi';
 import { openRazorpayCheckout, executeCheckoutFlow } from '../utils/razorpay';
+import type { RootState } from '../store/store';
+import type { components } from '../types/openapi';
 
-export default function usePasses({ showAlert } = {}) {
-  const { accessToken } = useSelector((s) => s.auth);
+type ActivePass = components['schemas']['ActivePass'];
+type ActiveCredit = components['schemas']['ActiveCredit'];
+type SpinHistoryItem = components['schemas']['SpinHistoryItem'];
+type SpinResult = components['schemas']['SpinResult'];
+
+interface UsePassesOptions {
+  showAlert?: (msg: string, variant: string) => void;
+}
+
+interface UsePassesReturn {
+  activePasses: ActivePass[];
+  activeCredits: ActiveCredit[];
+  totalCredits: number;
+  hasPassFor: (toolId: string) => boolean;
+  handleBuyPass: (passId: string, toolIds?: string[]) => Promise<void>;
+  handleBuyCredits: (packId: string) => Promise<void>;
+  handleSpin: () => Promise<SpinResult | { error: string }>;
+  passOrderLoading: boolean;
+  creditOrderLoading: boolean;
+  spinLoading: boolean;
+  spinHistory: SpinHistoryItem[];
+  refetchSpinHistory: () => void;
+  refetchPasses: () => void;
+}
+
+export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePassesReturn {
+  const { accessToken } = useSelector((s: RootState) => s.auth);
   const isAuthenticated = !!accessToken;
   const navigate = useNavigate();
 
@@ -31,12 +58,12 @@ export default function usePasses({ showAlert } = {}) {
   });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const activePasses = activeData?.passes || [];
-  const activeCredits = activeData?.credits || [];
+  const activePasses: ActivePass[] = activeData?.passes || [];
+  const activeCredits: ActiveCredit[] = activeData?.credits || [];
   const totalCredits = activeData?.total_credits || 0;
 
   const hasPassFor = useCallback(
-    (toolId) => {
+    (toolId: string): boolean => {
       return activePasses.some((p) => {
         const covers =
           p.tools_count === -1 || p.tool_ids.includes(toolId) || p.tool_ids.includes('*');
@@ -49,7 +76,7 @@ export default function usePasses({ showAlert } = {}) {
 
   // Buy a pass via Razorpay modal
   const handleBuyPass = useCallback(
-    async (passId, toolIds = []) => {
+    async (passId: string, toolIds: string[] = []): Promise<void> => {
       await executeCheckoutFlow({
         createOrder: () =>
           createPassOrder({
@@ -68,15 +95,16 @@ export default function usePasses({ showAlert } = {}) {
           onFailure,
         }) =>
           openRazorpayCheckout({
-            orderId: order_id,
-            amount,
-            currency,
-            keyId: key_id,
-            userEmail: user_email,
-            userName: user_name,
+            orderId: order_id as string | undefined,
+            amount: amount as number | undefined,
+            currency: currency as string | undefined,
+            keyId: key_id as string | undefined,
+            userEmail: user_email as string | undefined,
+            userName: user_name as string | undefined,
             description: `FixMyText Pass — ${passId}`,
-            onSuccess,
-            onFailure,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onSuccess: onSuccess as any,
+            onFailure: onFailure as ((msg: string) => void) | undefined,
           }),
         verifyPayment: (response) =>
           verifyPayment({
@@ -98,7 +126,7 @@ export default function usePasses({ showAlert } = {}) {
 
   // Buy credits via Razorpay modal
   const handleBuyCredits = useCallback(
-    async (packId) => {
+    async (packId: string): Promise<void> => {
       await executeCheckoutFlow({
         createOrder: () =>
           createCreditOrder({ pack_id: packId, region: BROWSER_REGION || 'US' }).unwrap(),
@@ -113,15 +141,16 @@ export default function usePasses({ showAlert } = {}) {
           onFailure,
         }) =>
           openRazorpayCheckout({
-            orderId: order_id,
-            amount,
-            currency,
-            keyId: key_id,
-            userEmail: user_email,
-            userName: user_name,
+            orderId: order_id as string | undefined,
+            amount: amount as number | undefined,
+            currency: currency as string | undefined,
+            keyId: key_id as string | undefined,
+            userEmail: user_email as string | undefined,
+            userName: user_name as string | undefined,
             description: `FixMyText Credits — ${packId}`,
-            onSuccess,
-            onFailure,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onSuccess: onSuccess as any,
+            onFailure: onFailure as ((msg: string) => void) | undefined,
           }),
         verifyPayment: (response) =>
           verifyPayment({
@@ -142,13 +171,14 @@ export default function usePasses({ showAlert } = {}) {
   );
 
   // Spin the wheel
-  const handleSpin = useCallback(async () => {
+  const handleSpin = useCallback(async (): Promise<SpinResult | { error: string }> => {
     try {
       const result = await spinWheel().unwrap();
       refetchSpinHistory();
       return result;
     } catch (err) {
-      return { error: err.data?.detail || 'Spin failed' };
+      const apiErr = err as { data?: { detail?: string } } | null;
+      return { error: apiErr?.data?.detail || 'Spin failed' };
     }
   }, [spinWheel, refetchSpinHistory]);
 
