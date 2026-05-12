@@ -14,7 +14,7 @@ describe('authSlice', () => {
     });
 
     it('does not affect user', () => {
-      const prev = { user: { name: 'Test' }, accessToken: 'old' };
+      const prev = { user: { name: 'Test' } as unknown as import('../../../types/openapi').components['schemas']['UserResponse'], accessToken: 'old' };
       const state = authReducer(prev, tokenRefreshed('new'));
       expect(state.user).toEqual({ name: 'Test' });
       expect(state.accessToken).toBe('new');
@@ -23,7 +23,7 @@ describe('authSlice', () => {
 
   describe('logout', () => {
     it('clears user and accessToken', () => {
-      const prev = { user: { name: 'Test' }, accessToken: 'token' };
+      const prev = { user: { name: 'Test' } as unknown as import('../../../types/openapi').components['schemas']['UserResponse'], accessToken: 'token' };
       const state = authReducer(prev, logout());
       expect(state.user).toBeNull();
       expect(state.accessToken).toBeNull();
@@ -33,16 +33,7 @@ describe('authSlice', () => {
   describe('extraReducers (matchFulfilled)', () => {
     // We simulate the actions that RTK Query would dispatch
     it('sets accessToken on login fulfilled', () => {
-      const action = {
-        type: 'authApi/executeMutation/fulfilled',
-        payload: { access_token: 'login-token' },
-        meta: { arg: { endpointName: 'login' } },
-      };
-      // The matcher checks action.type ends with /fulfilled and the endpoint name
-      // We need to use the actual matcher. Let's use the store for integration.
-      // Instead, test via the exported reducer with proper action type matching.
-      // RTK Query matcher uses: api.endpoints.login.matchFulfilled
-      // We'll test this indirectly by importing authApi
+      // tested via integration tests below
     });
   });
 });
@@ -52,17 +43,6 @@ import { authApi } from '../api/authApi';
 
 describe('authSlice extraReducers integration', () => {
   it('handles login.matchFulfilled', () => {
-    // Create a fake fulfilled action that matches authApi.endpoints.login.matchFulfilled
-    const action = authApi.endpoints.login.matchFulfilled({
-      type: `${authApi.reducerPath}/executeMutation/fulfilled`,
-      payload: { access_token: 'test-token-login' },
-      meta: {
-        arg: { endpointName: 'login', type: 'mutation' },
-        requestId: '1',
-        requestStatus: 'fulfilled',
-      },
-    });
-    // matchFulfilled is a type guard, not an action creator. Let's dispatch manually.
     const fulfilledAction = {
       type: `authApi/executeMutation/fulfilled`,
       payload: { access_token: 'test-token-login' },
@@ -138,7 +118,7 @@ describe('authSlice extraReducers integration', () => {
       },
     };
     if (authApi.endpoints.logout.matchFulfilled(action)) {
-      const state = authReducer({ user: { name: 'x' }, accessToken: 'tok' }, action);
+      const state = authReducer({ user: { name: 'x' } as unknown as import('../../../types/openapi').components['schemas']['UserResponse'], accessToken: 'tok' }, action);
       expect(state.user).toBeNull();
       expect(state.accessToken).toBeNull();
     }
