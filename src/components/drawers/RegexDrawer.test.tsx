@@ -82,8 +82,8 @@ describe('RegexDrawer', () => {
         ],
       },
     });
-    expect(screen.getByText(/\"123\" at index 4/)).toBeInTheDocument();
-    expect(screen.getByText(/\"456\" at index 12/)).toBeInTheDocument();
+    expect(screen.getByText(/"123" at index 4/)).toBeInTheDocument();
+    expect(screen.getByText(/"456" at index 12/)).toBeInTheDocument();
   });
 
   it('toggles regex flags', () => {
