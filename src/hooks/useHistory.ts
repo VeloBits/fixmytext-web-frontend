@@ -1,19 +1,46 @@
 import { useState, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useRecordOperationMutation, useClearHistoryMutation } from '../store/api/historyApi';
+import type { RootState } from '../store/store';
+import type { AlertType } from './useAlert';
 
 const MAX_HISTORY = 50;
 const PREVIEW_MAX = 500;
 
-export default function useHistory(setText, showAlert) {
-  const [history, setHistory] = useState([]);
+export interface HistoryEntry {
+  operation: string;
+  original: string;
+  result: string;
+  timestamp: number;
+}
+
+export interface ToolMeta {
+  toolId?: string;
+  toolType?: string;
+}
+
+export interface HistoryValue {
+  history: HistoryEntry[];
+  pushHistory: (operation: string, original: string, result: string, toolMeta?: ToolMeta) => void;
+  handleRestoreOriginal: (idx: number) => void;
+  handleRestoreResult: (idx: number) => void;
+  handleClearHistory: () => void;
+  handleUndo: () => void;
+  handleRedo: () => void;
+}
+
+export default function useHistory(
+  setText: (t: string) => void,
+  showAlert: (msg: string, type: AlertType) => void
+): HistoryValue {
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
   const undoIndexRef = useRef(-1);
-  const { accessToken } = useSelector((s) => s.auth);
+  const { accessToken } = useSelector((s: RootState) => s.auth);
   const [recordOperation] = useRecordOperationMutation();
   const [clearHistoryApi] = useClearHistoryMutation();
 
   const pushHistory = useCallback(
-    (operation, original, result, toolMeta = {}) => {
+    (operation: string, original: string, result: string, toolMeta: ToolMeta = {}): void => {
       const entry = { operation, original, result, timestamp: Date.now() };
       setHistory((prev) => {
         const next = [...prev, entry];
@@ -42,12 +69,12 @@ export default function useHistory(setText, showAlert) {
     [accessToken, recordOperation]
   );
 
-  const handleRestoreOriginal = (idx) => {
+  const handleRestoreOriginal = (idx: number): void => {
     setText(history[idx].original);
     showAlert(`Restored original from "${history[idx].operation}"`, 'success');
   };
 
-  const handleRestoreResult = (idx) => {
+  const handleRestoreResult = (idx: number): void => {
     setText(history[idx].result);
     showAlert(`Restored result of "${history[idx].operation}"`, 'success');
   };

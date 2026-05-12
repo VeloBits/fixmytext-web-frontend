@@ -1,4 +1,27 @@
 import { useState } from 'react';
+import type { AlertType } from './useAlert';
+
+export interface PasswordOptions {
+  upper: boolean;
+  lower: boolean;
+  numbers: boolean;
+  symbols: boolean;
+}
+
+export interface GeneratorsValue {
+  textGenType: string;
+  setTextGenType: (v: string) => void;
+  textGenCount: number;
+  setTextGenCount: (v: number) => void;
+  pwdLen: number;
+  setPwdLen: (v: number) => void;
+  pwdOpts: PasswordOptions;
+  setPwdOpts: (v: PasswordOptions) => void;
+  generatedPwd: string;
+  setGeneratedPwd: (v: string) => void;
+  handleGenerateText: () => string;
+  handleGeneratePassword: () => string | undefined;
+}
 
 const LOREM =
   'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum'.split(
@@ -14,11 +37,14 @@ const randSentence = () => {
   return words.join(' ') + '.';
 };
 
-export default function useGenerators(setText, showAlert) {
+export default function useGenerators(
+  setText: (t: string) => void,
+  showAlert: (msg: string, type: AlertType) => void
+): GeneratorsValue {
   const [textGenType, setTextGenType] = useState('words');
   const [textGenCount, setTextGenCount] = useState(50);
   const [pwdLen, setPwdLen] = useState(16);
-  const [pwdOpts, setPwdOpts] = useState({
+  const [pwdOpts, setPwdOpts] = useState<PasswordOptions>({
     upper: true,
     lower: true,
     numbers: true,
@@ -26,8 +52,8 @@ export default function useGenerators(setText, showAlert) {
   });
   const [generatedPwd, setGeneratedPwd] = useState('');
 
-  const handleGenerateText = () => {
-    let result;
+  const handleGenerateText = (): string => {
+    let result: string;
     if (textGenType === 'words') {
       result = Array.from({ length: textGenCount }, randWord).join(' ');
     } else if (textGenType === 'sentences') {
@@ -43,8 +69,8 @@ export default function useGenerators(setText, showAlert) {
     return result;
   };
 
-  const handleGeneratePassword = () => {
-    const pools = [];
+  const handleGeneratePassword = (): string | undefined => {
+    const pools: string[] = [];
     if (pwdOpts.upper) pools.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
     if (pwdOpts.lower) pools.push('abcdefghijklmnopqrstuvwxyz');
     if (pwdOpts.numbers) pools.push('0123456789');

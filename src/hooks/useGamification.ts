@@ -12,6 +12,19 @@ import {
   useGetPipelinesQuery,
 } from '../store/api/userDataApi';
 import { TOOLS, ACHIEVEMENTS, QUEST_TEMPLATES, LEVELS } from '../constants/tools';
+import type { RootState } from '../store/store';
+import type {
+  Achievement,
+  LevelDefinition,
+  QuestOp,
+  QuestTemplate,
+  Persona,
+} from '../types/tools';
+import type {
+  GamificationContextValue,
+  GamificationStreak,
+  GamificationDailyQuest,
+} from '../contexts/AppContext';
 
 // localStorage is a read-cache for pre-auth display speed only — never the source of truth.
 const STORAGE_KEY = 'fmx_gamification';
@@ -20,31 +33,47 @@ const STORAGE_KEY = 'fmx_gamification';
 const AI_TOOL_IDS = TOOLS.filter((t) => t.tabs?.includes('ai')).map((t) => t.id);
 const DEV_TOOL_IDS = TOOLS.filter((t) => t.tabs?.includes('code')).map((t) => t.id);
 
-function loadState() {
+interface GamificationState {
+  persona: Persona | null;
+  toolsUsed: Record<string, number>;
+  discoveredTools: string[];
+  totalOps: number;
+  totalChars: number;
+  xp: number;
+  streak: GamificationStreak;
+  achievements: string[];
+  favorites: string[];
+  dailyQuest: GamificationDailyQuest;
+  savedPipelines: unknown[];
+  completedQuests: string[];
+  sessionOps: QuestOp[];
+}
+
+function loadState(): Partial<GamificationState> | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return JSON.parse(raw) as Partial<GamificationState>;
   } catch {
     /* ignore */
   }
   return null;
 }
 
-function today() {
+function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function pickDailyQuest(completed = []) {
-  const available = QUEST_TEMPLATES.filter((q) => !completed.includes(q.id));
-  const pool = available.length > 0 ? available : QUEST_TEMPLATES;
+function pickDailyQuest(completed: string[] = []): QuestTemplate {
+  const available = (QUEST_TEMPLATES as QuestTemplate[]).filter((q) => !completed.includes(q.id));
+  const pool = available.length > 0 ? available : (QUEST_TEMPLATES as QuestTemplate[]);
   const day = (Date.now() / 86400000) | 0;
   const hash = (day * 2654435761) >>> 0;
   return pool[hash % pool.length];
 }
 
-function getLevel(xp) {
-  let lvl = LEVELS[0];
-  for (const l of LEVELS) {
+function getLevel(xp: number): LevelDefinition {
+  let lvl = (LEVELS as LevelDefinition[])[0];
+  for (const l of LEVELS as LevelDefinition[]) {
     if (xp >= l.xp) lvl = l;
     else break;
   }
@@ -53,26 +82,30 @@ function getLevel(xp) {
 
 /** Convert API response (flat) to hook state shape (nested).
  *  Note: favorites are NOT included here — they load from GET /user/favorites. */
-function apiToState(api) {
+function apiToState(api: Record<string, unknown>): Partial<GamificationState> {
+  // Cast unknown fields with defaults; numeric/boolean/string fields are explicitly typed
   return {
     persona: null, // persona is in preferences, not gamification
-    totalOps: api.total_ops || 0,
-    totalChars: api.total_chars || 0,
-    xp: api.xp || 0,
-    streak: { current: api.streak_current || 0, lastDate: api.streak_last_date || null },
-    achievements: api.achievements || [],
-    dailyQuest: {
-      id: api.daily_quest_id || null,
-      date: api.daily_quest_date || null,
-      completed: api.daily_quest_completed || false,
+    totalOps: (api.total_ops as number) || 0,
+    totalChars: (api.total_chars as number) || 0,
+    xp: (api.xp as number) || 0,
+    streak: {
+      current: (api.streak_current as number) || 0,
+      lastDate: (api.streak_last_date as string | null) || null,
     },
-    completedQuests: api.completed_quests || [],
+    achievements: (api.achievements as string[]) || [],
+    dailyQuest: {
+      id: (api.daily_quest_id as string | null) || null,
+      date: (api.daily_quest_date as string | null) || null,
+      completed: (api.daily_quest_completed as boolean) || false,
+    },
+    completedQuests: (api.completed_quests as string[]) || [],
   };
 }
 
 /** Convert hook state (nested) to API payload (flat).
  *  favorites are excluded — managed via dedicated /user/favorites endpoint. */
-function stateToApi(s) {
+function stateToApi(s: GamificationState): Record<string, unknown> {
   return {
     xp: s.xp,
     streak_current: s.streak.current,
@@ -87,7 +120,7 @@ function stateToApi(s) {
   };
 }
 
-const DEFAULT_STATE = {
+const DEFAULT_STATE: GamificationState = {
   persona: null,
   toolsUsed: {},
   discoveredTools: [],
@@ -103,19 +136,19 @@ const DEFAULT_STATE = {
   sessionOps: [],
 };
 
-export default function useGamification() {
-  const [state, setState] = useState(() => {
+export default function useGamification(): GamificationContextValue {
+  const [state, setState] = useState<GamificationState>(() => {
     const saved = loadState();
     return saved ? { ...DEFAULT_STATE, ...saved, sessionOps: [] } : { ...DEFAULT_STATE };
   });
 
-  const speedTimestamps = useRef([]);
-  const [newAchievement, setNewAchievement] = useState(null);
-  const [xpGain, setXpGain] = useState(null);
+  const speedTimestamps = useRef<number[]>([]);
+  const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
+  const [xpGain, setXpGain] = useState<number | null>(null);
   const hydrated = useRef(false);
 
   // Auth state from Redux
-  const accessToken = useSelector((s) => s.auth.accessToken);
+  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
   const isAuthenticated = !!accessToken;
 
   // RTK Query — fetch gamification + preferences + favorites from DB when authenticated
@@ -133,11 +166,13 @@ export default function useGamification() {
   useEffect(() => {
     if (dbGamification && !hydrated.current) {
       hydrated.current = true;
-      const dbState = apiToState(dbGamification);
+      // Cast: RTK Query returns unknown; shape is the flat gamification API object
+      const dbState = apiToState(dbGamification as Record<string, unknown>);
       setState((prev) => {
         const merged = { ...prev, ...dbState, sessionOps: prev.sessionOps };
         if (dbPrefs) {
-          merged.persona = dbPrefs.persona || prev.persona;
+          const prefs = dbPrefs as { persona?: Persona };
+          merged.persona = prefs.persona || prev.persona;
         }
         return merged;
       });
@@ -147,15 +182,17 @@ export default function useGamification() {
   // Hydrate favorites from dedicated endpoint
   useEffect(() => {
     if (dbFavorites) {
-      const ids = dbFavorites.favorites.map((f) => f.tool_id);
+      const favs = dbFavorites as { favorites: Array<{ tool_id: string }> };
+      const ids = favs.favorites.map((f) => f.tool_id);
       setState((prev) => ({ ...prev, favorites: ids }));
     }
   }, [dbFavorites]);
 
   // Hydrate discovered tools from dedicated endpoint
   useEffect(() => {
-    if (dbDiscovered?.tools) {
-      const ids = dbDiscovered.tools.map((t) => t.tool_id);
+    const disc = dbDiscovered as { tools?: Array<{ tool_id: string }> } | undefined;
+    if (disc?.tools) {
+      const ids = disc.tools.map((t) => t.tool_id);
       setState((prev) => {
         // Merge: keep any locally-tracked discoveries not yet in DB
         const merged = [...new Set([...ids, ...prev.discoveredTools])];
@@ -173,7 +210,7 @@ export default function useGamification() {
   // Hydrate saved pipelines from dedicated endpoint
   useEffect(() => {
     if (dbPipelines) {
-      setState((prev) => ({ ...prev, savedPipelines: dbPipelines }));
+      setState((prev) => ({ ...prev, savedPipelines: dbPipelines as unknown[] }));
     }
   }, [dbPipelines]);
 
@@ -223,7 +260,7 @@ export default function useGamification() {
     });
   }, []);
 
-  const recordToolUse = useCallback((toolId, charCount = 0) => {
+  const recordToolUse = useCallback((toolId: string, charCount = 0): void => {
     const now = Date.now();
     speedTimestamps.current.push(now);
     speedTimestamps.current = speedTimestamps.current.filter((t) => now - t < 60000);
@@ -247,10 +284,11 @@ export default function useGamification() {
       let dailyQuest = { ...prev.dailyQuest };
       let completedQuests = [...prev.completedQuests];
       if (!dailyQuest.completed && dailyQuest.id) {
-        const questDef = QUEST_TEMPLATES.find((q) => q.id === dailyQuest.id);
+        const questId = dailyQuest.id as string;
+        const questDef = (QUEST_TEMPLATES as QuestTemplate[]).find((q) => q.id === questId);
         if (questDef?.check(sessionOps)) {
           dailyQuest = { ...dailyQuest, completed: true };
-          completedQuests = [...completedQuests, dailyQuest.id];
+          completedQuests = [...completedQuests, questId];
           xpEarned += questDef.xp;
         }
       }
@@ -278,7 +316,7 @@ export default function useGamification() {
       };
 
       let achievements = [...prev.achievements];
-      let newUnlock = null;
+      let newUnlock: Achievement | null = null;
       for (const a of ACHIEVEMENTS) {
         if (!achievements.includes(a.id) && a.condition(achieveState)) {
           achievements = [...achievements, a.id];
@@ -312,7 +350,7 @@ export default function useGamification() {
   }, []);
 
   const toggleFavorite = useCallback(
-    (toolId) => {
+    (toolId: string): void => {
       setState((prev) => {
         const isFav = prev.favorites.includes(toolId);
         if (isAuthenticated) {
@@ -335,10 +373,10 @@ export default function useGamification() {
   );
 
   const setPersona = useCallback(
-    (persona) => {
+    (persona: Persona): void => {
       setState((prev) => ({ ...prev, persona }));
       if (isAuthenticated) {
-        syncPrefs({ persona })
+        syncPrefs({ persona: persona as unknown as string })
           .unwrap()
           .catch(() => {});
       }

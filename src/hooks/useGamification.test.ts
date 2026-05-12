@@ -24,12 +24,14 @@ vi.mock('../store/api/userDataApi', () => ({
 import { useSelector } from 'react-redux';
 import useGamification from './useGamification';
 
+const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
+
 describe('useGamification', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
     localStorage.clear();
-    useSelector.mockReturnValue('fake-token');
+    mockUseSelector.mockReturnValue('fake-token');
     mockSyncToDb.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSyncPrefs.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockApiAddFavorite.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -114,7 +116,7 @@ describe('useGamification', () => {
   it('setPersona updates persona state', () => {
     const { result } = renderHook(() => useGamification());
     act(() => {
-      result.current.setPersona('developer');
+      result.current.setPersona('developer' as unknown as Parameters<typeof result.current.setPersona>[0]);
     });
     expect(result.current.persona).toBe('developer');
     expect(result.current.onboarded).toBe(true);
@@ -123,7 +125,7 @@ describe('useGamification', () => {
   it('setPersona syncs to API when authenticated', () => {
     const { result } = renderHook(() => useGamification());
     act(() => {
-      result.current.setPersona('writer');
+      result.current.setPersona('writer' as unknown as Parameters<typeof result.current.setPersona>[0]);
     });
     expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'writer' });
   });

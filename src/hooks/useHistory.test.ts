@@ -16,14 +16,20 @@ vi.mock('../store/api/historyApi', () => ({
 
 import { useSelector } from 'react-redux';
 
+const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
+
 describe('useHistory', () => {
-  let setText, showAlert;
+  // vi.fn() returns a Mock — cast to target signature for use with useHistory
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let setText: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let showAlert: any;
 
   beforeEach(() => {
     setText = vi.fn();
     showAlert = vi.fn();
     vi.clearAllMocks();
-    useSelector.mockImplementation((fn) => fn({ auth: { accessToken: null } }));
+    mockUseSelector.mockImplementation((fn) => fn({ auth: { accessToken: null } }));
   });
 
   it('starts with empty history', () => {
@@ -134,7 +140,7 @@ describe('useHistory', () => {
   });
 
   it('records operation to backend when authenticated', () => {
-    useSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok123' } }));
+    mockUseSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok123' } }));
     const { result } = renderHook(() => useHistory(setText, showAlert));
     act(() => {
       result.current.pushHistory('Op', 'orig', 'res', { toolId: 'test', toolType: 'local' });
@@ -157,7 +163,7 @@ describe('useHistory', () => {
   });
 
   it('clears server history when authenticated', () => {
-    useSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok' } }));
+    mockUseSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok' } }));
     const { result } = renderHook(() => useHistory(setText, showAlert));
     act(() => {
       result.current.handleClearHistory();
