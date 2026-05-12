@@ -1,15 +1,17 @@
 import React from 'react';
+import type { ReactNode } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SmartSuggestions from './SmartSuggestions';
+import type { ToolDefinition } from '../../types/tools';
 
 vi.mock('framer-motion', () => {
   const m =
-    (tag) =>
-    ({ children, ...props }) =>
-      React.createElement(tag || 'div', props, children);
+    (tag: string) =>
+    ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) =>
+      React.createElement(tag || 'div', props as Record<string, unknown>, children);
   return {
-    motion: new Proxy({}, { get: (_, tag) => m(tag) }),
-    AnimatePresence: ({ children }) => children,
+    motion: new Proxy({}, { get: (_, tag: string) => m(tag) }),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => children,
     useReducedMotion: () => false,
   };
 });
@@ -18,7 +20,7 @@ describe('SmartSuggestions', () => {
   const suggestions = [
     { id: 'uppercase', icon: 'AA', label: 'Uppercase' },
     { id: 'lowercase', icon: 'aa', label: 'Lowercase' },
-  ];
+  ] as unknown as ToolDefinition[];
 
   it('returns null when no suggestions', () => {
     const { container } = render(

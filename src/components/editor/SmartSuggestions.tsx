@@ -1,7 +1,15 @@
 import { memo } from 'react';
+import type { MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { ToolDefinition } from '../../types/tools';
 
-export default memo(function SmartSuggestions({ suggestions, onToolClick, onDismiss }) {
+interface SmartSuggestionsProps {
+  suggestions: ToolDefinition[] | null;
+  onToolClick: (tool: ToolDefinition) => void;
+  onDismiss: (id: string) => void;
+}
+
+export default memo(function SmartSuggestions({ suggestions, onToolClick, onDismiss }: SmartSuggestionsProps) {
   if (!suggestions || suggestions.length === 0) return null;
 
   return (
@@ -23,7 +31,7 @@ export default memo(function SmartSuggestions({ suggestions, onToolClick, onDism
             <span>{tool.label}</span>
             <span
               className="tu-suggestion-dismiss"
-              onClick={(e) => {
+              onClick={(e: MouseEvent) => {
                 e.stopPropagation();
                 onDismiss(tool.id);
               }}

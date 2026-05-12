@@ -1,4 +1,17 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
+
+interface ParagraphGutterProps {
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
+  text: string;
+  scrollTop: number;
+}
+
+interface LinePosition {
+  idx: number;
+  top: number;
+  nonBlank: boolean;
+}
 
 /**
  * Paragraph-numbering gutter for a textarea.
@@ -12,9 +25,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
  * The textarea itself is unchanged — this component only handles gutter
  * rendering and scroll syncing.
  */
-export default function ParagraphGutter({ textareaRef, text, scrollTop }) {
-  const mirrorRef = useRef(null);
-  const [positions, setPositions] = useState([]);
+export default function ParagraphGutter({ textareaRef, text, scrollTop }: ParagraphGutterProps) {
+  const mirrorRef = useRef<HTMLDivElement | null>(null);
+  const [positions, setPositions] = useState<LinePosition[]>([]);
 
   // Measure paragraph Y offsets by rendering an invisible mirror div with
   // exact same width and font as the textarea, with one inline-block sentinel
@@ -45,7 +58,7 @@ export default function ParagraphGutter({ textareaRef, text, scrollTop }) {
     // textarea but get no number.
     const lines = (text || '').split('\n');
     mirror.innerHTML = '';
-    const sentinelEls = [];
+    const sentinelEls: HTMLSpanElement[] = [];
     lines.forEach((line, i) => {
       const sentinel = document.createElement('span');
       sentinel.dataset.idx = String(i);
