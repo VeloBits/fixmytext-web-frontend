@@ -30,7 +30,7 @@ describe('DrawerPanel', () => {
         <div>Content</div>
       </DrawerPanel>
     );
-    const drawer = container.querySelector('.tu-drawer');
+    const drawer = container.querySelector('.tu-drawer') as HTMLElement;
     // jsdom converts hex to rgb
     expect(drawer.style.borderColor).toBe('rgb(20, 184, 166)');
   });
@@ -41,7 +41,7 @@ describe('DrawerPanel', () => {
         <div>Content</div>
       </DrawerPanel>
     );
-    const drawer = container.querySelector('.tu-drawer');
+    const drawer = container.querySelector('.tu-drawer') as HTMLElement;
     expect(drawer.style.borderColor).toBe('var(--violet)');
   });
 
