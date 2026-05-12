@@ -25,7 +25,7 @@ describe('PricingIcons', () => {
   describe('NumIcon', () => {
     it('renders the number', () => {
       const { container } = render(<NumIcon n={5} />);
-      expect(container.querySelector('text').textContent).toBe('5');
+      expect(container.querySelector('text')?.textContent).toBe('5');
     });
 
     it('uses smaller font for multi-digit numbers', () => {
