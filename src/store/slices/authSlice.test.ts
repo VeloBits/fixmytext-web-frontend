@@ -14,7 +14,7 @@ describe('authSlice', () => {
     });
 
     it('does not affect user', () => {
-      const prev = { user: { name: 'Test' } as unknown as import('../../../types/openapi').components['schemas']['UserResponse'], accessToken: 'old' };
+      const prev = { user: { name: 'Test' } as unknown as import('../types/openapi').components['schemas']['UserResponse'], accessToken: 'old' };
       const state = authReducer(prev, tokenRefreshed('new'));
       expect(state.user).toEqual({ name: 'Test' });
       expect(state.accessToken).toBe('new');
@@ -23,7 +23,7 @@ describe('authSlice', () => {
 
   describe('logout', () => {
     it('clears user and accessToken', () => {
-      const prev = { user: { name: 'Test' } as unknown as import('../../../types/openapi').components['schemas']['UserResponse'], accessToken: 'token' };
+      const prev = { user: { name: 'Test' } as unknown as import('../types/openapi').components['schemas']['UserResponse'], accessToken: 'token' };
       const state = authReducer(prev, logout());
       expect(state.user).toBeNull();
       expect(state.accessToken).toBeNull();
@@ -118,7 +118,7 @@ describe('authSlice extraReducers integration', () => {
       },
     };
     if (authApi.endpoints.logout.matchFulfilled(action)) {
-      const state = authReducer({ user: { name: 'x' } as unknown as import('../../../types/openapi').components['schemas']['UserResponse'], accessToken: 'tok' }, action);
+      const state = authReducer({ user: { name: 'x' } as unknown as import('../types/openapi').components['schemas']['UserResponse'], accessToken: 'tok' }, action);
       expect(state.user).toBeNull();
       expect(state.accessToken).toBeNull();
     }

@@ -8,6 +8,7 @@ import {
 } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../store';
 
+/// <reference types="vite/client" />
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /** Maximum number of token refresh attempts before forcing logout. */
@@ -66,10 +67,8 @@ function createReauthQuery(rawBaseQuery: RtkBaseQuery): RtkBaseQuery {
       // Only attempt refresh if we haven't exceeded the retry limit
       if (!refreshPromise && retryCount < MAX_REFRESH_RETRIES) {
         retryCount++;
-        refreshPromise = defaultBaseQuery(
-          { url: '/api/v1/auth/refresh', method: 'POST' },
-          api,
-          extraOptions
+        refreshPromise = Promise.resolve(
+          defaultBaseQuery({ url: '/api/v1/auth/refresh', method: 'POST' }, api, extraOptions)
         )
           .then((refreshResult) => {
             if (refreshResult.data) {
@@ -122,9 +121,10 @@ export function createBaseQueryWithReauth(extraHeaders: ExtraHeadersFn): RtkBase
  * Reauth base query with automatic retry for transient server errors (5xx).
  * Use this for read-heavy APIs (queries). Mutations should NOT use this.
  */
+ 
 export const baseQueryWithRetry = retry(baseQueryWithReauth, {
   maxRetries: 2,
-  retryCondition: (_error, _args, { attempt }) => {
+  retryCondition: (_error: any, _args: any, { attempt }: { attempt: number }) => {
     // Only retry on server errors (5xx), not on client errors (4xx)
     if ((_error as FetchBaseQueryError & { status?: number })?.status && (_error as FetchBaseQueryError & { status?: number }).status! < 500) return false;
     return attempt <= 2;

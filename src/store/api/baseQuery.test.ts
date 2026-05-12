@@ -305,7 +305,7 @@ describe('baseQueryWithReauth — refresh failure', () => {
 
     expect(api.dispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
     // Original error is still returned
-    expect(result.error.status).toBe(401);
+    expect(result.error!.status).toBe(401);
   });
 });
 
@@ -350,7 +350,7 @@ describe('baseQueryWithReauth — auth endpoint skip', () => {
     );
 
     expect(api.dispatch).not.toHaveBeenCalled();
-    expect(result.error.status).toBe(401);
+    expect(result.error!.status).toBe(401);
   });
 });
 
@@ -384,7 +384,7 @@ describe('baseQueryWithReauth — max retry exceeded', () => {
     const result2 = await baseQueryWithReauth('/resource', api, {});
 
     expect(api.dispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
-    expect(result2.error.status).toBe(401);
+    expect(result2.error!.status).toBe(401);
   });
 });
 
@@ -475,7 +475,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
   it('does not retry on 4xx errors', async () => {
     const { baseQueryWithRetry } = await freshImport();
     // Verify retryCondition directly through the exposed options
-    const retryCondition = baseQueryWithRetry._retryOptions.retryCondition;
+    const retryCondition = baseQueryWithRetry._retryOptions!.retryCondition;
 
     // 400 — should not retry
     expect(retryCondition({ status: 400 }, {}, { attempt: 1 })).toBe(false);
@@ -489,7 +489,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
 
   it('retries on 5xx errors per retryCondition', async () => {
     const { baseQueryWithRetry } = await freshImport();
-    const retryCondition = baseQueryWithRetry._retryOptions.retryCondition;
+    const retryCondition = baseQueryWithRetry._retryOptions!.retryCondition;
 
     expect(retryCondition({ status: 500 }, {}, { attempt: 1 })).toBe(true);
     expect(retryCondition({ status: 502 }, {}, { attempt: 1 })).toBe(true);
@@ -498,7 +498,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
 
   it('stops retrying when attempt exceeds 2', async () => {
     const { baseQueryWithRetry } = await freshImport();
-    const retryCondition = baseQueryWithRetry._retryOptions.retryCondition;
+    const retryCondition = baseQueryWithRetry._retryOptions!.retryCondition;
 
     // attempt 3 — should not retry even for 500
     expect(retryCondition({ status: 500 }, {}, { attempt: 3 })).toBe(false);
@@ -506,7 +506,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
 
   it('retries when error has no status (network errors)', async () => {
     const { baseQueryWithRetry } = await freshImport();
-    const retryCondition = baseQueryWithRetry._retryOptions.retryCondition;
+    const retryCondition = baseQueryWithRetry._retryOptions!.retryCondition;
 
     // No status property — treated as non-4xx, should retry
     expect(retryCondition({}, {}, { attempt: 1 })).toBe(true);
@@ -515,7 +515,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
 
   it('has maxRetries set to 2', async () => {
     const { baseQueryWithRetry } = await freshImport();
-    expect(baseQueryWithRetry._retryOptions.maxRetries).toBe(2);
+    expect(baseQueryWithRetry._retryOptions!.maxRetries).toBe(2);
   });
 });
 
@@ -589,7 +589,7 @@ describe('baseQueryWithReauth — non-401 errors', () => {
     const result = await baseQueryWithReauth('/forbidden', api, {});
 
     expect(api.dispatch).not.toHaveBeenCalled();
-    expect(result.error.status).toBe(403);
+    expect(result.error!.status).toBe(403);
     expect(mockRawBaseQuery).toHaveBeenCalledTimes(1);
   });
 
@@ -602,7 +602,7 @@ describe('baseQueryWithReauth — non-401 errors', () => {
     const result = await baseQueryWithReauth('/server-error', api, {});
 
     expect(api.dispatch).not.toHaveBeenCalled();
-    expect(result.error.status).toBe(500);
+    expect(result.error!.status).toBe(500);
   });
 });
 
@@ -652,8 +652,9 @@ describe('baseQueryWithReauth — args type handling', () => {
     });
 
     // args is an object without url — should not be treated as auth endpoint
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const result = await baseQueryWithReauth({ body: 'data' }, api, {});
+     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+    const _result = await baseQueryWithReauth({ body: 'data' } as any, api, {});
     expect(api.dispatch).toHaveBeenCalledWith({
       type: 'auth/tokenRefreshed',
       payload: 'tok',
