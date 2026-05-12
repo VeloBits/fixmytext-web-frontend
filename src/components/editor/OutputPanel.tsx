@@ -110,11 +110,8 @@ export default memo(function OutputPanel({
   loading,
   exportTools,
   onOutputEdit,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAiAccept: _onAiAccept,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAiDismiss: _onAiDismiss,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setPreviewMode: _setPreviewMode,
 }: OutputPanelProps) {
   const [createShare, { isLoading: isSharing }] = useCreateShareMutation();
@@ -208,7 +205,8 @@ export default memo(function OutputPanel({
   // ── Rich text commands (contentEditable) ──
   const execCmd = useCallback((cmd: string, value: string | null = null) => {
     editorRef.current?.focus();
-    document.execCommand(cmd, false, value ?? undefined);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (document as any).execCommand(cmd, false, value);
   }, []);
 
   // fontSize via execCommand only supports 1-7, so we use a workaround:

@@ -249,7 +249,6 @@ const DRAWERS = {
 
 /* Tab bar component extracted to ./TabBar.jsx */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface WorkspaceTab {
   id: string;
   label: string;
@@ -269,10 +268,12 @@ interface WorkspaceTab {
     panelId?: string;
     handlerKey?: string;
     group?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
   panelId?: string;
   color?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -2207,8 +2208,8 @@ export default function TextForm(props: TextFormProps) {
                         {gamification?.favorites?.length > 0 ? 'Your Favourites' : 'Popular Tools'}
                       </h3>
                       <div className="tu-landing-tool-grid">
-                        {(gamification?.favorites?.length > 0
-                          ? gamification?.favorites
+                        {((gamification?.favorites?.length ?? 0) > 0
+                          ? (gamification?.favorites ?? [])
                               .slice(0, 8)
                               .map((id) => TOOLS.find((t) => t.id === id))
                               .filter(Boolean)
