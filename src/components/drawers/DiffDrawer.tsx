@@ -70,7 +70,7 @@ export default function DiffDrawer({ activeTool, text, onResult, showAlert }: Di
               matrix[i]![j - 1]! + 1,
               matrix[i - 1]![j - 1]! + (a[i - 1] !== b[j - 1] ? 1 : 0)
             );
-        const dist = matrix[a.length]![b.length]!
+        const dist = matrix[a.length]![b.length]!;
         const maxLen = Math.max(a.length, b.length);
         const similarity = ((1 - dist / maxLen) * 100).toFixed(1);
         onResult(
