@@ -86,6 +86,9 @@ vi.mock('../constants/endpoints', () => ({
 
 import { useSelector } from 'react-redux';
 
+// vi.mock replaces useSelector with a Mock instance — cast so TS knows
+const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
+
 describe('useAiTools', () => {
   let setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory;
 
@@ -96,14 +99,17 @@ describe('useAiTools', () => {
     setPreviewMode = vi.fn();
     showAlert = vi.fn();
     pushHistory = vi.fn();
-    useSelector.mockReturnValue({ accessToken: 'tok123' });
+    mockUseSelector.mockReturnValue({ accessToken: 'tok123' });
     mockTransformText.mockReturnValue({ unwrap: () => Promise.resolve({ result: 'output' }) });
   });
+
+  // Dynamic handlers (handleHashtags etc.) are spread from a Record — cast for test access
+  type AiToolsWithDynamic = ReturnType<typeof useAiTools> & Record<string, () => Promise<void>>;
 
   const renderAiTools = (text = 'hello world') =>
     renderHook(() =>
       useAiTools(text, setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
-    );
+    ) as ReturnType<typeof renderHook> & { result: { current: AiToolsWithDynamic } };
 
   it('returns default state values', () => {
     const { result } = renderAiTools();
@@ -139,7 +145,7 @@ describe('useAiTools', () => {
   });
 
   it('callAi shows warning when not authenticated', async () => {
-    useSelector.mockReturnValue({ accessToken: null });
+    mockUseSelector.mockReturnValue({ accessToken: null });
     const { result } = renderAiTools('hello');
     await act(async () => {
       await result.current.handleHashtags();
@@ -689,7 +695,7 @@ describe('useAiTools', () => {
     ];
     for (const h of handlers) {
       await act(async () => {
-        await result.current[h]();
+        await (result.current as AiToolsWithDynamic)[h]();
       });
     }
     expect(mockTransformText).toHaveBeenCalledTimes(handlers.length);

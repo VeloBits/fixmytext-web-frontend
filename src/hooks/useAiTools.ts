@@ -2,6 +2,33 @@ import { useState, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTransformTextMutation } from '../store/api/textApi';
 import { ENDPOINTS } from '../constants/endpoints';
+import type { RootState } from '../store/store';
+import type { AlertType } from './useAlert';
+
+interface ToolError {
+  status?: number;
+  data?: {
+    detail?: string | { code?: string; message?: string } | Record<string, unknown>;
+  };
+}
+
+interface ErrorResult {
+  message: string;
+  tone: AlertType;
+}
+
+interface AiToolDefinition {
+  handlerName: string;
+  endpoint: string;
+  label: string;
+  errorMsg: string;
+  toolId?: string;
+}
+
+export interface AiResult {
+  label: string;
+  result: string;
+}
 
 /**
  * Normalize a transform-API error into a user-facing message + alert tone.
@@ -11,23 +38,35 @@ import { ENDPOINTS } from '../constants/endpoints';
  *   - anything else: prefer `detail` (string or {message}), fall back to
  *     the caller-supplied default.
  */
-function formatToolError(err, fallback) {
+function formatToolError(err: ToolError, fallback: string): ErrorResult {
   const detail = err?.data?.detail;
-  if (err?.status === 403 && typeof detail === 'object' && detail?.code === 'email_not_verified') {
-    return {
-      message: detail.message || 'Please verify your email to use FixMyText tools.',
-      tone: 'warning',
-    };
+  if (err?.status === 403 && typeof detail === 'object' && detail !== null) {
+    const d = detail as { code?: string; message?: string };
+    if (d.code === 'email_not_verified') {
+      return {
+        message: d.message || 'Please verify your email to use FixMyText tools.',
+        tone: 'warning',
+      };
+    }
   }
   if (err?.status === 429) {
+    const msg429 =
+      typeof detail === 'string'
+        ? detail
+        : typeof detail === 'object' && detail !== null
+        ? (detail as { message?: string }).message
+        : undefined;
     return {
-      message:
-        (typeof detail === 'string' ? detail : detail?.message) ||
-        'Daily limit reached. Please try again later.',
+      message: msg429 || 'Daily limit reached. Please try again later.',
       tone: 'warning',
     };
   }
-  const msg = typeof detail === 'string' ? detail : detail?.message || fallback;
+  const msg =
+    typeof detail === 'string'
+      ? detail
+      : typeof detail === 'object' && detail !== null
+      ? (detail as { message?: string }).message || fallback
+      : fallback;
   return { message: msg, tone: 'danger' };
 }
 
@@ -35,9 +74,8 @@ function formatToolError(err, fallback) {
  * AI tool handler definitions.
  * Each entry maps to a callAi() invocation with specific endpoint and label.
  * Adding a new AI tool only requires adding an entry here.
- * @type {Array<{handlerName: string, endpoint: string, label: string, errorMsg: string, toolId?: string}>}
  */
-const AI_TOOL_DEFINITIONS = [
+const AI_TOOL_DEFINITIONS: AiToolDefinition[] = [
   // Original AI tools
   {
     handlerName: 'handleHashtags',
@@ -451,24 +489,24 @@ const AI_TOOL_DEFINITIONS = [
  * from AI_TOOL_DEFINITIONS, while parameterized handlers (translate, tone, etc.)
  * are defined individually.
  *
- * @param {string} text - The current input text.
- * @param {function} setText - Setter for the input text.
- * @param {function} setMarkdownMode - Setter to toggle markdown mode.
- * @param {function} setPreviewMode - Setter to change the preview mode.
- * @param {function} showAlert - Callback to display an alert notification.
- * @param {function} pushHistory - Callback to record an operation in history.
- * @returns {object} AI tool handlers, state setters, and result data.
+ * @param text - The current input text.
+ * @param setText - Setter for the input text.
+ * @param setMarkdownMode - Setter to toggle markdown mode.
+ * @param setPreviewMode - Setter to change the preview mode.
+ * @param showAlert - Callback to display an alert notification.
+ * @param pushHistory - Callback to record an operation in history.
+ * @returns AI tool handlers, state setters, and result data.
  */
 export default function useAiTools(
-  text,
-  setText,
-  setMarkdownMode,
-  setPreviewMode,
-  showAlert,
-  pushHistory
+  text: string,
+  setText: (t: string) => void,
+  setMarkdownMode: (v: boolean) => void,
+  setPreviewMode: (mode: string) => void,
+  showAlert: (msg: string, type: AlertType) => void,
+  pushHistory: ((label: string, orig: string, result: string, meta: Record<string, string>) => void) | undefined
 ) {
-  const { accessToken } = useSelector((s) => s.auth);
-  const [aiResult, setAiResult] = useState(null);
+  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const [aiResult, setAiResult] = useState<AiResult | null>(null);
   const [toneSetting, setToneSetting] = useState('formal');
   const [formatSetting, setFormatSetting] = useState('paragraph');
   const [translateLang, setTranslateLang] = useState('Spanish');
@@ -477,7 +515,7 @@ export default function useAiTools(
   const [joinSeparator, setJoinSeparator] = useState(', ');
   const [padAlign, setPadAlign] = useState('left');
   const [autoDetectLang, setAutoDetectLang] = useState(false);
-  const [detectedLang, setDetectedLang] = useState(null);
+  const [detectedLang, setDetectedLang] = useState<string | null>(null);
   const [caesarShift, setCaesarShift] = useState('3');
   const [railCount, setRailCount] = useState('3');
   const [curlTarget, setCurlTarget] = useState('javascript');
@@ -485,8 +523,7 @@ export default function useAiTools(
 
   const [transformText] = useTransformTextMutation();
 
-  /** @param {string} str - Text to check for markdown syntax. */
-  const hasMarkdown = (str) => /[|#*-]{2,}|^\s*[•\-\d]+[.)]\s|^\|.+\|$/m.test(str);
+  const hasMarkdown = (str: string): boolean => /[|#*-]{2,}|^\s*[•\-\d]+[.)]\s|^\|.+\|$/m.test(str);
 
   /**
    * Core AI call function. Sends text to an endpoint and processes the result.
@@ -496,7 +533,7 @@ export default function useAiTools(
    * @param {string} [toolId] - Optional tool identifier for history tracking.
    */
   const callAi = useCallback(
-    async (endpoint, label, errorMsg, toolId) => {
+    async (endpoint: string, label: string, errorMsg: string, toolId?: string): Promise<void> => {
       if (!text) return;
       if (!accessToken) {
         showAlert('Please log in to use AI tools', 'warning');
@@ -511,7 +548,7 @@ export default function useAiTools(
       // results are rejoined preserving the original separator pattern.
       // We tokenize the input by walking through it and recording each
       // non-empty content run plus the separator that follows it.
-      const tokens = [];
+      const tokens: Array<{ content: string; sep: string }> = [];
       const re = /([^\n]+)(\n+|$)/g;
       let m;
       while ((m = re.exec(text)) !== null) {
@@ -552,7 +589,7 @@ export default function useAiTools(
         );
       } catch (err) {
         const { message, tone } = formatToolError(
-          err,
+          err as ToolError,
           errorMsg || 'Daily AI limit reached. Upgrade to Pro for unlimited access.'
         );
         showAlert(message, tone);
@@ -567,8 +604,8 @@ export default function useAiTools(
    * The resulting object has the same property names as the original
    * hand-written handlers for backward compatibility.
    */
-  const simpleHandlers = useMemo(() => {
-    const result = {};
+  const simpleHandlers = useMemo((): Record<string, () => Promise<void>> => {
+    const result: Record<string, () => Promise<void>> = {};
     for (const tool of AI_TOOL_DEFINITIONS) {
       result[tool.handlerName] = () =>
         callAi(tool.endpoint, tool.label, tool.errorMsg, tool.toolId);
@@ -584,7 +621,7 @@ export default function useAiTools(
    * input and only continues from the last paragraph, producing a single
    * continuation block — the user sees output for the second paragraph only.
    */
-  const handleContinueWriting = async () => {
+  const handleContinueWriting = async (): Promise<void> => {
     if (!text) return;
     if (!accessToken) {
       showAlert('Please log in to use AI tools', 'warning');
@@ -613,13 +650,13 @@ export default function useAiTools(
         'success'
       );
     } catch (err) {
-      const { message, tone } = formatToolError(err, 'Could not continue writing.');
+      const { message, tone } = formatToolError(err as ToolError, 'Could not continue writing.');
       showAlert(message, tone);
     }
   };
 
   /** @param {string} [overrideVal] - Optional format value override. */
-  const handleChangeFormat = async (overrideVal) => {
+  const handleChangeFormat = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const fmt = overrideVal ?? formatSetting;
@@ -638,7 +675,7 @@ export default function useAiTools(
     } catch (err) {
       {
         const { message, tone } = formatToolError(
-          err,
+          err as ToolError,
           'Could not change format. Please try again.'
         );
         showAlert(message, tone);
@@ -647,7 +684,7 @@ export default function useAiTools(
   };
 
   /** @param {string} [overrideVal] - Optional tone value override. */
-  const handleChangeTone = async (overrideVal) => {
+  const handleChangeTone = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const tone = overrideVal ?? toneSetting;
@@ -661,14 +698,14 @@ export default function useAiTools(
       showAlert(`Tone changed to ${tone}`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err, 'Could not change tone. Please try again.');
+        const { message, tone } = formatToolError(err as ToolError, 'Could not change tone. Please try again.');
         showAlert(message, tone);
       }
     }
   };
 
   /** Detect the language of the current text. */
-  const handleDetectLanguage = async () => {
+  const handleDetectLanguage = async (): Promise<string | null | undefined> => {
     if (!text) return;
     try {
       const data = await transformText({ endpoint: ENDPOINTS.DETECT_LANGUAGE, text }).unwrap();
@@ -681,7 +718,7 @@ export default function useAiTools(
   };
 
   /** @param {string} [overrideVal] - Optional target language override. */
-  const handleTranslate = async (overrideVal) => {
+  const handleTranslate = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const lang = overrideVal ?? translateLang;
@@ -704,7 +741,7 @@ export default function useAiTools(
     } catch (err) {
       {
         const { message, tone } = formatToolError(
-          err,
+          err as ToolError,
           'Could not translate text. Please try again.'
         );
         showAlert(message, tone);
@@ -713,7 +750,7 @@ export default function useAiTools(
   };
 
   /** @param {string} [overrideVal] - Optional target language override. */
-  const handleTransliterate = async (overrideVal) => {
+  const handleTransliterate = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const lang = overrideVal ?? translitLang;
@@ -732,7 +769,7 @@ export default function useAiTools(
     } catch (err) {
       {
         const { message, tone } = formatToolError(
-          err,
+          err as ToolError,
           'Could not transliterate text. Please try again.'
         );
         showAlert(message, tone);
@@ -741,7 +778,7 @@ export default function useAiTools(
   };
 
   /** @param {string} [overrideVal] - Optional delimiter override. */
-  const handleSplitToLines = async (overrideVal) => {
+  const handleSplitToLines = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const delVal = overrideVal ?? splitDelimiter;
@@ -760,14 +797,14 @@ export default function useAiTools(
       showAlert('Text split to lines', 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err, 'Could not split text. Please try again.');
+        const { message, tone } = formatToolError(err as ToolError, 'Could not split text. Please try again.');
         showAlert(message, tone);
       }
     }
   };
 
   /** @param {string} [overrideVal] - Optional separator override. */
-  const handleJoinLines = async (overrideVal) => {
+  const handleJoinLines = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const sep = overrideVal ?? joinSeparator;
@@ -785,14 +822,14 @@ export default function useAiTools(
       showAlert('Lines joined', 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err, 'Could not join lines. Please try again.');
+        const { message, tone } = formatToolError(err as ToolError, 'Could not join lines. Please try again.');
         showAlert(message, tone);
       }
     }
   };
 
   /** @param {string} [overrideVal] - Optional Caesar shift override. */
-  const handleCaesarCipher = async (overrideVal) => {
+  const handleCaesarCipher = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const shift = parseInt(overrideVal ?? caesarShift, 10);
@@ -806,14 +843,14 @@ export default function useAiTools(
       showAlert(`Caesar cipher applied (shift ${shift})`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err, 'Could not apply Caesar cipher.');
+        const { message, tone } = formatToolError(err as ToolError, 'Could not apply Caesar cipher.');
         showAlert(message, tone);
       }
     }
   };
 
   /** @param {string} [overrideVal] - Optional rail count override. */
-  const handleRailFenceEnc = async (overrideVal) => {
+  const handleRailFenceEnc = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const rails = parseInt(overrideVal ?? railCount, 10);
@@ -831,14 +868,14 @@ export default function useAiTools(
       showAlert(`Rail fence encrypted (${rails} rails)`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err, 'Could not encrypt with Rail Fence.');
+        const { message, tone } = formatToolError(err as ToolError, 'Could not encrypt with Rail Fence.');
         showAlert(message, tone);
       }
     }
   };
 
   /** @param {string} [overrideVal] - Optional rail count override. */
-  const handleRailFenceDec = async (overrideVal) => {
+  const handleRailFenceDec = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const rails = parseInt(overrideVal ?? railCount, 10);
@@ -856,20 +893,20 @@ export default function useAiTools(
       showAlert(`Rail fence decrypted (${rails} rails)`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err, 'Could not decrypt Rail Fence.');
+        const { message, tone } = formatToolError(err as ToolError, 'Could not decrypt Rail Fence.');
         showAlert(message, tone);
       }
     }
   };
 
   /** @param {string} [overrideVal] - Optional target language override. */
-  const handleCurlToCode = async (overrideVal) => {
+  const handleCurlToCode = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const target = overrideVal ?? curlTarget;
 
     // Convert one curl command (already collapsed onto a single line).
-    const convertOne = (cmd) => {
+    const convertOne = (cmd: string): string => {
       const urlMatch = cmd.match(/curl\s+(?:.*?\s+)?['"]?(https?:\/\/[^\s'"]+)/);
       const url = urlMatch ? urlMatch[1] : 'https://api.example.com';
       const methodMatch = cmd.match(/-X\s+(\w+)/);
@@ -949,7 +986,7 @@ export default function useAiTools(
   };
 
   /** @param {string} [overrideVal] - Optional date format type override. */
-  const handleDateFormat = async (overrideVal) => {
+  const handleDateFormat = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const fmt = overrideVal ?? dateFormatType;
@@ -1001,7 +1038,7 @@ export default function useAiTools(
   };
 
   /** @param {string} [overrideVal] - Optional alignment override. */
-  const handlePadLines = async (overrideVal) => {
+  const handlePadLines = async (overrideVal?: string): Promise<void> => {
     if (!text) return;
     const original = text;
     const align = overrideVal ?? padAlign;
@@ -1015,7 +1052,7 @@ export default function useAiTools(
       showAlert(`Lines padded (${align})`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err, 'Could not pad lines. Please try again.');
+        const { message, tone } = formatToolError(err as ToolError, 'Could not pad lines. Please try again.');
         showAlert(message, tone);
       }
     }

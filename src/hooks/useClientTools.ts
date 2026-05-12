@@ -1,4 +1,18 @@
 import { useMemo } from 'react';
+import type React from 'react';
+import type { AiResult } from './useAiTools';
+import type { AlertType } from './useAlert';
+
+interface ClientToolsDeps {
+  textRef: React.RefObject<string>;
+  setToolResults: (fn: (prev: Record<string, string>) => Record<string, string>) => void;
+  setPreviewMode: (mode: string) => void;
+  setLocalLoading: (v: boolean) => void;
+  showAlert: (msg: string, type: AlertType) => void;
+  activeWorkspaceId: string;
+  setAiResult: (result: AiResult) => void;
+  pushHistory: (label: string, orig: string, result: string, meta: Record<string, string>) => void;
+}
 
 export default function useClientTools({
   textRef,
@@ -9,12 +23,12 @@ export default function useClientTools({
   activeWorkspaceId,
   setAiResult,
   pushHistory,
-}) {
+}: ClientToolsDeps) {
   return useMemo(() => {
     const handleFrequencyAnalysis = () => {
       const t = textRef.current;
       if (!t) return;
-      const freq = {};
+      const freq: Record<string, number> = {};
       for (const ch of t.toUpperCase()) {
         if (/[A-Z]/.test(ch)) freq[ch] = (freq[ch] || 0) + 1;
       }
@@ -273,11 +287,11 @@ export default function useClientTools({
       const raw = textRef.current || '';
       if (!raw.trim()) return;
 
-      const explainOne = (expr) => {
+      const explainOne = (expr: string): string | null => {
         const parts = expr.split(/\s+/);
         if (parts.length < 5 || parts.length > 6) return null;
         const [min, hour, dom, month, dow] = parts;
-        const descs = [];
+        const descs: string[] = [];
         if (min === '*') descs.push('every minute');
         else if (min.includes('/')) descs.push(`every ${min.split('/')[1]} minutes`);
         else descs.push(`at minute ${min}`);
@@ -502,7 +516,7 @@ export default function useClientTools({
       const t = textRef.current;
       if (!t) return;
       const words = t.toLowerCase().match(/\b[a-z]+\b/g) || [];
-      const freq = {};
+      const freq: Record<string, number> = {};
       words.forEach((w) => {
         freq[w] = (freq[w] || 0) + 1;
       });
@@ -584,7 +598,7 @@ export default function useClientTools({
         'if',
       ]);
       const words = t.toLowerCase().match(/\b[a-z]+\b/g) || [];
-      const freq = {};
+      const freq: Record<string, number> = {};
       words
         .filter((w) => !stopWords.has(w) && w.length > 2)
         .forEach((w) => {
@@ -758,7 +772,7 @@ export default function useClientTools({
       if (/^\d+$/.test(t)) {
         let n = parseInt(t),
           result = '';
-        const vals = [
+        const vals: [number, string][] = [
           [1000, 'M'],
           [900, 'CM'],
           [500, 'D'],
@@ -990,7 +1004,7 @@ export default function useClientTools({
           } catch {
             throw new Error(`Invalid base64 in JWT ${label}`);
           }
-          const jsonStr = new TextDecoder().decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
+          const jsonStr = new TextDecoder().decode(Uint8Array.from(binary, (c: string) => c.charCodeAt(0)));
           try {
             return JSON.parse(jsonStr);
           } catch {
@@ -1012,7 +1026,8 @@ export default function useClientTools({
         });
         showAlert('JWT decoded', 'success');
       } catch (err) {
-        showAlert(err.message || 'Invalid JWT token', 'danger');
+        const msg = err instanceof Error ? err.message : 'Invalid JWT token';
+        showAlert(msg, 'danger');
       } finally {
         setLocalLoading(false);
       }
