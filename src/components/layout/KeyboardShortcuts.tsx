@@ -6,8 +6,23 @@ import {
   detectConflicts,
   DEFAULT_SHORTCUT_GROUPS,
 } from '../../hooks/useKeyboardShortcuts';
+import type {
+  ShortcutDef,
+  ShortcutGroup,
+  ShortcutBinding,
+  KeybindingOverrides,
+} from '../../hooks/useKeyboardShortcuts';
 
-function ShortcutRow({ sc, isCustomized, onStartRecording, onReset, recording, conflict }) {
+interface ShortcutRowProps {
+  sc: ShortcutDef;
+  isCustomized: boolean | undefined;
+  onStartRecording: (id: string) => void;
+  onReset: (id: string) => void;
+  recording: boolean;
+  conflict: ShortcutDef | null;
+}
+
+function ShortcutRow({ sc, isCustomized, onStartRecording, onReset, recording, conflict }: ShortcutRowProps) {
   return (
     <div
       className={`tu-shortcuts-row${recording ? ' tu-shortcuts-row--recording' : ''}${
@@ -58,6 +73,17 @@ function ShortcutRow({ sc, isCustomized, onStartRecording, onReset, recording, c
   );
 }
 
+export interface KeyboardShortcutsProps {
+  isOpen: boolean;
+  onClose: () => void;
+  groups?: ShortcutGroup[];
+  overrides: KeybindingOverrides;
+  updateBinding: (id: string, binding: ShortcutBinding) => void;
+  resetAll: () => void;
+  resetOne: (id: string) => void;
+  isCustomized?: (id: string) => boolean;
+}
+
 export default function KeyboardShortcuts({
   isOpen,
   onClose,
@@ -67,11 +93,11 @@ export default function KeyboardShortcuts({
   resetAll,
   resetOne,
   isCustomized,
-}) {
-  const panelRef = useRef(null);
-  const [recordingId, setRecordingId] = useState(null);
-  const [pendingBinding, setPendingBinding] = useState(null);
-  const [conflict, setConflict] = useState(null);
+}: KeyboardShortcutsProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [recordingId, setRecordingId] = useState<string | null>(null);
+  const [pendingBinding, setPendingBinding] = useState<ShortcutBinding | null>(null);
+  const [conflict, setConflict] = useState<ShortcutDef | null>(null);
 
   useEffect(() => {
     if (isOpen && panelRef.current) panelRef.current.focus();
@@ -98,7 +124,7 @@ export default function KeyboardShortcuts({
   useEffect(() => {
     if (!recordingId) return;
 
-    const handler = (e) => {
+    const handler = (e: KeyboardEvent) => {
       e.preventDefault();
       e.stopPropagation();
 

@@ -1,10 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { ToolDefinition } from '../../types/tools';
 
-export default function CommandPalette({ search, onToolClick }) {
+interface CommandPaletteSearch {
+  isOpen: boolean;
+  query: string;
+  setQuery: (q: string) => void;
+  results: ToolDefinition[];
+  close: () => void;
+}
+
+export interface CommandPaletteProps {
+  search: CommandPaletteSearch;
+  onToolClick: (tool: ToolDefinition) => void;
+}
+
+export default function CommandPalette({ search, onToolClick }: CommandPaletteProps) {
   const [activeIdx, setActiveIdx] = useState(0);
-  const inputRef = useRef(null);
-  const resultsRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const results = search.results || [];
 
   useEffect(() => {
@@ -27,7 +41,7 @@ export default function CommandPalette({ search, onToolClick }) {
     search.close();
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Escape') {
       e.preventDefault();
       search.close();
@@ -68,7 +82,7 @@ export default function CommandPalette({ search, onToolClick }) {
               type="text"
               placeholder="What do you want to do with your text?"
               value={search.query}
-              onChange={(e) => search.setQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => search.setQuery(e.target.value)}
             />
 
             <div className="tu-palette-results" ref={resultsRef}>
