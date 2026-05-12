@@ -1,6 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
+import type { AlertType } from './useAlert';
 
-const defaultFmtCfg = {
+export interface FormatterConfig {
+  tabWidth: number;
+  useTabs: boolean;
+  semi: boolean;
+  singleQuote: boolean;
+  trailingComma: string;
+  bracketSpacing: boolean;
+  arrowParens: string;
+  jsxSingleQuote: boolean;
+  sortImports: boolean;
+  bracketSameLine: boolean;
+  htmlWhitespaceSensitivity: string;
+}
+
+export interface FormatterValue {
+  fmtCfg: FormatterConfig;
+  setFmtCfg: (cfg: FormatterConfig) => void;
+  handleFormatHtml: () => void;
+  handleFormatCss: () => void;
+  handleFormatJs: () => void;
+  handleFormatTs: () => void;
+}
+
+const defaultFmtCfg: FormatterConfig = {
   tabWidth: 2,
   useTabs: false,
   semi: true,
@@ -14,19 +38,21 @@ const defaultFmtCfg = {
   htmlWhitespaceSensitivity: 'css',
 };
 
-const parserImports = {
+type ParserKey = 'babel' | 'typescript' | 'html' | 'css';
+
+const parserImports: Record<ParserKey, () => Promise<{ default: unknown }>> = {
   babel: () => import('prettier/parser-babel'),
   typescript: () => import('prettier/parser-typescript'),
   html: () => import('prettier/parser-html'),
   css: () => import('prettier/parser-postcss'),
 };
 
-const sortImportsAlphabetically = (code) => {
+const sortImportsAlphabetically = (code: string): string => {
   const lines = code.split('\n');
   let i = 0;
   while (i < lines.length && lines[i].trim() === '') i++;
   const start = i;
-  const importLines = [];
+  const importLines: string[] = [];
   while (i < lines.length && /^\s*import\s/.test(lines[i])) {
     importLines.push(lines[i]);
     i++;
@@ -43,7 +69,12 @@ const sortImportsAlphabetically = (code) => {
   return [...lines.slice(0, start), ...sorted, ...lines.slice(i)].join('\n');
 };
 
-export default function useFormatter(text, setLoading, showAlert, onResult) {
+export default function useFormatter(
+  text: string,
+  setLoading: (v: boolean) => void,
+  showAlert: (msg: string, type: AlertType) => void,
+  onResult: (label: string, formatted: string) => void
+): FormatterValue {
   const [fmtCfg, setFmtCfg] = useState(defaultFmtCfg);
   // Ref always holds the latest config — avoids stale closures in handlers
   const cfgRef = useRef(fmtCfg);
@@ -51,7 +82,7 @@ export default function useFormatter(text, setLoading, showAlert, onResult) {
     cfgRef.current = fmtCfg;
   }, [fmtCfg]);
 
-  const runFormat = async (parser, successMsg) => {
+  const runFormat = async (parser: ParserKey, successMsg: string): Promise<void> => {
     if (!text) return;
     setLoading(true);
     const cfg = cfgRef.current;
@@ -64,6 +95,7 @@ export default function useFormatter(text, setLoading, showAlert, onResult) {
       if (cfg.sortImports && ['babel', 'babel-ts', 'typescript'].includes(parser)) {
         code = sortImportsAlphabetically(code);
       }
+      // Cast options to any to avoid strict prettier type mismatches on config strings
       const formatted = await prettierMod.default.format(code, {
         parser,
         plugins: [parserMod.default],
@@ -71,17 +103,18 @@ export default function useFormatter(text, setLoading, showAlert, onResult) {
         useTabs: cfg.useTabs,
         semi: cfg.semi,
         singleQuote: cfg.singleQuote,
-        trailingComma: cfg.trailingComma,
+        trailingComma: cfg.trailingComma as 'es5' | 'all' | 'none',
         bracketSpacing: cfg.bracketSpacing,
-        arrowParens: cfg.arrowParens,
+        arrowParens: cfg.arrowParens as 'always' | 'avoid',
         jsxSingleQuote: cfg.jsxSingleQuote,
         bracketSameLine: cfg.bracketSameLine,
-        htmlWhitespaceSensitivity: cfg.htmlWhitespaceSensitivity,
-      });
+        htmlWhitespaceSensitivity: cfg.htmlWhitespaceSensitivity as 'css' | 'strict' | 'ignore',
+      } as Parameters<typeof prettierMod.default.format>[1]);
       onResult(successMsg, formatted);
       showAlert(successMsg, 'success');
     } catch (err) {
-      showAlert(err.message?.split('\n')[0] || 'Format error', 'danger');
+      const errMsg = err instanceof Error ? err.message?.split('\n')[0] : undefined;
+      showAlert(errMsg || 'Format error', 'danger');
     } finally {
       setLoading(false);
     }

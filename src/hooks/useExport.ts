@@ -1,13 +1,27 @@
 import { useRef } from 'react';
+import type { AlertType } from './useAlert';
 
-export default function useExport(setLoading, showAlert) {
+export interface ExportValue {
+  setOutputText: (text: string) => void;
+  handleDownloadTxt: () => void;
+  handleDownloadJson: () => void;
+  handleDownloadPdf: () => Promise<void>;
+  handleDownloadDocx: () => Promise<void>;
+  handleDownloadCsv: () => void;
+  handleDownloadMd: () => void;
+}
+
+export default function useExport(
+  setLoading: (v: boolean) => void,
+  showAlert: (msg: string, type: AlertType) => void
+): ExportValue {
   const outputRef = useRef('');
 
-  const setOutputText = (text) => {
+  const setOutputText = (text: string): void => {
     outputRef.current = text;
   };
 
-  const triggerDownload = (blob, filename) => {
+  const triggerDownload = (blob: Blob, filename: string): void => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -16,12 +30,12 @@ export default function useExport(setLoading, showAlert) {
     URL.revokeObjectURL(url);
   };
 
-  const handleDownloadTxt = () => {
+  const handleDownloadTxt = (): void => {
     triggerDownload(new Blob([outputRef.current], { type: 'text/plain' }), 'fixmytext-output.txt');
     showAlert('Downloaded as TXT', 'success');
   };
 
-  const handleDownloadJson = () => {
+  const handleDownloadJson = (): void => {
     triggerDownload(
       new Blob([JSON.stringify({ output: outputRef.current }, null, 2)], {
         type: 'application/json',
@@ -31,7 +45,7 @@ export default function useExport(setLoading, showAlert) {
     showAlert('Downloaded as JSON', 'success');
   };
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadPdf = async (): Promise<void> => {
     setLoading(true);
     try {
       const { jsPDF } = await import('jspdf');
@@ -47,7 +61,7 @@ export default function useExport(setLoading, showAlert) {
     }
   };
 
-  const handleDownloadDocx = async () => {
+  const handleDownloadDocx = async (): Promise<void> => {
     setLoading(true);
     try {
       const { Document, Paragraph, TextRun, Packer } = await import('docx');
@@ -65,12 +79,12 @@ export default function useExport(setLoading, showAlert) {
     }
   };
 
-  const handleDownloadCsv = () => {
+  const handleDownloadCsv = (): void => {
     triggerDownload(new Blob([outputRef.current], { type: 'text/csv' }), 'fixmytext-output.csv');
     showAlert('Downloaded as CSV', 'success');
   };
 
-  const handleDownloadMd = () => {
+  const handleDownloadMd = (): void => {
     triggerDownload(
       new Blob([outputRef.current], { type: 'text/markdown' }),
       'fixmytext-output.md'

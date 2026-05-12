@@ -28,7 +28,7 @@ describe('useExport', () => {
       href: '',
       download: '',
       click: clickSpy,
-    });
+    } as unknown as HTMLElement);
     act(() => {
       result.current.handleDownloadTxt();
     });
@@ -46,7 +46,7 @@ describe('useExport', () => {
       href: '',
       download: '',
       click: clickSpy,
-    });
+    } as unknown as HTMLElement);
     act(() => {
       result.current.handleDownloadTxt();
     });
@@ -66,7 +66,7 @@ describe('useExport', () => {
       href: '',
       download: '',
       click: clickSpy,
-    });
+    } as unknown as HTMLElement);
     act(() => {
       result.current.handleDownloadJson();
     });
@@ -85,7 +85,7 @@ describe('useExport', () => {
       href: '',
       download: '',
       click: clickSpy,
-    });
+    } as unknown as HTMLElement);
     act(() => {
       result.current.handleDownloadCsv();
     });
@@ -104,7 +104,7 @@ describe('useExport', () => {
       href: '',
       download: '',
       click: clickSpy,
-    });
+    } as unknown as HTMLElement);
     act(() => {
       result.current.handleDownloadMd();
     });
