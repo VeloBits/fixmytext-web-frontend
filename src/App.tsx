@@ -19,28 +19,30 @@ const PricingPage = lazy(() => import('./pages/PricingPage'));
 const SharePage = lazy(() => import('./pages/SharePage'));
 
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
+import type { AlertLevel } from './contexts/AlertContext';
 import { AppProvider, useAppContext } from './contexts/AppContext';
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 import PassPurchaseModal from './components/subscription/PassPurchaseModal';
 import { ROUTES } from './constants';
 
 function AppInner() {
-  const { alerts, showAlert, dismissAlert } = useAlertContext();
+  const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
   const { user, isAuthenticated, gamification, subscription } = useAppContext();
+  // Narrow to the simpler signature used by page components
+  const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
 
   // Listen for global RTK Query errors from middleware
   useEffect(() => {
-    const handler = (e) => {
-      const { message, type } = e.detail;
-      showAlert(message, type);
+    const handler = (e: CustomEvent<{ message: string; type: string }>) => {
+      showAlert(e.detail.message, e.detail.type as Parameters<typeof showAlert>[1]);
     };
-    window.addEventListener('rtk-api-error', handler);
-    return () => window.removeEventListener('rtk-api-error', handler);
+    window.addEventListener('rtk-api-error', handler as EventListener);
+    return () => window.removeEventListener('rtk-api-error', handler as EventListener);
   }, [showAlert]);
 
-  const handleOnboardingComplete = (persona) => {
-    gamification.setPersona(persona);
+  const handleOnboardingComplete = (personaId: string) => {
+    gamification.setPersona(personaId as unknown as Parameters<typeof gamification.setPersona>[0]);
   };
 
   return (
@@ -59,21 +61,21 @@ function AppInner() {
       <Suspense fallback={<PageSkeleton />}>
         <Routes>
           <Route
-            exact
             path={ROUTES.HOME}
             element={
               <Home
                 mode={mode}
-                setMode={setMode}
-                showAlert={showAlert}
+                setMode={setMode as (mode: string) => void}
+                showAlert={showAlert as (message: string, type: string) => void}
                 gamification={gamification}
                 user={user}
                 isAuthenticated={isAuthenticated}
                 subscription={subscription}
               />
+
             }
           />
-          <Route exact path={ROUTES.ABOUT} element={<AboutPage />} />
+          <Route path={ROUTES.ABOUT} element={<AboutPage />} />
           <Route path={ROUTES.LOGIN} element={<LoginPage showAlert={showAlert} />} />
           <Route path={ROUTES.SIGNUP} element={<SignupPage showAlert={showAlert} />} />
           <Route
@@ -98,7 +100,7 @@ function AppInner() {
                 isAuthenticated={isAuthenticated}
                 showAlert={showAlert}
                 mode={mode}
-                setMode={setMode}
+                setMode={setMode as (mode: string) => void}
                 subscription={subscription}
               />
             }
