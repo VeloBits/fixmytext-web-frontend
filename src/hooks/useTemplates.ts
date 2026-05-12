@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { useSelector } from 'react-redux';
 import {
   useGetTemplatesQuery,
@@ -6,33 +6,70 @@ import {
   useUpdateTemplateMutation,
   useDeleteTemplateMutation,
 } from '../store/api/userDataApi';
+import type { RootState } from '../store/store';
 
 const STORAGE_KEY = 'tu-templates';
 
-function loadTemplates() {
+/** Template shape used in local (offline) storage */
+interface LocalTemplate {
+  name: string;
+  text: string;
+  tool_id: string | null;
+  id?: string;
+  createdAt?: number | string;
+  updatedAt?: number | string;
+}
+
+/** Normalised template shape presented to consumers */
+interface Template {
+  name: string;
+  text: string;
+  tool_id: string | null;
+  id?: string;
+  createdAt?: string | number;
+  updatedAt?: string | number;
+}
+
+interface UseTemplatesOptions {
+  getActiveToolId?: () => string | null;
+  openToolById?: (toolId: string | null, text: string) => void;
+  renameActiveTab?: (name: string) => void;
+}
+
+interface UseTemplatesReturn {
+  templates: Template[];
+  templateName: string;
+  setTemplateName: Dispatch<SetStateAction<string>>;
+  handleSaveTemplate: () => Promise<void>;
+  handleLoadTemplate: (idx: number) => void;
+  handleDeleteTemplate: (idx: number) => Promise<void>;
+  saveDirectly: (name: string, content: string, toolId?: string | null) => Promise<void>;
+}
+
+function loadTemplates(): LocalTemplate[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? (JSON.parse(raw) as LocalTemplate[]) : [];
   } catch {
     return [];
   }
 }
 
-function saveTemplates(templates) {
+function saveTemplates(templates: LocalTemplate[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
 }
 
 export default function useTemplates(
-  text,
-  setText,
-  showAlert,
-  { getActiveToolId, openToolById, renameActiveTab } = {}
-) {
-  const accessToken = useSelector((s) => s.auth.accessToken);
+  text: string,
+  setText: Dispatch<SetStateAction<string>>,
+  showAlert: (msg: string, variant: string) => void,
+  { getActiveToolId, openToolById, renameActiveTab }: UseTemplatesOptions = {}
+): UseTemplatesReturn {
+  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
   const isAuthenticated = !!accessToken;
 
   // Local state (used when not authenticated, or as initial value)
-  const [localTemplates, setLocalTemplates] = useState(loadTemplates);
+  const [localTemplates, setLocalTemplates] = useState<LocalTemplate[]>(loadTemplates);
   const [templateName, setTemplateName] = useState('');
 
   // RTK Query — DB-backed templates when authenticated
@@ -50,7 +87,7 @@ export default function useTemplates(
   }, [localTemplates, isAuthenticated]);
 
   // Use DB templates when authenticated, local otherwise
-  const templates =
+  const templates: Template[] =
     isAuthenticated && dbTemplates
       ? dbTemplates.map((t) => ({
           name: t.name,
@@ -62,7 +99,7 @@ export default function useTemplates(
         }))
       : localTemplates;
 
-  const handleSaveTemplate = useCallback(async () => {
+  const handleSaveTemplate = useCallback(async (): Promise<void> => {
     const name = templateName.trim();
     if (!name) {
       showAlert('Enter a template name', 'danger');
@@ -120,7 +157,7 @@ export default function useTemplates(
   ]);
 
   const handleLoadTemplate = useCallback(
-    (idx) => {
+    (idx: number): void => {
       const t = templates[idx];
       if (!t) return;
       // Always open via the tool tab — either the saved tool or a fallback
@@ -135,7 +172,7 @@ export default function useTemplates(
   );
 
   const handleDeleteTemplate = useCallback(
-    async (idx) => {
+    async (idx: number): Promise<void> => {
       const t = templates[idx];
       if (!t) return;
 
@@ -156,7 +193,7 @@ export default function useTemplates(
   );
 
   const saveDirectly = useCallback(
-    async (name, content, toolId = null) => {
+    async (name: string, content: string, toolId: string | null = null): Promise<void> => {
       if (!name || !content) return;
 
       if (isAuthenticated) {
