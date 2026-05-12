@@ -24,8 +24,9 @@ const ALWAYS_FREE_IDS = new Set([
   'save_json',
 ]);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface UseSubscriptionOptions {
-  showAlert?: (msg: string, variant: string) => void;
+  showAlert?: (...args: any[]) => unknown;
 }
 
 interface ToolUsage {
@@ -77,7 +78,6 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
       setShowUpgradeModal(true);
       return false;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       isAuthenticated,
       isPro,
@@ -154,14 +154,12 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
       const hasPass = passes.hasPassFor(toolId);
       return { uses, max: maxFree, hasPass };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isPro, toolUsesToday, dailyLoginBonus, freeUsesPerTool, passes.hasPassFor]
   );
 
   const refetchAll = useCallback((): void => {
     refetchStatus();
     passes.refetchPasses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchStatus, passes.refetchPasses]);
 
   return {

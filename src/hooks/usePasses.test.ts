@@ -12,7 +12,8 @@ const mocks = vi.hoisted(() => ({
   mockExecuteCheckoutFlow: vi.fn(),
 }));
 
-let activePassesData = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let activePassesData: any = {
   passes: [{ tools_count: -1, tool_ids: ['*'], uses_today: 0, uses_per_day: 10 }],
   credits: [{ amount: 50 }],
   total_credits: 50,
@@ -56,13 +57,16 @@ vi.mock('../utils/razorpay', () => ({
 import { useSelector } from 'react-redux';
 import usePasses from './usePasses';
 
+const mockUseSelector = vi.mocked(useSelector);
+
 describe('usePasses', () => {
-  let showAlert;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let showAlert: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
     showAlert = vi.fn();
-    useSelector.mockReturnValue({ accessToken: 'tok' });
+    mockUseSelector.mockReturnValue({ accessToken: 'tok' });
     mocks.mockSpinWheel.mockReturnValue({ unwrap: () => Promise.resolve({ prize: 'bonus' }) });
     mocks.mockExecuteCheckoutFlow.mockResolvedValue(undefined);
     activePassesData = {

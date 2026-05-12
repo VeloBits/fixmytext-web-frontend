@@ -42,9 +42,9 @@ describe('useRegexTester', () => {
     act(() => {
       result.current.handleRegexTest();
     });
-    expect(result.current.regexResult.total).toBe(2);
-    expect(result.current.regexResult.matches[0].match).toBe('hello');
-    expect(result.current.regexResult.matches[0].index).toBe(0);
+    expect(result.current.regexResult!.total).toBe(2);
+    expect(result.current.regexResult!.matches[0].match).toBe('hello');
+    expect(result.current.regexResult!.matches[0].index).toBe(0);
     expect(showAlert).toHaveBeenCalledWith('2 matches found', 'success');
   });
 
@@ -59,8 +59,8 @@ describe('useRegexTester', () => {
     act(() => {
       result.current.handleRegexTest();
     });
-    expect(result.current.regexResult.total).toBe(1);
-    expect(result.current.regexResult.matches[0].match).toBe('world');
+    expect(result.current.regexResult!.total).toBe(1);
+    expect(result.current.regexResult!.matches[0].match).toBe('world');
   });
 
   it('reports 0 matches with info', () => {
@@ -71,7 +71,7 @@ describe('useRegexTester', () => {
     act(() => {
       result.current.handleRegexTest();
     });
-    expect(result.current.regexResult.total).toBe(0);
+    expect(result.current.regexResult!.total).toBe(0);
     expect(showAlert).toHaveBeenCalledWith('0 matches found', 'info');
   });
 
@@ -94,7 +94,7 @@ describe('useRegexTester', () => {
     act(() => {
       result.current.handleRegexTest();
     });
-    expect(result.current.regexResult.matches[0].groups).toEqual(['2024', '01', '15']);
+    expect(result.current.regexResult!.matches[0].groups).toEqual(['2024', '01', '15']);
   });
 
   it('handles non-global with no match', () => {
@@ -108,7 +108,7 @@ describe('useRegexTester', () => {
     act(() => {
       result.current.handleRegexTest();
     });
-    expect(result.current.regexResult.total).toBe(0);
+    expect(result.current.regexResult!.total).toBe(0);
   });
 
   it('handles zero-length matches (advances lastIndex)', () => {
@@ -123,7 +123,7 @@ describe('useRegexTester', () => {
     act(() => {
       result.current.handleRegexTest();
     });
-    expect(result.current.regexResult.total).toBe(1);
+    expect(result.current.regexResult!.total).toBe(1);
   });
 
   it('singular match text', () => {

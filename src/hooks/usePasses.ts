@@ -19,8 +19,9 @@ type ActiveCredit = components['schemas']['ActiveCredit'];
 type SpinHistoryItem = components['schemas']['SpinHistoryItem'];
 type SpinResult = components['schemas']['SpinResult'];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface UsePassesOptions {
-  showAlert?: (msg: string, variant: string) => void;
+  showAlert?: (...args: any[]) => unknown;
 }
 
 interface UsePassesReturn {
@@ -57,7 +58,6 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
     skip: !isAuthenticated,
   });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const activePasses: ActivePass[] = activeData?.passes || [];
   const activeCredits: ActiveCredit[] = activeData?.credits || [];
   const totalCredits = activeData?.total_credits || 0;

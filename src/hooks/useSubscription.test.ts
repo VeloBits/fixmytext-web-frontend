@@ -7,7 +7,8 @@ const mockRefetchStatus = vi.fn();
 const mockNavigate = vi.fn();
 
 // Mutable mock so individual tests can override
-const mockSubscriptionQuery = vi.fn(() => ({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockSubscriptionQuery: any = vi.fn(() => ({
   data: {
     tier: 'free',
     tool_uses_today: { uppercase: 2 },
@@ -27,7 +28,8 @@ vi.mock('react-router-dom', () => ({
 }));
 
 vi.mock('../store/api/subscriptionApi', () => ({
-  useGetSubscriptionStatusQuery: (...args) => mockSubscriptionQuery(...args),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useGetSubscriptionStatusQuery: (...args: any[]) => mockSubscriptionQuery(...args),
   useCreateProCheckoutMutation: () => [mockCreateProCheckout, { isLoading: false }],
   useVerifyProPaymentMutation: () => [mockVerifyProPayment],
   useCancelSubscriptionMutation: () => [mockCancelSub, { isLoading: false }],
@@ -59,14 +61,18 @@ vi.mock('../utils/razorpay', () => ({
 import { useSelector } from 'react-redux';
 import useSubscription from './useSubscription';
 import { executeCheckoutFlow } from '../utils/razorpay';
+import type { ToolDefinition } from '../types/tools';
+
+const mockUseSelector = vi.mocked(useSelector);
 
 describe('useSubscription', () => {
-  let showAlert;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let showAlert: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
     showAlert = vi.fn();
-    useSelector.mockReturnValue({ accessToken: 'tok' });
+    mockUseSelector.mockReturnValue({ accessToken: 'tok' });
     mockCancelSub.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSubscriptionQuery.mockReturnValue({
       data: {
@@ -92,18 +98,18 @@ describe('useSubscription', () => {
 
   it('checkToolAccess returns true for always-free tool', () => {
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'find_replace', type: 'api' })).toBe(true);
+    expect(result.current.checkToolAccess({ id: 'find_replace', type: 'api' } as unknown as ToolDefinition)).toBe(true);
   });
 
   it('checkToolAccess returns true for drawer tool', () => {
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'some_drawer', type: 'drawer' })).toBe(true);
+    expect(result.current.checkToolAccess({ id: 'some_drawer', type: 'drawer' } as unknown as ToolDefinition)).toBe(true);
   });
 
   it('checkToolAccess returns true when not authenticated', () => {
-    useSelector.mockReturnValue({ accessToken: null });
+    mockUseSelector.mockReturnValue({ accessToken: null });
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' })).toBe(true);
+    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
   });
 
   it('checkToolAccess returns true for pro users', () => {
@@ -118,13 +124,13 @@ describe('useSubscription', () => {
       refetch: mockRefetchStatus,
     });
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' })).toBe(true);
+    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
   });
 
   it('checkToolAccess returns true when under free limit', () => {
     const { result } = renderHook(() => useSubscription({ showAlert }));
     // uppercase has 2 uses, limit is 3
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' })).toBe(true);
+    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
   });
 
   it('checkToolAccess shows upgrade modal when over limit', () => {
@@ -138,7 +144,7 @@ describe('useSubscription', () => {
       },
       refetch: mockRefetchStatus,
     });
-    const tool = { id: 'lowercase', type: 'api' };
+    const tool = { id: 'lowercase', type: 'api' } as unknown as ToolDefinition;
     const { result } = renderHook(() => useSubscription({ showAlert }));
     let access;
     act(() => {
@@ -161,7 +167,7 @@ describe('useSubscription', () => {
       refetch: mockRefetchStatus,
     });
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' })).toBe(true);
+    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
   });
 
   it('checkToolAccess returns true for null tool', () => {
@@ -182,7 +188,7 @@ describe('useSubscription', () => {
     });
     const { result } = renderHook(() => useSubscription({ showAlert }));
     act(() => {
-      result.current.checkToolAccess({ id: 'test', type: 'api' });
+      result.current.checkToolAccess({ id: 'test', type: 'api' } as unknown as ToolDefinition);
     });
     expect(result.current.showUpgradeModal).toBe(true);
     act(() => {
@@ -204,15 +210,13 @@ describe('useSubscription', () => {
       refetch: mockRefetchStatus,
     });
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    const usage = result.current.getToolUsage({ id: 'uppercase', type: 'api' });
+    const usage = result.current.getToolUsage('uppercase');
     expect(usage.max).toBe(Infinity);
   });
 
   it('handles missing status data', () => {
-    mockSubscriptionQuery.mockReturnValue({
-      data: null,
-      refetch: mockRefetchStatus,
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockSubscriptionQuery.mockReturnValue({ data: null as any, refetch: mockRefetchStatus });
     const { result } = renderHook(() => useSubscription({ showAlert }));
     expect(result.current.tier).toBe('free');
   });

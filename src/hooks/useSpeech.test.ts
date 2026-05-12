@@ -1,8 +1,15 @@
 import { renderHook, act } from '@testing-library/react';
 import useSpeech from './useSpeech';
 
+// Shorthand to cast window for setting/deleting speech recognition props
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const win = window as any;
+
 describe('useSpeech', () => {
-  let setText, showAlert;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let setText: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let showAlert: any;
 
   beforeEach(() => {
     setText = vi.fn();
@@ -32,8 +39,8 @@ describe('useSpeech', () => {
   });
 
   it('handleSpeechToText shows alert when not supported', () => {
-    delete window.SpeechRecognition;
-    delete window.webkitSpeechRecognition;
+    delete win.SpeechRecognition;
+    delete win.webkitSpeechRecognition;
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
       result.current.handleSpeechToText();
@@ -55,7 +62,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -79,7 +86,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -103,7 +110,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('', setText, showAlert));
     act(() => {
@@ -123,7 +130,8 @@ describe('useSpeech', () => {
     };
 
     act(() => {
-      mockRecognition.onresult(event);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockRecognition.onresult as any)(event);
     });
     expect(setText).toHaveBeenCalled();
   });
@@ -139,14 +147,15 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
       result.current.handleSpeechToText();
     });
     act(() => {
-      mockRecognition.onerror();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockRecognition.onerror as any)();
     });
     expect(result.current.listening).toBe(false);
     expect(showAlert).toHaveBeenCalledWith('Speech recognition error', 'danger');
@@ -163,7 +172,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -171,13 +180,14 @@ describe('useSpeech', () => {
     });
     expect(result.current.listening).toBe(true);
     act(() => {
-      mockRecognition.onend();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockRecognition.onend as any)();
     });
     expect(result.current.listening).toBe(false);
   });
 
   it('uses webkitSpeechRecognition fallback', () => {
-    delete window.SpeechRecognition;
+    delete win.SpeechRecognition;
     const mockRecognition = {
       start: vi.fn(),
       stop: vi.fn(),
@@ -188,7 +198,7 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    window.webkitSpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.webkitSpeechRecognition = vi.fn(function () { return mockRecognition; });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {

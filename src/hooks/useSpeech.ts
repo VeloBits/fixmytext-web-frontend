@@ -1,10 +1,15 @@
 import { useState, useRef } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 
-// Extend Window to add webkitSpeechRecognition fallback
+// Extend Window to add both SpeechRecognition and webkitSpeechRecognition
+// Note: SpeechRecognition is defined in lib.dom but not on the Window interface
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognitionConstructor = new () => any;
+
 declare global {
   interface Window {
-    webkitSpeechRecognition?: typeof SpeechRecognition;
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
   }
 }
 
@@ -20,7 +25,8 @@ export default function useSpeech(
   showAlert: (msg: string, variant: string) => void
 ): UseSpeechReturn {
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   const handleTts = (): void => {
     const msg = new SpeechSynthesisUtterance(text);
@@ -43,9 +49,11 @@ export default function useSpeech(
     recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = 'en-US';
-    recognition.onresult = (e: SpeechRecognitionEvent) => {
-      const transcript = Array.from(e.results)
-        .map((r) => r[0].transcript)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (e: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const transcript = Array.from(e.results as any[])
+        .map((r: any) => r[0].transcript)
         .join(' ');
       setText((prev) => (prev ? prev + ' ' + transcript : transcript));
     };

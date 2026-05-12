@@ -49,7 +49,6 @@ export function useTheme(): ThemeContextValue {
         localStorage.setItem(MODE_KEY, dbMode);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefs]);
 
   // Reset hydration on logout

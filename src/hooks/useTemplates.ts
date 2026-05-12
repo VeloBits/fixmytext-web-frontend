@@ -62,7 +62,8 @@ function saveTemplates(templates: LocalTemplate[]): void {
 export default function useTemplates(
   text: string,
   setText: Dispatch<SetStateAction<string>>,
-  showAlert: (msg: string, variant: string) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  showAlert: (...args: any[]) => unknown,
   { getActiveToolId, openToolById, renameActiveTab }: UseTemplatesOptions = {}
 ): UseTemplatesReturn {
   const accessToken = useSelector((s: RootState) => s.auth.accessToken);

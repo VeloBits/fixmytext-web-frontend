@@ -19,8 +19,21 @@ import { useSelector } from 'react-redux';
 import { useGetTemplatesQuery } from '../store/api/userDataApi';
 import useTemplates from './useTemplates';
 
+const mockUseSelector = vi.mocked(useSelector);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockGetTemplatesQuery = vi.mocked(useGetTemplatesQuery) as any;
+
 describe('useTemplates', () => {
-  let setText, showAlert, getActiveToolId, openToolById, renameActiveTab;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let setText: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let showAlert: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let getActiveToolId: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let openToolById: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let renameActiveTab: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -30,7 +43,7 @@ describe('useTemplates', () => {
     getActiveToolId = vi.fn(() => 'uppercase');
     openToolById = vi.fn();
     renameActiveTab = vi.fn();
-    useSelector.mockReturnValue(null); // not authenticated
+    mockUseSelector.mockReturnValue(null); // not authenticated
     mockApiCreate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockApiUpdate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockApiDelete.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -177,8 +190,8 @@ describe('useTemplates', () => {
   // Authenticated tests
   describe('authenticated', () => {
     beforeEach(() => {
-      useSelector.mockReturnValue('tok');
-      useGetTemplatesQuery.mockReturnValue({
+      mockUseSelector.mockReturnValue('tok');
+      mockGetTemplatesQuery.mockReturnValue({
         data: [
           {
             id: 1,
@@ -297,8 +310,8 @@ describe('useTemplates', () => {
     });
 
     it('saves via API when authenticated', async () => {
-      useSelector.mockReturnValue('tok');
-      useGetTemplatesQuery.mockReturnValue({ data: [] });
+      mockUseSelector.mockReturnValue('tok');
+      mockGetTemplatesQuery.mockReturnValue({ data: [] });
       const { result } = renderTpl();
       await act(async () => {
         await result.current.saveDirectly('New', 'content', 'tool1');
@@ -307,8 +320,8 @@ describe('useTemplates', () => {
     });
 
     it('updates via API when authenticated and name matches', async () => {
-      useSelector.mockReturnValue('tok');
-      useGetTemplatesQuery.mockReturnValue({
+      mockUseSelector.mockReturnValue('tok');
+      mockGetTemplatesQuery.mockReturnValue({
         data: [{ id: 5, name: 'Existing', text: 'old', created_at: '', updated_at: '' }],
       });
       const { result } = renderTpl();
@@ -324,8 +337,8 @@ describe('useTemplates', () => {
     });
 
     it('handles API failure in saveDirectly', async () => {
-      useSelector.mockReturnValue('tok');
-      useGetTemplatesQuery.mockReturnValue({ data: [] });
+      mockUseSelector.mockReturnValue('tok');
+      mockGetTemplatesQuery.mockReturnValue({ data: [] });
       mockApiCreate.mockReturnValue({ unwrap: () => Promise.reject(new Error('fail')) });
       const { result } = renderTpl();
       await act(async () => {

@@ -15,13 +15,19 @@ vi.mock('../store/api/userDataApi', () => ({
 import { useSelector } from 'react-redux';
 import { useGetPreferencesQuery } from '../store/api/userDataApi';
 
+// vi.mock returns loose types; cast to access mock methods
+const mockUseSelector = vi.mocked(useSelector);
+const mockGetPrefs = vi.mocked(useGetPreferencesQuery);
+
 describe('useTheme', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
     document.body.classList.remove('dark');
-    useSelector.mockImplementation((fn) => fn({ auth: { accessToken: null } }));
-    useGetPreferencesQuery.mockReturnValue({ data: undefined });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockUseSelector.mockImplementation((fn: any) => fn({ auth: { accessToken: null } }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockGetPrefs.mockReturnValue({ data: undefined } as any);
   });
 
   it('defaults to dark mode', () => {
@@ -56,7 +62,8 @@ describe('useTheme', () => {
   });
 
   it('syncs to backend when authenticated', () => {
-    useSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok' } }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockUseSelector.mockImplementation((fn: any) => fn({ auth: { accessToken: 'tok' } }));
     const { result } = renderHook(() => useTheme());
     act(() => {
       result.current.setMode('light');
@@ -73,8 +80,10 @@ describe('useTheme', () => {
   });
 
   it('hydrates from DB preferences when authenticated', () => {
-    useSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok' } }));
-    useGetPreferencesQuery.mockReturnValue({ data: { theme: 'light' } });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockUseSelector.mockImplementation((fn: any) => fn({ auth: { accessToken: 'tok' } }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockGetPrefs.mockReturnValue({ data: { theme: 'light' } } as any);
     const { result } = renderHook(() => useTheme());
     expect(result.current.mode).toBe('light');
     expect(localStorage.getItem('fmx_theme_mode')).toBe('light');

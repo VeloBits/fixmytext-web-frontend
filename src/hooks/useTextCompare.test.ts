@@ -58,7 +58,7 @@ describe('useTextCompare', () => {
       result.current.handleCompare();
     });
     expect(result.current.diffResult).toBeDefined();
-    const types = result.current.diffResult.map((d) => d.type);
+    const types = result.current.diffResult!.map((d) => d.type);
     expect(types).toContain('same');
     expect(types.some((t) => t === 'added' || t === 'removed')).toBe(true);
   });
@@ -106,7 +106,7 @@ describe('useTextCompare', () => {
     act(() => {
       result.current.handleCompare();
     });
-    const types = result.current.diffResult.map((d) => d.type);
+    const types = result.current.diffResult!.map((d) => d.type);
     expect(types).toContain('added');
   });
 
@@ -118,7 +118,7 @@ describe('useTextCompare', () => {
     act(() => {
       result.current.handleCompare();
     });
-    const types = result.current.diffResult.map((d) => d.type);
+    const types = result.current.diffResult!.map((d) => d.type);
     expect(types).toContain('removed');
   });
 });
