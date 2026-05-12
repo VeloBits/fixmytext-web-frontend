@@ -7,10 +7,10 @@
  */
 
 const STORAGE_KEY = 'fmx_visitor_id';
-let _visitorId = null;
-let _initPromise = null;
+let _visitorId: string | null = null;
+let _initPromise: Promise<string> | null = null;
 
-function getCachedId() {
+function getCachedId(): string | null {
   try {
     return localStorage.getItem(STORAGE_KEY);
   } catch {
@@ -18,7 +18,7 @@ function getCachedId() {
   }
 }
 
-function setCachedId(id) {
+function setCachedId(id: string): void {
   try {
     localStorage.setItem(STORAGE_KEY, id);
   } catch {
@@ -29,8 +29,8 @@ function setCachedId(id) {
 /**
  * Collect browser-specific signals and produce a SHA-256 fingerprint.
  */
-async function generateFingerprint() {
-  const components = [];
+async function generateFingerprint(): Promise<string> {
+  const components: string[] = [];
 
   // Screen
   components.push(`${screen.width}x${screen.height}x${screen.colorDepth}`);
@@ -46,13 +46,14 @@ async function generateFingerprint() {
 
   // Hardware signals
   components.push(String(navigator.hardwareConcurrency || ''));
-  components.push(String(navigator.deviceMemory || ''));
+  components.push(String((navigator as Navigator & { deviceMemory?: number }).deviceMemory || ''));
   components.push(String(navigator.maxTouchPoints || 0));
 
   // Canvas fingerprint
   try {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('no-canvas');
     ctx.textBaseline = 'top';
     ctx.font = '14px Arial';
     ctx.fillStyle = '#f60';

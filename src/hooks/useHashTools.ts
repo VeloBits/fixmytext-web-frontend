@@ -1,20 +1,24 @@
 import { useMemo } from 'react';
+import type React from 'react';
+import type { AiResult } from './useAiTools';
+import type { AlertType } from './useAlert';
 
 /**
  * useHashTools
  *
  * Extracts all hashing handler functions from TextForm.
  * Accepts a deps object and returns memoized hash handler functions.
- *
- * @param {Object} deps
- * @param {Object} deps.textRef
- * @param {Function} deps.setLocalLoading
- * @param {Function} deps.setAiResult
- * @param {Function} deps.setPreviewMode
- * @param {Function} deps.pushHistory
- * @param {Function} deps.showAlert
- * @returns {Object} All hash handler functions
  */
+
+interface HashToolsDeps {
+  textRef: React.RefObject<string>;
+  setLocalLoading: (v: boolean) => void;
+  setAiResult: (r: AiResult) => void;
+  setPreviewMode: (mode: string) => void;
+  pushHistory: (label: string, orig: string, result: string, meta: Record<string, string>) => void;
+  showAlert: (msg: string, type: AlertType) => void;
+}
+
 const useHashTools = ({
   textRef,
   setLocalLoading,
@@ -22,10 +26,14 @@ const useHashTools = ({
   setPreviewMode,
   pushHistory,
   showAlert,
-}) => {
+}: HashToolsDeps) => {
   return useMemo(() => {
     // Factory for all hash handlers
-    const createHashHandler = (toolId, label, hashFn) => async () => {
+    const createHashHandler = (
+      toolId: string,
+      label: string,
+      hashFn: (t: string) => Promise<string>
+    ) => async (): Promise<void> => {
       const t = textRef.current;
       if (!t) return;
       const original = t;
@@ -46,7 +54,7 @@ const useHashTools = ({
     };
 
     // Helper: Web Crypto API digest
-    const webCryptoHash = (algo) => async (text) => {
+    const webCryptoHash = (algo: string) => async (text: string): Promise<string> => {
       const data = new TextEncoder().encode(text);
       const buf = await crypto.subtle.digest(algo, data);
       return Array.from(new Uint8Array(buf))
@@ -55,7 +63,7 @@ const useHashTools = ({
     };
 
     // Helper: CRC32 (pure JS)
-    const crc32Fn = (text) => {
+    const crc32Fn = (text: string): string => {
       const table = new Uint32Array(256);
       for (let i = 0; i < 256; i++) {
         let c = i;
@@ -69,7 +77,7 @@ const useHashTools = ({
     };
 
     // Helper: Adler-32 (pure JS)
-    const adler32Fn = (text) => {
+    const adler32Fn = (text: string): string => {
       const bytes = new TextEncoder().encode(text);
       let a = 1,
         b = 0;
@@ -81,7 +89,7 @@ const useHashTools = ({
     };
 
     // Helper: FNV-1a 32-bit (pure JS)
-    const fnv1aFn = (text) => {
+    const fnv1aFn = (text: string): string => {
       const bytes = new TextEncoder().encode(text);
       let hash = 0x811c9dc5;
       for (let i = 0; i < bytes.length; i++) {

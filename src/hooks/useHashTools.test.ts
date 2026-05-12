@@ -150,8 +150,9 @@ describe('useHashTools', () => {
       await result.current.handleSha256();
 
       expect(fakeDigest).toHaveBeenCalled();
-      expect(fakeDigest.mock.calls[0][0]).toBe('SHA-256');
-      expect(fakeDigest.mock.calls[0][1].constructor.name).toBe('Uint8Array');
+      const digestCalls = fakeDigest.mock.calls as unknown[][];
+      expect(digestCalls[0][0]).toBe('SHA-256');
+      expect((digestCalls[0][1] as { constructor: { name: string } }).constructor.name).toBe('Uint8Array');
       expect(deps.setLocalLoading).toHaveBeenCalledWith(true);
       expect(deps.setAiResult).toHaveBeenCalledWith({
         label: 'SHA-256 Hash',
