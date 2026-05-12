@@ -1,9 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useRefreshMutation, useGetMeQuery } from '../store/api/authApi';
+import type { RootState } from '../store/store';
+import type { User } from '../store/slices/authSlice';
 
-export function useAuth() {
-  const { accessToken, user } = useSelector((s) => s.auth);
+export interface AuthContextValue {
+  user: User | null;
+  isAuthenticated: boolean;
+}
+
+export function useAuth(): AuthContextValue {
+  const { accessToken, user } = useSelector((s: RootState) => s.auth);
   const [refresh] = useRefreshMutation();
   const attempted = useRef(false);
 

@@ -6,14 +6,33 @@
  */
 import { useState, useCallback, useRef } from 'react';
 
+export type AlertType = 'info' | 'success' | 'warning' | 'danger';
+
+export interface AlertItem {
+  id: number;
+  msg: string;
+  type: AlertType;
+}
+
+export interface ShowAlertOptions {
+  duration?: number;
+}
+
+export interface AlertContextValue {
+  alert: AlertItem | null;
+  alerts: AlertItem[];
+  showAlert: (message: unknown, type?: AlertType, options?: ShowAlertOptions) => number;
+  dismissAlert: (id: number) => void;
+}
+
 let nextId = 0;
 
-export function useAlert() {
-  const [alerts, setAlerts] = useState([]);
-  const timers = useRef({});
-  const activeMessages = useRef(new Set());
+export function useAlert(): AlertContextValue {
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const activeMessages = useRef(new Set<string>());
 
-  const dismissAlert = useCallback((id) => {
+  const dismissAlert = useCallback((id: number): void => {
     clearTimeout(timers.current[id]);
     delete timers.current[id];
     setAlerts((prev) => {
@@ -24,22 +43,35 @@ export function useAlert() {
   }, []);
 
   const showAlert = useCallback(
-    (message, type = 'info', options = {}) => {
+    (message: unknown, type: AlertType = 'info', options: ShowAlertOptions = {}): number => {
       // FastAPI 422 responses set `detail` to an array of validation-error
       // objects. Coerce anything non-string to a readable message so React
       // never tries to render an object as a child.
+      let msg: string;
       if (typeof message !== 'string') {
         if (Array.isArray(message)) {
-          message = message
-            .map((m) => (typeof m === 'string' ? m : m?.msg || JSON.stringify(m)))
+          msg = (message as unknown[])
+            .map((m) => {
+              if (typeof m === 'string') return m;
+              const obj = m as Record<string, unknown>;
+              return typeof obj?.msg === 'string' ? obj.msg : JSON.stringify(m);
+            })
             .join('; ');
         } else if (message && typeof message === 'object') {
-          message = message.msg || message.message || JSON.stringify(message);
+          const obj = message as Record<string, unknown>;
+          msg =
+            typeof obj.msg === 'string'
+              ? obj.msg
+              : typeof obj.message === 'string'
+              ? obj.message
+              : JSON.stringify(message);
         } else {
-          message = String(message);
+          msg = String(message);
         }
+      } else {
+        msg = message;
       }
-      const key = `${type}::${message}`;
+      const key = `${type}::${msg}`;
 
       // Skip if an identical message+type is already visible
       if (activeMessages.current.has(key)) return -1;
@@ -52,7 +84,7 @@ export function useAlert() {
       setAlerts((prev) => {
         // Cap at 5 visible toasts
         const next = prev.length >= 5 ? prev.slice(1) : prev;
-        return [...next, { id, msg: message, type }];
+        return [...next, { id, msg, type }];
       });
 
       if (duration > 0) {
