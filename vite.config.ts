@@ -20,7 +20,7 @@ const CHUNK_MAP = {
   ],
 }
 
-function manualChunks(id) {
+function manualChunks(id: string): string | undefined {
   for (const [chunk, pkgs] of Object.entries(CHUNK_MAP)) {
     if (pkgs.some((pkg) => id.includes(`/node_modules/${pkg}/`))) {
       return chunk

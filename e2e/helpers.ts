@@ -1,24 +1,29 @@
 import crypto from 'node:crypto';
+import type { APIRequestContext, APIResponse } from '@playwright/test';
 
-export const API_URL = process.env.E2E_API_URL || 'http://localhost:8000';
+export const API_URL: string = process.env.E2E_API_URL ?? 'http://localhost:8000';
 
-export function uniqueEmail(prefix = 'e2e') {
+export function uniqueEmail(prefix = 'e2e'): string {
   const rand = crypto.randomBytes(6).toString('hex');
   return `${prefix}+${rand}@example.test`;
 }
 
-export function razorpaySignature(orderId, paymentId, secret) {
+export function razorpaySignature(orderId: string, paymentId: string, secret: string): string {
   return crypto
     .createHmac('sha256', secret)
     .update(`${orderId}|${paymentId}`)
     .digest('hex');
 }
 
-export async function apiPost(request, path, body, token) {
-  const headers = { 'Content-Type': 'application/json' };
+export async function apiPost(
+  request: APIRequestContext,
+  path: string,
+  body: Record<string, unknown>,
+  token?: string,
+): Promise<APIResponse> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await request.post(`${API_URL}${path}`, { headers, data: body });
-  return res;
+  return request.post(`${API_URL}${path}`, { headers, data: body });
 }
 
 /**
@@ -28,7 +33,10 @@ export async function apiPost(request, path, body, token) {
  *
  * Requires the backend running with EMAIL_BACKEND=console.
  */
-export async function registerVerifiedUser(request, { password = 'TestPass123!' } = {}) {
+export async function registerVerifiedUser(
+  request: APIRequestContext,
+  { password = 'TestPass123!' } = {},
+) {
   const email = uniqueEmail();
   const displayName = 'E2E Tester';
 
