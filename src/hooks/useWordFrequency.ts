@@ -1,18 +1,32 @@
+interface AiResult {
+  label: string;
+  result: string;
+}
+
+interface PushHistoryMeta {
+  toolId: string;
+  toolType: string;
+}
+
+interface UseWordFrequencyReturn {
+  handleWordFrequency: () => void;
+}
+
 export default function useWordFrequency(
-  text,
-  showAlert,
-  setAiResult,
-  setPreviewMode,
-  pushHistory
-) {
-  const handleWordFrequency = () => {
+  text: string,
+  showAlert: (msg: string, variant: string) => void,
+  setAiResult: (result: AiResult) => void,
+  setPreviewMode: (mode: string) => void,
+  pushHistory: ((label: string, input: string, output: string, meta: PushHistoryMeta) => void) | null | undefined
+): UseWordFrequencyReturn {
+  const handleWordFrequency = (): void => {
     if (!text) return;
     const words = text.toLowerCase().match(/[a-z\u00C0-\u024F]+(?:'[a-z]+)?/gi);
     if (!words || words.length === 0) {
       showAlert('No words found', 'info');
       return;
     }
-    const freq = {};
+    const freq: Record<string, number> = {};
     for (const w of words) {
       const lower = w.toLowerCase();
       freq[lower] = (freq[lower] || 0) + 1;

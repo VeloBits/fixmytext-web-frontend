@@ -1,11 +1,35 @@
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 
-export default function useRegexTester(text, showAlert) {
+interface RegexMatch {
+  match: string;
+  index: number;
+  groups: string[];
+}
+
+interface RegexResult {
+  matches: RegexMatch[];
+  total: number;
+}
+
+interface UseRegexTesterReturn {
+  regexPattern: string;
+  setRegexPattern: Dispatch<SetStateAction<string>>;
+  regexFlags: string;
+  setRegexFlags: Dispatch<SetStateAction<string>>;
+  regexResult: RegexResult | null;
+  setRegexResult: Dispatch<SetStateAction<RegexResult | null>>;
+  handleRegexTest: () => void;
+}
+
+export default function useRegexTester(
+  text: string,
+  showAlert: (msg: string, variant: string) => void
+): UseRegexTesterReturn {
   const [regexPattern, setRegexPattern] = useState('');
   const [regexFlags, setRegexFlags] = useState('g');
-  const [regexResult, setRegexResult] = useState(null);
+  const [regexResult, setRegexResult] = useState<RegexResult | null>(null);
 
-  const handleRegexTest = () => {
+  const handleRegexTest = (): void => {
     if (!regexPattern) {
       showAlert('Enter a regex pattern', 'danger');
       return;
@@ -16,8 +40,8 @@ export default function useRegexTester(text, showAlert) {
     }
     try {
       const re = new RegExp(regexPattern, regexFlags);
-      const matches = [];
-      let m;
+      const matches: RegexMatch[] = [];
+      let m: RegExpExecArray | null;
       if (regexFlags.includes('g')) {
         while ((m = re.exec(text)) !== null) {
           matches.push({ match: m[0], index: m.index, groups: m.slice(1) });
@@ -33,7 +57,7 @@ export default function useRegexTester(text, showAlert) {
         matches.length ? 'success' : 'info'
       );
     } catch (err) {
-      showAlert('Invalid regex: ' + err.message, 'danger');
+      showAlert('Invalid regex: ' + (err as Error).message, 'danger');
     }
   };
 
