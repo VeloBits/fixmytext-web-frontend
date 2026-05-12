@@ -449,7 +449,7 @@ export default function TextForm(props: TextFormProps) {
         bottomResize.setSize(Number(ps.fmx_bottom_h));
       }
     }
-  }, [uiSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [uiSettings]);
 
   useEffect(() => {
     if (!accessToken) uiSettingsHydrated.current = false;
@@ -522,7 +522,7 @@ export default function TextForm(props: TextFormProps) {
       fmx_split_pct: splitResize.size,
       fmx_bottom_h: bottomResize.size,
     });
-  }, [sidebarResize.size, splitResize.size, bottomResize.size]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sidebarResize.size, splitResize.size, bottomResize.size]);
 
   // Set default tab from persona
   useEffect(() => {
@@ -954,7 +954,6 @@ export default function TextForm(props: TextFormProps) {
       ai.setAiResult(null);
       setPreviewMode(null);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [toolTexts]
   );
 
@@ -993,7 +992,6 @@ export default function TextForm(props: TextFormProps) {
     setPreviewMode(null);
     // Schedule auto-run after text is set
     pendingAutoRun.current = tool;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Keep template helpers ref up to date
@@ -1058,7 +1056,6 @@ export default function TextForm(props: TextFormProps) {
         togglePanel(tool.panelId);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [text, gamification?.recordToolUse, trial.checkTrial, subscription?.checkToolAccess]
   );
 
@@ -1109,7 +1106,6 @@ export default function TextForm(props: TextFormProps) {
         openToolTab(tool);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [openToolTab, executeToolAction, text, gamification?.recordToolUse]
   );
 
@@ -1151,7 +1147,6 @@ export default function TextForm(props: TextFormProps) {
       executeToolAction(ws.tool);
     }, 2000);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, activeWorkspaceId]);
 
   // ── Auto-run formatter when config changes ───────────
@@ -1165,7 +1160,6 @@ export default function TextForm(props: TextFormProps) {
     if (!ws.tool || !['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)) return;
     const timer = setTimeout(() => executeToolAction(ws.tool), 300);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formatter.fmtCfg]);
 
   // ── Keyboard Shortcuts (power-user hotkeys) ─────────────
@@ -2795,7 +2789,8 @@ export default function TextForm(props: TextFormProps) {
                       {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
                         'find' && (
                         <LazyDrawer>
-                          <FindReplaceDrawer {...findReplace} disabled={disabled} text={text} />
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          <FindReplaceDrawer {...(findReplace as any)} disabled={disabled} text={text} />
                         </LazyDrawer>
                       )}
                       <LazyDrawer>{(() => {
@@ -2906,7 +2901,8 @@ export default function TextForm(props: TextFormProps) {
                                   setPreviewMode('result');
                                 }}
                                 showAlert={showAlert}
-                                transformText={transformText}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                transformText={transformText as any}
                               />
                             );
                           case 'diffdrawer':
@@ -2954,7 +2950,8 @@ export default function TextForm(props: TextFormProps) {
                           case 'randtext':
                             return (
                               <RandomTextDrawer
-                                {...generators}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                {...(generators as any)}
                                 onResult={(txt) => {
                                   aiResultSourceRef.current = 'randtext';
                                   ai.setAiResult({ label: 'Random Text', result: txt });
@@ -2966,7 +2963,8 @@ export default function TextForm(props: TextFormProps) {
                             return (
                               <FakeDataDrawer
                                 activeTool={
-                                  workspaceTabs.find((t) => t.id === activeWorkspaceId)?.tool
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                  workspaceTabs.find((t) => t.id === activeWorkspaceId)?.tool as any
                                 }
                                 onResult={(label, result) => {
                                   ai.setAiResult({ label, result });

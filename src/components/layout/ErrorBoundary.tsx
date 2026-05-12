@@ -100,7 +100,7 @@ const styles = {
     border: '1px solid #3C3C3C',
     borderRadius: 8,
     padding: '40px 32px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
   iconRow: {
     marginBottom: 16,
@@ -146,7 +146,7 @@ const styles = {
     fontFamily: 'inherit',
   },
   details: {
-    textAlign: 'left',
+    textAlign: 'left' as const,
   },
   summary: {
     fontSize: '0.78rem',
@@ -163,8 +163,8 @@ const styles = {
     padding: 12,
     overflow: 'auto',
     maxHeight: 200,
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
+    whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'break-word' as const,
     margin: 0,
   },
 };

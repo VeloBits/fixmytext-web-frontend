@@ -4,7 +4,12 @@ import EmailVerificationBanner from './EmailVerificationBanner';
 
 const mockResendVerification = vi.fn();
 
-let mockState = {
+interface MockAuthState {
+  accessToken: string | null;
+  user: { email: string; is_email_verified: boolean } | null;
+}
+
+let mockState: MockAuthState = {
   accessToken: null,
   user: null,
 };
@@ -18,7 +23,7 @@ vi.mock('../../store/api/authApi', () => ({
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
 }));
 
-function setAuth({ accessToken = null, user = null } = {}) {
+function setAuth({ accessToken = null, user = null }: Partial<MockAuthState> = {}) {
   mockState = { accessToken, user };
 }
 

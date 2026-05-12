@@ -134,7 +134,7 @@ export default function KeyboardShortcuts({
         return;
       }
 
-      const binding = eventToBinding(e);
+      const binding = eventToBinding(e as unknown as Parameters<typeof eventToBinding>[0]);
       if (!binding) return; // bare modifier
 
       // Require at least one modifier for non-special keys
@@ -160,7 +160,7 @@ export default function KeyboardShortcuts({
       }
 
       // Check for conflicts
-      const conflicts = detectConflicts(groups, recordingId, binding);
+      const conflicts = detectConflicts(groups ?? DEFAULT_SHORTCUT_GROUPS, recordingId, binding);
       if (conflicts.length > 0) {
         setPendingBinding(binding);
         setConflict(conflicts[0]);

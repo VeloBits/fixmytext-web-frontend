@@ -15,7 +15,7 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('../../hooks/useKeyboardShortcuts', () => ({
   formatShortcut: (sc) => {
-    const parts = [];
+    const parts: string[] = [];
     if (sc.ctrl) parts.push('Ctrl');
     if (sc.shift) parts.push('Shift');
     if (sc.alt) parts.push('Alt');
@@ -106,7 +106,7 @@ describe('KeyboardShortcuts', () => {
   it('calls onClose on overlay click', () => {
     const onClose = vi.fn();
     renderShortcuts({ onClose });
-    fireEvent.click(document.querySelector('.tu-shortcuts-overlay'));
+    fireEvent.click(document.querySelector('.tu-shortcuts-overlay')!);
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -151,7 +151,7 @@ describe('KeyboardShortcuts', () => {
   it('closes on Escape key when not recording', () => {
     const onClose = vi.fn();
     renderShortcuts({ onClose });
-    const panel = document.querySelector('.tu-shortcuts');
+    const panel = document.querySelector('.tu-shortcuts')!;
     fireEvent.keyDown(panel, { key: 'Escape' });
     expect(onClose).toHaveBeenCalled();
   });

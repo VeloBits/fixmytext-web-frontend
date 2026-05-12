@@ -100,14 +100,14 @@ describe('CommandPalette', () => {
     const close = vi.fn();
     render(<CommandPalette search={makeSearch({ close })} onToolClick={vi.fn()} />);
     // Click overlay (the outer div)
-    fireEvent.click(document.querySelector('.tu-palette-overlay'));
+    fireEvent.click(document.querySelector('.tu-palette-overlay')!);
     expect(close).toHaveBeenCalled();
   });
 
   it('handles Escape key to close', () => {
     const close = vi.fn();
     render(<CommandPalette search={makeSearch({ close })} onToolClick={vi.fn()} />);
-    const palette = document.querySelector('.tu-palette');
+    const palette = document.querySelector('.tu-palette')!;
     fireEvent.keyDown(palette, { key: 'Escape' });
     expect(close).toHaveBeenCalled();
   });
@@ -118,7 +118,7 @@ describe('CommandPalette', () => {
       { id: 'b', label: 'B', description: 'd', icon: 'i', color: 'c' },
     ];
     render(<CommandPalette search={makeSearch({ results })} onToolClick={vi.fn()} />);
-    const palette = document.querySelector('.tu-palette');
+    const palette = document.querySelector('.tu-palette')!;
     fireEvent.keyDown(palette, { key: 'ArrowDown' });
     // Second item should become active
     const items = document.querySelectorAll('.tu-palette-item');
@@ -130,7 +130,7 @@ describe('CommandPalette', () => {
     const close = vi.fn();
     const results = [{ id: 'a', label: 'A', description: 'd', icon: 'i', color: 'c' }];
     render(<CommandPalette search={makeSearch({ results, close })} onToolClick={onToolClick} />);
-    const palette = document.querySelector('.tu-palette');
+    const palette = document.querySelector('.tu-palette')!;
     fireEvent.keyDown(palette, { key: 'Enter' });
     expect(onToolClick).toHaveBeenCalledWith(results[0]);
   });

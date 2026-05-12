@@ -6,7 +6,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import Navbar from './Navbar';
 import { expectNoA11yViolations } from '../../test/axeHelper';
 
-function makeStore(accessToken = null) {
+function makeStore(accessToken: string | null = null) {
   return configureStore({
     reducer: {
       auth: () => ({ accessToken }),
@@ -14,7 +14,7 @@ function makeStore(accessToken = null) {
   });
 }
 
-function renderNavbar(props = {}, accessToken = null) {
+function renderNavbar(props = {}, accessToken: string | null = null) {
   return render(
     <Provider store={makeStore(accessToken)}>
       <MemoryRouter>
