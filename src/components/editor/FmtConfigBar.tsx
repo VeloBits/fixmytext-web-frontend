@@ -1,4 +1,4 @@
-import type { FormatterConfig } from '../../hooks/useFormatter';
+import type { FormatterConfig } from '@/hooks/useFormatter';
 
 interface FmtConfigBarProps {
   toolId: string;

@@ -7,7 +7,7 @@ import type {
   Achievement,
   QuestTemplate,
   LevelDefinition,
-} from '../types/tools';
+} from '@/types/tools';
 
 /* ═══════════════════════════════════════════════════════
    Tool & Category Configuration — Data-driven tool system

@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import type { MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { ToolDefinition } from '../../types/tools';
+import type { ToolDefinition } from '@/types/tools';
 
 interface SmartSuggestionsProps {
   suggestions: ToolDefinition[] | null;

@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useGetPassCatalogQuery } from '../../store/api/passesApi';
-import formatPriceUtil from '../../utils/formatPrice';
-import type { SubscriptionContextValue } from '../../contexts/AppContext';
-import type { AlertLevel } from '../../contexts/AlertContext';
+import { useGetPassCatalogQuery } from '@/store/api/passesApi';
+import formatPriceUtil from '@/utils/formatPrice';
+import type { SubscriptionContextValue } from '@/contexts/AppContext';
+import type { AlertLevel } from '@/contexts/AlertContext';
 import type { NavigateFunction } from 'react-router-dom';
 
 type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';

@@ -2,13 +2,13 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetPassCatalogQuery } from '../store/api/passesApi';
-import useSubscription from '../hooks/useSubscription';
-import formatPriceUtil from '../utils/formatPrice';
-import type { AlertLevel } from '../contexts/AlertContext';
-import type { SubscriptionContextValue } from '../contexts/AppContext';
-import type { RootState } from '../store/store';
-import type { components } from '../types/openapi';
+import { useGetPassCatalogQuery } from '@/store/api/passesApi';
+import useSubscription from '@/hooks/useSubscription';
+import formatPriceUtil from '@/utils/formatPrice';
+import type { AlertLevel } from '@/contexts/AlertContext';
+import type { SubscriptionContextValue } from '@/contexts/AppContext';
+import type { RootState } from '@/store/store';
+import type { components } from '@/types/openapi';
 
 type PassCatalogItem = components['schemas']['PassCatalogItem'];
 type CreditPackItem = components['schemas']['CreditPackItem'];
@@ -34,7 +34,7 @@ import {
   BucketIcon,
   BarrelIcon,
   GiftIcon,
-} from '../components/icons/PricingIcons';
+} from '@/components/icons/PricingIcons';
 
 const PRO_PRICES = { inr: '₹399', usd: '$5', gbp: '£4', eur: '€4.50' };
 

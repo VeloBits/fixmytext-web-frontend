@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../store/store';
-import type { AlertLevel } from '../../contexts/AlertContext';
+import type { RootState } from '@/store/store';
+import type { AlertLevel } from '@/contexts/AlertContext';
 
 export interface NavbarProps {
   showAlert?: (message: string, type: AlertLevel) => void;

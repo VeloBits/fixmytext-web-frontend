@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useRecordOperationMutation, useClearHistoryMutation } from '../store/api/historyApi';
-import type { RootState } from '../store/store';
+import { useRecordOperationMutation, useClearHistoryMutation } from '@/store/api/historyApi';
+import type { RootState } from '@/store/store';
 import type { AlertType } from './useAlert';
 
 const MAX_HISTORY = 50;

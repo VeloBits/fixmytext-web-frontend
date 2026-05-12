@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { SubscriptionContextValue } from '../contexts/AppContext';
+import type { SubscriptionContextValue } from '@/contexts/AppContext';
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -47,18 +47,18 @@ vi.mock('react-redux', () => ({
 }));
 
 // ── hooks mock ──
-vi.mock('../hooks/useSubscription', () => ({
+vi.mock('@/hooks/useSubscription', () => ({
   default: () => defaultSubscription,
 }));
 
 // ── API mock ──
 const mockCatalogQuery = vi.fn();
-vi.mock('../store/api/passesApi', () => ({
+vi.mock('@/store/api/passesApi', () => ({
   useGetPassCatalogQuery: () => mockCatalogQuery(),
 }));
 
 // ── formatPrice mock ──
-vi.mock('../utils/formatPrice', () => ({
+vi.mock('@/utils/formatPrice', () => ({
   default: (price: number) => `$${price}`,
 }));
 
@@ -125,7 +125,7 @@ function renderPricing(
 }
 
 import PricingPage from './PricingPage';
-import { expectNoA11yViolations } from '../test/axeHelper';
+import { expectNoA11yViolations } from '@/test/axeHelper';
 
 describe('PricingPage', () => {
   beforeEach(() => {

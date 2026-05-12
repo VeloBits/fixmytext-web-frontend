@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import OutputPanel from './OutputPanel';
-import type { ToolDefinition } from '../../types/tools';
-import { expectNoA11yViolations } from '../../test/axeHelper';
+import type { ToolDefinition } from '@/types/tools';
+import { expectNoA11yViolations } from '@/test/axeHelper';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -46,7 +46,7 @@ vi.mock('@emoji-mart/react', () => ({
 }));
 
 // Mock shareApi
-vi.mock('../../store/api/shareApi', () => ({
+vi.mock('@/store/api/shareApi', () => ({
   useCreateShareMutation: () => [
     vi.fn().mockResolvedValue({ share_url: 'http://example.com/share/1' }),
     { isLoading: false },

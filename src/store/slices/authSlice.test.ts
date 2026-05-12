@@ -40,7 +40,7 @@ describe('authSlice', () => {
 });
 
 // Integration test with actual authApi matchers
-import { authApi } from '../api/authApi';
+import { authApi } from '@/store/api/authApi';
 
 describe('authSlice extraReducers integration', () => {
   it('handles login.matchFulfilled', () => {

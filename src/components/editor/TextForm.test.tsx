@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TextForm from './TextForm';
-import { expectNoA11yViolations } from '../../test/axeHelper';
+import { expectNoA11yViolations } from '@/test/axeHelper';
 
 // ── Framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -44,25 +44,25 @@ vi.mock('react-router-dom', () => ({
 }));
 
 // ── RTK Query API mocks ──
-vi.mock('../../store/api/textApi', () => ({
+vi.mock('@/store/api/textApi', () => ({
   useTransformTextMutation: () => [
     vi.fn().mockResolvedValue({ result: 'transformed' }),
     { isLoading: false },
   ],
 }));
-vi.mock('../../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useLogoutMutation: () => [vi.fn().mockResolvedValue(undefined), {}],
 }));
-vi.mock('../../store/api/historyApi', () => ({
+vi.mock('@/store/api/historyApi', () => ({
   useGetHistoryQuery: () => ({ data: null, isFetching: false }),
   useDeleteHistoryEntryMutation: () => [vi.fn(), {}],
   useClearHistoryMutation: () => [vi.fn(), {}],
 }));
-vi.mock('../../store/api/userDataApi', () => ({
+vi.mock('@/store/api/userDataApi', () => ({
   useGetUiSettingsQuery: () => ({ data: null }),
   useUpdateUiSettingsMutation: () => [vi.fn().mockResolvedValue(undefined), {}],
 }));
-vi.mock('../../store/api/shareApi', () => ({
+vi.mock('@/store/api/shareApi', () => ({
   useCreateShareMutation: () => [
     vi.fn().mockResolvedValue({ share_url: 'http://example.com/share/1' }),
     { isLoading: false },
@@ -70,7 +70,7 @@ vi.mock('../../store/api/shareApi', () => ({
 }));
 
 // ── Custom hooks mocks ──
-vi.mock('../../hooks/useFindReplace', () => ({
+vi.mock('@/hooks/useFindReplace', () => ({
   default: () => ({
     findText: '',
     setFindText: vi.fn(),
@@ -81,7 +81,7 @@ vi.mock('../../hooks/useFindReplace', () => ({
     matchCount: 0,
   }),
 }));
-vi.mock('../../hooks/useTextCompare', () => ({
+vi.mock('@/hooks/useTextCompare', () => ({
   default: () => ({
     compareText: '',
     setCompareText: vi.fn(),
@@ -90,7 +90,7 @@ vi.mock('../../hooks/useTextCompare', () => ({
     handleCompare: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useGenerators', () => ({
+vi.mock('@/hooks/useGenerators', () => ({
   default: () => ({
     handleGenerateRandom: vi.fn(),
     handleGeneratePassword: vi.fn(),
@@ -106,7 +106,7 @@ vi.mock('../../hooks/useGenerators', () => ({
     setIncludeSymbols: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useFormatter', () => ({
+vi.mock('@/hooks/useFormatter', () => ({
   default: () => ({
     handleFormatHtml: vi.fn(),
     handleFormatCss: vi.fn(),
@@ -116,7 +116,7 @@ vi.mock('../../hooks/useFormatter', () => ({
     setFmtCfg: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useAiTools', () => ({
+vi.mock('@/hooks/useAiTools', () => ({
   default: () => ({
     aiResult: null,
     setAiResult: vi.fn(),
@@ -211,14 +211,14 @@ vi.mock('../../hooks/useAiTools', () => ({
     setterKey: null,
   }),
 }));
-vi.mock('../../hooks/useSpeech', () => ({
+vi.mock('@/hooks/useSpeech', () => ({
   default: () => ({
     handleTts: vi.fn(),
     handleSpeechToText: vi.fn(),
     listening: false,
   }),
 }));
-vi.mock('../../hooks/useExport', () => ({
+vi.mock('@/hooks/useExport', () => ({
   default: () => ({
     handleDownloadTxt: vi.fn(),
     handleDownloadPdf: vi.fn(),
@@ -229,7 +229,7 @@ vi.mock('../../hooks/useExport', () => ({
     setOutputText: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useRegexTester', () => ({
+vi.mock('@/hooks/useRegexTester', () => ({
   default: () => ({
     pattern: '',
     setPattern: vi.fn(),
@@ -240,7 +240,7 @@ vi.mock('../../hooks/useRegexTester', () => ({
     handleTest: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useTemplates', () => ({
+vi.mock('@/hooks/useTemplates', () => ({
   default: () => ({
     templates: [],
     templateName: '',
@@ -251,7 +251,7 @@ vi.mock('../../hooks/useTemplates', () => ({
     saveDirectly: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useHistory', () => ({
+vi.mock('@/hooks/useHistory', () => ({
   default: () => ({
     history: [],
     pushHistory: vi.fn(),
@@ -262,25 +262,25 @@ vi.mock('../../hooks/useHistory', () => ({
     canRedo: false,
   }),
 }));
-vi.mock('../../hooks/useWordFrequency', () => ({
+vi.mock('@/hooks/useWordFrequency', () => ({
   default: () => ({
     handleWordFrequency: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/usePipeline', () => ({
+vi.mock('@/hooks/usePipeline', () => ({
   default: () => ({
     steps: [],
     addStep: vi.fn(),
     clearSteps: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useSmartSuggestions', () => ({
+vi.mock('@/hooks/useSmartSuggestions', () => ({
   default: () => ({
     suggestions: [],
     dismiss: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useToolSearch', () => ({
+vi.mock('@/hooks/useToolSearch', () => ({
   default: () => ({
     query: '',
     setQuery: vi.fn(),
@@ -290,14 +290,14 @@ vi.mock('../../hooks/useToolSearch', () => ({
     close: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useResize', () => ({
+vi.mock('@/hooks/useResize', () => ({
   default: (dir: string, defaultSize: number) => ({
     size: defaultSize,
     setSize: vi.fn(),
     onMouseDown: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/useTrialLimit', () => ({
+vi.mock('@/hooks/useTrialLimit', () => ({
   default: () => ({
     checkTrial: vi.fn(() => true),
     showSignInGate: false,
@@ -305,7 +305,7 @@ vi.mock('../../hooks/useTrialLimit', () => ({
     trialCount: 0,
   }),
 }));
-vi.mock('../../hooks/useKeyboardShortcuts', () => ({
+vi.mock('@/hooks/useKeyboardShortcuts', () => ({
   default: () => ({
     shortcutsOpen: false,
     setShortcutsOpen: vi.fn(),
@@ -341,49 +341,49 @@ vi.mock('./OutputPanel', () => ({
       `OutputPanel:${(props.previewMode as string) || 'none'}`
     ),
 }));
-vi.mock('../drawers/DrawerPanel', () => ({
+vi.mock('@/components/drawers/DrawerPanel', () => ({
   default: ({ children, title }: { children?: React.ReactNode; title?: string }) =>
     React.createElement('div', { 'data-testid': 'drawer-panel' }, title, children),
 }));
-vi.mock('../drawers/FindReplaceDrawer', () => ({
+vi.mock('@/components/drawers/FindReplaceDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'find-replace-drawer' }),
 }));
-vi.mock('../drawers/CompareDrawer', () => ({
+vi.mock('@/components/drawers/CompareDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'compare-output' }),
   CompareInput: () => React.createElement('div', { 'data-testid': 'compare-input' }),
 }));
-vi.mock('../drawers/GeneratorDrawer', () => ({
+vi.mock('@/components/drawers/GeneratorDrawer', () => ({
   RandomTextDrawer: () => React.createElement('div', { 'data-testid': 'random-text-drawer' }),
   PasswordDrawer: () => React.createElement('div', { 'data-testid': 'password-drawer' }),
 }));
 vi.mock('./FmtConfigBar', () => ({
   default: () => React.createElement('div', { 'data-testid': 'fmt-config-bar' }),
 }));
-vi.mock('../drawers/RegexDrawer', () => ({
+vi.mock('@/components/drawers/RegexDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'regex-drawer' }),
 }));
-vi.mock('../drawers/LineToolsDrawer', () => ({
+vi.mock('@/components/drawers/LineToolsDrawer', () => ({
   WrapLinesDrawer: () => React.createElement('div', { 'data-testid': 'wrap-lines-drawer' }),
   FilterLinesDrawer: () => React.createElement('div', { 'data-testid': 'filter-lines-drawer' }),
   TruncateLinesDrawer: () => React.createElement('div', { 'data-testid': 'truncate-lines-drawer' }),
   NthLineDrawer: () => React.createElement('div', { 'data-testid': 'nth-line-drawer' }),
 }));
-vi.mock('../drawers/TemplatesDrawer', () => ({
+vi.mock('@/components/drawers/TemplatesDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'templates-drawer' }),
 }));
-vi.mock('../drawers/HistoryDrawer', () => ({
+vi.mock('@/components/drawers/HistoryDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'history-drawer' }),
 }));
-vi.mock('../drawers/CipherDrawer', () => ({
+vi.mock('@/components/drawers/CipherDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'cipher-drawer' }),
 }));
-vi.mock('../drawers/DiffDrawer', () => ({
+vi.mock('@/components/drawers/DiffDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'diff-drawer' }),
 }));
-vi.mock('../drawers/FakeDataDrawer', () => ({
+vi.mock('@/components/drawers/FakeDataDrawer', () => ({
   default: () => React.createElement('div', { 'data-testid': 'fake-data-drawer' }),
 }));
-vi.mock('../drawers/DevToolsDrawer', () => ({
+vi.mock('@/components/drawers/DevToolsDrawer', () => ({
   JsonPathDrawer: () => React.createElement('div', { 'data-testid': 'jsonpath-drawer' }),
   MarkdownPreviewDrawer: () => React.createElement('div', { 'data-testid': 'mdpreview-drawer' }),
   LoremIpsumDrawer: () => React.createElement('div', { 'data-testid': 'lorem-drawer' }),
@@ -395,13 +395,13 @@ vi.mock('./SmartSuggestions', () => ({
 vi.mock('./BottomPanel', () => ({
   default: () => React.createElement('div', { 'data-testid': 'bottom-panel' }),
 }));
-vi.mock('../layout/CommandPalette', () => ({
+vi.mock('@/components/layout/CommandPalette', () => ({
   default: () => React.createElement('div', { 'data-testid': 'command-palette' }),
 }));
-vi.mock('../layout/KeyboardShortcuts', () => ({
+vi.mock('@/components/layout/KeyboardShortcuts', () => ({
   default: () => React.createElement('div', { 'data-testid': 'keyboard-shortcuts' }),
 }));
-vi.mock('../gamification/AchievementToast', () => ({
+vi.mock('@/components/gamification/AchievementToast', () => ({
   default: () => React.createElement('div', { 'data-testid': 'achievement-toast' }),
 }));
 

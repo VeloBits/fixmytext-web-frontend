@@ -1,5 +1,5 @@
-import { ACHIEVEMENTS } from '../../constants/tools';
-import type { GamificationContextValue } from '../../contexts/AppContext';
+import { ACHIEVEMENTS } from '@/constants/tools';
+import type { GamificationContextValue } from '@/contexts/AppContext';
 
 interface AchievementsSectionProps {
   g: GamificationContextValue;

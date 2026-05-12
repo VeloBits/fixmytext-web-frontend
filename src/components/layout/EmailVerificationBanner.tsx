@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useResendVerificationMutation } from '../../store/api/authApi';
-import type { RootState } from '../../store/store';
-import type { AlertLevel } from '../../contexts/AlertContext';
+import { useResendVerificationMutation } from '@/store/api/authApi';
+import type { RootState } from '@/store/store';
+import type { AlertLevel } from '@/contexts/AlertContext';
 
 const DISMISSAL_KEY = 'fmt:email-verify-dismissed-until';
 const NAVBAR_HEIGHT = 44; // keep in sync with the navbar's CSS height

@@ -5,13 +5,13 @@ import {
   eventToBinding,
   detectConflicts,
   DEFAULT_SHORTCUT_GROUPS,
-} from '../../hooks/useKeyboardShortcuts';
+} from '@/hooks/useKeyboardShortcuts';
 import type {
   ShortcutDef,
   ShortcutGroup,
   ShortcutBinding,
   KeybindingOverrides,
-} from '../../hooks/useKeyboardShortcuts';
+} from '@/hooks/useKeyboardShortcuts';
 
 interface ShortcutRowProps {
   sc: ShortcutDef;

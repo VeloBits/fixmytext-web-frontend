@@ -4,9 +4,9 @@ import {
   useGetHistoryQuery,
   useDeleteHistoryEntryMutation,
   useClearHistoryMutation,
-} from '../../store/api/historyApi';
-import type { HistoryEntry } from '../../hooks/useHistory';
-import type { RootState } from '../../store/store';
+} from '@/store/api/historyApi';
+import type { HistoryEntry } from '@/hooks/useHistory';
+import type { RootState } from '@/store/store';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 

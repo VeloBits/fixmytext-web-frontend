@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useGetShareQuery } from '../store/api/shareApi';
-import { TOOLS } from '../constants/tools';
-import ToolIcon from '../components/editor/ToolIcon';
-import type { AlertLevel } from '../contexts/AlertContext';
+import { useGetShareQuery } from '@/store/api/shareApi';
+import { TOOLS } from '@/constants/tools';
+import ToolIcon from '@/components/editor/ToolIcon';
+import type { AlertLevel } from '@/contexts/AlertContext';
 
 interface SharePageProps {
   showAlert?: (message: string, type: AlertLevel) => void;

@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import type React from 'react';
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 export type ThemeMode = 'light' | 'dark';
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Alert as AlertItem, AlertLevel } from '../../contexts/AlertContext';
+import type { Alert as AlertItem, AlertLevel } from '@/contexts/AlertContext';
 
 const ICONS: Record<AlertLevel, React.ReactElement> = {
   success: (

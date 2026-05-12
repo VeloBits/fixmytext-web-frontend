@@ -7,13 +7,13 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn((fn) => fn({ auth: { accessToken: null } })),
 }));
 
-vi.mock('../store/api/userDataApi', () => ({
+vi.mock('@/store/api/userDataApi', () => ({
   useGetPreferencesQuery: vi.fn(() => ({ data: undefined })),
   useUpdatePreferencesMutation: () => [mockUpdatePrefs],
 }));
 
 import { useSelector } from 'react-redux';
-import { useGetPreferencesQuery } from '../store/api/userDataApi';
+import { useGetPreferencesQuery } from '@/store/api/userDataApi';
 
 // vi.mock returns loose types; cast to access mock methods
 const mockUseSelector = vi.mocked(useSelector);

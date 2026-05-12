@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { useTransformTextMutation } from '../store/api/textApi';
-import { ENDPOINTS } from '../constants/endpoints';
-import type { RootState } from '../store/store';
+import { useTransformTextMutation } from '@/store/api/textApi';
+import { ENDPOINTS } from '@/constants/endpoints';
+import type { RootState } from '@/store/store';
 import type { AlertType } from './useAlert';
 
 interface ToolError {

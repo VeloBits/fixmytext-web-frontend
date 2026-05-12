@@ -27,11 +27,11 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mocks.mockNavigate,
 }));
 
-vi.mock('../utils/region', () => ({
+vi.mock('@/utils/region', () => ({
   BROWSER_REGION: 'US',
 }));
 
-vi.mock('../store/api/passesApi', () => ({
+vi.mock('@/store/api/passesApi', () => ({
   useGetActivePassesQuery: () => ({
     data: activePassesData,
     refetch: mocks.mockRefetch,
@@ -42,14 +42,14 @@ vi.mock('../store/api/passesApi', () => ({
   useSpinWheelMutation: () => [mocks.mockSpinWheel, { isLoading: false }],
 }));
 
-vi.mock('../store/api/userDataApi', () => ({
+vi.mock('@/store/api/userDataApi', () => ({
   useGetSpinHistoryQuery: () => ({
     data: { spins: [{ id: 1 }] },
     refetch: mocks.mockRefetchSpinHistory,
   }),
 }));
 
-vi.mock('../utils/razorpay', () => ({
+vi.mock('@/utils/razorpay', () => ({
   openRazorpayCheckout: vi.fn(),
   executeCheckoutFlow: mocks.mockExecuteCheckoutFlow,
 }));

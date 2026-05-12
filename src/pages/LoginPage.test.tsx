@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LoginPage from './LoginPage';
-import { expectNoA11yViolations } from '../test/axeHelper';
+import { expectNoA11yViolations } from '@/test/axeHelper';
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
@@ -18,11 +18,11 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
-vi.mock('../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useLoginMutation: () => [mockLogin, { isLoading: false }],
 }));
 
-vi.mock('../constants', () => ({
+vi.mock('@/constants', () => ({
   ROUTES: {
     HOME: '/',
     SIGNUP: '/signup',

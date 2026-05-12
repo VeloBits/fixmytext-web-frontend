@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
 import Navbar from './Navbar';
-import { expectNoA11yViolations } from '../../test/axeHelper';
+import { expectNoA11yViolations } from '@/test/axeHelper';
 
 function makeStore(accessToken: string | null = null) {
   return configureStore({

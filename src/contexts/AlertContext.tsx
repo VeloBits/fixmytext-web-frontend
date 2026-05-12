@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import type React from 'react';
-import { useAlert } from '../hooks/useAlert';
+import { useAlert } from '@/hooks/useAlert';
 
 export type AlertLevel = 'success' | 'danger' | 'warning' | 'info';
 

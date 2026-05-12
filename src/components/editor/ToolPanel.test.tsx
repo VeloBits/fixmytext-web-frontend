@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ToolPanel from './ToolPanel';
-import type { ToolDefinition } from '../../types/tools';
+import type { ToolDefinition } from '@/types/tools';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {

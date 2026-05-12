@@ -1,22 +1,22 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '../constants/tools';
-import { useGetToolStatsQuery } from '../store/api/userDataApi';
-import type { AlertLevel } from '../contexts/AlertContext';
+import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '@/constants/tools';
+import { useGetToolStatsQuery } from '@/store/api/userDataApi';
+import type { AlertLevel } from '@/contexts/AlertContext';
 import type {
   GamificationContextValue,
   SubscriptionContextValue,
   User,
-} from '../contexts/AppContext';
+} from '@/contexts/AppContext';
 
 // Extracted dashboard section components
-import OverviewSection from '../components/dashboard/OverviewSection';
-import SubscriptionSection from '../components/dashboard/SubscriptionSection';
-import RewardsSection from '../components/dashboard/RewardsSection';
-import ProfileSection from '../components/dashboard/ProfileSection';
-import AchievementsSection from '../components/dashboard/AchievementsSection';
-import FavoritesSection from '../components/dashboard/FavoritesSection';
-import HistorySection from '../components/dashboard/HistorySection';
+import OverviewSection from '@/components/dashboard/OverviewSection';
+import SubscriptionSection from '@/components/dashboard/SubscriptionSection';
+import RewardsSection from '@/components/dashboard/RewardsSection';
+import ProfileSection from '@/components/dashboard/ProfileSection';
+import AchievementsSection from '@/components/dashboard/AchievementsSection';
+import FavoritesSection from '@/components/dashboard/FavoritesSection';
+import HistorySection from '@/components/dashboard/HistorySection';
 
 interface DashboardPageProps {
   gamification: GamificationContextValue;

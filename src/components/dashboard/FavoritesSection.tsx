@@ -1,5 +1,5 @@
-import { TOOLS } from '../../constants/tools';
-import type { GamificationContextValue } from '../../contexts/AppContext';
+import { TOOLS } from '@/constants/tools';
+import type { GamificationContextValue } from '@/contexts/AppContext';
 
 interface FavoritesSectionProps {
   g: GamificationContextValue;

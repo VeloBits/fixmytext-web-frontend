@@ -5,8 +5,8 @@ import {
   useCreateTemplateMutation,
   useUpdateTemplateMutation,
   useDeleteTemplateMutation,
-} from '../store/api/userDataApi';
-import type { RootState } from '../store/store';
+} from '@/store/api/userDataApi';
+import type { RootState } from '@/store/store';
 
 const STORAGE_KEY = 'tu-templates';
 

@@ -4,8 +4,8 @@
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useGetPreferencesQuery, useUpdatePreferencesMutation } from '../store/api/userDataApi';
-import type { RootState } from '../store/store';
+import { useGetPreferencesQuery, useUpdatePreferencesMutation } from '@/store/api/userDataApi';
+import type { RootState } from '@/store/store';
 
 /** Light or dark theme mode — mirrors ThemeContext.ThemeMode */
 type ThemeMode = 'light' | 'dark';

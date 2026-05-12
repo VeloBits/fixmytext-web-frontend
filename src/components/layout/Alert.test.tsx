@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import type { AlertType, AlertItem } from '../../hooks/useAlert';
+import type { AlertType, AlertItem } from '@/hooks/useAlert';
 
 import Alert from './Alert';
 

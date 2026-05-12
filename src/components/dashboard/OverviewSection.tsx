@@ -1,6 +1,6 @@
-import { TOOLS, ACHIEVEMENTS, LEVELS, QUEST_TEMPLATES } from '../../constants/tools';
-import type { GamificationContextValue } from '../../contexts/AppContext';
-import type { LevelDefinition } from '../../types/tools';
+import { TOOLS, ACHIEVEMENTS, LEVELS, QUEST_TEMPLATES } from '@/constants/tools';
+import type { GamificationContextValue } from '@/contexts/AppContext';
+import type { LevelDefinition } from '@/types/tools';
 
 export interface TopTool {
   id: string;

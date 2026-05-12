@@ -27,7 +27,7 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock('../store/api/subscriptionApi', () => ({
+vi.mock('@/store/api/subscriptionApi', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   useGetSubscriptionStatusQuery: (...args: any[]) => mockSubscriptionQuery(...args),
   useCreateProCheckoutMutation: () => [mockCreateProCheckout, { isLoading: false }],
@@ -53,15 +53,15 @@ vi.mock('./usePasses', () => ({
   })),
 }));
 
-vi.mock('../utils/razorpay', () => ({
+vi.mock('@/utils/razorpay', () => ({
   openRazorpayCheckout: vi.fn(),
   executeCheckoutFlow: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { useSelector } from 'react-redux';
 import useSubscription from './useSubscription';
-import { executeCheckoutFlow } from '../utils/razorpay';
-import type { ToolDefinition } from '../types/tools';
+import { executeCheckoutFlow } from '@/utils/razorpay';
+import type { ToolDefinition } from '@/types/tools';
 
 const mockUseSelector = vi.mocked(useSelector);
 

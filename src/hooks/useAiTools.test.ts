@@ -5,10 +5,10 @@ const mockTransformText = vi.fn();
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
-vi.mock('../store/api/textApi', () => ({
+vi.mock('@/store/api/textApi', () => ({
   useTransformTextMutation: () => [mockTransformText],
 }));
-vi.mock('../constants/endpoints', () => ({
+vi.mock('@/constants/endpoints', () => ({
   ENDPOINTS: {
     GENERATE_HASHTAGS: '/hashtags',
     GENERATE_SEO_TITLES: '/seo',

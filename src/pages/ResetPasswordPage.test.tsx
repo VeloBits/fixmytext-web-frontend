@@ -19,11 +19,11 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
-vi.mock('../store/api/authApi', () => ({
+vi.mock('@/store/api/authApi', () => ({
   useResetPasswordMutation: () => [mockResetPassword, { isLoading: false }],
 }));
 
-vi.mock('../constants', () => ({
+vi.mock('@/constants', () => ({
   ROUTES: {
     HOME: '/',
     LOGIN: '/login',

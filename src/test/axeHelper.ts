@@ -1,5 +1,10 @@
 import { axe } from 'vitest-axe';
 
+interface RuleObject {
+  enabled: boolean;
+  [key: string]: unknown;
+}
+
 /**
  * Run axe-core against a rendered container and assert no violations.
  *
@@ -12,7 +17,10 @@ import { axe } from 'vitest-axe';
  * Override per test by passing `rules`, e.g.:
  *   await expectNoA11yViolations(container, { region: { enabled: true } });
  */
-export async function expectNoA11yViolations(container, ruleOverrides = {}) {
+export async function expectNoA11yViolations(
+  container: Element,
+  ruleOverrides: Record<string, RuleObject> = {},
+): Promise<void> {
   const results = await axe(container, {
     rules: {
       'color-contrast': { enabled: false },
@@ -20,5 +28,7 @@ export async function expectNoA11yViolations(container, ruleOverrides = {}) {
       ...ruleOverrides,
     },
   });
-  expect(results).toHaveNoViolations();
+  // toHaveNoViolations is registered globally via setup.ts → expect.extend(axeMatchers)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (expect(results) as any).toHaveNoViolations();
 }
