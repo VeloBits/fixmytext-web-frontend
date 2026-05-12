@@ -6,9 +6,9 @@ import {
   type FetchBaseQueryError,
   type FetchBaseQueryMeta,
 } from '@reduxjs/toolkit/query/react';
+/// <reference types="vite/client" />
 import type { RootState } from '../store';
 
-/// <reference types="vite/client" />
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /** Maximum number of token refresh attempts before forcing logout. */
@@ -122,11 +122,14 @@ export function createBaseQueryWithReauth(extraHeaders: ExtraHeadersFn): RtkBase
  * Use this for read-heavy APIs (queries). Mutations should NOT use this.
  */
  
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function retryCondition(_error: any, _args: any, { attempt }: { attempt: number }): boolean {
+  if ((_error as FetchBaseQueryError & { status?: number })?.status &&
+      (_error as FetchBaseQueryError & { status?: number }).status! < 500) return false;
+  return attempt <= 2;
+}
+
 export const baseQueryWithRetry = retry(baseQueryWithReauth, {
   maxRetries: 2,
-  retryCondition: (_error: any, _args: any, { attempt }: { attempt: number }) => {
-    // Only retry on server errors (5xx), not on client errors (4xx)
-    if ((_error as FetchBaseQueryError & { status?: number })?.status && (_error as FetchBaseQueryError & { status?: number }).status! < 500) return false;
-    return attempt <= 2;
-  },
+  retryCondition,
 }) as RtkBaseQuery & { _retryOptions?: { maxRetries: number; retryCondition: (...args: unknown[]) => boolean } };
