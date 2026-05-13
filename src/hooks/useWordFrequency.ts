@@ -21,6 +21,7 @@ export default function useWordFrequency(
 ): UseWordFrequencyReturn {
   const handleWordFrequency = (): void => {
     if (!text) return;
+    // eslint-disable-next-line security/detect-unsafe-regex -- no ReDoS risk: non-nested character classes with simple optional suffix
     const words = text.toLowerCase().match(/[a-z\u00C0-\u024F]+(?:'[a-z]+)?/gi);
     if (!words || words.length === 0) {
       showAlert('No words found', 'info');
