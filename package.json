@@ -12,7 +12,7 @@
     "blakejs": "^1.2.1",
     "blueimp-md5": "^2.19.0",
     "docx": "9.6.1",
-    "dompurify": "3.4.2",
+    "dompurify": "3.4.3",
     "framer-motion": "^12.38.0",
     "js-sha256": "^0.11.1",
     "js-sha3": "^0.9.3",
