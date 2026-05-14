@@ -1,4 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import * as Sentry from '@sentry/react';
+
+vi.mock('@sentry/react', () => ({
+  default: { captureException: vi.fn() },
+  captureException: vi.fn(),
+}));
 
 import ErrorBoundary from './ErrorBoundary';
 
@@ -36,6 +42,7 @@ describe('ErrorBoundary', () => {
     );
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     expect(screen.getByText(/An unexpected error occurred/)).toBeInTheDocument();
+    expect(Sentry.captureException).toHaveBeenCalledOnce();
   });
 
   it('shows error details in details element', () => {

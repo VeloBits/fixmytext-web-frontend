@@ -1,5 +1,6 @@
 import { isRejectedWithValue } from '@reduxjs/toolkit';
 import type { Middleware } from 'redux';
+import * as Sentry from '@sentry/react';
 
 /**
  * Shape of an RTK Query rejected-with-value payload as returned by
@@ -54,6 +55,14 @@ export const errorMiddleware: Middleware = (_api) => (next) => (action) => {
         detail: { message, type: 'danger', endpoint, status: error?.status },
       })
     );
+
+    // Capture non-401 query errors in Sentry
+    const status = (action.payload as RtkErrorPayload | undefined)?.status;
+    if (status !== 401 && status !== undefined) {
+      Sentry.captureException(new Error(`RTK Query error: ${endpoint ?? 'unknown'} — ${status}`), {
+        extra: { endpoint, status },
+      });
+    }
   }
 
   return next(action);
