@@ -10,7 +10,7 @@ import {
 const FILTERED = '[Filtered]';
 const PII_KEYS = /text|prompt|password|token|cookie|authorization/i;
 
-function scrubObject(obj: Record<string, unknown>): Record<string, unknown> {
+export function scrubObject(obj: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(obj).map(([k, v]) => [k, PII_KEYS.test(k) ? FILTERED : v])
   );

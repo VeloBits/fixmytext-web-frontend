@@ -1,13 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type * as SentryTypes from '@sentry/react';
+import * as Sentry from '@sentry/react';
+import { initSentry, scrubObject } from './sentry';
 
-// Mock @sentry/react before importing the module under test
 vi.mock('@sentry/react', () => ({
   init: vi.fn(),
   reactRouterV7BrowserTracingIntegration: vi.fn(() => ({})),
 }));
 
-// Mock react-router-dom hooks used by the integration
 vi.mock('react-router-dom', () => ({
   useEffect: vi.fn(),
   useLocation: vi.fn(),
@@ -18,76 +17,49 @@ vi.mock('react-router-dom', () => ({
 
 describe('initSentry', () => {
   beforeEach(() => {
-    vi.resetModules();
-    vi.stubEnv('VITE_SENTRY_DSN', '');
+    vi.mocked(Sentry.init).mockClear();
+    vi.unstubAllEnvs();
   });
 
-  it('does not call Sentry.init when DSN is empty', async () => {
-    const { default: Sentry } = await import('@sentry/react');
-    const { initSentry } = await import('./sentry');
+  it('does not call Sentry.init when DSN is empty', () => {
+    vi.stubEnv('VITE_SENTRY_DSN', '');
     initSentry();
     expect(Sentry.init).not.toHaveBeenCalled();
   });
 
-  it('calls Sentry.init when DSN is provided', async () => {
+  it('calls Sentry.init when DSN is provided', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://test@sentry.io/123');
-    const { default: Sentry } = await import('@sentry/react');
-    const { initSentry } = await import('./sentry');
     initSentry();
     expect(Sentry.init).toHaveBeenCalledOnce();
   });
 });
 
-describe('PII scrubber (beforeSend)', () => {
-  it('strips text field from request data', async () => {
-    vi.stubEnv('VITE_SENTRY_DSN', 'https://test@sentry.io/123');
-    const { default: Sentry } = await import('@sentry/react');
-    const { initSentry } = await import('./sentry');
-    initSentry();
-
-    const initCall = vi.mocked(Sentry.init).mock.calls[0]?.[0];
-    const beforeSend = initCall?.beforeSend;
-
-    const event = {
-      request: { data: { text: 'user content', other: 'keep' } },
-    } as Parameters<NonNullable<typeof beforeSend>>[0];
-
-    const result = beforeSend?.(event, {}) as SentryTypes.ErrorEvent | null | undefined;
-    expect((result?.request?.data as Record<string, unknown>)?.['text']).toBe('[Filtered]');
-    expect((result?.request?.data as Record<string, unknown>)?.['other']).toBe('keep');
+describe('scrubObject (PII scrubber)', () => {
+  it('strips text field', () => {
+    const result = scrubObject({ text: 'user content', other: 'keep' });
+    expect(result['text']).toBe('[Filtered]');
+    expect(result['other']).toBe('keep');
   });
 
-  it('strips password field from request data', async () => {
-    vi.stubEnv('VITE_SENTRY_DSN', 'https://test@sentry.io/123');
-    const { default: Sentry } = await import('@sentry/react');
-    const { initSentry } = await import('./sentry');
-    initSentry();
-
-    const initCall = vi.mocked(Sentry.init).mock.calls[0]?.[0];
-    const beforeSend = initCall?.beforeSend;
-
-    const event = {
-      request: { data: { password: 'secret123' } },
-    } as Parameters<NonNullable<typeof beforeSend>>[0];
-
-    const result = beforeSend?.(event, {}) as SentryTypes.ErrorEvent | null | undefined;
-    expect((result?.request?.data as Record<string, unknown>)?.['password']).toBe('[Filtered]');
+  it('strips password field', () => {
+    const result = scrubObject({ password: 'secret123' });
+    expect(result['password']).toBe('[Filtered]');
   });
 
-  it('returns event unchanged when no PII fields present', async () => {
-    vi.stubEnv('VITE_SENTRY_DSN', 'https://test@sentry.io/123');
-    const { default: Sentry } = await import('@sentry/react');
-    const { initSentry } = await import('./sentry');
-    initSentry();
+  it('strips token field', () => {
+    const result = scrubObject({ token: 'abc123', action: 'submit' });
+    expect(result['token']).toBe('[Filtered]');
+    expect(result['action']).toBe('submit');
+  });
 
-    const initCall = vi.mocked(Sentry.init).mock.calls[0]?.[0];
-    const beforeSend = initCall?.beforeSend;
+  it('strips authorization field', () => {
+    const result = scrubObject({ authorization: 'Bearer xyz' });
+    expect(result['authorization']).toBe('[Filtered]');
+  });
 
-    const event = {
-      request: { data: { action: 'submit', count: 3 } },
-    } as Parameters<NonNullable<typeof beforeSend>>[0];
-
-    const result = beforeSend?.(event, {}) as SentryTypes.ErrorEvent | null | undefined;
-    expect((result?.request?.data as Record<string, unknown>)?.['action']).toBe('submit');
+  it('returns object unchanged when no PII fields present', () => {
+    const result = scrubObject({ action: 'submit', count: 3 });
+    expect(result['action']).toBe('submit');
+    expect(result['count']).toBe(3);
   });
 });
