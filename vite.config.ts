@@ -2,6 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -29,7 +30,22 @@ function manualChunks(id: string): string | undefined {
 }
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    sentryVitePlugin({
+      org: process.env.SENTRY_ORG,
+      project: 'fixmytext-frontend',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      sourcemaps: {
+        filesToDeleteAfterUpload: ['./dist/**/*.map'],
+      },
+      release: {
+        name: process.env.VITE_SENTRY_RELEASE,
+      },
+      disable: !process.env.SENTRY_AUTH_TOKEN,
+      telemetry: false,
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -38,6 +54,7 @@ export default defineConfig({
   server: { port: 3000, host: true },
   preview: { port: 3000 },
   build: {
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks,

@@ -31,6 +31,7 @@ export default function SignupPage({ showAlert }: SignupPageProps) {
       showAlert('Password must be at least 8 characters', 'danger');
       return;
     }
+    // eslint-disable-next-line security/detect-possible-timing-attacks -- client-side UI check only; timing attacks are not a threat here
     if (password !== confirmPassword) {
       showAlert('Passwords do not match', 'danger');
       return;

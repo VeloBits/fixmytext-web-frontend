@@ -907,6 +907,7 @@ export default function useAiTools(
 
     // Convert one curl command (already collapsed onto a single line).
     const convertOne = (cmd: string): string => {
+      // eslint-disable-next-line security/detect-unsafe-regex -- ReDoS risk is negligible: lazy .*? on single-line curl string owned by the user
       const urlMatch = cmd.match(/curl\s+(?:.*?\s+)?['"]?(https?:\/\/[^\s'"]+)/);
       const url = urlMatch ? (urlMatch[1] ?? 'https://api.example.com') : 'https://api.example.com';
       const methodMatch = cmd.match(/-X\s+(\w+)/);

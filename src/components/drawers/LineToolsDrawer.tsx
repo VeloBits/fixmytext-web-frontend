@@ -33,6 +33,7 @@ function lineMatches(line: string, pattern: string, caseSensitive: boolean, useR
   if (useRegex) {
     try {
       const flags = caseSensitive ? '' : 'i';
+      // eslint-disable-next-line security/detect-non-literal-regexp -- intentional: user-provided regex pattern in a line-filter tool
       return new RegExp(pattern, flags).test(line);
     } catch {
       return false;

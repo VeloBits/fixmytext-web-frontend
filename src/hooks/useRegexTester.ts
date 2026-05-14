@@ -39,6 +39,7 @@ export default function useRegexTester(
       return;
     }
     try {
+      // eslint-disable-next-line security/detect-non-literal-regexp -- intentional: this is a regex tester tool; user input is the regex pattern
       const re = new RegExp(regexPattern, regexFlags);
       const matches: RegexMatch[] = [];
       let m: RegExpExecArray | null;

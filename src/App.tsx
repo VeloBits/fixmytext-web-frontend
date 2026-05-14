@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import OnboardingModal from './components/layout/OnboardingModal';
 import PageSkeleton from './components/layout/PageSkeleton';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
 
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
@@ -26,6 +27,7 @@ import PassPurchaseModal from './components/subscription/PassPurchaseModal';
 import { ROUTES } from './constants';
 
 function AppInner() {
+  const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
   const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
   const { user, isAuthenticated, gamification, subscription } = useAppContext();
@@ -59,7 +61,7 @@ function AppInner() {
         subscription={subscription}
       />
       <Suspense fallback={<PageSkeleton />}>
-        <Routes>
+        <SentryRoutes>
           <Route
             path={ROUTES.HOME}
             element={
@@ -106,7 +108,7 @@ function AppInner() {
             }
           />
           <Route path={ROUTES.SHARE} element={<SharePage showAlert={showAlert} />} />
-        </Routes>
+        </SentryRoutes>
       </Suspense>
     </>
   );

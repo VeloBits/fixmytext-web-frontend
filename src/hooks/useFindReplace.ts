@@ -35,6 +35,7 @@ export default function useFindReplace(
       let count = 0;
       const flags = findCaseSensitive ? 'g' : 'gi';
       const pattern = findUseRegex ? findText : findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // eslint-disable-next-line security/detect-non-literal-regexp -- intentional: user-provided find/replace regex pattern
       const re = new RegExp(pattern, flags);
       const result = text.replace(re, () => {
         count++;

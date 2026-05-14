@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { components } from '@/types/openapi';
 import { authApi } from '@/store/api/authApi';
+import * as Sentry from '@sentry/react';
 
 export type User = components['schemas']['UserResponse'];
 
@@ -21,6 +22,7 @@ const authSlice = createSlice({
     logout(state) {
       state.user = null;
       state.accessToken = null;
+      Sentry.setUser(null);
     },
   },
   extraReducers: (builder) => {
@@ -35,10 +37,12 @@ const authSlice = createSlice({
     });
     builder.addMatcher(authApi.endpoints.getMe.matchFulfilled, (state, { payload }) => {
       state.user = payload;
+      Sentry.setUser({ id: payload.id, email: payload.email });
     });
     builder.addMatcher(authApi.endpoints.logout.matchFulfilled, (state) => {
       state.user = null;
       state.accessToken = null;
+      Sentry.setUser(null);
     });
   },
 });
