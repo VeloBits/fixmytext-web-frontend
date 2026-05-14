@@ -1,6 +1,8 @@
 import js from '@eslint/js';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+// @ts-expect-error – eslint-plugin-security ships without type declarations
+import security from 'eslint-plugin-security';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -74,4 +76,12 @@ export default [
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
   }),
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { security },
+    rules: {
+      ...security.configs.recommended.rules,
+      'security/detect-object-injection': 'off',
+    },
+  },
 ];

@@ -5,6 +5,7 @@ function getMatchCount(text: string, findText: string, caseSensitive: boolean, u
   try {
     const flags = caseSensitive ? 'g' : 'gi';
     const pattern = useRegex ? findText : findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // eslint-disable-next-line security/detect-non-literal-regexp -- intentional: this is a user-facing find/replace regex tool
     const re = new RegExp(pattern, flags);
     return (text.match(re) || []).length;
   } catch {

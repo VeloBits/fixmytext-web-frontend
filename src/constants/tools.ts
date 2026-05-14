@@ -3410,6 +3410,7 @@ export const SMART_SUGGESTION_RULES: SmartSuggestionRule[] = [
     toolIds: ['css_fmt'],
   },
   { test: (t) => /function\s+\w+|const\s+\w+\s*=|=>\s*\{/m.test(t), toolIds: ['js_fmt'] },
+  // eslint-disable-next-line security/detect-unsafe-regex -- ReDoS risk is negligible: applied to .trim() output with bounded quantifiers on known character classes
   { test: (t) => /^[01]{7,8}(\s+[01]{7,8})*$/.test(t.trim()), toolIds: ['binary_dec'] },
   { test: (t) => /^\\u[0-9a-fA-F]{4}/.test(t.trim()), toolIds: ['unicode_unesc'] },
   {
@@ -3426,6 +3427,7 @@ export const SMART_SUGGESTION_RULES: SmartSuggestionRule[] = [
       /^\s*<\?xml|^\s*<[\w-]+[^>]*>/m.test(t) && !/<(html|head|body|div|span|p|a)\b/i.test(t),
     toolIds: ['xml_fmt', 'xml_json'],
   },
+  // eslint-disable-next-line security/detect-unsafe-regex -- ReDoS risk is negligible: client-side heuristic on user-owned text, bounded flag repetition
   { test: (t) => /^curl\s+(-[A-Za-z]+\s+)*['"]?https?:\/\//m.test(t), toolIds: ['curl_to_code'] },
   {
     test: (t) =>

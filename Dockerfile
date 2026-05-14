@@ -21,6 +21,7 @@ RUN npm ci --silent
 # Copy source and build (VITE_* env vars are baked in at build time)
 COPY . .
 RUN npm run build
+RUN find /app/dist -name "*.map" -delete
 
 
 # ── Stage 2: Serve with nginx ──────────────────────────────────────────────────
@@ -30,11 +31,14 @@ FROM nginx:1.27-alpine AS runtime
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copy our custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/app.conf
+COPY --chown=nginx:nginx nginx.conf /etc/nginx/conf.d/app.conf
 
 # Copy the production build from stage 1
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --chown=nginx:nginx --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+# Run as non-root nginx user; nginx-alpine listens on 8080 (not 80) for non-root
+USER nginx
+
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
