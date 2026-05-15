@@ -21,6 +21,7 @@ RUN npm ci --silent
 # Copy source and build (VITE_* env vars are baked in at build time)
 COPY . .
 RUN npm run build
+RUN find /app/dist -name "*.map" -delete
 
 
 # ── Stage 2: Serve with nginx ──────────────────────────────────────────────────
