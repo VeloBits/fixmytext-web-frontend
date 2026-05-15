@@ -3419,7 +3419,7 @@ export const SMART_SUGGESTION_RULES: SmartSuggestionRule[] = [
   },
   { test: (t) => /xn--[a-z0-9]+/i.test(t), toolIds: ['url_dec'] },
   {
-    test: (t) => /^\s*SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP/im.test(t),
+    test: (t) => /^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)\b/im.test(t),
     toolIds: ['sql_fmt'],
   },
   {

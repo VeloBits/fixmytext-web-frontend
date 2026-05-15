@@ -251,7 +251,9 @@ describe('SMART_SUGGESTION_RULES', () => {
     const rule = SMART_SUGGESTION_RULES.find((r) => r.toolIds.includes('sql_fmt'));
     expect(rule).toBeDefined();
     expect(rule!.test('SELECT * FROM users WHERE id = 1')).toBe(true);
+    expect(rule!.test('  INSERT INTO users (name) VALUES ("A")')).toBe(true);
     expect(rule!.test('not sql')).toBe(false);
+    expect(rule!.test('please INSERT this text somewhere')).toBe(false);
   });
 
   it('XML rule detects XML', () => {
