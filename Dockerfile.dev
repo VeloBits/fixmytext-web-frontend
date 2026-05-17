@@ -1,7 +1,7 @@
 # Development — minimal single-stage image.
 # Source code is mounted as a volume; Vite dev server hot-reloads on change.
 
-FROM node:20-alpine
+FROM node:20.20.2-alpine
 
 WORKDIR /app
 
