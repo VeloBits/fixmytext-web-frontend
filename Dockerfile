@@ -25,7 +25,7 @@ RUN find /app/dist -name "*.map" -delete
 
 
 # ── Stage 2: Serve with nginx ──────────────────────────────────────────────────
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.31-alpine AS runtime
 
 # Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
