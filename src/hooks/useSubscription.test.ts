@@ -23,6 +23,17 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: true,
+    isLoading: false,
+    accessToken: 'tok',
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
@@ -59,11 +70,13 @@ vi.mock('@/utils/razorpay', () => ({
 }));
 
 import { useSelector } from 'react-redux';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import useSubscription from './useSubscription';
 import { executeCheckoutFlow } from '@/utils/razorpay';
 import type { ToolDefinition } from '@/types/tools';
 
 const mockUseSelector = vi.mocked(useSelector);
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('useSubscription', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,6 +86,14 @@ describe('useSubscription', () => {
     vi.clearAllMocks();
     showAlert = vi.fn();
     mockUseSelector.mockReturnValue({ accessToken: 'tok' });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockCancelSub.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSubscriptionQuery.mockReturnValue({
       data: {
@@ -108,6 +129,14 @@ describe('useSubscription', () => {
 
   it('checkToolAccess returns true when not authenticated', () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     const { result } = renderHook(() => useSubscription({ showAlert }));
     expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
   });

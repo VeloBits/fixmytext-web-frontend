@@ -6,6 +6,21 @@ import { configureStore } from '@reduxjs/toolkit';
 import Navbar from './Navbar';
 import { expectNoA11yViolations } from '@/test/axeHelper';
 
+// Mock useOidcAuth so we can control isAuthenticated per test
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
+import { useOidcAuth } from '@/auth/useOidcAuth';
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
+
 function makeStore(accessToken: string | null = null) {
   return configureStore({
     reducer: {
@@ -15,6 +30,16 @@ function makeStore(accessToken: string | null = null) {
 }
 
 function renderNavbar(props = {}, accessToken: string | null = null) {
+  // Keep Redux store in sync for any selectors that may read from it,
+  // and also update the OIDC mock since Navbar uses useOidcAuth.
+  mockUseOidcAuth.mockReturnValue({
+    isAuthenticated: !!accessToken,
+    isLoading: false,
+    accessToken,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  });
   return render(
     <Provider store={makeStore(accessToken)}>
       <MemoryRouter>

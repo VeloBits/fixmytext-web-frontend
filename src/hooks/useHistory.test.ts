@@ -9,14 +9,25 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn((fn) => fn({ auth: { accessToken: null } })),
 }));
 
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 vi.mock('@/store/api/historyApi', () => ({
   useRecordOperationMutation: () => [mockRecordOperation],
   useClearHistoryMutation: () => [mockClearHistoryApi],
 }));
 
-import { useSelector } from 'react-redux';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 
-const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('useHistory', () => {
   // vi.fn() returns a Mock — cast to target signature for use with useHistory
@@ -29,7 +40,15 @@ describe('useHistory', () => {
     setText = vi.fn();
     showAlert = vi.fn();
     vi.clearAllMocks();
-    mockUseSelector.mockImplementation((fn) => fn({ auth: { accessToken: null } }));
+    // Default: not authenticated
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
   });
 
   it('starts with empty history', () => {
@@ -140,7 +159,14 @@ describe('useHistory', () => {
   });
 
   it('records operation to backend when authenticated', () => {
-    mockUseSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok123' } }));
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok123',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     const { result } = renderHook(() => useHistory(setText, showAlert));
     act(() => {
       result.current.pushHistory('Op', 'orig', 'res', { toolId: 'test', toolType: 'local' });
@@ -163,7 +189,14 @@ describe('useHistory', () => {
   });
 
   it('clears server history when authenticated', () => {
-    mockUseSelector.mockImplementation((fn) => fn({ auth: { accessToken: 'tok' } }));
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     const { result } = renderHook(() => useHistory(setText, showAlert));
     act(() => {
       result.current.handleClearHistory();

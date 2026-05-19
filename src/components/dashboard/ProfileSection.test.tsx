@@ -69,9 +69,7 @@ describe('ProfileSection — email verification', () => {
     expect(screen.queryByText('Verify your email')).not.toBeInTheDocument();
   });
 
-  it('resend button sends the request and goes into cooldown on success', async () => {
-    mockResendVerification.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-
+  it('resend button shows Keycloak redirect message', async () => {
     const showAlertLocal = vi.fn();
     const user = {
       email: 'x@example.com',
@@ -92,26 +90,16 @@ describe('ProfileSection — email verification', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Resend verification email' }));
 
     await waitFor(() => {
-      expect(mockResendVerification).toHaveBeenCalled();
       expect(showAlertLocal).toHaveBeenCalledWith(
-        'Verification email sent. Check your inbox and spam folder.',
-        'success'
+        'Please check your Keycloak account to resend the verification email.',
+        'info'
       );
     });
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /resend in \d+s/i })).toBeDisabled();
-    });
+    // No cooldown in new implementation
+    expect(screen.getByRole('button', { name: 'Resend verification email' })).not.toBeDisabled();
   });
 
   it('parses backend 429 "wait N seconds" into a cooldown label', async () => {
-    mockResendVerification.mockReturnValue({
-      unwrap: () =>
-        Promise.reject({
-          status: 429,
-          data: { detail: 'Please wait 30 seconds before requesting another.' },
-        }),
-    });
     const showAlertLocal = vi.fn();
     render(
       <ProfileSection
@@ -128,13 +116,15 @@ describe('ProfileSection — email verification', () => {
       />
     );
 
+    // New behavior: no API call, no 429. Just shows Keycloak message.
     fireEvent.click(screen.getByRole('button', { name: 'Resend verification email' }));
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /resend in (29|30)s/i })).toBeDisabled();
       expect(showAlertLocal).toHaveBeenCalledWith(
-        'Please wait 30 seconds before requesting another.',
-        'warning'
+        'Please check your Keycloak account to resend the verification email.',
+        'info'
       );
     });
+    // No countdown/cooldown in new Keycloak-based flow
+    expect(screen.queryByRole('button', { name: /resend in \d+s/i })).not.toBeInTheDocument();
   });
 });

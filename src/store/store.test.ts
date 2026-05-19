@@ -9,7 +9,7 @@ describe('store', () => {
   it('has auth slice in state', () => {
     const state = store.getState();
     expect(state).toHaveProperty('auth');
-    expect(state.auth).toEqual({ user: null, accessToken: null });
+    expect(state.auth).toEqual({ user: null });
   });
 
   it('has all API reducer paths in state', () => {

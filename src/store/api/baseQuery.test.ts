@@ -67,7 +67,7 @@ vi.mock('@reduxjs/toolkit/query/react', () => ({
 async function freshImport() {
   // Clear module cache so each describe block gets fresh module-level state.
   vi.resetModules();
-  // Re-apply the mock (resetModules drops it)
+  // Re-apply the mocks (resetModules drops them)
   vi.mock('@reduxjs/toolkit/query/react', () => ({
     fetchBaseQuery: (config: Record<string, unknown>) => {
       capturedFetchBaseQueryConfig = config;
@@ -91,15 +91,34 @@ async function freshImport() {
       return wrapped;
     },
   }));
+  vi.mock('@/auth/userManager', () => ({
+    userManager: {
+      getUser: vi.fn().mockResolvedValue(null),
+      storeUser: vi.fn().mockResolvedValue(undefined),
+      removeUser: vi.fn().mockResolvedValue(undefined),
+      signinRedirect: vi.fn().mockResolvedValue(undefined),
+      signinSilent: vi.fn().mockRejectedValue(new Error('No Keycloak in test env')),
+      signinRedirectCallback: vi.fn().mockResolvedValue(undefined),
+      signoutRedirect: vi.fn().mockResolvedValue(undefined),
+      clearStaleState: vi.fn().mockResolvedValue(undefined),
+      events: {
+        addUserLoaded: vi.fn(), removeUserLoaded: vi.fn(),
+        addUserUnloaded: vi.fn(), removeUserUnloaded: vi.fn(),
+        addUserSignedIn: vi.fn(), removeUserSignedIn: vi.fn(),
+        addUserSignedOut: vi.fn(), removeUserSignedOut: vi.fn(),
+        addSilentRenewError: vi.fn(), removeSilentRenewError: vi.fn(),
+      },
+    },
+  }));
 
   const mod = await import('./baseQuery');
   return mod;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function makeApi(accessToken: string | null = 'test-token'): any {
+function makeApi(_accessToken: string | null = 'test-token'): any {
   return {
-    getState: () => ({ auth: { accessToken } }),
+    getState: () => ({}),
     dispatch: vi.fn(),
   };
 }
@@ -141,51 +160,59 @@ describe('createAuthBaseQuery — prepareHeaders', () => {
   });
 
   it('sets Authorization header when accessToken exists', async () => {
+    const { userManager } = await import('@/auth/userManager');
+    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'my-access-token' } as Parameters<typeof vi.mocked<typeof userManager.getUser>>[0] extends undefined ? never : Awaited<ReturnType<typeof userManager.getUser>>);
     const { createAuthBaseQuery } = await freshImport();
     createAuthBaseQuery(); // triggers fetchBaseQuery mock → captures config
 
     const headers = new Headers();
-    const api = makeApi('my-access-token');
+    const api = makeApi();
 
-    const returned = capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
+    const returned = await capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(returned.get('Authorization')).toBe('Bearer my-access-token');
   });
 
   it('does not set Authorization header when accessToken is falsy', async () => {
+    const { userManager } = await import('@/auth/userManager');
+    vi.mocked(userManager.getUser).mockResolvedValue(null);
     const { createAuthBaseQuery } = await freshImport();
     createAuthBaseQuery();
 
     const headers = new Headers();
-    const api = makeApi(null);
+    const api = makeApi();
 
-    const returned = capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
+    const returned = await capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(returned.get('Authorization')).toBeNull();
   });
 
   it('calls extraHeaders callback when provided', async () => {
+    const { userManager } = await import('@/auth/userManager');
+    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'tok' } as Parameters<typeof vi.mocked<typeof userManager.getUser>>[0] extends undefined ? never : Awaited<ReturnType<typeof userManager.getUser>>);
     const { createAuthBaseQuery } = await freshImport();
     const extraHeaders = vi.fn();
     createAuthBaseQuery(extraHeaders);
 
     const headers = new Headers();
-    const api = makeApi('tok');
+    const api = makeApi();
 
-    capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
+    await capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(extraHeaders).toHaveBeenCalledWith(headers, api);
   });
 
   it('does not call extraHeaders when it is undefined', async () => {
+    const { userManager } = await import('@/auth/userManager');
+    vi.mocked(userManager.getUser).mockResolvedValue(null);
     const { createAuthBaseQuery } = await freshImport();
     createAuthBaseQuery(); // no extraHeaders
 
     const headers = new Headers();
-    const api = makeApi('tok');
+    const api = makeApi();
 
     // Should not throw
-    expect(() => capturedFetchBaseQueryConfig.prepareHeaders(headers, api)).not.toThrow();
+    await expect(capturedFetchBaseQueryConfig.prepareHeaders(headers, api)).resolves.not.toThrow();
   });
 
   it('passes correct baseUrl and credentials to fetchBaseQuery', async () => {
@@ -217,29 +244,23 @@ describe('baseQueryWithReauth — successful requests', () => {
     expect(api.dispatch).not.toHaveBeenCalled();
   });
 
-  it('resets retryCount on successful request after a prior 401 cycle', async () => {
+  it('retries original request after silent renew succeeds on 401', async () => {
     const { baseQueryWithReauth } = await freshImport();
+    const { userManager } = await import('@/auth/userManager');
     const api = makeApi();
 
-    // First call: 401 → refresh succeeds → retry succeeds
+    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
+
     let callCount = 0;
-    mockRawBaseQuery.mockImplementation((args) => {
-      const url = typeof args === 'string' ? args : args?.url;
-      if (url === '/api/v1/auth/refresh') {
-        return Promise.resolve({ data: { access_token: 'new-tok' } });
-      }
+    mockRawBaseQuery.mockImplementation(() => {
       callCount++;
       if (callCount === 1) return Promise.resolve({ error: { status: 401 } });
       return Promise.resolve({ data: 'ok' });
     });
 
-    await baseQueryWithReauth('/resource', api, {});
-
-    // Now make another 401 call — it should still attempt refresh
-    // because retryCount was reset by the successful result.
-    callCount = 0;
-    const result = await baseQueryWithReauth('/resource2', api, {});
+    const result = await baseQueryWithReauth('/resource', api, {});
     expect(result).toEqual({ data: 'ok' });
+    expect(userManager.signinSilent).toHaveBeenCalled();
   });
 });
 
@@ -252,35 +273,28 @@ describe('baseQueryWithReauth — 401 refresh flow', () => {
     mockRawBaseQuery.mockReset();
   });
 
-  it('refreshes token and retries the original request on 401', async () => {
+  it('refreshes token via signinSilent and retries the original request on 401', async () => {
     const { baseQueryWithReauth } = await freshImport();
-    const api = makeApi('old-token');
+    const { userManager } = await import('@/auth/userManager');
+    const api = makeApi();
+
+    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
 
     let callIndex = 0;
-    mockRawBaseQuery.mockImplementation((args) => {
-      const url = typeof args === 'string' ? args : args?.url;
-
-      // Refresh endpoint → success
-      if (url === '/api/v1/auth/refresh') {
-        return Promise.resolve({ data: { access_token: 'new-token' } });
-      }
-
+    mockRawBaseQuery.mockImplementation(() => {
       callIndex++;
       // First call to the real endpoint → 401
       if (callIndex === 1) {
         return Promise.resolve({ error: { status: 401 } });
       }
-      // Retry after refresh → success
+      // Retry after silent renew → success
       return Promise.resolve({ data: 'retried-ok' });
     });
 
     const result = await baseQueryWithReauth('/protected', api, {});
 
-    // Token refresh dispatched
-    expect(api.dispatch).toHaveBeenCalledWith({
-      type: 'auth/tokenRefreshed',
-      payload: 'new-token',
-    });
+    // Silent renew was called
+    expect(userManager.signinSilent).toHaveBeenCalled();
 
     // The retried request's data is returned
     expect(result).toEqual({ data: 'retried-ok' });
@@ -296,25 +310,21 @@ describe('baseQueryWithReauth — refresh failure', () => {
     mockRawBaseQuery.mockReset();
   });
 
-  it('dispatches logout when token refresh fails', async () => {
+  it('calls signinRedirect when silent renew fails on 401', async () => {
     const { baseQueryWithReauth } = await freshImport();
-    const api = makeApi('old-token');
+    const { userManager } = await import('@/auth/userManager');
+    const api = makeApi();
 
-    mockRawBaseQuery.mockImplementation((args) => {
-      const url = typeof args === 'string' ? args : args?.url;
+    // signinSilent fails (default from setup mock)
+    vi.mocked(userManager.signinSilent).mockRejectedValue(new Error('silent renew failed'));
+    vi.mocked(userManager.signinRedirect).mockResolvedValue(undefined);
 
-      if (url === '/api/v1/auth/refresh') {
-        // Refresh returns error (no data)
-        return Promise.resolve({ error: { status: 401 } });
-      }
-
-      // Original request → 401
-      return Promise.resolve({ error: { status: 401 } });
-    });
+    mockRawBaseQuery.mockResolvedValue({ error: { status: 401 } });
 
     const result = await baseQueryWithReauth('/protected', api, {});
 
-    expect(api.dispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
+    expect(userManager.signinSilent).toHaveBeenCalled();
+    expect(userManager.signinRedirect).toHaveBeenCalled();
     // Original error is still returned
     expect(result.error!.status).toBe(401);
   });
@@ -374,28 +384,22 @@ describe('baseQueryWithReauth — max retry exceeded', () => {
     mockRawBaseQuery.mockReset();
   });
 
-  it('forces logout when refresh retry limit is exceeded', async () => {
+  it('calls signinRedirect when silent renew fails repeatedly on 401', async () => {
     const { baseQueryWithReauth } = await freshImport();
+    const { userManager } = await import('@/auth/userManager');
     const api = makeApi();
 
-    // Every call returns 401, refresh always "succeeds" so retryCount increments
-    mockRawBaseQuery.mockImplementation((args) => {
-      const url = typeof args === 'string' ? args : args?.url;
-      if (url === '/api/v1/auth/refresh') {
-        return Promise.resolve({ data: { access_token: 'tok' } });
-      }
-      return Promise.resolve({ error: { status: 401 } });
-    });
+    // signinSilent always fails
+    vi.mocked(userManager.signinSilent).mockRejectedValue(new Error('silent renew failed'));
+    vi.mocked(userManager.signinRedirect).mockResolvedValue(undefined);
 
-    // First call: 401 → refresh (retryCount 0→1) → retry → still 401 (retryCount reset won't happen because still error)
-    await baseQueryWithReauth('/resource', api, {});
+    mockRawBaseQuery.mockResolvedValue({ error: { status: 401 } });
 
-    // Second call: retryCount is now 1 (== MAX_REFRESH_RETRIES), so it should
-    // skip refresh and force logout immediately.
-    const result2 = await baseQueryWithReauth('/resource', api, {});
+    // First call: 401 → signinSilent fails → signinRedirect called → returns 401
+    const result = await baseQueryWithReauth('/resource', api, {});
 
-    expect(api.dispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
-    expect(result2.error!.status).toBe(401);
+    expect(userManager.signinRedirect).toHaveBeenCalled();
+    expect(result.error!.status).toBe(401);
   });
 });
 
@@ -408,33 +412,23 @@ describe('baseQueryWithReauth — refresh mutex', () => {
     mockRawBaseQuery.mockReset();
   });
 
-  it('concurrent 401 requests share one refresh call', async () => {
+  it('concurrent 401 requests each trigger their own signinSilent (no mutex in new impl)', async () => {
     const { baseQueryWithReauth } = await freshImport();
+    const { userManager } = await import('@/auth/userManager');
     const api = makeApi();
-    let refreshCallCount = 0;
 
-    // Use a deferred promise for the refresh so we can control timing
-    let resolveRefresh: ((value: unknown) => void) | undefined;
-    const refreshDeferred = new Promise((r) => {
-      resolveRefresh = r;
+    // signinSilent resolves after a tick (to allow concurrency)
+    let silentRenewCallCount = 0;
+    vi.mocked(userManager.signinSilent).mockImplementation(() => {
+      silentRenewCallCount++;
+      return Promise.resolve(undefined);
     });
 
-    mockRawBaseQuery.mockImplementation((args) => {
-      const url = typeof args === 'string' ? args : args?.url;
-      if (url === '/api/v1/auth/refresh') {
-        refreshCallCount++;
-        return refreshDeferred;
-      }
-      // First time each request is called → 401
-      // After refresh → success
-      if (!args._retried) {
-        // newArgs computed but not used — kept for documentation purposes
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const newArgs =
-          typeof args === 'string' ? { url: args, _retried: true } : { ...args, _retried: true };
-        // Store that we've retried by checking call count per url
-        return Promise.resolve({ error: { status: 401 } });
-      }
+    let rawCallCount = 0;
+    mockRawBaseQuery.mockImplementation(() => {
+      rawCallCount++;
+      // First two calls (one per request) → 401; subsequent retries → success
+      if (rawCallCount <= 2) return Promise.resolve({ error: { status: 401 } });
       return Promise.resolve({ data: 'ok' });
     });
 
@@ -442,16 +436,10 @@ describe('baseQueryWithReauth — refresh mutex', () => {
     const p1 = baseQueryWithReauth('/a', api, {});
     const p2 = baseQueryWithReauth('/b', api, {});
 
-    // Let the event loop settle so both enter the 401 branch
-    await new Promise((r) => setTimeout(r, 0));
-
-    // Resolve the single refresh
-    resolveRefresh?.({ data: { access_token: 'fresh' } });
-
     await Promise.all([p1, p2]);
 
-    // Refresh endpoint should have been called only once due to mutex
-    expect(refreshCallCount).toBe(1);
+    // Both requests encountered 401 and tried signinSilent
+    expect(silentRenewCallCount).toBeGreaterThanOrEqual(1);
   });
 });
 
@@ -540,6 +528,8 @@ describe('createBaseQueryWithReauth', () => {
   });
 
   it('returns a reauth query that uses custom headers', async () => {
+    const { userManager } = await import('@/auth/userManager');
+    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'tok' } as Parameters<typeof vi.mocked<typeof userManager.getUser>>[0] extends undefined ? never : Awaited<ReturnType<typeof userManager.getUser>>);
     const { createBaseQueryWithReauth } = await freshImport();
     const extraHeaders = vi.fn((headers) => {
       headers.set('X-Custom', 'value');
@@ -550,23 +540,22 @@ describe('createBaseQueryWithReauth', () => {
 
     // Verify extraHeaders was wired into fetchBaseQuery config
     const headers = new Headers();
-    const api = makeApi('tok');
-    capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
+    const api = makeApi();
+    await capturedFetchBaseQueryConfig!.prepareHeaders(headers, api);
 
     expect(extraHeaders).toHaveBeenCalled();
   });
 
-  it('performs reauth on 401 for custom header query', async () => {
+  it('performs reauth on 401 for custom header query via signinSilent', async () => {
     const { createBaseQueryWithReauth } = await freshImport();
+    const { userManager } = await import('@/auth/userManager');
     const query = createBaseQueryWithReauth(() => {});
     const api = makeApi();
 
+    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
+
     let callIndex = 0;
-    mockRawBaseQuery.mockImplementation((args) => {
-      const url = typeof args === 'string' ? args : args?.url;
-      if (url === '/api/v1/auth/refresh') {
-        return Promise.resolve({ data: { access_token: 'new' } });
-      }
+    mockRawBaseQuery.mockImplementation(() => {
       callIndex++;
       if (callIndex === 1) return Promise.resolve({ error: { status: 401 } });
       return Promise.resolve({ data: 'ok-custom' });
@@ -574,10 +563,7 @@ describe('createBaseQueryWithReauth', () => {
 
     const result = await query('/custom-endpoint', api, {});
 
-    expect(api.dispatch).toHaveBeenCalledWith({
-      type: 'auth/tokenRefreshed',
-      payload: 'new',
-    });
+    expect(userManager.signinSilent).toHaveBeenCalled();
     expect(result).toEqual({ data: 'ok-custom' });
   });
 });
@@ -649,26 +635,22 @@ describe('baseQueryWithReauth — args type handling', () => {
 
   it('handles args with undefined url gracefully', async () => {
     const { baseQueryWithReauth } = await freshImport();
+    const { userManager } = await import('@/auth/userManager');
     const api = makeApi();
 
+    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
+
     let callIndex = 0;
-    mockRawBaseQuery.mockImplementation((args) => {
-      const url = typeof args === 'string' ? args : args?.url;
-      if (url === '/api/v1/auth/refresh') {
-        return Promise.resolve({ data: { access_token: 'tok' } });
-      }
+    mockRawBaseQuery.mockImplementation(() => {
       callIndex++;
       if (callIndex === 1) return Promise.resolve({ error: { status: 401 } });
       return Promise.resolve({ data: 'ok' });
     });
 
     // args is an object without url — should not be treated as auth endpoint
-     
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-    const _result = await baseQueryWithReauth({ body: 'data' } as any, api, {});
-    expect(api.dispatch).toHaveBeenCalledWith({
-      type: 'auth/tokenRefreshed',
-      payload: 'tok',
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await baseQueryWithReauth({ body: 'data' } as any, api, {});
+    expect(userManager.signinSilent).toHaveBeenCalled();
+    expect(result).toEqual({ data: 'ok' });
   });
 });

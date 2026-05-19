@@ -8,6 +8,17 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 vi.mock('@/store/api/userDataApi', () => ({
   useGetTemplatesQuery: vi.fn(() => ({ data: undefined })),
   useCreateTemplateMutation: () => [mockApiCreate],
@@ -17,11 +28,13 @@ vi.mock('@/store/api/userDataApi', () => ({
 
 import { useSelector } from 'react-redux';
 import { useGetTemplatesQuery } from '@/store/api/userDataApi';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import useTemplates from './useTemplates';
 
 const mockUseSelector = vi.mocked(useSelector);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockGetTemplatesQuery = vi.mocked(useGetTemplatesQuery) as any;
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('useTemplates', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,6 +57,15 @@ describe('useTemplates', () => {
     openToolById = vi.fn();
     renameActiveTab = vi.fn();
     mockUseSelector.mockReturnValue(null); // not authenticated
+    // Default: not authenticated (must re-set after vi.clearAllMocks() wipes mockReturnValue)
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockApiCreate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockApiUpdate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockApiDelete.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -191,6 +213,14 @@ describe('useTemplates', () => {
   describe('authenticated', () => {
     beforeEach(() => {
       mockUseSelector.mockReturnValue('tok');
+      mockUseOidcAuth.mockReturnValue({
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: 'tok',
+        oidcUser: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+      });
       mockGetTemplatesQuery.mockReturnValue({
         data: [
           {
@@ -311,6 +341,14 @@ describe('useTemplates', () => {
 
     it('saves via API when authenticated', async () => {
       mockUseSelector.mockReturnValue('tok');
+      mockUseOidcAuth.mockReturnValue({
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: 'tok',
+        oidcUser: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+      });
       mockGetTemplatesQuery.mockReturnValue({ data: [] });
       const { result } = renderTpl();
       await act(async () => {
@@ -321,6 +359,14 @@ describe('useTemplates', () => {
 
     it('updates via API when authenticated and name matches', async () => {
       mockUseSelector.mockReturnValue('tok');
+      mockUseOidcAuth.mockReturnValue({
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: 'tok',
+        oidcUser: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+      });
       mockGetTemplatesQuery.mockReturnValue({
         data: [{ id: 5, name: 'Existing', text: 'old', created_at: '', updated_at: '' }],
       });
@@ -338,6 +384,14 @@ describe('useTemplates', () => {
 
     it('handles API failure in saveDirectly', async () => {
       mockUseSelector.mockReturnValue('tok');
+      mockUseOidcAuth.mockReturnValue({
+        isAuthenticated: true,
+        isLoading: false,
+        accessToken: 'tok',
+        oidcUser: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+      });
       mockGetTemplatesQuery.mockReturnValue({ data: [] });
       mockApiCreate.mockReturnValue({ unwrap: () => Promise.reject(new Error('fail')) });
       const { result } = renderTpl();
