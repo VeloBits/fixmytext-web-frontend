@@ -46,6 +46,18 @@ vi.mock('react-redux', () => ({
   Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
+// ── useOidcAuth mock ──
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: true,
+    isLoading: false,
+    accessToken: 'token123',
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 // ── hooks mock ──
 vi.mock('@/hooks/useSubscription', () => ({
   default: () => defaultSubscription,
@@ -111,9 +123,18 @@ const defaultSubscription = {
 
 function renderPricing(
   props: Record<string, unknown> = {},
-  catalogOverride?: Record<string, unknown>
+  catalogOverride?: Record<string, unknown>,
+  accessToken: string | null = 'token123'
 ) {
-  mockUseSelector.mockReturnValue({ accessToken: 'token123' });
+  mockUseSelector.mockReturnValue({ accessToken });
+  mockUseOidcAuth.mockReturnValue({
+    isAuthenticated: !!accessToken,
+    isLoading: false,
+    accessToken,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  });
   mockCatalogQuery.mockReturnValue(
     catalogOverride ?? {
       data: { passes: [samplePass, samplePassMultiDay], credit_packs: [sampleCredit] },
@@ -126,6 +147,8 @@ function renderPricing(
 
 import PricingPage from './PricingPage';
 import { expectNoA11yViolations } from '@/test/axeHelper';
+import { useOidcAuth } from '@/auth/useOidcAuth';
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('PricingPage', () => {
   beforeEach(() => {
@@ -133,6 +156,15 @@ describe('PricingPage', () => {
     defaultSubscriptionMocks.handleUpgrade.mockReset();
     defaultSubscriptionMocks.handleBuyPass.mockResolvedValue({});
     defaultSubscriptionMocks.handleBuyCredits.mockResolvedValue({});
+    // Default: authenticated (reset after any per-test override)
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'token123',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
   });
 
   // ── Basic render ──
@@ -189,6 +221,7 @@ describe('PricingPage', () => {
 
   it('navigates to login if not authenticated when upgrading', () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [samplePass], credit_packs: [] },
       isLoading: false,
@@ -239,6 +272,7 @@ describe('PricingPage', () => {
 
   it('navigates to login if not authenticated when buying pass', async () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [samplePass], credit_packs: [] },
       isLoading: false,
@@ -371,6 +405,7 @@ describe('PricingPage', () => {
 
   it('calls handleBuyCredits via unauthenticated user shows alert', async () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [], credit_packs: [sampleCredit] },
       isLoading: false,

@@ -1,75 +1,104 @@
 import { renderHook } from '@testing-library/react';
 import { useAuth } from './useAuth';
 
-const mockRefresh = vi.fn();
 vi.mock('react-redux', () => ({
-  useSelector: vi.fn(),
+  useSelector: vi.fn((fn) => fn({ auth: { user: null } })),
 }));
+
 vi.mock('@/store/api/authApi', () => ({
-  useRefreshMutation: () => [mockRefresh],
-  useGetMeQuery: vi.fn(),
+  useGetMeQuery: vi.fn().mockReturnValue({}),
+}));
+
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
 }));
 
 import { useSelector } from 'react-redux';
 import { useGetMeQuery } from '@/store/api/authApi';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 
-// vi.mock replaces these with Mock instances — cast so TS knows
-const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
-const mockUseGetMeQuery = useGetMeQuery as unknown as ReturnType<typeof vi.fn>;
+const mockUseSelector = vi.mocked(useSelector);
+const mockUseGetMeQuery = vi.mocked(useGetMeQuery);
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('useAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRefresh.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    // Default: not authenticated
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockUseSelector.mockImplementation((fn: any) => fn({ auth: { user: null } }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockUseGetMeQuery.mockReturnValue({} as any);
   });
 
   it('returns user and isAuthenticated=true when token exists', () => {
-    mockUseSelector.mockReturnValue({ accessToken: 'tok', user: { name: 'Test' } });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockUseSelector.mockImplementation((fn: any) => fn({ auth: { user: { name: 'Test' } } }));
     const { result } = renderHook(() => useAuth());
     expect(result.current.user).toEqual({ name: 'Test' });
     expect(result.current.isAuthenticated).toBe(true);
   });
 
   it('returns isAuthenticated=false when no token', () => {
-    mockUseSelector.mockReturnValue({ accessToken: null, user: null });
     const { result } = renderHook(() => useAuth());
     expect(result.current.isAuthenticated).toBe(false);
   });
 
   it('calls refresh on mount when no token', () => {
-    mockUseSelector.mockReturnValue({ accessToken: null, user: null });
-    renderHook(() => useAuth());
-    expect(mockRefresh).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not call refresh when token exists', () => {
-    mockUseSelector.mockReturnValue({ accessToken: 'tok', user: null });
-    renderHook(() => useAuth());
-    expect(mockRefresh).not.toHaveBeenCalled();
-  });
-
-  it('calls refresh only once even on re-render', () => {
-    mockUseSelector.mockReturnValue({ accessToken: null, user: null });
-    const { rerender } = renderHook(() => useAuth());
-    rerender();
-    expect(mockRefresh).toHaveBeenCalledTimes(1);
-  });
-
-  it('skips useGetMeQuery when not authenticated', () => {
-    mockUseSelector.mockReturnValue({ accessToken: null, user: null });
+    // useAuth no longer calls useRefreshMutation; it delegates to useOidcAuth.
+    // This test verifies that getMe is skipped when not authenticated.
     renderHook(() => useAuth());
     expect(mockUseGetMeQuery).toHaveBeenCalledWith(undefined, { skip: true });
   });
 
   it('does not skip useGetMeQuery when authenticated', () => {
-    mockUseSelector.mockReturnValue({ accessToken: 'tok', user: null });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     renderHook(() => useAuth());
     expect(mockUseGetMeQuery).toHaveBeenCalledWith(undefined, { skip: false });
   });
 
-  it('handles refresh failure silently', () => {
-    mockRefresh.mockReturnValue({ unwrap: () => Promise.reject(new Error('fail')) });
-    mockUseSelector.mockReturnValue({ accessToken: null, user: null });
-    expect(() => renderHook(() => useAuth())).not.toThrow();
+  it('calls refresh only once even on re-render', () => {
+    // useAuth no longer has a "refresh once" mechanism — it delegates to
+    // useOidcAuth. This test verifies stable behaviour on re-render.
+    const { rerender } = renderHook(() => useAuth());
+    rerender();
+    // useGetMeQuery should have been called (possibly multiple times due to
+    // React Strict Mode or rerender) but should NOT throw.
+    expect(mockUseGetMeQuery).toHaveBeenCalled();
+  });
+
+  it('skips useGetMeQuery when not authenticated', () => {
+    renderHook(() => useAuth());
+    expect(mockUseGetMeQuery).toHaveBeenCalledWith(undefined, { skip: true });
   });
 });

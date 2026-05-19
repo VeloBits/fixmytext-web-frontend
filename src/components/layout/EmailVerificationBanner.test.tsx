@@ -19,12 +19,35 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 vi.mock('@/store/api/authApi', () => ({
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
 }));
 
+import { useOidcAuth } from '@/auth/useOidcAuth';
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
+
 function setAuth({ accessToken = null, user = null }: Partial<MockAuthState> = {}) {
   mockState = { accessToken, user };
+  // Keep OIDC in sync with Redux mock state
+  mockUseOidcAuth.mockReturnValue({
+    isAuthenticated: !!accessToken,
+    isLoading: false,
+    accessToken,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  });
 }
 
 describe('EmailVerificationBanner', () => {
@@ -33,7 +56,7 @@ describe('EmailVerificationBanner', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    setAuth();
+    setAuth(); // resets both mockState and mockUseOidcAuth to unauthenticated
   });
 
   it('renders nothing when the user is signed out', () => {
@@ -58,28 +81,23 @@ describe('EmailVerificationBanner', () => {
     expect(screen.getByRole('button', { name: 'Resend email' })).toBeInTheDocument();
   });
 
-  it('resends successfully and locks the button into a cooldown', async () => {
+  it('resends successfully and shows Keycloak redirect message', async () => {
     setAuth({
       accessToken: 'tok',
       user: { email: 'u@example.com', is_email_verified: false },
     });
-    mockResendVerification.mockReturnValue({ unwrap: () => Promise.resolve({}) });
 
     render(<EmailVerificationBanner showAlert={showAlert} />);
     fireEvent.click(screen.getByRole('button', { name: 'Resend email' }));
 
     await waitFor(() => {
-      expect(mockResendVerification).toHaveBeenCalled();
       expect(showAlert).toHaveBeenCalledWith(
-        'Verification email sent. Check your inbox and spam folder.',
-        'success'
+        'Please check your Keycloak account to resend the verification email.',
+        'info'
       );
     });
-
-    // Button switches to a disabled "Resend in Ns" countdown label.
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /resend in \d+s/i })).toBeDisabled();
-    });
+    // Button stays enabled (no cooldown in new Keycloak-based flow)
+    expect(screen.getByRole('button', { name: 'Resend email' })).not.toBeDisabled();
   });
 
   it('parses backend 429 "wait N seconds" into a countdown', async () => {
@@ -87,24 +105,19 @@ describe('EmailVerificationBanner', () => {
       accessToken: 'tok',
       user: { email: 'u@example.com', is_email_verified: false },
     });
-    mockResendVerification.mockReturnValue({
-      unwrap: () =>
-        Promise.reject({
-          status: 429,
-          data: { detail: 'Please wait 45 seconds before requesting another.' },
-        }),
-    });
 
+    // New behavior: clicking resend shows the Keycloak message (no API call, no 429)
     render(<EmailVerificationBanner showAlert={showAlert} />);
     fireEvent.click(screen.getByRole('button', { name: 'Resend email' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /resend in 4[4-5]s/i })).toBeDisabled();
       expect(showAlert).toHaveBeenCalledWith(
-        'Please wait 45 seconds before requesting another.',
-        'warning'
+        'Please check your Keycloak account to resend the verification email.',
+        'info'
       );
     });
+    // No cooldown in new implementation
+    expect(screen.queryByRole('button', { name: /resend in \d+s/i })).not.toBeInTheDocument();
   });
 
   it('dismiss button hides the banner and persists the dismissal', () => {

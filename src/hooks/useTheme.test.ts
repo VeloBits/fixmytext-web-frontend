@@ -7,6 +7,17 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn((fn) => fn({ auth: { accessToken: null } })),
 }));
 
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 vi.mock('@/store/api/userDataApi', () => ({
   useGetPreferencesQuery: vi.fn(() => ({ data: undefined })),
   useUpdatePreferencesMutation: () => [mockUpdatePrefs],
@@ -14,10 +25,12 @@ vi.mock('@/store/api/userDataApi', () => ({
 
 import { useSelector } from 'react-redux';
 import { useGetPreferencesQuery } from '@/store/api/userDataApi';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 
 // vi.mock returns loose types; cast to access mock methods
 const mockUseSelector = vi.mocked(useSelector);
 const mockGetPrefs = vi.mocked(useGetPreferencesQuery);
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('useTheme', () => {
   beforeEach(() => {
@@ -28,6 +41,15 @@ describe('useTheme', () => {
     mockUseSelector.mockImplementation((fn: any) => fn({ auth: { accessToken: null } }));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockGetPrefs.mockReturnValue({ data: undefined } as any);
+    // Default: not authenticated (must re-set after vi.clearAllMocks())
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
   });
 
   it('defaults to dark mode', () => {
@@ -62,8 +84,14 @@ describe('useTheme', () => {
   });
 
   it('syncs to backend when authenticated', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockUseSelector.mockImplementation((fn: any) => fn({ auth: { accessToken: 'tok' } }));
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     const { result } = renderHook(() => useTheme());
     act(() => {
       result.current.setMode('light');
@@ -80,8 +108,14 @@ describe('useTheme', () => {
   });
 
   it('hydrates from DB preferences when authenticated', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockUseSelector.mockImplementation((fn: any) => fn({ auth: { accessToken: 'tok' } }));
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockGetPrefs.mockReturnValue({ data: { theme: 'light' } } as any);
     const { result } = renderHook(() => useTheme());

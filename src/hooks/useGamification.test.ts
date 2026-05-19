@@ -9,6 +9,17 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: true,
+    isLoading: false,
+    accessToken: 'fake-token',
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 vi.mock('@/store/api/userDataApi', () => ({
   useGetGamificationQuery: vi.fn(() => ({ data: undefined })),
   useUpdateGamificationMutation: () => [mockSyncToDb],

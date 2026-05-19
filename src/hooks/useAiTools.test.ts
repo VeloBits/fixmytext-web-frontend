@@ -5,6 +5,16 @@ const mockTransformText = vi.fn();
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: true,
+    isLoading: false,
+    accessToken: 'tok123',
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
 vi.mock('@/store/api/textApi', () => ({
   useTransformTextMutation: () => [mockTransformText],
 }));
@@ -84,11 +94,9 @@ vi.mock('@/constants/endpoints', () => ({
   },
 }));
 
-import { useSelector } from 'react-redux';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 
-// vi.mock replaces useSelector with a Mock instance — cast so TS knows
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockUseSelector = useSelector as unknown as any;
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('useAiTools', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,7 +117,15 @@ describe('useAiTools', () => {
     setPreviewMode = vi.fn();
     showAlert = vi.fn();
     pushHistory = vi.fn();
-    mockUseSelector.mockReturnValue({ accessToken: 'tok123' });
+    // Default: authenticated via OIDC
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok123',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockTransformText.mockReturnValue({ unwrap: () => Promise.resolve({ result: 'output' }) });
   });
 
@@ -155,7 +171,14 @@ describe('useAiTools', () => {
   });
 
   it('callAi shows warning when not authenticated', async () => {
-    mockUseSelector.mockReturnValue({ accessToken: null });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     const { result } = renderAiTools('hello');
     await act(async () => {
       await result.current.handleHashtags!();

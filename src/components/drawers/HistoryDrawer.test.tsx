@@ -10,12 +10,27 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
+// Mock useOidcAuth — HistoryDrawer uses this for isAuthenticated
+vi.mock('@/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 // Mock RTK Query hooks
 vi.mock('@/store/api/historyApi', () => ({
   useGetHistoryQuery: vi.fn(() => ({ data: null, isFetching: false })),
   useDeleteHistoryEntryMutation: vi.fn(() => [vi.fn(), {}]),
   useClearHistoryMutation: vi.fn(() => [vi.fn(), {}]),
 }));
+
+import { useOidcAuth } from '@/auth/useOidcAuth';
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('HistoryDrawer', () => {
   const baseProps = {
@@ -29,6 +44,15 @@ describe('HistoryDrawer', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default: not authenticated
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
   });
 
   it('renders header', () => {
@@ -77,6 +101,7 @@ describe('HistoryDrawer', () => {
   it('shows session/saved tabs when authenticated', async () => {
     const { useSelector } = await import('react-redux');
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, accessToken: 'token123', oidcUser: null, login: vi.fn(), logout: vi.fn() });
     render(<HistoryDrawer {...baseProps} />);
     expect(screen.getByText('Session')).toBeInTheDocument();
     expect(screen.getByText('All History')).toBeInTheDocument();
@@ -85,6 +110,7 @@ describe('HistoryDrawer', () => {
   it('switches to All History view when authenticated', async () => {
     const { useSelector } = await import('react-redux');
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, accessToken: 'token123', oidcUser: null, login: vi.fn(), logout: vi.fn() });
     render(<HistoryDrawer {...baseProps} />);
     fireEvent.click(screen.getByText('All History'));
     expect(screen.getByText(/0 total operations/i)).toBeInTheDocument();
@@ -93,6 +119,7 @@ describe('HistoryDrawer', () => {
   it('switches back to Session view when Session button clicked', async () => {
     const { useSelector } = await import('react-redux');
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, accessToken: 'token123', oidcUser: null, login: vi.fn(), logout: vi.fn() });
     render(<HistoryDrawer {...baseProps} />);
     fireEvent.click(screen.getByText('All History'));
     fireEvent.click(screen.getByText('Session'));
@@ -111,6 +138,7 @@ describe('HistoryDrawer', () => {
     const { useSelector } = await import('react-redux');
     const { useGetHistoryQuery } = await import('../../store/api/historyApi');
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, accessToken: 'token123', oidcUser: null, login: vi.fn(), logout: vi.fn() });
     (vi.mocked(useGetHistoryQuery) as AnyMock).mockReturnValue({
       data: {
         total: 1,
@@ -147,6 +175,7 @@ describe('HistoryDrawer', () => {
     const mockDelete = vi.fn().mockReturnValue({ unwrap: () => Promise.resolve() });
     (vi.mocked(useDeleteHistoryEntryMutation) as AnyMock).mockReturnValue([mockDelete, {}]);
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, accessToken: 'token123', oidcUser: null, login: vi.fn(), logout: vi.fn() });
     (vi.mocked(useGetHistoryQuery) as AnyMock).mockReturnValue({
       data: {
         total: 1,
@@ -180,6 +209,7 @@ describe('HistoryDrawer', () => {
     const mockClear = vi.fn().mockReturnValue({ unwrap: () => Promise.resolve() });
     (vi.mocked(useClearHistoryMutation) as AnyMock).mockReturnValue([mockClear, {}]);
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, accessToken: 'token123', oidcUser: null, login: vi.fn(), logout: vi.fn() });
     (vi.mocked(useGetHistoryQuery) as AnyMock).mockReturnValue({
       data: {
         total: 1,

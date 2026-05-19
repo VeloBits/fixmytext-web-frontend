@@ -7,6 +7,7 @@
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
+    "@hookform/resolvers": "^5.2.2",
     "@reduxjs/toolkit": "^2.11.2",
     "@sentry/react": "^10.53.1",
     "blakejs": "^1.2.1",
@@ -25,11 +26,13 @@
     "qrcode": "^1.5.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-hook-form": "^7.76.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.15.0",
     "sql-formatter": "^15.7.3",
     "whirlpool-hash": "^1.1.6",
-    "xxhashjs": "^0.2.2"
+    "xxhashjs": "^0.2.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@axe-core/react": "^4.11.3",
