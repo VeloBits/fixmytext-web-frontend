@@ -6,10 +6,10 @@ describe('ENDPOINTS', () => {
     expect(Object.keys(ENDPOINTS).length).toBeGreaterThan(0);
   });
 
-  it('all values are strings starting with /api/v1/text/', () => {
+  it('all values are strings starting with /api/v1/text/ or /api/v1/ai/', () => {
     for (const [, value] of Object.entries(ENDPOINTS)) {
       expect(typeof value).toBe('string');
-      expect(value).toMatch(/^\/api\/v1\/text\//);
+      expect(value).toMatch(/^\/api\/v1\/(text|ai)\//);
     }
   });
 
@@ -35,11 +35,17 @@ describe('ENDPOINTS', () => {
     expect(ENDPOINTS.HEX_ENCODE).toBe('/api/v1/text/hex-encode');
   });
 
-  it('contains AI endpoints', () => {
-    expect(ENDPOINTS.SUMMARIZE).toBe('/api/v1/text/summarize');
-    expect(ENDPOINTS.FIX_GRAMMAR).toBe('/api/v1/text/fix-grammar');
-    expect(ENDPOINTS.PARAPHRASE).toBe('/api/v1/text/paraphrase');
-    expect(ENDPOINTS.TRANSLATE).toBe('/api/v1/text/translate');
+  it('AI tool endpoints route to /api/v1/ai/', () => {
+    expect(ENDPOINTS.SUMMARIZE).toBe('/api/v1/ai/summarize');
+    expect(ENDPOINTS.FIX_GRAMMAR).toBe('/api/v1/ai/fix-grammar');
+    expect(ENDPOINTS.PARAPHRASE).toBe('/api/v1/ai/paraphrase');
+    expect(ENDPOINTS.TRANSLATE).toBe('/api/v1/ai/translate');
+  });
+
+  it('non-AI tool endpoints still route to /api/v1/text/', () => {
+    expect(ENDPOINTS.UPPERCASE).toBe('/api/v1/text/uppercase');
+    expect(ENDPOINTS.BASE64_ENCODE).toBe('/api/v1/text/base64-encode');
+    expect(ENDPOINTS.ATBASH).toBe('/api/v1/text/atbash');
   });
 
   it('contains cipher endpoints', () => {

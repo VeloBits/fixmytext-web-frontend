@@ -249,7 +249,7 @@ describe('baseQueryWithReauth — successful requests', () => {
     const { userManager } = await import('@/auth/userManager');
     const api = makeApi();
 
-    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
+    vi.mocked(userManager.signinSilent).mockResolvedValue(null);
 
     let callCount = 0;
     mockRawBaseQuery.mockImplementation(() => {
@@ -278,7 +278,7 @@ describe('baseQueryWithReauth — 401 refresh flow', () => {
     const { userManager } = await import('@/auth/userManager');
     const api = makeApi();
 
-    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
+    vi.mocked(userManager.signinSilent).mockResolvedValue(null);
 
     let callIndex = 0;
     mockRawBaseQuery.mockImplementation(() => {
@@ -421,7 +421,7 @@ describe('baseQueryWithReauth — refresh mutex', () => {
     let silentRenewCallCount = 0;
     vi.mocked(userManager.signinSilent).mockImplementation(() => {
       silentRenewCallCount++;
-      return Promise.resolve(undefined);
+      return Promise.resolve(null);
     });
 
     let rawCallCount = 0;
@@ -552,7 +552,7 @@ describe('createBaseQueryWithReauth', () => {
     const query = createBaseQueryWithReauth(() => {});
     const api = makeApi();
 
-    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
+    vi.mocked(userManager.signinSilent).mockResolvedValue(null);
 
     let callIndex = 0;
     mockRawBaseQuery.mockImplementation(() => {
@@ -638,7 +638,7 @@ describe('baseQueryWithReauth — args type handling', () => {
     const { userManager } = await import('@/auth/userManager');
     const api = makeApi();
 
-    vi.mocked(userManager.signinSilent).mockResolvedValue(undefined);
+    vi.mocked(userManager.signinSilent).mockResolvedValue(null);
 
     let callIndex = 0;
     mockRawBaseQuery.mockImplementation(() => {
