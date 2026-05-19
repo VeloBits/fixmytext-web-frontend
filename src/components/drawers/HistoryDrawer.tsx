@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 import {
   useGetHistoryQuery,
   useDeleteHistoryEntryMutation,
   useClearHistoryMutation,
 } from '@/store/api/historyApi';
 import type { HistoryEntry } from '@/hooks/useHistory';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 
@@ -39,12 +38,12 @@ export default function HistoryDrawer({
   setText,
   showAlert,
 }: HistoryDrawerProps) {
-  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const { isAuthenticated } = useOidcAuth();
   const [view, setView] = useState<'session' | 'saved'>('session');
   const [page, setPage] = useState(1);
   const { data: serverHistory, isFetching } = useGetHistoryQuery(
     { page, pageSize: 25 },
-    { skip: !accessToken || view !== 'saved' }
+    { skip: !isAuthenticated || view !== 'saved' }
   );
   const [deleteEntry] = useDeleteHistoryEntryMutation();
   const [clearServer] = useClearHistoryMutation();
@@ -56,7 +55,7 @@ export default function HistoryDrawer({
           Operation History
         </span>
         <span style={{ flex: 1 }} />
-        {accessToken && (
+        {isAuthenticated && (
           <>
             <button
               className={`tu-btn tu-btn--tools${view === 'session' ? ' tu-btn--active' : ''}`}
@@ -164,7 +163,7 @@ export default function HistoryDrawer({
       )}
 
       {/* Saved (server-side) view */}
-      {view === 'saved' && accessToken && (
+      {view === 'saved' && isAuthenticated && (
         <>
           <div
             style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.3rem' }}

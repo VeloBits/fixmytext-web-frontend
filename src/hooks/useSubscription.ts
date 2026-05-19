@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   useGetSubscriptionStatusQuery,
@@ -9,7 +8,7 @@ import {
 } from '@/store/api/subscriptionApi';
 import usePasses from './usePasses';
 import { openRazorpayCheckout, executeCheckoutFlow } from '@/utils/razorpay';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { ToolDefinition } from '@/types/tools';
 
 const ALWAYS_FREE_IDS = new Set([
@@ -37,8 +36,7 @@ interface ToolUsage {
 }
 
 export default function useSubscription({ showAlert }: UseSubscriptionOptions = {}) {
-  const { accessToken } = useSelector((s: RootState) => s.auth);
-  const isAuthenticated = !!accessToken;
+  const { isAuthenticated } = useOidcAuth();
   const navigate = useNavigate();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [blockedTool, setBlockedTool] = useState<ToolDefinition | null>(null);

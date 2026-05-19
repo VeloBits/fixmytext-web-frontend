@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useResendVerificationMutation } from '@/store/api/authApi';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { RootState } from '@/store/store';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
@@ -87,9 +87,10 @@ export interface EmailVerificationBannerProps {
 
 export default function EmailVerificationBanner({ showAlert }: EmailVerificationBannerProps) {
   const user = useSelector((s: RootState) => s.auth.user);
-  const isAuthenticated = useSelector((s: RootState) => !!s.auth.accessToken);
+  const { isAuthenticated } = useOidcAuth();
 
-  const [resendVerification, { isLoading }] = useResendVerificationMutation();
+  // TODO: resend-verification endpoint removed in Keycloak migration. Email verification is now handled by Keycloak.
+  const [isLoading] = useState(false);
   const [dismissed, setDismissed] = useState(() => {
     try {
       const until = Number(localStorage.getItem(DISMISSAL_KEY) || 0);
@@ -98,7 +99,7 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
       return false;
     }
   });
-  const [cooldownUntil, setCooldownUntil] = useState(0);
+  const [cooldownUntil] = useState(0);
   const [, forceTick] = useState(0);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
@@ -131,32 +132,9 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
   }
 
   const handleResend = async () => {
-    if (cooldownUntil > Date.now()) return;
-    try {
-      await resendVerification().unwrap();
-      showAlert('Verification email sent. Check your inbox and spam folder.', 'success');
-      // Mirror the server-side 2-minute cooldown so the UI stays honest even
-      // if the user hammers the button.
-      setCooldownUntil(Date.now() + 120 * 1000);
-    } catch (err) {
-      const apiErr = err as { status?: number; data?: { detail?: string } };
-      if (apiErr?.status === 429) {
-        // Parse "Please wait N seconds..." out of the backend detail when we
-        // can; fall back to a two-minute lockout otherwise.
-        const match = /(\d+)\s*seconds?/.exec(apiErr?.data?.detail || '');
-        const waitSec = match ? Number(match[1]) : 120;
-        setCooldownUntil(Date.now() + waitSec * 1000);
-        showAlert(
-          apiErr?.data?.detail || 'Please wait a bit before requesting another email.',
-          'warning'
-        );
-      } else {
-        showAlert(
-          apiErr?.data?.detail || 'Could not send verification email. Try again shortly.',
-          'danger'
-        );
-      }
-    }
+    // TODO: Email verification resend is now handled by Keycloak.
+    // Redirect the user to Keycloak to resend the verification email.
+    showAlert('Please check your Keycloak account to resend the verification email.', 'info');
   };
 
   const handleDismiss = () => {

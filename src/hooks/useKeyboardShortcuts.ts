@@ -1,8 +1,7 @@
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { TOOLS } from '@/constants/tools';
 import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@/store/api/userDataApi';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { ToolDefinition } from '@/types/tools';
 
 /* ═══════════════════════════════════════════════════════
@@ -204,8 +203,7 @@ export default function useKeyboardShortcuts(actions: KeyboardActions) {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [overrides, setOverrides] = useState(loadCustomBindings);
 
-  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
-  const isAuthenticated = !!accessToken;
+  const { isAuthenticated } = useOidcAuth();
   const hydrated = useRef(false);
 
   const { data: uiSettings } = useGetUiSettingsQuery(undefined, { skip: !isAuthenticated });

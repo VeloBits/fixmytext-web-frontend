@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense, type ReactNode, type Ref, type RefObject } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransformTextMutation } from '@/store/api/textApi';
-import { useSelector } from 'react-redux';
-import { useLogoutMutation } from '@/store/api/authApi';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import {
   useGetHistoryQuery,
   useDeleteHistoryEntryMutation,
@@ -348,11 +347,11 @@ export default function TextForm(props: TextFormProps) {
 
   const showAlert = props.showAlert;
   const navigate = useNavigate();
-  const [logout] = useLogoutMutation();
+  const { isAuthenticated, logout: oidcLogout } = useOidcAuth();
 
   const handleLogout = async () => {
     try {
-      await logout().unwrap();
+      await oidcLogout();
       showAlert('Logged out', 'success');
       navigate(ROUTES.HOME);
     } catch {
@@ -413,18 +412,17 @@ export default function TextForm(props: TextFormProps) {
   const subscription = props.subscription;
 
   // ── Persistent history (server-side) ─────────────────────
-  const accessToken = useSelector((s: Record<string, { accessToken: string | null } | undefined>) => s.auth?.accessToken ?? null);
   const [historyView, setHistoryView] = useState('session'); // 'session' | 'saved'
   const [historyPage, setHistoryPage] = useState(1);
   const { data: serverHistory, isFetching: historyFetching } = useGetHistoryQuery(
     { page: historyPage, pageSize: 25 },
-    { skip: !accessToken || historyView !== 'saved' }
+    { skip: !isAuthenticated || historyView !== 'saved' }
   );
   const [deleteHistoryEntry] = useDeleteHistoryEntryMutation();
   const [clearServerHistory] = useClearHistoryMutation();
 
   // ── UI Settings (tool_view + panel sizes synced to server) ──
-  const { data: uiSettings } = useGetUiSettingsQuery(undefined, { skip: !accessToken });
+  const { data: uiSettings } = useGetUiSettingsQuery(undefined, { skip: !isAuthenticated });
   const [updateUiSettings] = useUpdateUiSettingsMutation();
   const uiSettingsHydrated = useRef(false);
 
@@ -453,8 +451,8 @@ export default function TextForm(props: TextFormProps) {
   }, [uiSettings]);
 
   useEffect(() => {
-    if (!accessToken) uiSettingsHydrated.current = false;
-  }, [accessToken]);
+    if (!isAuthenticated) uiSettingsHydrated.current = false;
+  }, [isAuthenticated]);
 
   // Resizable panels
   const splitRef = useRef<HTMLElement>(null);
@@ -504,7 +502,7 @@ export default function TextForm(props: TextFormProps) {
   const panelSizeSyncTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const syncPanelSizes = useCallback(
     (updates: Record<string, number>) => {
-      if (!accessToken) return;
+      if (!isAuthenticated) return;
       clearTimeout(panelSizeSyncTimer.current);
       panelSizeSyncTimer.current = setTimeout(() => {
         updateUiSettings({ panel_sizes: updates })
@@ -512,12 +510,12 @@ export default function TextForm(props: TextFormProps) {
           .catch(() => {});
       }, 800);
     },
-    [accessToken, updateUiSettings]
+    [isAuthenticated, updateUiSettings]
   );
 
   // Watch panel sizes and sync to server
   useEffect(() => {
-    if (!accessToken || !uiSettingsHydrated.current) return;
+    if (!isAuthenticated || !uiSettingsHydrated.current) return;
     syncPanelSizes({
       fmx_sidebar_w: sidebarResize.size,
       fmx_split_pct: splitResize.size,
@@ -1514,7 +1512,7 @@ export default function TextForm(props: TextFormProps) {
                     onClick={() => {
                       setToolViewMode('list');
                       localStorage.setItem('fmx_tool_view', 'list');
-                      if (accessToken)
+                      if (isAuthenticated)
                         updateUiSettings({ tool_view: 'list' })
                           .unwrap()
                           .catch(() => {});
@@ -1546,7 +1544,7 @@ export default function TextForm(props: TextFormProps) {
                     onClick={() => {
                       setToolViewMode('grid');
                       localStorage.setItem('fmx_tool_view', 'grid');
-                      if (accessToken)
+                      if (isAuthenticated)
                         updateUiSettings({ tool_view: 'grid' })
                           .unwrap()
                           .catch(() => {});
@@ -1774,7 +1772,7 @@ export default function TextForm(props: TextFormProps) {
           {activeTab === '_history' && (
             <div className="tu-sidebar-panel">
               {/* View toggle: Session vs Saved (only if logged in) */}
-              {accessToken && (
+              {isAuthenticated && (
                 <div className="tu-sidebar-panel-tabs">
                   <button
                     className={`tu-sidebar-panel-tab${
@@ -1859,7 +1857,7 @@ export default function TextForm(props: TextFormProps) {
               )}
 
               {/* Saved history (server-side, paginated) */}
-              {historyView === 'saved' && accessToken && (
+              {historyView === 'saved' && isAuthenticated && (
                 <>
                   {serverHistory && serverHistory.total > 0 && (
                     <div className="tu-sidebar-panel-actions">

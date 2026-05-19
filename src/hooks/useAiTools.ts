@@ -1,8 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import { useTransformTextMutation } from '@/store/api/textApi';
 import { ENDPOINTS } from '@/constants/endpoints';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { AlertType } from './useAlert';
 
 interface ToolError {
@@ -505,7 +504,7 @@ export default function useAiTools(
   showAlert: (msg: string, type: AlertType) => void,
   pushHistory: ((label: string, orig: string, result: string, meta: Record<string, string>) => void) | undefined
 ) {
-  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const { isAuthenticated } = useOidcAuth();
   const [aiResult, setAiResult] = useState<AiResult | null>(null);
   const [toneSetting, setToneSetting] = useState('formal');
   const [formatSetting, setFormatSetting] = useState('paragraph');
@@ -535,7 +534,7 @@ export default function useAiTools(
   const callAi = useCallback(
     async (endpoint: string, label: string, errorMsg: string, toolId?: string): Promise<void> => {
       if (!text) return;
-      if (!accessToken) {
+      if (!isAuthenticated) {
         showAlert('Please log in to use AI tools', 'warning');
         return;
       }
@@ -595,7 +594,7 @@ export default function useAiTools(
         showAlert(message, tone);
       }
     },
-    [text, accessToken, transformText, setAiResult, setPreviewMode, pushHistory, showAlert]
+    [text, isAuthenticated, transformText, setAiResult, setPreviewMode, pushHistory, showAlert]
   );
 
   /**
@@ -623,7 +622,7 @@ export default function useAiTools(
    */
   const handleContinueWriting = async (): Promise<void> => {
     if (!text) return;
-    if (!accessToken) {
+    if (!isAuthenticated) {
       showAlert('Please log in to use AI tools', 'warning');
       return;
     }

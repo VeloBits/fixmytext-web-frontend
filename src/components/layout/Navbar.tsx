@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
 export interface NavbarProps {
@@ -10,7 +9,7 @@ export interface NavbarProps {
 
 export default function Navbar({ showAlert }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const { isAuthenticated } = useOidcAuth();
 
   const handleShare = () => {
     navigator.clipboard
@@ -100,7 +99,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
         </a>
 
         {/* Upgrade (when logged in, free tier) */}
-        {accessToken && (
+        {isAuthenticated && (
           <Link
             className="tu-titlebar-upgrade d-none d-md-flex"
             to="/pricing"
@@ -111,7 +110,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
         )}
 
         {/* Sign In (when logged out) */}
-        {!accessToken && (
+        {!isAuthenticated && (
           <Link className="tu-titlebar-signin" to="/login" title="Sign in">
             Sign In
           </Link>
@@ -139,7 +138,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
           <Link className="tu-mobile-link" to="/pricing" onClick={() => setMenuOpen(false)}>
             Pricing
           </Link>
-          {!accessToken && (
+          {!isAuthenticated && (
             <Link className="tu-mobile-link" to="/login" onClick={() => setMenuOpen(false)}>
               Sign In
             </Link>

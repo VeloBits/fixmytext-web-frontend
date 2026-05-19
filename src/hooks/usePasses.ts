@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { BROWSER_REGION } from '@/utils/region';
 import {
@@ -11,7 +10,7 @@ import {
 } from '@/store/api/passesApi';
 import { useGetSpinHistoryQuery } from '@/store/api/userDataApi';
 import { openRazorpayCheckout, executeCheckoutFlow } from '@/utils/razorpay';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { components } from '@/types/openapi';
 
 type ActivePass = components['schemas']['ActivePass'];
@@ -42,8 +41,7 @@ interface UsePassesReturn {
 }
 
 export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePassesReturn {
-  const { accessToken } = useSelector((s: RootState) => s.auth);
-  const isAuthenticated = !!accessToken;
+  const { isAuthenticated } = useOidcAuth();
   const navigate = useNavigate();
 
   const { data: activeData, refetch } = useGetActivePassesQuery(undefined, {

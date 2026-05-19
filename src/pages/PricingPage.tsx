@@ -1,13 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetPassCatalogQuery } from '@/store/api/passesApi';
 import useSubscription from '@/hooks/useSubscription';
 import formatPriceUtil from '@/utils/formatPrice';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { AlertLevel } from '@/contexts/AlertContext';
 import type { SubscriptionContextValue } from '@/contexts/AppContext';
-import type { RootState } from '@/store/store';
 import type { components } from '@/types/openapi';
 
 type PassCatalogItem = components['schemas']['PassCatalogItem'];
@@ -168,7 +167,7 @@ interface PricingPageProps {
 
 export default function PricingPage({ showAlert, subscription: subProp }: PricingPageProps) {
   const navigate = useNavigate();
-  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const { isAuthenticated } = useOidcAuth();
   const fallbackSub = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
   const subscription = subProp || fallbackSub;
   const { data: catalog, isLoading, error: catalogError } = useGetPassCatalogQuery();
@@ -207,7 +206,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
   );
 
   const handleBuyPass = async (passId: string) => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       showAlert?.('Sign in to purchase a pass', 'warning');
       navigate('/login');
       return;
@@ -221,7 +220,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
   };
 
   const handleBuyCredits = async (packId: string) => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       showAlert?.('Sign in to purchase credits', 'warning');
       navigate('/login');
       return;
@@ -320,7 +319,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                 <button
                   className="tu-pricing-pro-btn"
                   onClick={() => {
-                    if (!accessToken) {
+                    if (!isAuthenticated) {
                       navigate('/login');
                       return;
                     }

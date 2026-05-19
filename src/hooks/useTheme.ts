@@ -3,9 +3,8 @@
  * Syncs to DB when authenticated, falls back to localStorage.
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { useGetPreferencesQuery, useUpdatePreferencesMutation } from '@/store/api/userDataApi';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 
 /** Light or dark theme mode — mirrors ThemeContext.ThemeMode */
 type ThemeMode = 'light' | 'dark';
@@ -29,8 +28,7 @@ export function useTheme(): ThemeContextValue {
     return saved;
   });
 
-  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
-  const isAuthenticated = !!accessToken;
+  const { isAuthenticated } = useOidcAuth();
   const hydrated = useRef(false);
 
   const { data: prefs } = useGetPreferencesQuery(undefined, { skip: !isAuthenticated });
