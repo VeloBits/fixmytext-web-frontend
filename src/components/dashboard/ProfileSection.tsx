@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { PERSONAS } from '@/constants/tools';
-import { useResendVerificationMutation } from '@/store/api/authApi';
 import type { GamificationContextValue, User } from '@/contexts/AppContext';
 import type { AlertLevel } from '@/contexts/AlertContext';
 import type { Persona } from '@/types/tools';
@@ -24,8 +23,9 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
   const [nameInput, setNameInput] = useState(user?.display_name || '');
   const nameRef = useRef<HTMLInputElement>(null);
 
-  const [resendVerification, { isLoading: resending }] = useResendVerificationMutation();
-  const [cooldownUntil, setCooldownUntil] = useState(0);
+  // TODO: Email verification resend is now handled by Keycloak.
+  const resending = false;
+  const [cooldownUntil] = useState(0);
   const [, forceTick] = useState(0);
 
   const isVerified = !!user?.is_email_verified;
@@ -48,28 +48,8 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
   }, [cooldownUntil]);
 
   const handleResendVerification = async () => {
-    if (cooldownUntil > Date.now() || resending) return;
-    try {
-      await resendVerification().unwrap();
-      showAlert('Verification email sent. Check your inbox and spam folder.', 'success');
-      setCooldownUntil(Date.now() + 120 * 1000);
-    } catch (err) {
-      const e = err as { status?: number; data?: { detail?: string } };
-      if (e?.status === 429) {
-        const match = /(\d+)\s*seconds?/.exec(e?.data?.detail || '');
-        const waitSec = match ? Number(match[1]) : 120;
-        setCooldownUntil(Date.now() + waitSec * 1000);
-        showAlert(
-          e?.data?.detail || 'Please wait a bit before requesting another email.',
-          'warning'
-        );
-      } else {
-        showAlert(
-          e?.data?.detail || 'Could not send verification email. Try again shortly.',
-          'danger'
-        );
-      }
-    }
+    // TODO: Email verification resend is now handled by Keycloak.
+    showAlert('Please check your Keycloak account to resend the verification email.', 'info');
   };
 
   const cooldownSecs = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));

@@ -1,7 +1,7 @@
 export { store } from './store';
 export type { RootState, AppDispatch } from './store';
 
-export { tokenRefreshed, logout } from './slices/authSlice';
+export { logout } from './slices/authSlice';
 export type { AuthState } from './slices/authSlice';
 
 export { errorMiddleware } from './middleware/errorMiddleware';

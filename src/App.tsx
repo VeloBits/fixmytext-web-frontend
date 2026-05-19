@@ -8,13 +8,12 @@ import OnboardingModal from './components/layout/OnboardingModal';
 import PageSkeleton from './components/layout/PageSkeleton';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
+import { AuthCallback } from './auth/AuthCallback';
+import { useOidcAuth } from './auth/useOidcAuth';
 
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
-const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
-const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const SharePage = lazy(() => import('./pages/SharePage'));
@@ -25,6 +24,16 @@ import { AppProvider, useAppContext } from './contexts/AppContext';
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 import PassPurchaseModal from './components/subscription/PassPurchaseModal';
 import { ROUTES } from './constants';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading, login } = useOidcAuth();
+  if (isLoading) return <PageSkeleton />;
+  if (!isAuthenticated) {
+    login();
+    return null;
+  }
+  return <>{children}</>;
+}
 
 function AppInner() {
   const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
@@ -74,21 +83,12 @@ function AppInner() {
                 isAuthenticated={isAuthenticated}
                 subscription={subscription}
               />
-
             }
           />
           <Route path={ROUTES.ABOUT} element={<AboutPage />} />
-          <Route path={ROUTES.LOGIN} element={<LoginPage showAlert={showAlert} />} />
-          <Route path={ROUTES.SIGNUP} element={<SignupPage showAlert={showAlert} />} />
-          <Route
-            path={ROUTES.FORGOT_PASSWORD}
-            element={<ForgotPasswordPage showAlert={showAlert} />}
-          />
-          <Route
-            path={ROUTES.RESET_PASSWORD}
-            element={<ResetPasswordPage showAlert={showAlert} />}
-          />
-          <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage showAlert={showAlert} />} />
+          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route
             path={ROUTES.PRICING}
             element={<PricingPage showAlert={showAlert} subscription={subscription} />}
@@ -96,15 +96,17 @@ function AppInner() {
           <Route
             path={ROUTES.DASHBOARD}
             element={
-              <DashboardPage
-                gamification={gamification}
-                user={user}
-                isAuthenticated={isAuthenticated}
-                showAlert={showAlert}
-                mode={mode}
-                setMode={setMode as (mode: string) => void}
-                subscription={subscription}
-              />
+              <ProtectedRoute>
+                <DashboardPage
+                  gamification={gamification}
+                  user={user}
+                  isAuthenticated={isAuthenticated}
+                  showAlert={showAlert}
+                  mode={mode}
+                  setMode={setMode as (mode: string) => void}
+                  subscription={subscription}
+                />
+              </ProtectedRoute>
             }
           />
           <Route path={ROUTES.SHARE} element={<SharePage showAlert={showAlert} />} />

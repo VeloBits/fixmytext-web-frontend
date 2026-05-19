@@ -1,6 +1,10 @@
-import { useEffect, useRef } from 'react';
+/**
+ * @deprecated Use `useOidcAuth` from `@/auth/useOidcAuth` directly.
+ * This re-export exists for backward compatibility during the Keycloak migration.
+ */
 import { useSelector } from 'react-redux';
-import { useRefreshMutation, useGetMeQuery } from '@/store/api/authApi';
+import { useGetMeQuery } from '@/store/api/authApi';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { RootState } from '@/store/store';
 import type { User } from '@/store/slices/authSlice';
 
@@ -10,21 +14,11 @@ export interface AuthContextValue {
 }
 
 export function useAuth(): AuthContextValue {
-  const { accessToken, user } = useSelector((s: RootState) => s.auth);
-  const [refresh] = useRefreshMutation();
-  const attempted = useRef(false);
+  const { isAuthenticated, accessToken } = useOidcAuth();
+  const user = useSelector((s: RootState) => s.auth.user);
 
-  useEffect(() => {
-    if (!accessToken && !attempted.current) {
-      attempted.current = true;
-      refresh()
-        .unwrap()
-        .catch(() => {});
-    }
-    // Effect intentionally runs only once on mount (empty deps array)
-  }, []);
-
+  // Trigger /auth/me fetch when authenticated so the Redux user is populated
   useGetMeQuery(undefined, { skip: !accessToken });
 
-  return { user, isAuthenticated: !!accessToken };
+  return { user, isAuthenticated };
 }

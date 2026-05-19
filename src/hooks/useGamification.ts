@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import {
   useGetGamificationQuery,
   useUpdateGamificationMutation,
@@ -12,7 +11,7 @@ import {
   useGetPipelinesQuery,
 } from '@/store/api/userDataApi';
 import { TOOLS, ACHIEVEMENTS, QUEST_TEMPLATES, LEVELS } from '@/constants/tools';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type {
   Achievement,
   LevelDefinition,
@@ -148,9 +147,8 @@ export default function useGamification(): GamificationContextValue {
   const [xpGain, setXpGain] = useState<number | null>(null);
   const hydrated = useRef(false);
 
-  // Auth state from Redux
-  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
-  const isAuthenticated = !!accessToken;
+  // Auth state from OIDC
+  const { isAuthenticated } = useOidcAuth();
 
   // RTK Query — fetch gamification + preferences + favorites from DB when authenticated
   const { data: dbGamification } = useGetGamificationQuery(undefined, { skip: !isAuthenticated });

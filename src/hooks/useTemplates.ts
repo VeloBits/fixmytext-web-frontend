@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { useSelector } from 'react-redux';
 import {
   useGetTemplatesQuery,
   useCreateTemplateMutation,
   useUpdateTemplateMutation,
   useDeleteTemplateMutation,
 } from '@/store/api/userDataApi';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 
 const STORAGE_KEY = 'tu-templates';
 
@@ -66,8 +65,7 @@ export default function useTemplates(
   showAlert: (...args: any[]) => unknown,
   { getActiveToolId, openToolById, renameActiveTab }: UseTemplatesOptions = {}
 ): UseTemplatesReturn {
-  const accessToken = useSelector((s: RootState) => s.auth.accessToken);
-  const isAuthenticated = !!accessToken;
+  const { isAuthenticated } = useOidcAuth();
 
   // Local state (used when not authenticated, or as initial value)
   const [localTemplates, setLocalTemplates] = useState<LocalTemplate[]>(loadTemplates);

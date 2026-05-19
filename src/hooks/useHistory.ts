@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { useRecordOperationMutation, useClearHistoryMutation } from '@/store/api/historyApi';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@/auth/useOidcAuth';
 import type { AlertType } from './useAlert';
 
 const MAX_HISTORY = 50;
@@ -35,7 +34,7 @@ export default function useHistory(
 ): HistoryValue {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const undoIndexRef = useRef(-1);
-  const { accessToken } = useSelector((s: RootState) => s.auth);
+  const { isAuthenticated } = useOidcAuth();
   const [recordOperation] = useRecordOperationMutation();
   const [clearHistoryApi] = useClearHistoryMutation();
 
@@ -49,7 +48,7 @@ export default function useHistory(
       });
 
       // Persist to backend if authenticated (fire-and-forget)
-      if (accessToken) {
+      if (isAuthenticated) {
         recordOperation({
           tool_id: toolMeta.toolId || operation.toLowerCase().replace(/\s+/g, '_'),
           tool_label: operation,
@@ -66,7 +65,7 @@ export default function useHistory(
           });
       }
     },
-    [accessToken, recordOperation]
+    [isAuthenticated, recordOperation]
   );
 
   const handleRestoreOriginal = (idx: number): void => {
@@ -106,7 +105,7 @@ export default function useHistory(
     setHistory([]);
     undoIndexRef.current = -1;
     // Also clear server-side history if authenticated
-    if (accessToken) {
+    if (isAuthenticated) {
       clearHistoryApi()
         .unwrap()
         .catch(() => {});
