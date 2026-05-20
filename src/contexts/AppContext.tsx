@@ -1,6 +1,9 @@
 import { createContext, useContext, useMemo } from 'react';
 import type React from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useSelector } from 'react-redux';
+import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useGetMeQuery } from '@/store/api/authApi';
+import type { RootState } from '@/store/store';
 import useGamification from '@/hooks/useGamification';
 import useSubscription from '@/hooks/useSubscription';
 import { useAlertContext } from './AlertContext';
@@ -112,8 +115,10 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const { showAlert } = useAlertContext();
-  // useAuth, useGamification, useSubscription are JS hooks — cast to typed interfaces.
-  const { user, isAuthenticated } = useAuth() as { user: User | null; isAuthenticated: boolean };
+  const { isAuthenticated, accessToken } = useOidcAuth();
+  const user = useSelector((s: RootState) => s.auth.user) as User | null;
+  // Trigger /auth/me fetch when authenticated so Redux user state is populated.
+  useGetMeQuery(undefined, { skip: !accessToken });
   const gamification = useGamification() as unknown as GamificationContextValue;
   const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 

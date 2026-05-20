@@ -890,6 +890,10 @@ export default function TextForm(props: TextFormProps) {
       handleExtractNumbers: clientTools.handleExtractNumbers,
     }),
 
+     
+    // TODO: Wrap individual handler functions in useCallback to remove this disable.
+    // The 30+ handlers defined above are recreated on every render, causing the
+    // useMemo to re-run unnecessarily. Tracked in PARTIAL_IMPLEMENTATIONS.md.
     [
       callApi,
       ai,

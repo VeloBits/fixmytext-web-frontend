@@ -9,6 +9,7 @@ import PageSkeleton from './components/layout/PageSkeleton';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { AuthCallback } from './auth/AuthCallback';
+import { SilentCallback } from './auth/SilentCallback';
 import { useOidcAuth } from './auth/useOidcAuth';
 
 const AboutPage = lazy(() => import('./pages/AboutPage'));
@@ -90,6 +91,7 @@ function AppInner() {
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/silent-callback" element={<SilentCallback />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route
             path={ROUTES.PRICING}
