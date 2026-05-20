@@ -4,8 +4,7 @@ export type { AiResult } from './useAiTools';
 export { useAlert } from './useAlert';
 export type { AlertType, AlertItem, ShowAlertOptions, AlertContextValue } from './useAlert';
 
-export { useAuth } from './useAuth';
-export type { AuthContextValue } from './useAuth';
+// useAuth removed — use useOidcAuth from @/auth/useOidcAuth directly.
 
 export { default as useClientTools } from './useClientTools';
 

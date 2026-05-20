@@ -49,6 +49,12 @@ vi.mock('react-redux', () => ({
   Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
+// ── API mocks (authApi needed because AppContext calls useGetMeQuery) ──
+vi.mock('@/store/api/authApi', () => ({
+  useGetMeQuery: vi.fn().mockReturnValue({ data: null, isLoading: false }),
+  authApi: { reducerPath: 'authApi' },
+}));
+
 // ── hook mocks ──
 vi.mock('./hooks/useAlert', () => ({
   useAlert: () => ({ alerts: [], showAlert: vi.fn(), dismissAlert: vi.fn() }),
@@ -56,9 +62,7 @@ vi.mock('./hooks/useAlert', () => ({
 vi.mock('./hooks/useTheme', () => ({
   useTheme: () => ({ mode: 'light', setMode: vi.fn() }),
 }));
-vi.mock('./hooks/useAuth', () => ({
-  useAuth: () => ({ user: null, isAuthenticated: false }),
-}));
+// useAuth removed (Sprint 4b) — AppContext now uses useOidcAuth + useGetMeQuery directly.
 vi.mock('./hooks/useGamification', () => ({
   default: () => ({
     onboarded: true,
@@ -101,12 +105,8 @@ vi.mock('./pages/SignupPage', () => ({
 vi.mock('./pages/ForgotPasswordPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'forgot-password-page' }),
 }));
-vi.mock('./pages/ResetPasswordPage', () => ({
-  default: () => React.createElement('div', { 'data-testid': 'reset-password-page' }),
-}));
-vi.mock('./pages/VerifyEmailPage', () => ({
-  default: () => React.createElement('div', { 'data-testid': 'verify-email-page' }),
-}));
+// ResetPasswordPage and VerifyEmailPage were removed in Sprint 4b (Keycloak handles these).
+// Mocks deleted to avoid misleading future readers.
 vi.mock('./pages/DashboardPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'dashboard-page' }),
 }));

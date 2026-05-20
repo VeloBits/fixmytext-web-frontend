@@ -28,6 +28,7 @@ vi.mock('@/auth/userManager', () => ({
     removeUser: vi.fn().mockResolvedValue(undefined),
     signinRedirect: vi.fn().mockResolvedValue(undefined),
     signinSilent: vi.fn().mockRejectedValue(new Error('No Keycloak in test env')),
+    signinSilentCallback: vi.fn().mockResolvedValue(undefined),
     signinRedirectCallback: vi.fn().mockResolvedValue(undefined),
     signoutRedirect: vi.fn().mockResolvedValue(undefined),
     clearStaleState: vi.fn().mockResolvedValue(undefined),

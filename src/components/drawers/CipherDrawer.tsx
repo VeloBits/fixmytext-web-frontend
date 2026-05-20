@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ENDPOINTS } from '@/constants/endpoints';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 
@@ -37,15 +38,15 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
     }
 
     const configs = {
-      vigenere_enc: { endpoint: '/api/v1/text/vigenere-encrypt', label: 'Vigenere Encrypted' },
-      vigenere_dec: { endpoint: '/api/v1/text/vigenere-decrypt', label: 'Vigenere Decrypted' },
-      playfair_enc: { endpoint: '/api/v1/text/playfair-encrypt', label: 'Playfair Encrypted' },
+      vigenere_enc: { endpoint: ENDPOINTS.VIGENERE_ENC, label: 'Vigenere Encrypted' },
+      vigenere_dec: { endpoint: ENDPOINTS.VIGENERE_DEC, label: 'Vigenere Decrypted' },
+      playfair_enc: { endpoint: ENDPOINTS.PLAYFAIR_ENC, label: 'Playfair Encrypted' },
       substitution_cipher: {
-        endpoint: '/api/v1/text/substitution-cipher',
+        endpoint: ENDPOINTS.SUBSTITUTION_CIPHER,
         label: 'Substitution Applied',
       },
       columnar_transposition: {
-        endpoint: '/api/v1/text/columnar-transposition',
+        endpoint: ENDPOINTS.COLUMNAR_TRANSPOSITION,
         label: 'Columnar Transposition Applied',
       },
     };
