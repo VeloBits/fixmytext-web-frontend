@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { apiFetch } from '../src/client';
+import { apiFetch, clearSession } from '../src/client';
 
 const mockFetch = vi.fn();
 globalThis.fetch = mockFetch;
@@ -76,5 +76,40 @@ describe('ENDPOINTS', () => {
     const { ENDPOINTS } = await import('../src/endpoints');
     expect(ENDPOINTS.UPPERCASE).toBe('/api/v1/text/uppercase');
     expect(ENDPOINTS.FIX_GRAMMAR).toBe('/api/v1/ai/fix-grammar');
+  });
+});
+
+describe('clearSession', () => {
+  it('POSTs to /api/v1/auth/session/clear with credentials include', async () => {
+    mockFetch.mockResolvedValue(makeResponse({}, 204));
+
+    await clearSession({ baseUrl: 'http://localhost:8000' });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:8000/api/v1/auth/session/clear',
+      expect.objectContaining({
+        method: 'POST',
+        credentials: 'include',
+      })
+    );
+  });
+
+  it('swallows network errors silently', async () => {
+    mockFetch.mockRejectedValue(new Error('network down'));
+
+    // Should not throw
+    await expect(
+      clearSession({ baseUrl: 'http://localhost:8000' })
+    ).resolves.toBeUndefined();
+  });
+
+  it('uses default base URL when not provided', async () => {
+    mockFetch.mockResolvedValue(makeResponse({}, 204));
+
+    await clearSession();
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain('/api/v1/auth/session/clear');
   });
 });

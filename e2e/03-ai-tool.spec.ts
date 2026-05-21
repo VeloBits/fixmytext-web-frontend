@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { registerVerifiedUser } from './helpers';
+import { registerVerifiedUser, API_URL } from './helpers';
 
 test('AI tool (Summarize) returns backend response (AI_BACKEND=fake)', async ({
   page,
@@ -10,7 +10,7 @@ test('AI tool (Summarize) returns backend response (AI_BACKEND=fake)', async ({
     await registerVerifiedUser(request);
 
   // Verify email via the API directly to keep this spec focused.
-  const verify = await request.post('http://localhost:8000/api/v1/auth/verify-email', {
+  const verify = await request.post(`${API_URL}/api/v1/auth/verify-email`, {
     data: { token: verificationToken },
   });
   expect(verify.ok()).toBeTruthy();

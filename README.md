@@ -21,18 +21,38 @@ frontend/
 
 - Node.js 20+
 - npm 10+
-- Backend running at http://localhost:8000 (see [backend README](../backend/README.md))
+- Backend running at `http://api-dev.velobits.dev` via docker compose (see [backend README](../backend/README.md))
+- **`/etc/hosts` entries** for the VeloBits subdomain architecture (see below)
+
+## Local subdomain setup (Sprint 5b)
+
+The VeloBits platform runs each product on its own subdomain. Local dev mirrors
+production exactly — only the DNS source changes (`/etc/hosts` here, real DNS
+in Sprint 9).
+
+Add these to your dev machine's `/etc/hosts` (one-time):
+
+```bash
+sudo tee -a /etc/hosts <<EOF
+127.0.0.1 auth-dev.velobits.dev
+127.0.0.1 api-dev.velobits.dev
+127.0.0.1 develop-fixmytext.velobits.dev
+EOF
+```
+
+Without these entries, OIDC redirects and API calls will fail (`ERR_NAME_NOT_RESOLVED`).
 
 ## Setup
 
 ```bash
 cd frontend
 npm install          # installs root app + links all workspace packages
-cp .env.example .env
+cp .env.example .env  # defaults already target the velobits.dev subdomains
 npm run dev
 ```
 
-Open http://localhost:3000
+Open `http://develop-fixmytext.velobits.dev:3000` (the port comes from Vite; Sprint 5e moves
+the app behind Traefik at `:80` and drops the explicit port).
 
 ## Scripts
 

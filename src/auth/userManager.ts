@@ -1,8 +1,12 @@
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 
-const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080';
-const KEYCLOAK_REALM = import.meta.env.VITE_KEYCLOAK_REALM ?? 'fixmytext';
-const KEYCLOAK_CLIENT_ID = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'fixmytext-frontend';
+// Sprint 5b: defaults updated to the Velobits-Dev realm hosted at the new
+// auth-dev.velobits.dev subdomain (resolved via /etc/hosts in local dev).
+// Production overrides via VITE_KEYCLOAK_URL = https://auth.velobits.dev,
+// VITE_KEYCLOAK_REALM = Velobits-Prod, VITE_KEYCLOAK_CLIENT_ID = fixmytext.
+const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL ?? 'http://auth-dev.velobits.dev';
+const KEYCLOAK_REALM = import.meta.env.VITE_KEYCLOAK_REALM ?? 'Velobits-Dev';
+const KEYCLOAK_CLIENT_ID = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'develop-fixmytext';
 
 export const userManager = new UserManager({
   authority: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`,
