@@ -77,7 +77,7 @@ export default [
     },
   }),
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}', 'packages/**/*.{ts,tsx}'],
     plugins: { security },
     rules: {
       ...security.configs.recommended.rules,

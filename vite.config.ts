@@ -2,6 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -32,6 +33,7 @@ function manualChunks(id: string): string | undefined {
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
     sentryVitePlugin({
       org: process.env.SENTRY_ORG,
       project: 'fixmytext-frontend',

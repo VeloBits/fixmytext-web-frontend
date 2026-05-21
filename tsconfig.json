@@ -1,26 +1,19 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "noImplicitAny": true,
-    "noUncheckedIndexedAccess": true,
-    "allowJs": false,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "types": ["vitest/globals", "@testing-library/jest-dom"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@velobits/design-system": ["./packages/design-system/src/index.ts"],
+      "@velobits/design-system/*": ["./packages/design-system/src/*"],
+      "@velobits/api-client": ["./packages/api-client/src/index.ts"],
+      "@velobits/api-client/*": ["./packages/api-client/src/*"],
+      "@velobits/auth-shared": ["./packages/auth-shared/src/index.ts"],
+      "@velobits/auth-shared/*": ["./packages/auth-shared/src/*"],
+      "@velobits/tools-registry": ["./packages/tools-registry/src/index.ts"],
+      "@velobits/tools-registry/*": ["./packages/tools-registry/src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "packages/*/src/**/*", "packages/*/tests/**/*"],
   "exclude": ["node_modules", "dist", "coverage", "e2e"]
 }

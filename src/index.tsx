@@ -1,3 +1,4 @@
+import '@velobits/design-system/theme.css';
 import { initSentry } from '@/lib/sentry';
 import React from 'react';
 import ReactDOM from 'react-dom/client';

@@ -5,7 +5,7 @@
 
 @import './tokens.css';
 @import './base.css';
-@import './navbar.css';
+/* navbar.css removed — Navbar.tsx now uses Tailwind utilities */
 @import './editor.css';
 @import './buttons.css';
 @import './toolcard.css';
