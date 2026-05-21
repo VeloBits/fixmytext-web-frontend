@@ -1,4 +1,4 @@
-export { apiFetch } from './client';
+export { apiFetch, clearSession } from './client';
 export type { ApiFetchOptions, ApiError } from './client';
 
 export { ENDPOINTS } from './endpoints';

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseSession } from '../src/claims';
+import { SESSION_COOKIE_NAME, SSO_COOKIE_NAME, SESSION_CLEAR_PATH } from '../src/constants';
 
 function makePayload(overrides: Record<string, unknown> = {}): string {
   const payload = {
@@ -52,5 +53,19 @@ describe('parseSession', () => {
     expect(parseSession('not-valid')).toBeNull();
     expect(parseSession('')).toBeNull();
     expect(parseSession('!!!.!!!')).toBeNull();
+  });
+});
+
+describe('constants', () => {
+  it('SESSION_COOKIE_NAME uses per-app naming (Sprint 5b)', () => {
+    expect(SESSION_COOKIE_NAME).toBe('fixmytext_session');
+  });
+
+  it('SSO_COOKIE_NAME documents the global SSO cookie at .velobits.dev', () => {
+    expect(SSO_COOKIE_NAME).toBe('VELOBITS_SSO');
+  });
+
+  it('SESSION_CLEAR_PATH points at the logout endpoint', () => {
+    expect(SESSION_CLEAR_PATH).toBe('/api/v1/auth/session/clear');
   });
 });

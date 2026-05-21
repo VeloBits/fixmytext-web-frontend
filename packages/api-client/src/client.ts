@@ -35,6 +35,26 @@ function getDefaultBaseUrl(): string {
   return 'http://localhost:8000';
 }
 
+/**
+ * POST /api/v1/auth/session/clear — clear the per-app session cookie.
+ * Called by the frontend on logout BEFORE redirecting to Keycloak end-session.
+ * Always sends credentials: 'include' so the browser attaches the cookie
+ * (server needs it to know what to clear). Errors are swallowed — clearing
+ * is best-effort; the OIDC logout still runs afterward.
+ */
+export async function clearSession(options: { baseUrl?: string } = {}): Promise<void> {
+  const baseUrl = options.baseUrl ?? getDefaultBaseUrl();
+  try {
+    await fetch(`${baseUrl}/api/v1/auth/session/clear`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch {
+    // Best-effort: server may be down or unreachable. Logout still proceeds
+    // via the OIDC end-session redirect.
+  }
+}
+
 export async function apiFetch<T = unknown>(
   path: string,
   options: ApiFetchOptions = {}

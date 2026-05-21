@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { User as OidcUser } from 'oidc-client-ts';
 import * as Sentry from '@sentry/react';
+import { clearSession } from '@velobits/api-client';
 import { userManager } from './userManager';
 
 export interface OidcAuthState {
@@ -46,13 +47,16 @@ export function useOidcAuth(): OidcAuthState {
   }, []);
 
   const login = useCallback(() => userManager.signinRedirect(), []);
-  const logout = useCallback(
-    () =>
-      userManager.signoutRedirect({
-        post_logout_redirect_uri: `${window.location.origin}/login`,
-      }),
-    []
-  );
+  const logout = useCallback(async () => {
+    // Sprint 5b: clear the per-app session cookie FIRST (best-effort), then
+    // redirect to Keycloak end-session which clears the SSO cookie.
+    // Order matters: if signoutRedirect runs first the page navigates away
+    // before clearSession completes.
+    await clearSession();
+    await userManager.signoutRedirect({
+      post_logout_redirect_uri: `${window.location.origin}/login`,
+    });
+  }, []);
 
   return {
     isAuthenticated: !!oidcUser && !oidcUser.expired,

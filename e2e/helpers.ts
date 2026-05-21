@@ -1,7 +1,9 @@
 import crypto from 'node:crypto';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
-export const API_URL: string = process.env.E2E_API_URL ?? 'http://localhost:8000';
+// Sprint 5b: API base URL is now api-dev.velobits.dev (via /etc/hosts + Traefik + Kong).
+// CI can override via E2E_API_URL env var to point at any host (incl. localhost ports).
+export const API_URL: string = process.env.E2E_API_URL ?? 'http://api-dev.velobits.dev';
 
 export function uniqueEmail(prefix = 'e2e'): string {
   const rand = crypto.randomBytes(6).toString('hex');
