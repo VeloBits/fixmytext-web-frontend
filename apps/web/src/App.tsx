@@ -122,7 +122,7 @@ function AppInner() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/app">
       <AlertProvider>
         <ThemeProvider>
           <AppProvider>

@@ -16,11 +16,11 @@ test('AI tool (Summarize) returns backend response (AI_BACKEND=fake)', async ({
   expect(verify.ok()).toBeTruthy();
 
   // Log in via UI so the frontend's auth state (cookie + redux) is populated.
-  await page.goto('/login');
+  await page.goto('/app/login');
   await page.locator('#email').fill(email);
   await page.locator('#password').fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
-  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+  await expect(page).toHaveURL(/\/app\/?$/, { timeout: 15_000 });
 
   const input = page.locator('textarea.tu-textarea').first();
   await input.fill('The quick brown fox jumps over the lazy dog.');

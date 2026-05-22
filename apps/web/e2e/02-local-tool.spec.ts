@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('local tool (MD5) transforms input client-side', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/app/');
   const input = page.locator('textarea.tu-textarea').first();
   await expect(input).toBeVisible();
   await input.fill('hello world');

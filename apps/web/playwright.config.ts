@@ -1,8 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Sprint 5b: dev frontend URL switches to the VeloBits subdomain.
-// E2E_FRONTEND_URL is the canonical override (used by CI + alt-port dev).
-// Sprint 5e moves the e2e dir into apps/web/e2e and updates this path.
+// After Sprint 5e the Vite app is served under /app (Vite base: '/app').
+// E2E_FRONTEND_URL overrides the full origin (without path suffix).
 const FRONTEND_URL = process.env.E2E_FRONTEND_URL || 'http://develop-fixmytext.velobits.dev:3000';
 
 export default defineConfig({
