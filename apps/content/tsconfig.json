@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "allowJs": false,
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"],
+      "@velobits/design-system": ["../../packages/design-system/src/index.ts"],
+      "@velobits/design-system/*": ["../../packages/design-system/src/*"],
+      "@velobits/api-client": ["../../packages/api-client/src/index.ts"],
+      "@velobits/api-client/*": ["../../packages/api-client/src/*"],
+      "@velobits/auth-shared": ["../../packages/auth-shared/src/index.ts"],
+      "@velobits/auth-shared/*": ["../../packages/auth-shared/src/*"],
+      "@velobits/tools-registry": ["../../packages/tools-registry/src/index.ts"],
+      "@velobits/tools-registry/*": ["../../packages/tools-registry/src/*"]
+    }
+  },
+  "include": [".", "next-env.d.ts"],
+  "exclude": ["node_modules", ".next", "e2e"]
+}
