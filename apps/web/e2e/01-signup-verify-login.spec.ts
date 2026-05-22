@@ -6,13 +6,13 @@ test('signup → verify email via link → login', async ({ page, request }) => 
   const password = 'TestPass123!';
 
   // Signup via UI.
-  await page.goto('/signup');
+  await page.goto('/app/signup');
   await page.locator('#displayName').fill('E2E Tester');
   await page.locator('#email').fill(email);
   await page.locator('#password').fill(password);
   await page.locator('#confirmPassword').fill(password);
   await page.getByRole('button', { name: 'Create Account' }).click();
-  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+  await expect(page).toHaveURL(/\/app\/?$/, { timeout: 15_000 });
 
   // The /register response does not echo the verification token; we use the
   // authenticated /auth/resend-verification endpoint, which does (when
@@ -38,13 +38,13 @@ test('signup → verify email via link → login', async ({ page, request }) => 
   expect(verification_token).toBeTruthy();
 
   // Visit the verify-email page with the token in the URL.
-  await page.goto(`/verify-email?token=${encodeURIComponent(verification_token)}`);
+  await page.goto(`/app/verify-email?token=${encodeURIComponent(verification_token)}`);
   await expect(page.getByText(/Email verified/i)).toBeVisible({ timeout: 10_000 });
 
   // Log in via UI.
-  await page.goto('/login');
+  await page.goto('/app/login');
   await page.locator('#email').fill(email);
   await page.locator('#password').fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
-  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+  await expect(page).toHaveURL(/\/app\/?$/, { timeout: 15_000 });
 });

@@ -11,9 +11,9 @@ const KEYCLOAK_CLIENT_ID = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'develop-f
 export const userManager = new UserManager({
   authority: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`,
   client_id: KEYCLOAK_CLIENT_ID,
-  redirect_uri: `${window.location.origin}/auth/callback`,
-  silent_redirect_uri: `${window.location.origin}/auth/silent-callback`,
-  post_logout_redirect_uri: `${window.location.origin}/login`,
+  redirect_uri: `${window.location.origin}/app/auth/callback`,
+  silent_redirect_uri: `${window.location.origin}/app/auth/silent-callback`,
+  post_logout_redirect_uri: `${window.location.origin}/app/login`,
   response_type: 'code',
   scope: 'openid email profile',
   automaticSilentRenew: true,

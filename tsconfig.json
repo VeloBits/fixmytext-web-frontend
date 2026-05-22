@@ -1,19 +1,11 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "types": ["vitest/globals", "@testing-library/jest-dom"],
-    "paths": {
-      "@/*": ["./src/*"],
-      "@velobits/design-system": ["./packages/design-system/src/index.ts"],
-      "@velobits/design-system/*": ["./packages/design-system/src/*"],
-      "@velobits/api-client": ["./packages/api-client/src/index.ts"],
-      "@velobits/api-client/*": ["./packages/api-client/src/*"],
-      "@velobits/auth-shared": ["./packages/auth-shared/src/index.ts"],
-      "@velobits/auth-shared/*": ["./packages/auth-shared/src/*"],
-      "@velobits/tools-registry": ["./packages/tools-registry/src/index.ts"],
-      "@velobits/tools-registry/*": ["./packages/tools-registry/src/*"]
-    }
-  },
-  "include": ["src/**/*", "packages/*/src/**/*", "packages/*/tests/**/*"],
-  "exclude": ["node_modules", "dist", "coverage", "e2e"]
+  "files": [],
+  "references": [
+    { "path": "./apps/web" },
+    { "path": "./apps/content" },
+    { "path": "./packages/design-system" },
+    { "path": "./packages/api-client" },
+    { "path": "./packages/auth-shared" },
+    { "path": "./packages/tools-registry" }
+  ]
 }
