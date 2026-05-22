@@ -65,7 +65,15 @@ export default [
     },
   },
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/'],
+    ignores: [
+      'dist/',
+      'node_modules/',
+      'coverage/',
+      // Next.js auto-generated files — never edit or lint these
+      '**/next-env.d.ts',
+      '**/.next/**',
+      '**/tsconfig.tsbuildinfo',
+    ],
   },
   ...tseslint.config({
     files: ['**/*.{ts,tsx}'],

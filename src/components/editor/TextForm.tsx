@@ -1170,6 +1170,25 @@ export default function TextForm(props: TextFormProps) {
     return () => clearTimeout(timer);
   }, [formatter.fmtCfg]);
 
+  // ── ?tool=<id> deep-link from /tools/[slug] CTA ─────────
+  // When a user arrives from a per-tool SEO page via
+  //   WEB_APP_BASE_URL?tool=<id>
+  // pre-select that tool in the editor on first mount.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const toolId = params.get('tool');
+    if (!toolId) return;
+    const match = TOOLS.find((t) => t.id === toolId);
+    if (match) {
+      handleToolClick(match);
+      // Clean the query string so the URL looks canonical.
+      const url = new URL(window.location.href);
+      url.searchParams.delete('tool');
+      window.history.replaceState({}, '', url.toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally runs once on mount; handleToolClick is stable
+
   // ── Keyboard Shortcuts (power-user hotkeys) ─────────────
   // Use a ref so the keydown handler always sees the latest closures
   // without triggering re-registration on every render.
