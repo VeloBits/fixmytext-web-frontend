@@ -1,0 +1,35 @@
+{
+  "name": "@velobits/content-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "lint": "eslint app/ components/ lib/",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium"
+  },
+  "dependencies": {
+    "@velobits/api-client": "*",
+    "@velobits/auth-shared": "*",
+    "@velobits/design-system": "*",
+    "@velobits/tools-registry": "*",
+    "next": "^15.3.2",
+    "next-auth": "^5.0.0-beta.28",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "framer-motion": "^12.38.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/node": "^25.6.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "typescript": "^6.0.3"
+  }
+}
