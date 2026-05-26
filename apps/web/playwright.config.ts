@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// After Sprint 5e the Vite app is served under /app (Vite base: '/app').
+// The Vite app is served under /app (Vite base: '/app').
 // E2E_FRONTEND_URL overrides the full origin (without path suffix).
 const FRONTEND_URL = process.env.E2E_FRONTEND_URL || 'http://develop-fixmytext.velobits.dev:3000';
 

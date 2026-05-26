@@ -1,13 +1,9 @@
 'use client';
 /**
- * PricingContent — client component that mirrors PricingPage.tsx from the
- * Vite editor app. The Next.js page shell (app/pricing/page.tsx) provides the
- * SEO meta tags; this component handles all interactive behaviour (Razorpay
- * checkout, pass catalog fetch, subscription state).
- *
- * Sprint 5c: minimal static rendering. Full interactive parity with the Vite
- * PricingPage is Sprint 5e work (when the Vite app moves to apps/web/ and this
- * becomes the canonical pricing surface).
+ * PricingContent — client component for the pricing page.
+ * The Next.js page shell (app/pricing/page.tsx) provides the SEO meta tags;
+ * this component handles all interactive behaviour (Razorpay checkout,
+ * pass catalog fetch, subscription state).
  */
 import { WEB_APP_BASE_URL } from '@velobits/api-client';
 

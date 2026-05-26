@@ -48,8 +48,8 @@ export function useOidcAuth(): OidcAuthState {
 
   const login = useCallback(() => userManager.signinRedirect(), []);
   const logout = useCallback(async () => {
-    // Sprint 5b: clear the per-app session cookie FIRST (best-effort), then
-    // redirect to Keycloak end-session which clears the SSO cookie.
+    // Clear the per-app session cookie FIRST (best-effort), then redirect to
+    // Keycloak end-session which clears the SSO cookie.
     // Order matters: if signoutRedirect runs first the page navigates away
     // before clearSession completes.
     await clearSession();

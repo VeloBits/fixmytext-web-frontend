@@ -10,14 +10,11 @@ interface Props {
 }
 
 /**
- * Sprint 5c — The main win: OG cards now work for social sharing.
+ * Server-renders OG meta tags for social sharing.
  *
- * Before (Vite SPA): every /share/{id} URL served a blank shell; Twitter,
- * LinkedIn, and Slack scrapers saw no useful meta → generic preview cards.
- *
- * After (Next.js SSR): generateMetadata() fetches the share record server-side
- * and populates og:title, og:description, and twitter:card with real content
- * from the tool output → rich preview cards on every platform.
+ * generateMetadata() fetches the share record server-side and populates
+ * og:title, og:description, and twitter:card with real content from the tool
+ * output — so Twitter, LinkedIn, and Slack show rich preview cards.
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;

@@ -6,7 +6,7 @@
  * authentication flows through the Vite editor app (Keycloak PKCE); this app
  * is a consumer of the session cookie produced after login.
  *
- * Routes in Sprint 5c (/about, /pricing, /share) are all public — auth() is
+ * Current routes (/about, /pricing, /share) are all public — auth() is
  * available for future protected routes (user profile, dashboard, etc.).
  */
 import NextAuth from 'next-auth';

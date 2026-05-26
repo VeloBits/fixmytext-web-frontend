@@ -33,7 +33,7 @@ function manualChunks(id: string): string | undefined {
 
 // Remote entry URLs — used when VITE_USE_REMOTES=true (separate remote builds deployed).
 // In the default single-build mode these are unused; the shell loads components locally.
-// Override with env vars when deploying remotes independently (Sprint 9+).
+// Override with env vars when deploying remotes independently.
 const EDITOR_REMOTE_ENTRY =
   process.env.VITE_EDITOR_REMOTE_ENTRY ?? 'http://localhost:3001/app/remoteEntry.js'
 const ANALYTICS_REMOTE_ENTRY =

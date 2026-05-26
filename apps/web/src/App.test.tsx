@@ -62,7 +62,7 @@ vi.mock('./hooks/useAlert', () => ({
 vi.mock('./hooks/useTheme', () => ({
   useTheme: () => ({ mode: 'light', setMode: vi.fn() }),
 }));
-// useAuth removed (Sprint 4b) — AppContext now uses useOidcAuth + useGetMeQuery directly.
+// AppContext uses useOidcAuth + useGetMeQuery directly (no legacy useAuth hook).
 vi.mock('./hooks/useGamification', () => ({
   default: () => ({
     onboarded: true,
@@ -105,8 +105,8 @@ vi.mock('./pages/SignupPage', () => ({
 vi.mock('./pages/ForgotPasswordPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'forgot-password-page' }),
 }));
-// ResetPasswordPage and VerifyEmailPage were removed in Sprint 4b (Keycloak handles these).
-// Mocks deleted to avoid misleading future readers.
+// ResetPasswordPage and VerifyEmailPage are not in the router (Keycloak handles these flows).
+// Mocks omitted — no routes exist to test.
 vi.mock('./pages/DashboardPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'dashboard-page' }),
 }));

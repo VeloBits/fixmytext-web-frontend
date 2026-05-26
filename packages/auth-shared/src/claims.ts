@@ -1,4 +1,4 @@
-/** Shape of the session cookie payload issued by account-svc (Sprint 5b). */
+/** Shape of the session cookie payload issued by account-svc. */
 export interface SessionClaims {
   sub: string;
   email: string;
@@ -13,9 +13,8 @@ export interface SessionClaims {
  * The cookie is a base64url-encoded JSON payload followed by a dot-separated
  * HMAC-SHA256 signature: `<base64payload>.<hex-signature>`.
  *
- * NOTE: In 5a this is a type-only contract — full signature verification
- * is implemented in Sprint 5b when account-svc begins issuing the cookie.
- * For now, parseSession() only decodes and validates the shape.
+ * NOTE: This function only decodes and validates shape + expiry.
+ * Full HMAC signature verification is performed server-side by account-svc.
  */
 export function parseSession(raw: string): SessionClaims | null {
   try {

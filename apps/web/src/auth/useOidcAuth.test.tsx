@@ -46,7 +46,7 @@ describe('useOidcAuth', () => {
     expect(typeof result.current.logout).toBe('function');
   });
 
-  it('logout calls clearSession BEFORE signoutRedirect (Sprint 5b)', async () => {
+  it('logout calls clearSession BEFORE signoutRedirect', async () => {
     const callOrder: string[] = [];
     mockClearSession.mockImplementation(async () => {
       callOrder.push('clearSession');

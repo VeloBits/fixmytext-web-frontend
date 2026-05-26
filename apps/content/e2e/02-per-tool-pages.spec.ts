@@ -1,5 +1,5 @@
 /**
- * Sprint 5d — Per-tool SEO page smoke tests.
+ * Per-tool SEO page smoke tests.
  *
  * Verifies that the 254 SSG tool pages are reachable, have correct meta,
  * carry JSON-LD, and link back to the Vite editor via WEB_APP_BASE_URL.

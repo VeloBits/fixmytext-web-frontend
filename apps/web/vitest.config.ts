@@ -35,10 +35,9 @@ export default defineConfig({
         '**/*.config.js',
         'src/index.jsx',
       ],
-      // Thresholds calibrated after Sprint 5e move to apps/web/.
+      // Thresholds calibrated to actual coverage after the app moved to apps/web/.
       // Gaps remain in the editor's complex hook files (react-hooks/exhaustive-deps
-      // patterns) and RTKQ API slices — covered in Sprint 5g baseline.
-      // Raise toward 80% in Sprint 5g/5h as tests expand.
+      // patterns) and RTKQ API slices. Raise toward 80% as tests expand.
       thresholds: {
         lines: 68,
         branches: 59,

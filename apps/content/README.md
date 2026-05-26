@@ -1,6 +1,6 @@
 # @velobits/content-app — Next.js Content Surface
 
-> Sprint 5c — The content surface of FixMyText: SEO-optimised pages, OG cards, and marketing content.
+> The content surface of FixMyText: SEO-optimised pages, OG cards, and marketing content.
 
 ## Why Next.js here and Vite in `apps/web/`?
 
@@ -33,17 +33,16 @@ Visit:
 - `http://localhost:3001/pricing`
 - `http://localhost:3001/share/<id>` (needs a real share ID from the running backend)
 
-### Path routing (Sprint 5e)
+### Path routing
 
-In Sprint 5e, when the Vite app moves to `apps/web/` and both apps are containerised,
-Traefik will route by path within `develop-fixmytext.velobits.dev`:
+Traefik routes by path within `develop-fixmytext.velobits.dev`:
 
 | Path | → App | Port |
 |---|---|---|
 | `/about`, `/pricing`, `/share/*` | content-app | 3001 |
 | `/app/*`, `/` | web-app | 3000 |
 
-Until Sprint 5e, access each app directly by port.
+Both apps can also be accessed directly by port during development.
 
 ## Shared packages
 
@@ -57,6 +56,6 @@ Until Sprint 5e, access each app directly by port.
 ## Auth
 
 Auth.js v5 is configured in `auth.ts`. It reads the `fixmytext_session` cookie
-issued by account-svc and surfaces it as a Next.js session. Sprint 5c's routes
-(`/about`, `/pricing`, `/share/[id]`) are all public — `auth()` is available for
+issued by account-svc and surfaces it as a Next.js session. All current routes
+(`/about`, `/pricing`, `/share/[id]`) are public — `auth()` is available for
 future protected routes.

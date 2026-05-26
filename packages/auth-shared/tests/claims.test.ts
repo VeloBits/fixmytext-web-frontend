@@ -57,7 +57,7 @@ describe('parseSession', () => {
 });
 
 describe('constants', () => {
-  it('SESSION_COOKIE_NAME uses per-app naming (Sprint 5b)', () => {
+  it('SESSION_COOKIE_NAME uses per-app naming', () => {
     expect(SESSION_COOKIE_NAME).toBe('fixmytext_session');
   });
 

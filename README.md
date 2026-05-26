@@ -38,7 +38,7 @@ frontend/
 
 The VeloBits platform runs each product on its own subdomain. Local dev mirrors
 production exactly — only the DNS source changes (`/etc/hosts` here, real DNS
-in Sprint 9).
+in production).
 
 Add these to your dev machine's `/etc/hosts` (one-time):
 

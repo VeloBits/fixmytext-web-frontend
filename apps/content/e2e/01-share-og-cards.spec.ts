@@ -1,10 +1,9 @@
 /**
- * Sprint 5c — OG card smoke test.
+ * OG card smoke test.
  *
  * Verifies that the Next.js content app server-renders correct Open Graph and
- * Twitter Card meta tags on /share/[id] pages. This is the primary deliverable
- * of Sprint 5c: before this sprint, social scrapers (Twitter, LinkedIn, Slack)
- * saw blank shells; after this sprint they see rich preview cards.
+ * Twitter Card meta tags on /share/[id] pages. Social scrapers (Twitter,
+ * LinkedIn, Slack) see rich preview cards instead of blank shells.
  *
  * Requires the backend running with a real share record. The share ID is passed
  * via E2E_SHARE_ID env var; tests are skipped if not provided.

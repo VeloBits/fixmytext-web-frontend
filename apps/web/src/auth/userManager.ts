@@ -1,7 +1,6 @@
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 
-// Sprint 5b: defaults updated to the Velobits-Dev realm hosted at the new
-// auth-dev.velobits.dev subdomain (resolved via /etc/hosts in local dev).
+// Defaults to the Velobits-Dev realm at auth-dev.velobits.dev (resolved via /etc/hosts in local dev).
 // Production overrides via VITE_KEYCLOAK_URL = https://auth.velobits.dev,
 // VITE_KEYCLOAK_REALM = Velobits-Prod, VITE_KEYCLOAK_CLIENT_ID = fixmytext.
 const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL ?? 'http://auth-dev.velobits.dev';

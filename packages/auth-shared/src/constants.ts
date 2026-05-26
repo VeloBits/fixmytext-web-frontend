@@ -1,5 +1,5 @@
 /**
- * Per-app session cookie name (Sprint 5b).
+ * Per-app session cookie name.
  * Host-only, scoped to `fixmytext.velobits.dev` (or `develop-fixmytext.velobits.dev` in dev).
  * Issued by account-svc on successful /auth/me.
  *
@@ -16,8 +16,8 @@ export const SESSION_COOKIE_NAME = 'fixmytext_session';
  * subsequent cross-app navigation (e.g. fixmytext → chat).
  *
  * NOTE: Keycloak's actual cookie names (KEYCLOAK_IDENTITY, KC_RESTART) differ
- * from `VELOBITS_SSO`. Renaming via a Keycloak SPI plugin is a Sprint 9
- * polish item; the SSO mechanism works regardless of cookie name.
+ * from `VELOBITS_SSO`. Renaming via a Keycloak SPI plugin is a future polish
+ * item; the SSO mechanism works regardless of cookie name.
  */
 export const SSO_COOKIE_NAME = 'VELOBITS_SSO';
 
