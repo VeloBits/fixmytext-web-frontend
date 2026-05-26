@@ -1,12 +1,17 @@
 {
-  "name": "fixmytext",
+  "name": "velobits-frontend",
   "version": "0.1.0",
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
+    "@hookform/resolvers": "^5.2.2",
     "@reduxjs/toolkit": "^2.11.2",
     "@sentry/react": "^10.53.1",
     "blakejs": "^1.2.1",
@@ -20,21 +25,25 @@
     "jspdf": "4.2.1",
     "marked": "^18.0.3",
     "murmurhash3js": "^3.0.1",
+    "oidc-client-ts": "^3.5.0",
     "prettier": "^3.8.3",
     "qrcode": "^1.5.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-hook-form": "^7.76.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.15.0",
     "sql-formatter": "^15.7.3",
     "whirlpool-hash": "^1.1.6",
-    "xxhashjs": "^0.2.2"
+    "xxhashjs": "^0.2.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@axe-core/react": "^4.11.3",
     "@eslint/js": "^9.39.4",
     "@playwright/test": "^1.59.1",
     "@sentry/vite-plugin": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -63,22 +72,20 @@
     "vitest-axe": "^0.1.0"
   },
   "scripts": {
-    "dev": "vite --port 3000",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
+    "dev": "npm run dev -w @velobits/web-app",
+    "build": "npm run build -w @velobits/web-app",
+    "preview": "npm run preview -w @velobits/web-app",
+    "lint": "eslint apps/web/src/ packages/ && npm run --workspaces --if-present lint",
+    "lint:fix": "eslint apps/web/src/ packages/ --fix",
+    "test": "npm run test -w @velobits/web-app",
+    "test:watch": "npm run test:watch -w @velobits/web-app",
+    "test:coverage": "npm run test:coverage -w @velobits/web-app",
+    "test:packages": "npm run --workspaces --if-present test",
+    "test:e2e": "npm run test:e2e -w @velobits/web-app",
     "test:e2e:install": "playwright install --with-deps chromium",
-    "gen:types": "openapi-typescript ../backend/openapi.json -o src/types/openapi.d.ts",
-    "typecheck": "npm run typecheck:app && npm run typecheck:node && npm run typecheck:e2e",
-    "prepare": "husky",
-    "typecheck:app": "tsc --noEmit",
-    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
-    "typecheck:e2e": "tsc --noEmit -p tsconfig.e2e.json"
+    "gen:types": "openapi-typescript ../backend/openapi.json -o packages/api-client/src/types/openapi.d.ts",
+    "typecheck": "npm run --workspaces --if-present typecheck",
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

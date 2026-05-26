@@ -1,0 +1,48 @@
+/* Import VeloBits design tokens (Tailwind v4 @theme from design-system package) */
+@import '@velobits/design-system/theme.css';
+
+/* VSCode Dark+ theme variables — applied at body level to match the Vite app */
+body {
+  --bg: #f8f8f8;
+  --bg2: #eaeaeb;
+  --surface: #eaeaeb;
+  --surface-2: #e0e0e1;
+  --border: #c8c8c8;
+  --text: #1a1a1a;
+  --text-2: #3a3a3a;
+  --text-3: #6b6b6b;
+  --nav-bg: #2c2c2c;
+  --titlebar-bg: #2c2c2c;
+  --titlebar-fg: #cccccc;
+  --font-display: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-xl: 10px;
+  --r-pill: 999px;
+  --t: 0.12s ease;
+  --accent: #007acc;
+  --accent-hover: #1c8cd9;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+}
+
+body.dark {
+  --bg: #1e1e1e;
+  --bg2: #252526;
+  --surface: #252526;
+  --surface-2: #2d2d2d;
+  --border: #3c3c3c;
+  --text: #d4d4d4;
+  --text-2: #ababab;
+  --text-3: #858585;
+  --nav-bg: #323233;
+  --titlebar-bg: #323233;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 transparent;
+}
