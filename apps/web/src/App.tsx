@@ -12,13 +12,10 @@ import { AuthCallback } from './auth/AuthCallback';
 import { SilentCallback } from './auth/SilentCallback';
 import { useOidcAuth } from './auth/useOidcAuth';
 
-const AboutPage = lazy(() => import('./pages/AboutPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
-const PricingPage = lazy(() => import('./pages/PricingPage'));
-const SharePage = lazy(() => import('./pages/SharePage'));
 
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
@@ -87,16 +84,11 @@ function AppInner() {
               />
             }
           />
-          <Route path={ROUTES.ABOUT} element={<AboutPage />} />
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/auth/silent-callback" element={<SilentCallback />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route
-            path={ROUTES.PRICING}
-            element={<PricingPage showAlert={showAlert} subscription={subscription} />}
-          />
           <Route
             path={ROUTES.DASHBOARD}
             element={
@@ -113,7 +105,6 @@ function AppInner() {
               </ProtectedRoute>
             }
           />
-          <Route path={ROUTES.SHARE} element={<SharePage showAlert={showAlert} />} />
         </SentryRoutes>
       </Suspense>
     </>
