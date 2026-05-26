@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ tests/",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "gen:types": "openapi-typescript ../../../backend/openapi.json -o src/types/openapi.d.ts"
   },
   "devDependencies": {
