@@ -3,9 +3,9 @@ import './assets/css/App.css';
 import Alert from './components/layout/Alert';
 import EmailVerificationBanner from './components/layout/EmailVerificationBanner';
 import Navbar from './components/layout/Navbar';
-import Home from './pages/Home';
 import OnboardingModal from './components/layout/OnboardingModal';
 import PageSkeleton from './components/layout/PageSkeleton';
+import RemoteErrorBoundary from './components/layout/RemoteErrorBoundary';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { AuthCallback } from './auth/AuthCallback';
@@ -15,7 +15,33 @@ import { useOidcAuth } from './auth/useOidcAuth';
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
-const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+
+// Editor and Dashboard are loaded via the federation runtime when separate remote
+// builds are deployed (VITE_USE_REMOTES=true). In dev and single-build mode they
+// resolve to local imports — same components, zero extra latency, no network hop.
+//
+// To enable remote loading:
+//   VITE_USE_REMOTES=true + ensure remoteEntry-editor.js / remoteEntry-analytics.js
+//   are served at the URLs configured in vite.config.ts.
+const USE_REMOTES = import.meta.env.VITE_USE_REMOTES === 'true';
+
+const EditorPage = lazy(() => {
+  if (USE_REMOTES) {
+    return import('editor-remote/EditorPage')
+      .then((m) => ({ default: m.default }))
+      .catch(() => import('./pages/Home').then((m) => ({ default: m.default })));
+  }
+  return import('./pages/Home');
+});
+
+const DashboardPage = lazy(() => {
+  if (USE_REMOTES) {
+    return import('analytics-remote/AnalyticsPage')
+      .then((m) => ({ default: m.default }))
+      .catch(() => import('./pages/DashboardPage').then((m) => ({ default: m.default })));
+  }
+  return import('./pages/DashboardPage');
+});
 
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
@@ -73,15 +99,17 @@ function AppInner() {
           <Route
             path={ROUTES.HOME}
             element={
-              <Home
-                mode={mode}
-                setMode={setMode as (mode: string) => void}
-                showAlert={showAlert as (message: string, type: string) => void}
-                gamification={gamification}
-                user={user}
-                isAuthenticated={isAuthenticated}
-                subscription={subscription}
-              />
+              <RemoteErrorBoundary name="Editor">
+                <EditorPage
+                  mode={mode}
+                  setMode={setMode as (mode: string) => void}
+                  showAlert={showAlert as (message: string, type: string) => void}
+                  gamification={gamification}
+                  user={user}
+                  isAuthenticated={isAuthenticated}
+                  subscription={subscription}
+                />
+              </RemoteErrorBoundary>
             }
           />
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
@@ -93,15 +121,17 @@ function AppInner() {
             path={ROUTES.DASHBOARD}
             element={
               <ProtectedRoute>
-                <DashboardPage
-                  gamification={gamification}
-                  user={user}
-                  isAuthenticated={isAuthenticated}
-                  showAlert={showAlert}
-                  mode={mode}
-                  setMode={setMode as (mode: string) => void}
-                  subscription={subscription}
-                />
+                <RemoteErrorBoundary name="Dashboard">
+                  <DashboardPage
+                    gamification={gamification}
+                    user={user}
+                    isAuthenticated={isAuthenticated}
+                    showAlert={showAlert}
+                    mode={mode}
+                    setMode={setMode as (mode: string) => void}
+                    subscription={subscription}
+                  />
+                </RemoteErrorBoundary>
               </ProtectedRoute>
             }
           />

@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
+import { federation } from '@module-federation/vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -30,8 +31,56 @@ function manualChunks(id: string): string | undefined {
   }
 }
 
+// Remote entry URLs — used when VITE_USE_REMOTES=true (separate remote builds deployed).
+// In the default single-build mode these are unused; the shell loads components locally.
+// Override with env vars when deploying remotes independently (Sprint 9+).
+const EDITOR_REMOTE_ENTRY =
+  process.env.VITE_EDITOR_REMOTE_ENTRY ?? 'http://localhost:3001/app/remoteEntry.js'
+const ANALYTICS_REMOTE_ENTRY =
+  process.env.VITE_ANALYTICS_REMOTE_ENTRY ?? 'http://localhost:3002/app/remoteEntry.js'
+
 export default defineConfig({
   plugins: [
+    federation({
+      name: 'fixmytext-shell',
+      // Exposes both remote surfaces from this build so external hosts (other
+      // VeloBits apps, future shell) can consume them as federated remotes.
+      exposes: {
+        './EditorPage': './src/remotes/editor/index.ts',
+        './AnalyticsPage': './src/remotes/analytics/index.ts',
+      },
+      filename: 'remoteEntry.js',
+      // Manual type declarations live in src/types/federation.d.ts — skip auto-DTS.
+      dts: false,
+      // Remotes are only consumed when VITE_USE_REMOTES=true. In dev/CI the
+      // shell loads components locally (no network hop, no extra Vite server).
+      remotes: {
+        'editor-remote': {
+          type: 'module',
+          name: 'editor-remote',
+          entry: EDITOR_REMOTE_ENTRY,
+          entryGlobalName: 'editor-remote',
+          shareScope: 'default',
+        },
+        'analytics-remote': {
+          type: 'module',
+          name: 'analytics-remote',
+          entry: ANALYTICS_REMOTE_ENTRY,
+          entryGlobalName: 'analytics-remote',
+          shareScope: 'default',
+        },
+      },
+      // Shared singletons — prevents duplicate React contexts and Redux stores
+      // when remotes are loaded at runtime from separate origins.
+      shared: {
+        react: { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
+        'react-router-dom': { singleton: true, requiredVersion: '^7.0.0' },
+        '@reduxjs/toolkit': { singleton: true },
+        'react-redux': { singleton: true },
+        '@sentry/react': { singleton: true },
+      },
+    }),
     react(),
     tailwindcss(),
     sentryVitePlugin({
