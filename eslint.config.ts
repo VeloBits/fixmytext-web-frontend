@@ -9,7 +9,7 @@ import tseslint from 'typescript-eslint';
 export default [
   js.configs.recommended,
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['apps/web/src/**/*.{ts,tsx}'],
     plugins: {
       react,
       'react-hooks': reactHooks,
@@ -41,7 +41,7 @@ export default [
   },
   // Test files: add Vitest globals and relax rules that don't apply in tests
   {
-    files: ['src/**/*.test.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
+    files: ['apps/web/src/**/*.test.{ts,tsx}', 'apps/web/src/test/**/*.{ts,tsx}'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -57,7 +57,7 @@ export default [
     },
   },
   {
-    files: ['e2e/**/*.{ts,tsx}', '*.config.ts'],
+    files: ['apps/web/e2e/**/*.{ts,tsx}', 'apps/*/playwright.config.ts', '*.config.ts'],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -65,7 +65,15 @@ export default [
     },
   },
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/'],
+    ignores: [
+      'dist/',
+      'node_modules/',
+      'coverage/',
+      // Next.js auto-generated files — never edit or lint these
+      '**/next-env.d.ts',
+      '**/.next/**',
+      '**/tsconfig.tsbuildinfo',
+    ],
   },
   ...tseslint.config({
     files: ['**/*.{ts,tsx}'],
@@ -77,7 +85,7 @@ export default [
     },
   }),
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['apps/web/src/**/*.{ts,tsx}', 'packages/**/*.{ts,tsx}'],
     plugins: { security },
     rules: {
       ...security.configs.recommended.rules,
