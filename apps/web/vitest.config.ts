@@ -10,6 +10,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      // Module Federation remotes are resolved via the Vite plugin at build/dev time
+      // but Vitest runs outside the plugin pipeline. Alias the remote module IDs back
+      // to their local implementations so tests resolve without a running remote server.
+      'editor-remote/EditorPage': path.resolve(__dirname, 'src/remotes/editor/index.ts'),
+      'analytics-remote/AnalyticsPage': path.resolve(
+        __dirname,
+        'src/remotes/analytics/index.ts',
+      ),
     },
   },
   test: {
