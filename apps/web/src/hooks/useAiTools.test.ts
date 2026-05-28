@@ -732,4 +732,506 @@ describe('useAiTools', () => {
     }
     expect(mockTransformText).toHaveBeenCalledTimes(handlers.length);
   });
+
+  it('callAi multi-line text generates multi-line result message', async () => {
+    const { result } = renderAiTools('line one\nline two');
+    await act(async () => {
+      await result.current.handleHashtags!();
+    });
+    expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('generated for'), 'success');
+  });
+
+  it('callAi without pushHistory still succeeds', async () => {
+    const { result } = renderHook(() =>
+      useAiTools('hello', setText, setMarkdownMode, setPreviewMode, showAlert, undefined)
+    );
+    await act(async () => {
+      await (result.current as AiToolsWithDynamic).handleHashtags!();
+    });
+    expect(showAlert).toHaveBeenCalledWith('Hashtags generated', 'success');
+  });
+
+  describe('formatToolError branches', () => {
+    it('handles 403 with email_not_verified code and custom message', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 403,
+            data: { detail: { code: 'email_not_verified', message: 'Verify your email first' } },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleHashtags!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Verify your email first', 'warning');
+    });
+
+    it('handles 403 with email_not_verified code but no message (uses default)', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 403,
+            data: { detail: { code: 'email_not_verified' } },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleHashtags!();
+      });
+      expect(showAlert).toHaveBeenCalledWith(
+        'Please verify your email to use FixMyText tools.',
+        'warning'
+      );
+    });
+
+    it('handles 403 with object detail but non-email_not_verified code', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 403,
+            data: { detail: { code: 'other_code', message: 'Other 403 error' } },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleHashtags!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Other 403 error', 'danger');
+    });
+
+    it('handles 429 with object detail containing message', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 429,
+            data: { detail: { message: 'Too many requests today' } },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleSummarize!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Too many requests today', 'warning');
+    });
+
+    it('handles 429 with undefined detail (uses default message)', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 429,
+            data: {},
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleSummarize!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Daily limit reached. Please try again later.', 'warning');
+    });
+
+    it('handles 429 with null detail (uses default message)', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 429,
+            data: { detail: null },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleSummarize!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Daily limit reached. Please try again later.', 'warning');
+    });
+
+    it('handles generic error with object detail containing message', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 500,
+            data: { detail: { message: 'Internal server error' } },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleHashtags!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Internal server error', 'danger');
+    });
+
+    it('handles generic error with object detail but no message (uses fallback)', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 500,
+            data: { detail: { code: 'some_code' } },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleHashtags!();
+      });
+      expect(showAlert).toHaveBeenCalledWith(
+        'Could not generate hashtags. Please try again.',
+        'danger'
+      );
+    });
+
+    it('handles generic error with null detail (uses fallback)', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 500,
+            data: { detail: null },
+          }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleHashtags!();
+      });
+      expect(showAlert).toHaveBeenCalledWith(
+        'Could not generate hashtags. Please try again.',
+        'danger'
+      );
+    });
+  });
+
+  describe('handleContinueWriting', () => {
+    it('handles multi-paragraph text', async () => {
+      const { result } = renderHook(() =>
+        useAiTools(
+          'para one\n\npara two',
+          setText,
+          setMarkdownMode,
+          setPreviewMode,
+          showAlert,
+          pushHistory
+        )
+      );
+      await act(async () => {
+        await result.current.handleContinueWriting!();
+      });
+      expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('Continued'), 'success');
+    });
+
+    it('handles single paragraph', async () => {
+      const { result } = renderHook(() =>
+        useAiTools('single para', setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleContinueWriting!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Continue Writing generated', 'success');
+    });
+
+    it('does nothing when text is empty', async () => {
+      const { result } = renderAiTools('');
+      await act(async () => {
+        await result.current.handleContinueWriting!();
+      });
+      expect(mockTransformText).not.toHaveBeenCalled();
+    });
+
+    it('shows warning when not authenticated', async () => {
+      mockUseOidcAuth.mockReturnValue({
+        isAuthenticated: false,
+        isLoading: false,
+        accessToken: null,
+        oidcUser: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleContinueWriting!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Please log in to use AI tools', 'warning');
+    });
+
+    it('handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Continue failed' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleContinueWriting!();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Continue failed', 'danger');
+    });
+  });
+
+  describe('handleChangeTone error path', () => {
+    it('handles error with showAlert', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Tone error' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleChangeTone('casual');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Tone error', 'danger');
+    });
+  });
+
+  describe('handleTransliterate error path', () => {
+    it('handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Translit error' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleTransliterate('Hindi');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Translit error', 'danger');
+    });
+
+    it('does nothing when text is empty', async () => {
+      const { result } = renderAiTools('');
+      await act(async () => {
+        await result.current.handleTransliterate('Hindi');
+      });
+      expect(mockTransformText).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleTranslate error path', () => {
+    it('handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Translate error' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleTranslate('French');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Translate error', 'danger');
+    });
+
+    it('does nothing when text is empty', async () => {
+      const { result } = renderAiTools('');
+      await act(async () => {
+        await result.current.handleTranslate('French');
+      });
+      expect(mockTransformText).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleTranslate with autoDetect and no pushHistory', () => {
+    it('autoDetectLang with pushHistory undefined', async () => {
+      mockTransformText.mockReturnValue({ unwrap: () => Promise.resolve({ result: 'English' }) });
+      const { result } = renderHook(() =>
+        useAiTools('hello', setText, setMarkdownMode, setPreviewMode, showAlert, undefined)
+      );
+      await act(async () => {
+        result.current.setAutoDetectLang(true);
+      });
+      await act(async () => {
+        await result.current.handleTranslate('French');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Detected: English', 'info');
+    });
+  });
+
+  describe('handleSplitToLines and handleJoinLines error paths', () => {
+    it('handleSplitToLines handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Split error' } }),
+      });
+      const { result } = renderAiTools('a,b,c');
+      await act(async () => {
+        await result.current.handleSplitToLines();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Split error', 'danger');
+    });
+
+    it('handleSplitToLines does nothing when text is empty', async () => {
+      const { result } = renderAiTools('');
+      await act(async () => {
+        await result.current.handleSplitToLines();
+      });
+      expect(mockTransformText).not.toHaveBeenCalled();
+    });
+
+    it('handleJoinLines handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Join error' } }),
+      });
+      const { result } = renderAiTools('a\nb');
+      await act(async () => {
+        await result.current.handleJoinLines();
+      });
+      expect(showAlert).toHaveBeenCalledWith('Join error', 'danger');
+    });
+
+    it('handleJoinLines does nothing when text is empty', async () => {
+      const { result } = renderAiTools('');
+      await act(async () => {
+        await result.current.handleJoinLines();
+      });
+      expect(mockTransformText).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handlePadLines error path', () => {
+    it('handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Pad error' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handlePadLines('right');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Pad error', 'danger');
+    });
+
+    it('does nothing when text is empty', async () => {
+      const { result } = renderAiTools('');
+      await act(async () => {
+        await result.current.handlePadLines('right');
+      });
+      expect(mockTransformText).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleCaesarCipher and handleRailFence error paths', () => {
+    it('handleCaesarCipher handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Caesar error' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleCaesarCipher('3');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Caesar error', 'danger');
+    });
+
+    it('handleCaesarCipher does nothing when text is empty', async () => {
+      const { result } = renderAiTools('');
+      await act(async () => {
+        await result.current.handleCaesarCipher('3');
+      });
+      expect(mockTransformText).not.toHaveBeenCalled();
+    });
+
+    it('handleRailFenceEnc handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Rail error' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleRailFenceEnc('3');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Rail error', 'danger');
+    });
+
+    it('handleRailFenceDec handles error', async () => {
+      mockTransformText.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 500, data: { detail: 'Rail dec error' } }),
+      });
+      const { result } = renderAiTools('hello');
+      await act(async () => {
+        await result.current.handleRailFenceDec('3');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Rail dec error', 'danger');
+    });
+  });
+
+  describe('handleDateFormat with multi-line input', () => {
+    it('formats multiple date lines', async () => {
+      const { result } = renderHook(() =>
+        useAiTools(
+          '2024-01-15\n2024-06-20',
+          setText,
+          setMarkdownMode,
+          setPreviewMode,
+          showAlert,
+          pushHistory
+        )
+      );
+      await act(async () => {
+        await result.current.handleDateFormat('iso');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Date formatted as iso', 'success');
+    });
+
+    it('formats as unix format type', async () => {
+      const { result } = renderHook(() =>
+        useAiTools('2024-01-15', setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleDateFormat('unix');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Date formatted as unix', 'success');
+    });
+  });
+
+  describe('handleCurlToCode extra branches', () => {
+    it('converts to unknown target (falls through to raw cmd)', async () => {
+      const curlText = "curl 'https://api.example.com'";
+      const { result } = renderHook(() =>
+        useAiTools(curlText, setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleCurlToCode('ruby');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Converted to ruby', 'success');
+    });
+
+    it('converts multiple curl commands', async () => {
+      const curlText =
+        "curl 'https://api.example.com/a'\ncurl 'https://api.example.com/b'";
+      const { result } = renderHook(() =>
+        useAiTools(curlText, setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleCurlToCode('javascript');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Converted 2 commands to javascript', 'success');
+    });
+
+    it('converts python with body', async () => {
+      const curlText =
+        "curl -X POST 'https://api.example.com' -H 'Content-Type: application/json' -d 'key=value'";
+      const { result } = renderHook(() =>
+        useAiTools(curlText, setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleCurlToCode('python');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Converted to python', 'success');
+    });
+
+    it('converts javascript with headers and body', async () => {
+      const curlText =
+        "curl -X POST 'https://api.example.com' -H 'Content-Type: application/json' -d 'body=data'";
+      const { result } = renderHook(() =>
+        useAiTools(curlText, setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleCurlToCode('javascript');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Converted to javascript', 'success');
+    });
+
+    it('handles input with no curl command (uses full collapsed text)', async () => {
+      const { result } = renderHook(() =>
+        useAiTools('not a curl', setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleCurlToCode('javascript');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Converted to javascript', 'success');
+    });
+
+    it('converts python without body (else branch)', async () => {
+      const curlText = "curl -X GET 'https://api.example.com' -H 'Accept: application/json'";
+      const { result } = renderHook(() =>
+        useAiTools(curlText, setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      );
+      await act(async () => {
+        await result.current.handleCurlToCode('python');
+      });
+      expect(showAlert).toHaveBeenCalledWith('Converted to python', 'success');
+    });
+  });
 });

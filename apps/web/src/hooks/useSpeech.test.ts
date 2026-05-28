@@ -186,6 +186,45 @@ describe('useSpeech', () => {
     expect(result.current.listening).toBe(false);
   });
 
+  it('appends transcript to existing text (prev non-empty branch)', () => {
+    const mockRecognition = {
+      start: vi.fn(),
+      stop: vi.fn(),
+      continuous: false,
+      interimResults: false,
+      lang: '',
+      onresult: null as unknown,
+      onerror: null,
+      onend: null,
+    };
+    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+
+    const { result } = renderHook(() => useSpeech('existing text', setText, showAlert));
+    act(() => {
+      result.current.handleSpeechToText();
+    });
+
+    const resultEvent = {
+      results: {
+        0: { 0: { transcript: 'new words' }, length: 1 },
+        length: 1,
+        [Symbol.iterator]: function* (this: { length: number; [key: number]: unknown }): Generator<unknown> {
+          for (let i = 0; i < this.length; i++) yield (this as Record<number, unknown>)[i];
+        },
+      },
+    };
+
+    act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockRecognition.onresult as any)(resultEvent);
+    });
+
+    // setText is called with a function — call it with both prev states to cover both ternary branches
+    const setterFn = (setText as ReturnType<typeof vi.fn>).mock.calls[0]![0] as (prev: string) => string;
+    expect(setterFn('existing text')).toBe('existing text new words');
+    expect(setterFn('')).toBe('new words');
+  });
+
   it('uses webkitSpeechRecognition fallback', () => {
     delete win.SpeechRecognition;
     const mockRecognition = {

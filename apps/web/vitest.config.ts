@@ -35,14 +35,11 @@ export default defineConfig({
         '**/*.config.js',
         'src/index.jsx',
       ],
-      // Thresholds calibrated to actual coverage after the app moved to apps/web/.
-      // Gaps remain in the editor's complex hook files (react-hooks/exhaustive-deps
-      // patterns) and RTKQ API slices. Raise toward 80% as tests expand.
       thresholds: {
-        lines: 68,
-        branches: 59,
-        functions: 60,
-        statements: 66,
+        lines: 70,
+        branches: 70,
+        functions: 70,
+        statements: 70,
       },
     },
     include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],

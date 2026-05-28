@@ -34,11 +34,13 @@ vi.mock('blakejs', () => ({
 }));
 
 vi.mock('whirlpool-hash', () => {
-  const finalize = vi.fn(() => 'whirlpool-bytes');
-  const update = vi.fn();
+  class Whirlpool {
+    update = vi.fn();
+    finalize = vi.fn(() => 'whirlpool-bytes');
+  }
   return {
     default: {
-      Whirlpool: vi.fn(() => ({ update, finalize })),
+      Whirlpool,
       encoders: { toHex: vi.fn(() => 'whirlpool-hex') },
     },
   };
@@ -310,6 +312,48 @@ describe('useHashTools', () => {
       const calls = deps.setLocalLoading.mock.calls;
       expect(calls[0]).toEqual([true]);
       expect(calls[calls.length - 1]).toEqual([false]);
+    });
+  });
+
+  // --- All remaining handlers via happy-path batch ---
+
+  describe('remaining dynamic-import handlers', () => {
+    const remaining: Array<keyof ReturnType<typeof useHashTools>> = [
+      'handleSha224',
+      'handleSha384',
+      'handleSha512',
+      'handleSha512_224',
+      'handleSha512_256',
+      'handleSha3_224',
+      'handleSha3_256',
+      'handleSha3_384',
+      'handleSha3_512',
+      'handleKeccak256',
+      'handleRipemd160',
+      'handleBlake2b',
+      'handleBlake2s',
+      'handleWhirlpool',
+      'handleXxhash',
+      'handleMurmurHash3',
+    ];
+
+    it.each(remaining)('%s executes and calls showAlert with success', async (handlerName) => {
+      const deps = makeDeps('test');
+      const { result } = renderHook(() => useHashTools(deps));
+      await (result.current[handlerName] as () => Promise<void>)();
+      expect(deps.setLocalLoading).toHaveBeenCalledWith(true);
+      expect(deps.showAlert).toHaveBeenCalledWith(expect.stringContaining('generated'), 'success');
+      expect(deps.setLocalLoading).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('multiline text path', () => {
+    it('handleCrc32 joins per-line hashes when text contains newlines', async () => {
+      const deps = makeDeps('abc\ndef');
+      const { result } = renderHook(() => useHashTools(deps));
+      await result.current.handleCrc32();
+      const call = deps.setAiResult.mock.calls[0]?.[0] as { result: string };
+      expect(call.result).toContain('\n');
     });
   });
 });

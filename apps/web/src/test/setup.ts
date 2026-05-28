@@ -8,6 +8,14 @@ expect.extend(axeMatchers);
 // jsdom doesn't implement scrollIntoView
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
+// jsdom doesn't implement ResizeObserver
+class ResizeObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
+
 // Prevent Sentry from sending real events during tests
 vi.mock('@sentry/react', () => ({
   init: vi.fn(),
