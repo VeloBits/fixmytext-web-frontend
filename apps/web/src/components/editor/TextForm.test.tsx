@@ -392,6 +392,9 @@ vi.mock('@/components/drawers/DevToolsDrawer', () => ({
 vi.mock('./SmartSuggestions', () => ({
   default: () => React.createElement('div', { 'data-testid': 'smart-suggestions' }),
 }));
+vi.mock('./ParagraphGutter', () => ({
+  default: () => React.createElement('div', { 'data-testid': 'paragraph-gutter' }),
+}));
 vi.mock('./BottomPanel', () => ({
   default: () => React.createElement('div', { 'data-testid': 'bottom-panel' }),
 }));
@@ -809,5 +812,123 @@ describe('TextForm', () => {
   it('has no axe violations', async () => {
     const { container } = render(<TextForm {...defaultProps} />);
     await expectNoA11yViolations(container);
+  });
+
+  // --- Settings menu button interactions ---
+
+  it('clicking theme toggle in settings calls setMode', () => {
+    render(<TextForm {...defaultProps} mode="dark" />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const themeBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Light Theme')
+    );
+    fireEvent.click(themeBtn!);
+    expect(defaultProps.setMode).toHaveBeenCalledWith('light');
+  });
+
+  it('clicking command palette in settings opens search', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const cpBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Command Palette')
+    );
+    expect(cpBtn).toBeTruthy();
+    fireEvent.click(cpBtn!);
+    expect(document.querySelector('.tu-settings-menu')).not.toBeInTheDocument();
+  });
+
+  it('clicking dashboard in settings closes the menu', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const dashBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Dashboard')
+    );
+    expect(dashBtn).toBeTruthy();
+    fireEvent.click(dashBtn!);
+    expect(document.querySelector('.tu-settings-menu')).not.toBeInTheDocument();
+  });
+
+  it('clicking keyboard shortcuts in settings closes the menu', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const kbBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Keyboard Shortcuts')
+    );
+    expect(kbBtn).toBeTruthy();
+    fireEvent.click(kbBtn!);
+    expect(document.querySelector('.tu-settings-menu')).not.toBeInTheDocument();
+  });
+
+  it('clicking Sign In in settings closes the menu (unauthenticated)', () => {
+    render(<TextForm {...defaultProps} isAuthenticated={false} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const signInBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Sign In')
+    );
+    expect(signInBtn).toBeTruthy();
+    fireEvent.click(signInBtn!);
+    expect(document.querySelector('.tu-settings-menu')).not.toBeInTheDocument();
+  });
+
+  it('clicking Sign Out in settings closes the menu (authenticated)', () => {
+    const props = {
+      ...defaultProps,
+      isAuthenticated: true,
+      user: { display_name: 'Alice', email: 'alice@example.com' },
+    };
+    render(<TextForm {...props} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const signOutBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Sign Out')
+    );
+    expect(signOutBtn).toBeTruthy();
+    fireEvent.click(signOutBtn!);
+    expect(document.querySelector('.tu-settings-menu')).not.toBeInTheDocument();
+  });
+
+  it('clicking Upgrade to Pro in settings closes the menu', () => {
+    const props = {
+      ...defaultProps,
+      isAuthenticated: true,
+      user: { display_name: 'Free User', email: 'free@example.com' },
+      subscription: { isPro: false, checkToolAccess: vi.fn(() => true), refetchStatus: vi.fn(), totalCredits: 0 },
+    };
+    render(<TextForm {...props} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const upgradeBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Upgrade to Pro')
+    );
+    expect(upgradeBtn).toBeTruthy();
+    fireEvent.click(upgradeBtn!);
+    expect(document.querySelector('.tu-settings-menu')).not.toBeInTheDocument();
+  });
+
+  it('clicking a tool in ToolPanel opens a workspace tab', () => {
+    render(<TextForm {...defaultProps} />);
+    const toolPanel = screen.getByTestId('tool-panel');
+    fireEvent.click(toolPanel);
+    expect(document.querySelector('.tu-editor-split')).toBeInTheDocument();
+  });
+
+  it('workspace shows output panel for active tool', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(screen.getByTestId('tool-panel'));
+    expect(document.querySelector('.tu-editor-output')).toBeInTheDocument();
+  });
+
+  it('renders light theme toggle text when mode is light', () => {
+    render(<TextForm {...defaultProps} mode="light" />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    expect(screen.getByText('Dark Theme')).toBeInTheDocument();
+  });
+
+  it('clicking light theme toggle calls setMode with dark', () => {
+    render(<TextForm {...defaultProps} mode="light" />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar')!);
+    const themeBtn = Array.from(document.querySelectorAll('.tu-settings-item')).find((el) =>
+      el.textContent?.includes('Dark Theme')
+    );
+    fireEvent.click(themeBtn!);
+    expect(defaultProps.setMode).toHaveBeenCalledWith('dark');
   });
 });

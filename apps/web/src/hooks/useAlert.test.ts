@@ -135,4 +135,102 @@ describe('useAlert', () => {
     });
     expect(result.current.alerts[0]!.type).toBe('info');
   });
+
+  // ── message coercion (lines 52-69 in useAlert.ts) ──────────────────────────
+
+  it('coerces an array of strings into a semicolon-separated message', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert(['error one', 'error two'], 'danger', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toBe('error one; error two');
+  });
+
+  it('coerces an array of objects with msg property', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert([{ msg: 'field required' }, { msg: 'too short' }], 'danger', {
+        duration: 0,
+      });
+    });
+    expect(result.current.alerts[0]!.msg).toBe('field required; too short');
+  });
+
+  it('coerces array items without msg using JSON.stringify', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert([{ code: 'E001' }], 'danger', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toContain('E001');
+  });
+
+  it('coerces mixed array (string and object) items', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert(['plain string', { msg: 'obj msg' }], 'danger', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toBe('plain string; obj msg');
+  });
+
+  it('coerces an object with msg property', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert({ msg: 'server error' }, 'danger', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toBe('server error');
+  });
+
+  it('coerces an object with message property (no msg)', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert({ message: 'network failure' }, 'danger', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toBe('network failure');
+  });
+
+  it('coerces an object without msg or message via JSON.stringify', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert({ code: 'E42', detail: 'unknown' }, 'danger', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toContain('E42');
+  });
+
+  it('coerces a number via String()', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert(42, 'info', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toBe('42');
+  });
+
+  it('coerces null via String()', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert(null, 'info', { duration: 0 });
+    });
+    expect(result.current.alerts[0]!.msg).toBe('null');
+  });
+
+  it('dismissAlert with non-existent id does not throw (covers if-alert false branch)', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert('hello', 'info', { duration: 0 });
+    });
+    expect(result.current.alerts).toHaveLength(1);
+    // Dismiss with an ID that doesn't match any alert — should be a no-op
+    act(() => {
+      result.current.dismissAlert(999999);
+    });
+    expect(result.current.alerts).toHaveLength(1);
+  });
+
+  it('deduplicates identical alerts (does not add same msg+type twice)', () => {
+    const { result } = renderHook(() => useAlert());
+    act(() => {
+      result.current.showAlert('dup', 'info', { duration: 0 });
+      result.current.showAlert('dup', 'info', { duration: 0 });
+    });
+    expect(result.current.alerts).toHaveLength(1);
+  });
 });
