@@ -108,7 +108,7 @@ describe('initSentry callback branches', () => {
   it('beforeSend scrubs request.data when it is an object', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://test@sentry.io/123');
     initSentry();
-    const { beforeSend } = vi.mocked(Sentry.init).mock.calls[0]?.[0] as {
+    const { beforeSend } = vi.mocked(Sentry.init).mock.calls[0]?.[0] as unknown as {
       beforeSend: (e: Record<string, unknown>) => unknown;
     };
     const event = { request: { data: { text: 'secret', safe: 'ok' } } };
@@ -120,7 +120,7 @@ describe('initSentry callback branches', () => {
   it('beforeSend scrubs event.extra when present', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://test@sentry.io/123');
     initSentry();
-    const { beforeSend } = vi.mocked(Sentry.init).mock.calls[0]?.[0] as {
+    const { beforeSend } = vi.mocked(Sentry.init).mock.calls[0]?.[0] as unknown as {
       beforeSend: (e: Record<string, unknown>) => unknown;
     };
     const event = { extra: { token: 'abc', id: 1 } };
@@ -132,7 +132,7 @@ describe('initSentry callback branches', () => {
   it('beforeSend returns event unchanged when no request.data or extra', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://test@sentry.io/123');
     initSentry();
-    const { beforeSend } = vi.mocked(Sentry.init).mock.calls[0]?.[0] as {
+    const { beforeSend } = vi.mocked(Sentry.init).mock.calls[0]?.[0] as unknown as {
       beforeSend: (e: Record<string, unknown>) => unknown;
     };
     const event = { message: 'error occurred' };
