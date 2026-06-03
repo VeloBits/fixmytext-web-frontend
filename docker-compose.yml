@@ -1,54 +1,173 @@
-# fixmytext-frontend — unified compose file with profiles.
+# fixmytext-frontend — unified compose for all microfrontends.
 #
 # Profiles:
-#   dev   development stack  (hot reload, source volumes)
-#   prod  production stack   (multi-stage builds, nginx)
+#   dev  — Vite dev servers + next dev (hot reload, volume-mounted source)
+#   prod — Built nginx containers + wrangler pages dev (Cloudflare simulation)
 #
 # Usage:
-#   docker compose --profile dev up --build     # dev
-#   docker compose --profile prod up --build    # prod
-#
+#   docker compose --profile dev up --build
+#   docker compose --profile prod up --build
+
 services:
 
-  # ══════════════════════════════════════════════════════════════════════════
-  # DEV  —  profile: dev
-  # ══════════════════════════════════════════════════════════════════════════
-  frontend-dev:
+  # ── Router — dev ──────────────────────────────────────────────────────────────
+  router:
     profiles: ["dev"]
     build:
       context: .
-      dockerfile: Dockerfile.dev
-    container_name: fixmytext-frontend-dev
+      dockerfile: docker/Dockerfile.router
+      args:
+        NGINX_CONF: docker/nginx.router.dev.conf
+    container_name: fixmytext-router
     ports:
-      - "3000:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - .:/app               # mount project root — Vite hot-reloads on change
-      - /app/node_modules    # preserve container's node_modules
-    environment:
-      - VITE_API_URL=http://localhost:8000
+      - "3000:80"
+    depends_on:
+      - shell-dev
+      - editor-remote-dev
+      - analytics-remote-dev
+      - content-dev
+    restart: unless-stopped
 
-  # ══════════════════════════════════════════════════════════════════════════
-  # PROD  —  profile: prod
-  # ═════════════════════════════════════════════════════════════════════════════════
-  frontend-prod:
+  # ── Router — prod ─────────────────────────────────────────────────────────────
+  router-prod:
     profiles: ["prod"]
     build:
       context: .
-      dockerfile: Dockerfile
-      target: runtime
+      dockerfile: docker/Dockerfile.router
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
-    container_name: fixmytext-frontend-prod
-    restart: unless-stopped
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+        NGINX_CONF: docker/nginx.router.prod.conf
+    container_name: fixmytext-router-prod
     ports:
-      - "80:8080"
+      - "3000:80"
+    depends_on:
+      - shell-prod
+      - editor-remote-prod
+      - analytics-remote-prod
+      - content-prod
+    restart: unless-stopped
+
+  # ── Shell — dev ────────────────────────────────────────────────────────────────
+  shell-dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vite.dev
+      args:
+        APP_WORKSPACE: "@velobits/shell"
+    container_name: fixmytext-shell-dev
+    ports:
+      - "3100:3100"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file: .env.docker.dev
+    restart: unless-stopped
+
+  # ── Shell — prod ───────────────────────────────────────────────────────────────
+  shell-prod:
+    profiles: ["prod"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vite.prod
+      args:
+        APP_WORKSPACE: "@velobits/shell"
+        APP_PATH: "apps/shell"
+    container_name: fixmytext-shell-prod
+    env_file: .env.docker.prod
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
+
+  # ── Editor Remote — dev ────────────────────────────────────────────────────────
+  editor-remote-dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vite.dev
+      args:
+        APP_WORKSPACE: "@velobits/editor-remote"
+    container_name: fixmytext-editor-dev
+    ports:
+      - "3101:3101"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file: .env.docker.dev
+    restart: unless-stopped
+
+  # ── Editor Remote — prod ───────────────────────────────────────────────────────
+  editor-remote-prod:
+    profiles: ["prod"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vite.prod
+      args:
+        APP_WORKSPACE: "@velobits/editor-remote"
+        APP_PATH: "apps/editor-remote"
+    container_name: fixmytext-editor-prod
+    env_file: .env.docker.prod
+    restart: unless-stopped
+
+  # ── Analytics Remote — dev ─────────────────────────────────────────────────────
+  analytics-remote-dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vite.dev
+      args:
+        APP_WORKSPACE: "@velobits/analytics-remote"
+    container_name: fixmytext-analytics-dev
+    ports:
+      - "3102:3102"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file: .env.docker.dev
+    restart: unless-stopped
+
+  # ── Analytics Remote — prod ────────────────────────────────────────────────────
+  analytics-remote-prod:
+    profiles: ["prod"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vite.prod
+      args:
+        APP_WORKSPACE: "@velobits/analytics-remote"
+        APP_PATH: "apps/analytics-remote"
+    container_name: fixmytext-analytics-prod
+    env_file: .env.docker.prod
+    restart: unless-stopped
+
+  # ── Content — dev ──────────────────────────────────────────────────────────────
+  content-dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.content.dev
+    container_name: fixmytext-content-dev
+    ports:
+      - "3103:3103"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file: .env.docker.dev
+    restart: unless-stopped
+
+  # ── Content — prod ─────────────────────────────────────────────────────────────
+  content-prod:
+    profiles: ["prod"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.content.prod
+    container_name: fixmytext-content-prod
+    env_file: .env.docker.prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3103"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
