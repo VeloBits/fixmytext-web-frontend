@@ -101,10 +101,5 @@
     "deploy:analytics": "npm run build:analytics && npx wrangler pages deploy apps/analytics-remote/dist --project-name fixmytext-analytics-remote",
     "deploy:content": "npm run build:cf -w @velobits/content-app && cd apps/content && npx wrangler deploy",
     "deploy:worker": "npm run deploy -w @velobits/cf-router-worker"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
-    ]
   }
 }
