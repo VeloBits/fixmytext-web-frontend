@@ -13,5 +13,5 @@
       "@velobits/tools-registry/*": ["../../packages/tools-registry/src/*"]
     }
   },
-  "include": ["src/**/*", "vite.config.ts"]
+  "include": ["src/**/*", "vite.config.ts", "../shell/src/types/*.d.ts"]
 }

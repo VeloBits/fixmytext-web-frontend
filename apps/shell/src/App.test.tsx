@@ -90,6 +90,11 @@ vi.mock('./hooks/useSubscription', () => ({
 }));
 
 // ── child component mocks ──
+// App.tsx loads the home route via editor-remote/EditorPage (MF remote).
+// Mock the remote module directly so the route renders the expected test element.
+vi.mock('editor-remote/EditorPage', () => ({
+  default: () => React.createElement('div', { 'data-testid': 'home-page' }),
+}));
 vi.mock('./pages/Home', () => ({
   default: () => React.createElement('div', { 'data-testid': 'home-page' }),
 }));

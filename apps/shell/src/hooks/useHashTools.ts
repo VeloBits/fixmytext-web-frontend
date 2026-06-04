@@ -157,7 +157,7 @@ const useHashTools = ({
     const handleWhirlpool = createHashHandler('whirlpool', 'Whirlpool Hash', async (t) => {
       const m = await import('whirlpool-hash');
       const w = new m.default.Whirlpool();
-      w.update(t);
+      w.update(Buffer.from(t));
       return m.default.encoders.toHex(w.finalize());
     });
     const handleCrc32 = createHashHandler('crc32', 'CRC32 Checksum', async (t) => crc32Fn(t));
