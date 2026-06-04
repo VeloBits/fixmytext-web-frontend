@@ -15,6 +15,6 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.e2e.json"
   },
   "dependencies": {
-    "@module-federation/vite": "^1.15.5"
+    "@module-federation/vite": "^1.16.2"
   }
 }

@@ -72,6 +72,15 @@
     "vitest": "^4.1.6",
     "vitest-axe": "^0.1.0"
   },
+  "overrides": {
+    "ws": "8.21.0",
+    "@module-federation/dts-plugin": {
+      "ws": "8.21.0"
+    },
+    "next": {
+      "postcss": "^8.5.15"
+    }
+  },
   "scripts": {
     "dev": "npm run dev -w @velobits/shell",
     "dev:shell": "npm run dev -w @velobits/shell",

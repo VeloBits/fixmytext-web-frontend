@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
-    "@module-federation/vite": "^1.15.5"
+    "@module-federation/vite": "^1.16.2"
   },
   "peerDependencies": {
     "react": "^19.0.0",

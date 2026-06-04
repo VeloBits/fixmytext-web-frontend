@@ -19,7 +19,7 @@
     "@velobits/auth-shared": "*",
     "@velobits/design-system": "*",
     "@velobits/tools-registry": "*",
-    "next": "^15.3.2",
+    "next": "^15.5.19",
     "next-auth": "^5.0.0-beta.28",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -34,6 +34,6 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
     "typescript": "^6.0.3",
-    "wrangler": "^3.99.0"
+    "wrangler": "^4.97.0"
   }
 }
