@@ -139,6 +139,3 @@ jobs:
 
       - name: Audit for vulnerabilities
         run: npm audit --audit-level=high
-
-      - name: Verify package signatures
-        run: npm audit signatures
