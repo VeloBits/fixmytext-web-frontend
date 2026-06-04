@@ -6,7 +6,8 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "worker"
   ],
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
@@ -71,25 +72,43 @@
     "vitest": "^4.1.6",
     "vitest-axe": "^0.1.0"
   },
+  "overrides": {
+    "ws": "8.21.0",
+    "@module-federation/dts-plugin": {
+      "ws": "8.21.0"
+    },
+    "next": {
+      "postcss": "^8.5.15"
+    }
+  },
   "scripts": {
-    "dev": "npm run dev -w @velobits/web-app",
-    "build": "npm run build -w @velobits/web-app",
-    "preview": "npm run preview -w @velobits/web-app",
-    "lint": "eslint apps/web/src/ packages/ && npm run --workspaces --if-present lint",
-    "lint:fix": "eslint apps/web/src/ packages/ --fix",
-    "test": "npm run test -w @velobits/web-app",
-    "test:watch": "npm run test:watch -w @velobits/web-app",
-    "test:coverage": "npm run test:coverage -w @velobits/web-app",
+    "dev": "npm run dev -w @velobits/shell",
+    "dev:shell": "npm run dev -w @velobits/shell",
+    "dev:editor": "npm run dev -w @velobits/editor-remote",
+    "dev:analytics": "npm run dev -w @velobits/analytics-remote",
+    "dev:content": "npm run dev -w @velobits/content-app",
+    "build": "npm run build -w @velobits/shell",
+    "build:all": "npm run build -w @velobits/shell && npm run build -w @velobits/editor-remote && npm run build -w @velobits/analytics-remote && npm run build -w @velobits/content-app",
+    "build:shell": "npm run build -w @velobits/shell",
+    "build:editor": "npm run build -w @velobits/editor-remote",
+    "build:analytics": "npm run build -w @velobits/analytics-remote",
+    "build:content": "npm run build -w @velobits/content-app",
+    "preview": "npm run preview -w @velobits/shell",
+    "lint": "eslint apps/shell/src/ apps/editor-remote/src/ apps/analytics-remote/src/ packages/ && npm run --workspaces --if-present lint",
+    "lint:fix": "eslint apps/shell/src/ apps/editor-remote/src/ apps/analytics-remote/src/ packages/ --fix",
+    "test": "npm run test -w @velobits/shell",
+    "test:watch": "npm run test:watch -w @velobits/shell",
+    "test:coverage": "npm run test:coverage -w @velobits/shell",
     "test:packages": "npm run --workspaces --if-present test",
-    "test:e2e": "npm run test:e2e -w @velobits/web-app",
+    "test:e2e": "npm run test:e2e -w @velobits/shell",
     "test:e2e:install": "playwright install --with-deps chromium",
     "gen:types": "openapi-typescript ../backend/openapi.json -o packages/api-client/src/types/openapi.d.ts",
     "typecheck": "npm run --workspaces --if-present typecheck",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
-    ]
+    "prepare": "husky",
+    "deploy:shell": "npm run build:shell && npx wrangler pages deploy apps/shell/dist --project-name fixmytext-shell",
+    "deploy:editor": "npm run build:editor && npx wrangler pages deploy apps/editor-remote/dist --project-name fixmytext-editor-remote",
+    "deploy:analytics": "npm run build:analytics && npx wrangler pages deploy apps/analytics-remote/dist --project-name fixmytext-analytics-remote",
+    "deploy:content": "npm run build:cf -w @velobits/content-app && cd apps/content && npx wrangler deploy",
+    "deploy:worker": "npm run deploy -w @velobits/cf-router-worker"
   }
 }
