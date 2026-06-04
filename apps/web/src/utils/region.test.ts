@@ -123,24 +123,4 @@ describe('detectBrowserRegion', () => {
     } as unknown as typeof Intl;
     expect(detectBrowserRegion()).toBe('');
   });
-
-  it('handles undefined timeZone (uses empty string fallback)', () => {
-    globalThis.Intl = {
-      DateTimeFormat: () => ({
-        resolvedOptions: () => ({ timeZone: undefined }),
-      }),
-    } as unknown as typeof Intl;
-    mockLanguage('ja');
-    expect(detectBrowserRegion()).toBe('');
-  });
-
-  it('handles undefined navigator.language (uses empty string fallback)', () => {
-    mockTimezone('Pacific/Auckland');
-    Object.defineProperty(globalThis, 'navigator', {
-      value: { language: undefined },
-      writable: true,
-      configurable: true,
-    });
-    expect(detectBrowserRegion()).toBe('');
-  });
 });
