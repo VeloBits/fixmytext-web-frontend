@@ -1,0 +1,71 @@
+# Multi-stage Vite production build.
+# Build args:
+#   APP_WORKSPACE — npm workspace name, e.g. @velobits/shell
+#   APP_PATH      — path from monorepo root, e.g. apps/shell
+
+ARG APP_WORKSPACE=@velobits/shell
+ARG APP_PATH=apps/shell
+
+# ── Stage 1: Build ─────────────────────────────────────────────────────────────
+FROM node:24-alpine AS builder
+
+ARG APP_WORKSPACE
+ARG APP_PATH
+
+WORKDIR /app
+
+# Copy workspace manifests first for better layer caching
+COPY package.json package-lock.json ./
+COPY apps/shell/package.json             ./apps/shell/
+COPY apps/editor-remote/package.json     ./apps/editor-remote/
+COPY apps/analytics-remote/package.json  ./apps/analytics-remote/
+COPY apps/content/package.json           ./apps/content/
+COPY packages/api-client/package.json    ./packages/api-client/
+COPY packages/auth-shared/package.json   ./packages/auth-shared/
+COPY packages/design-system/package.json ./packages/design-system/
+COPY packages/tools-registry/package.json ./packages/tools-registry/
+
+RUN npm ci --silent
+
+# Copy all source (packages + apps/shell since remotes resolve @/ from there)
+COPY packages/ ./packages/
+COPY apps/shell/ ./apps/shell/
+COPY ${APP_PATH}/ ./${APP_PATH}/
+
+# Vite bakes env vars at build time
+ARG VITE_API_URL
+ARG VITE_KEYCLOAK_URL
+ARG VITE_KEYCLOAK_REALM
+ARG VITE_KEYCLOAK_CLIENT_ID
+ARG VITE_KEYCLOAK_ENABLED_PROVIDERS
+ARG VITE_EDITOR_REMOTE_ENTRY
+ARG VITE_ANALYTICS_REMOTE_ENTRY
+ARG VITE_SENTRY_DSN
+ARG VITE_SENTRY_ENVIRONMENT
+
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL \
+    VITE_KEYCLOAK_REALM=$VITE_KEYCLOAK_REALM \
+    VITE_KEYCLOAK_CLIENT_ID=$VITE_KEYCLOAK_CLIENT_ID \
+    VITE_KEYCLOAK_ENABLED_PROVIDERS=$VITE_KEYCLOAK_ENABLED_PROVIDERS \
+    VITE_EDITOR_REMOTE_ENTRY=$VITE_EDITOR_REMOTE_ENTRY \
+    VITE_ANALYTICS_REMOTE_ENTRY=$VITE_ANALYTICS_REMOTE_ENTRY \
+    VITE_SENTRY_DSN=$VITE_SENTRY_DSN \
+    VITE_SENTRY_ENVIRONMENT=$VITE_SENTRY_ENVIRONMENT
+
+RUN npm run build -w ${APP_WORKSPACE}
+RUN find /app/${APP_PATH}/dist -name "*.map" -delete
+
+# ── Stage 2: Serve ─────────────────────────────────────────────────────────────
+FROM nginx:1.27-alpine AS runtime
+
+# Re-declare ARGs so they're available in this stage (Docker ARGs don't carry across stages)
+ARG APP_PATH=apps/shell
+
+RUN rm /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx docker/nginx.static.conf /etc/nginx/conf.d/app.conf
+COPY --chown=nginx:nginx --from=builder /app/${APP_PATH}/dist /usr/share/nginx/html
+
+USER nginx
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]

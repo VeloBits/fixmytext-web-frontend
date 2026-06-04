@@ -1,7 +1,7 @@
 {
   "files": [],
   "references": [
-    { "path": "./apps/web" },
+    { "path": "./apps/shell" },
     { "path": "./apps/content" },
     { "path": "./packages/design-system" },
     { "path": "./packages/api-client" },

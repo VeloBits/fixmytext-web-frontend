@@ -1,0 +1,32 @@
+# apps/content production image.
+# Runs: @opennextjs/cloudflare build (handles next build internally) → wrangler dev
+# Single-stage so wrangler and its node_modules are available at runtime.
+
+FROM node:24-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+COPY apps/content/package.json            ./apps/content/
+COPY packages/api-client/package.json     ./packages/api-client/
+COPY packages/auth-shared/package.json    ./packages/auth-shared/
+COPY packages/design-system/package.json  ./packages/design-system/
+COPY packages/tools-registry/package.json ./packages/tools-registry/
+
+RUN npm ci --silent
+
+COPY packages/ ./packages/
+COPY apps/content/ ./apps/content/
+
+ARG NEXT_PUBLIC_API_URL
+ARG AUTH_SECRET
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+    AUTH_SECRET=$AUTH_SECRET \
+    NODE_ENV=production
+
+RUN npm run build:cf -w @velobits/content-app
+
+EXPOSE 3103
+
+WORKDIR /app/apps/content
+CMD ["npx", "wrangler", "dev", "--port", "3103", "--ip", "0.0.0.0"]
