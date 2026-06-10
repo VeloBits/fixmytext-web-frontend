@@ -2506,6 +2506,12 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
 }
 
 /* ── Responsive: Mobile ──────────────────────────── */
+/* Mobile-only chrome — hidden by default (desktop), revealed at ≤768px below. */
+.tu-mobile-cmdbar,
+.tu-sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .tu-forge {
     grid-template-columns: 1fr;
@@ -2515,9 +2521,43 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   .tu-activity-bar {
     display: none;
   }
+
+  /* Sidebar becomes an off-canvas sheet that slides in over the editor.
+     Driven by the existing sidebarOpen state via tu-forge--sidebar-collapsed,
+     so no new React state is needed. */
   .tu-forge-sidebar {
-    display: none;
+    position: fixed;
+    left: 0;
+    top: var(--app-chrome-offset);
+    bottom: 52px;
+    width: min(86vw, 320px);
+    z-index: 130;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.35);
+    overflow-y: auto;
   }
+  .tu-forge:not(.tu-forge--sidebar-collapsed) .tu-forge-sidebar {
+    transform: translateX(0);
+  }
+
+  /* Backdrop behind the open sheet (tap to dismiss). */
+  .tu-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--app-chrome-offset);
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 125;
+  }
+
+  /* Keep editor content clear of the fixed command bar. */
+  .tu-forge-center {
+    padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+  }
+
   .tu-editor-split {
     grid-template-columns: 1fr !important;
   }
@@ -2526,18 +2566,84 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   }
   .tu-editor-input {
     border-right: none;
-    min-height: 200px;
+    min-height: 240px;
   }
   .tu-editor-output {
-    min-height: 200px;
+    min-height: 240px;
     border-top: 1px solid var(--border);
   }
   .tu-bottom-panel {
-    height: 180px;
-    min-height: 180px;
+    height: 160px;
+    min-height: 0;
   }
   .tu-stats-grid {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  /* Settings menu floats above the command bar instead of the hidden
+     activity bar it was anchored to. */
+  .tu-settings-menu {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 64px;
+    width: min(92vw, 320px);
+  }
+
+  /* Mobile command bar — replaces the hidden vertical activity bar. */
+  .tu-mobile-cmdbar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 52px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--activitybar-bg);
+    border-top: 1px solid var(--activitybar-border);
+    z-index: 140;
+  }
+  .tu-mobile-cmd-btn {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--activitybar-inactive);
+    cursor: pointer;
+    font-family: inherit;
+    transition: color var(--t);
+  }
+  .tu-mobile-cmd-btn:hover,
+  .tu-mobile-cmd-btn--active {
+    color: var(--activitybar-fg);
+  }
+  .tu-mobile-cmd-label {
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+}
+
+/* Very small phones: let one editor pane take the full height when focused. */
+@media (max-width: 480px) {
+  .tu-editor-split--focus-input .tu-editor-output {
+    display: none;
+  }
+  .tu-editor-split--focus-output .tu-editor-input {
+    display: none;
+  }
+  .tu-editor-split--focus-input .tu-editor-input,
+  .tu-editor-split--focus-output .tu-editor-output {
+    min-height: calc(100vh - var(--app-chrome-offset) - 52px - 80px);
+  }
+  .tu-gen {
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 
@@ -3291,6 +3397,7 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   transform: translate(-50%, -50%);
   z-index: 1001;
   width: 360px;
+  max-width: calc(100vw - 24px);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);

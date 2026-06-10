@@ -821,3 +821,18 @@
 .tu-diff-side-cell:first-child {
   border-right: 2px solid var(--border);
 }
+
+/* ── Responsive: keep drawer controls usable on phones ──
+   Drawers render inline inside the (now full-width) editor panes on mobile,
+   so let control rows wrap and stop fixed-width inputs forcing overflow. */
+@media (max-width: 768px) {
+  .tu-fr-row {
+    flex-wrap: wrap;
+  }
+  .tu-fr-slider {
+    max-width: 100%;
+  }
+  .tu-diff-side-row {
+    flex-wrap: wrap;
+  }
+}

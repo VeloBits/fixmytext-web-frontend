@@ -37,6 +37,7 @@ import useToolSearch from '@/hooks/useToolSearch';
 import useResize from '@/hooks/useResize';
 import useTrialLimit from '@/hooks/useTrialLimit';
 import useDrawerState from '@/hooks/useDrawerState';
+import useIsMobile from '@/hooks/useIsMobile';
 import useKeyboardShortcuts from '@/hooks/useKeyboardShortcuts';
 import useHashTools from '@/hooks/useHashTools';
 import useClientTools from '@/hooks/useClientTools';
@@ -312,8 +313,19 @@ export default function TextForm(props: TextFormProps) {
   const { activePanel, setActivePanel, togglePanel } = useDrawerState();
   const [previewMode, setPreviewMode] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
+  // On mobile the sidebar is an off-canvas sheet — start it closed so it
+  // doesn't cover the editor. Desktop (and the jsdom test env, which has no
+  // matchMedia) keeps the historical open-by-default behaviour.
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      return !window.matchMedia('(max-width: 768px)').matches;
+    }
+    return true;
+  });
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Mobile-only: focus a single editor pane (input/output) to maximise space.
+  const [mobileFocus, setMobileFocus] = useState<'input' | 'output' | null>(null);
   const [toolViewMode, setToolViewMode] = useState(
     () => localStorage.getItem('fmx_tool_view') || 'grid'
   );
@@ -1372,7 +1384,9 @@ export default function TextForm(props: TextFormProps) {
       <div
         className={`tu-forge${sidebarOpen ? '' : ' tu-forge--sidebar-collapsed'}`}
         style={
-          sidebarOpen ? { gridTemplateColumns: `48px ${sidebarResize.size}px 1fr` } : undefined
+          sidebarOpen && !isMobile
+            ? { gridTemplateColumns: `48px ${sidebarResize.size}px 1fr` }
+            : undefined
         }
       >
         {/* ─── Activity Bar (far left icons) ─── */}
@@ -2633,7 +2647,9 @@ export default function TextForm(props: TextFormProps) {
             <>
               <div
                 ref={splitRef as unknown as Ref<HTMLDivElement>}
-                className="tu-editor-split"
+                className={`tu-editor-split${
+                  mobileFocus ? ` tu-editor-split--focus-${mobileFocus}` : ''
+                }`}
                 style={{
                   gridTemplateColumns: `${splitResize.size}fr 4px ${100 - splitResize.size}fr`,
                 }}
@@ -3317,6 +3333,7 @@ export default function TextForm(props: TextFormProps) {
                 text={text}
                 gamification={gamification}
                 style={{ height: bottomResize.size }}
+                defaultCollapsed={isMobile}
               />
 
               {/* Smart Suggestions — below bottom panel */}
@@ -3330,6 +3347,99 @@ export default function TextForm(props: TextFormProps) {
             </>
           )}
         </div>
+
+        {/* ─── Mobile sidebar backdrop (tap to close the tool sheet) ─── */}
+        {isMobile && sidebarOpen && (
+          <div
+            className="tu-sidebar-backdrop"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* ─── Mobile command bar (replaces the hidden vertical activity bar) ─── */}
+        <nav
+          className="tu-mobile-cmdbar"
+          data-testid="editor-mobile-cmdbar"
+          aria-label="Editor actions"
+        >
+          <button
+            className={`tu-mobile-cmd-btn${
+              activeTab === 'all' && sidebarOpen ? ' tu-mobile-cmd-btn--active' : ''
+            }`}
+            onClick={() => handleActivityClick('all')}
+            aria-label="Tools"
+          >
+            {ACTIVITY_ICONS.all}
+            <span className="tu-mobile-cmd-label">Tools</span>
+          </button>
+          <button
+            className={`tu-mobile-cmd-btn${
+              activeTab === '_favourites' && sidebarOpen ? ' tu-mobile-cmd-btn--active' : ''
+            }`}
+            onClick={() => handleActivityClick('_favourites')}
+            aria-label="Favourites"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            <span className="tu-mobile-cmd-label">Saved</span>
+          </button>
+          <button
+            className={`tu-mobile-cmd-btn${
+              activeTab === '_templates' && sidebarOpen ? ' tu-mobile-cmd-btn--active' : ''
+            }`}
+            onClick={() => handleActivityClick('_templates')}
+            aria-label="Templates"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            <span className="tu-mobile-cmd-label">Templates</span>
+          </button>
+          <button
+            className={`tu-mobile-cmd-btn${
+              activeTab === '_history' && sidebarOpen ? ' tu-mobile-cmd-btn--active' : ''
+            }`}
+            onClick={() => handleActivityClick('_history')}
+            aria-label="History"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span className="tu-mobile-cmd-label">History</span>
+          </button>
+          <button
+            className={`tu-mobile-cmd-btn${mobileFocus ? ' tu-mobile-cmd-btn--active' : ''}`}
+            onClick={() =>
+              setMobileFocus((f) => (f === null ? 'input' : f === 'input' ? 'output' : null))
+            }
+            aria-label="Toggle editor focus"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <line x1="12" y1="4" x2="12" y2="20" />
+            </svg>
+            <span className="tu-mobile-cmd-label">
+              {mobileFocus === 'input' ? 'Input' : mobileFocus === 'output' ? 'Output' : 'Focus'}
+            </span>
+          </button>
+          <button
+            className={`tu-mobile-cmd-btn${settingsOpen ? ' tu-mobile-cmd-btn--active' : ''}`}
+            onClick={() => setSettingsOpen((o) => !o)}
+            aria-label="Settings"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <span className="tu-mobile-cmd-label">Settings</span>
+          </button>
+        </nav>
       </div>
 
       {/* Settings menu (rendered outside .tu-forge to escape overflow:hidden) */}

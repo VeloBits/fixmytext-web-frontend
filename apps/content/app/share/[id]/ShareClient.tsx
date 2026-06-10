@@ -125,15 +125,15 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
           </div>
 
           {/* Content */}
-          <div className="flex overflow-auto max-h-[60vh] font-mono text-sm leading-relaxed">
+          <div className="flex overflow-auto max-h-[60vh] font-mono text-xs sm:text-sm leading-relaxed">
             {lines.length > 1 && (
-              <div className="select-none px-3 py-4 text-right text-[var(--text-3)] border-r border-[var(--border)] bg-[var(--surface-2)] min-w-[3rem]">
+              <div className="hidden sm:block select-none px-3 py-4 text-right text-[var(--text-3)] border-r border-[var(--border)] bg-[var(--surface-2)] min-w-[3rem]">
                 {lines.map((_, i) => (
                   <div key={i}>{i + 1}</div>
                 ))}
               </div>
             )}
-            <pre className="flex-1 p-4 text-[var(--text)] whitespace-pre-wrap break-words overflow-auto">
+            <pre className="flex-1 min-w-0 p-4 text-[var(--text)] whitespace-pre-wrap break-words overflow-auto">
               {share.output_text}
             </pre>
           </div>

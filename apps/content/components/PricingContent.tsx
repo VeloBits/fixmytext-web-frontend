@@ -45,7 +45,7 @@ export default function PricingContent() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-[var(--text)] mb-3 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--text)] mb-3 tracking-tight">
             Simple, honest pricing
           </h1>
           <p className="text-lg text-[var(--text-2)] max-w-xl mx-auto">

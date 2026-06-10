@@ -1094,6 +1094,11 @@
 }
 
 /* ── Responsive ── */
+/* Mobile section nav — hidden on desktop (the sidebar handles nav there). */
+.tu-dash-tabstrip {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .tu-dash {
     grid-template-columns: 1fr;
@@ -1109,5 +1114,44 @@
   }
   .tu-dash-row {
     grid-template-columns: 1fr;
+  }
+
+  /* Horizontal scrolling section tabs replace the hidden sidebar nav. */
+  .tu-dash-tabstrip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 10px 12px;
+    background: var(--editor-bg);
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  .tu-dash-tabstrip::-webkit-scrollbar {
+    display: none;
+  }
+  .tu-dash-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: var(--r-pill);
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: 0.8rem;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all var(--t);
+  }
+  .tu-dash-tab--active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
   }
 }

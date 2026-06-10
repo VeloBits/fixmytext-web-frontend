@@ -13,3 +13,17 @@
     padding: 0 1rem;
   }
 }
+
+/* ── Touch targets ───────────────────────────────────────
+   Enlarge tap targets on coarse-pointer (touch) devices only,
+   so desktop pointer density is left untouched. */
+@media (pointer: coarse) {
+  .tu-activity-btn,
+  .tu-input-toolbar-btn,
+  .tu-drawer-close,
+  .tu-bottom-tab,
+  .tu-mobile-cmd-btn,
+  .tu-dash-tab {
+    min-height: var(--tap-min, 44px);
+  }
+}

@@ -591,9 +591,7 @@
   font-size: 0.7rem;
 }
 
-/* ── Responsive: hide panel on mobile ─────────────── */
-@media (max-width: 768px) {
-  .tu-tpanel {
-    display: none;
-  }
-}
+/* ── Responsive ───────────────────────────────────────
+   The tool panel is no longer hidden on mobile: the sidebar that hosts it
+   becomes an off-canvas sheet (see editor.css @media max-width:768px), so the
+   tool list must stay rendered inside it for tool switching to work on phones. */

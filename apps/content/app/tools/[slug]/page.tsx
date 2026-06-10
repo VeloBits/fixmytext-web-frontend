@@ -121,7 +121,7 @@ export default async function ToolPage({ params }: Props) {
                 {tool.icon}
               </div>
               <div>
-                <h1 className="text-3xl font-extrabold text-[var(--text)] tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text)] tracking-tight">
                   {tool.label}
                 </h1>
                 <p className="text-sm text-[var(--text-3)] mt-0.5">

@@ -32,6 +32,8 @@ export { default as useHashTools } from './useHashTools';
 export { default as useHistory } from './useHistory';
 export type { HistoryEntry, ToolMeta, HistoryValue } from './useHistory';
 
+export { default as useIsMobile } from './useIsMobile';
+
 export { default as useKeyboardShortcuts } from './useKeyboardShortcuts';
 export type {
   ShortcutDef,

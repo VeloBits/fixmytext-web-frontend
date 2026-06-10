@@ -39,6 +39,8 @@ interface BottomPanelProps {
   text: string;
   gamification?: GamificationProps | null;
   style?: CSSProperties;
+  /** Start collapsed (used on mobile to reclaim vertical space). */
+  defaultCollapsed?: boolean;
 }
 
 function timeAgo(ts: number): string {
@@ -59,9 +61,9 @@ const TABS = [
   { id: 'pipeline', label: 'Pipeline', icon: '▶' },
 ];
 
-export default memo(function BottomPanel({ pipeline, history, text, gamification, style }: BottomPanelProps) {
+export default memo(function BottomPanel({ pipeline, history, text, gamification, style, defaultCollapsed = false }: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState('stats');
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
   // Text stats
   const stats = useMemo(() => {

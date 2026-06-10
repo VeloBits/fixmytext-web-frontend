@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import useIsMobile from '@/hooks/useIsMobile';
 import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '@/constants/tools';
 import { useGetToolStatsQuery } from '@/store/api/userDataApi';
 import type { AlertLevel } from '@/contexts/AlertContext';
@@ -56,6 +57,7 @@ export default function DashboardPage({
   subscription,
 }: DashboardPageProps) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState(() => {
     return searchParams.get('tab') || 'overview';
@@ -262,6 +264,23 @@ export default function DashboardPage({
 
       {/* Main content */}
       <div className="tu-dash-main">
+        {/* Mobile section nav — replaces the hidden sidebar on small screens.
+            Gated on isMobile so the section labels aren't duplicated in the DOM
+            on desktop (the sidebar already provides them). */}
+        {isMobile && (
+          <nav className="tu-dash-tabstrip" aria-label="Dashboard sections">
+            {sections.map((s) => (
+              <button
+                key={s.id}
+                className={`tu-dash-tab${activeSection === s.id ? ' tu-dash-tab--active' : ''}`}
+                onClick={() => setActiveSection(s.id)}
+              >
+                <span className="tu-dash-tab-icon">{s.icon}</span>
+                <span className="tu-dash-tab-label">{s.label}</span>
+              </button>
+            ))}
+          </nav>
+        )}
         <ActiveSection {...sectionProps} />
       </div>
     </div>

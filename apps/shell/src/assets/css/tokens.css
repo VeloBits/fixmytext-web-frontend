@@ -28,6 +28,9 @@
   --r-pill: 999px;
 
   --t: 0.12s ease;
+
+  /* Minimum touch target on coarse-pointer (touch) devices */
+  --tap-min: 44px;
 }
 
 /* ═══════════════════════════════════════════════════════

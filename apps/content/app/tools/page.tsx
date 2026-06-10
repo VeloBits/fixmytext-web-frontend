@@ -23,7 +23,7 @@ export default function ToolsPage() {
       {/* Hero */}
       <div className="border-b border-[var(--border)] bg-[var(--surface)] py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl font-extrabold text-[var(--text)] tracking-tight mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--text)] tracking-tight mb-3">
             {TOOLS.length}+ Free Text Tools
           </h1>
           <p className="text-[var(--text-2)] text-lg max-w-xl mx-auto">
