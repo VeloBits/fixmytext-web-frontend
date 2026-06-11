@@ -17,6 +17,6 @@ export * from './store';
 export * from './utils';
 export * from './constants';
 
-// Auth runtime, gamification UI, and shared hooks are consumed via subpaths
-// (e.g. '@velobits/app-core/auth/useOidcAuth', '@velobits/app-core/hooks/usePasses')
-// and are folded into this barrel in Phase 2 alongside the federation `shared` wiring.
+// Auth runtime, gamification UI, shared hooks, and shared UI components are consumed
+// via subpaths (e.g. '@velobits/app-core/auth/useOidcAuth',
+// '@velobits/app-core/components/editor/ToolIcon').

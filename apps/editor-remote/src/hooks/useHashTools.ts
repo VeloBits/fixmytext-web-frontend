@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type React from 'react';
 import type { AiResult } from './useAiTools';
-import type { AlertType } from './useAlert';
+import type { AlertLevel as AlertType } from '@velobits/app-core/types/alert';
 
 /**
  * useHashTools

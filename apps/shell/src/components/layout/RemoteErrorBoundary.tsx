@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { Component, type ReactNode } from 'react';
 
 interface Props {
@@ -22,8 +23,6 @@ export default class RemoteErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const Sentry = require('@sentry/react');
       Sentry.captureException(error, { tags: { remote: this.props.name } });
     } catch {
       // Sentry not available

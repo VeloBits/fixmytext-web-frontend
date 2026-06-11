@@ -3,7 +3,7 @@ import type {
   GamificationContextValue,
   SubscriptionContextValue,
   User,
-} from '@/contexts/AppContext';
+} from '@velobits/app-core/types/context';
 
 interface HomeProps {
   mode: string;

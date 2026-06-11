@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import ToolIcon from './ToolIcon';
+import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
 
 interface WorkspaceTabTool {
   id: string;

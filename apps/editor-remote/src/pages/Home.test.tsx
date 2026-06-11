@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import Home from './Home';
-import type { GamificationContextValue, SubscriptionContextValue } from '@/contexts/AppContext';
+import type { GamificationContextValue, SubscriptionContextValue } from '@velobits/app-core/types/context';
 
 // Mock TextForm since it's a complex component
 vi.mock('@/components/editor/TextForm', () => ({

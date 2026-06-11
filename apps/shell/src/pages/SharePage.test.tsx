@@ -31,7 +31,7 @@ vi.mock('@velobits/app-core/constants/tools', () => ({
   TOOLS: [{ id: 'uppercase', label: 'Uppercase', icon: 'AA', color: 'pink' }],
 }));
 
-vi.mock('@/components/editor/ToolIcon', () => ({
+vi.mock('@velobits/app-core/components/editor/ToolIcon', () => ({
   default: ({ icon, toolId }: { icon?: string; toolId?: string }) => <span data-testid="tool-icon">{toolId || icon}</span>,
 }));
 

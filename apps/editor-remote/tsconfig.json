@@ -1,8 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "paths": {
-      "@/*": ["../shell/src/*"],
+      "@/*": ["./src/*"],
       "@velobits/app-core": ["../../packages/app-core/src/index.ts"],
       "@velobits/app-core/*": ["../../packages/app-core/src/*"],
       "@velobits/design-system": ["../../packages/design-system/src/index.ts"],
@@ -15,5 +16,5 @@
       "@velobits/tools-registry/*": ["../../packages/tools-registry/src/*"]
     }
   },
-  "include": ["src/**/*", "vite.config.ts", "../shell/src/types/*.d.ts"]
+  "include": ["src/**/*", "vite.config.ts"]
 }

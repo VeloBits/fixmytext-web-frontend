@@ -26,7 +26,7 @@ export default defineConfig({
         'react-redux': { singleton: true },
         '@sentry/react': { singleton: true },
         // Singleton: the host provides the one store/api instance at runtime.
-        '@velobits/app-core': { singleton: true, requiredVersion: false },
+        '@velobits/app-core': { singleton: true, requiredVersion: '*' },
       },
     }),
     react(),

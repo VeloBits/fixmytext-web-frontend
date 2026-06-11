@@ -7,10 +7,6 @@ import { federation } from '@module-federation/vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Resolve @/ and workspace packages from apps/shell/src so this
-// remote can share source without duplicating files.
-const shellSrc = path.resolve(__dirname, '../shell/src')
-
 export default defineConfig({
   plugins: [
     federation({
@@ -28,7 +24,7 @@ export default defineConfig({
         'react-redux': { singleton: true },
         '@sentry/react': { singleton: true },
         // Singleton: the host provides the one store/api instance at runtime.
-        '@velobits/app-core': { singleton: true, requiredVersion: false },
+        '@velobits/app-core': { singleton: true, requiredVersion: '*' },
       },
     }),
     react(),
@@ -36,7 +32,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': shellSrc,
+      '@': path.resolve(__dirname, 'src'),
       '@velobits/app-core': path.resolve(__dirname, '../../packages/app-core/src'),
       '@velobits/design-system': path.resolve(__dirname, '../../packages/design-system/src'),
       '@velobits/api-client': path.resolve(__dirname, '../../packages/api-client/src'),

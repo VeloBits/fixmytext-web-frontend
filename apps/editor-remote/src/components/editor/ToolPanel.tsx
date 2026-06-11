@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useMemo, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { USE_CASE_TABS, TOOL_GROUPS } from '@velobits/app-core/constants/tools';
-import ToolIcon from './ToolIcon';
+import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
 import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
 
 interface TooltipState {

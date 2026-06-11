@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { AlertType } from './useAlert';
+import type { AlertLevel as AlertType } from '@velobits/app-core/types/alert';
 
 export interface PasswordOptions {
   upper: boolean;

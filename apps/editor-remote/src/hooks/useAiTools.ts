@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTransformTextMutation } from '@velobits/app-core/store/api/textApi';
 import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
-import type { AlertType } from './useAlert';
+import type { AlertLevel as AlertType } from '@velobits/app-core/types/alert';
 
 interface ToolError {
   status?: number;

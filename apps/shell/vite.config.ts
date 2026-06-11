@@ -58,7 +58,7 @@ export default defineConfig({
         // Shared as a singleton so the Redux store / RTK Query api objects are a
         // single instance across shell + remotes (remote hooks dispatch to the
         // host's store). This is the linchpin of the source split.
-        '@velobits/app-core': { singleton: true, requiredVersion: false },
+        '@velobits/app-core': { singleton: true, requiredVersion: '*' },
       },
     }),
     react(),

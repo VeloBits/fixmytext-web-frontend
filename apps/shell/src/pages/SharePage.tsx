@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetShareQuery } from '@velobits/app-core/store/api/shareApi';
 import { TOOLS } from '@velobits/app-core/constants/tools';
-import ToolIcon from '@/components/editor/ToolIcon';
+import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
 interface SharePageProps {

@@ -43,7 +43,7 @@ import useClientTools from '@/hooks/useClientTools';
 
 // Components
 import ToolPanel from './ToolPanel';
-import ToolIcon from './ToolIcon';
+import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
 import OutputPanel from './OutputPanel';
 import ParagraphGutter from './ParagraphGutter';
 
