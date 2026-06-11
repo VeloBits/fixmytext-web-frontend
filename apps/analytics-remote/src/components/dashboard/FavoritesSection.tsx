@@ -1,5 +1,5 @@
 import { TOOLS } from '@velobits/app-core/constants/tools';
-import type { GamificationContextValue } from '@/contexts/AppContext';
+import type { GamificationContextValue } from '@velobits/app-core/types/context';
 
 interface FavoritesSectionProps {
   g: GamificationContextValue;

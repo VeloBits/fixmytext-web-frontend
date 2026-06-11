@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { GamificationContextValue, SubscriptionContextValue, User } from '@/contexts/AppContext';
+import type { GamificationContextValue, SubscriptionContextValue, User } from '@velobits/app-core/types/context';
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {

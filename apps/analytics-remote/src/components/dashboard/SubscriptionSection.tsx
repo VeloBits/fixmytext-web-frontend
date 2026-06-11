@@ -2,8 +2,8 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useGetPassCatalogQuery } from '@velobits/app-core/store/api/passesApi';
 import formatPriceUtil from '@velobits/app-core/utils/formatPrice';
-import type { SubscriptionContextValue } from '@/contexts/AppContext';
-import type { AlertLevel } from '@/contexts/AlertContext';
+import type { SubscriptionContextValue } from '@velobits/app-core/types/context';
+import type { AlertLevel } from '@velobits/app-core/types/alert';
 import type { NavigateFunction } from 'react-router-dom';
 
 type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';

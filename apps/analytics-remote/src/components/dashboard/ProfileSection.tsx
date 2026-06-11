@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { PERSONAS } from '@velobits/app-core/constants/tools';
-import type { GamificationContextValue, User } from '@/contexts/AppContext';
-import type { AlertLevel } from '@/contexts/AlertContext';
+import type { GamificationContextValue, User } from '@velobits/app-core/types/context';
+import type { AlertLevel } from '@velobits/app-core/types/alert';
 import type { Persona } from '@velobits/app-core/types/tools';
 
 

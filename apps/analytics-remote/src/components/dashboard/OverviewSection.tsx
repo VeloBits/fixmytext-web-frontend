@@ -1,5 +1,5 @@
 import { TOOLS, ACHIEVEMENTS, LEVELS, QUEST_TEMPLATES } from '@velobits/app-core/constants/tools';
-import type { GamificationContextValue } from '@/contexts/AppContext';
+import type { GamificationContextValue } from '@velobits/app-core/types/context';
 import type { LevelDefinition } from '@velobits/app-core/types/tools';
 
 export interface TopTool {

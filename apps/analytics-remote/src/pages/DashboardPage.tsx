@@ -2,12 +2,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '@velobits/app-core/constants/tools';
 import { useGetToolStatsQuery } from '@velobits/app-core/store/api/userDataApi';
-import type { AlertLevel } from '@/contexts/AlertContext';
+import type { AlertLevel } from '@velobits/app-core/types/alert';
 import type {
   GamificationContextValue,
   SubscriptionContextValue,
   User,
-} from '@/contexts/AppContext';
+} from '@velobits/app-core/types/context';
 
 // Extracted dashboard section components
 import OverviewSection from '@/components/dashboard/OverviewSection';

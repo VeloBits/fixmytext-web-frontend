@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProfileSection from './ProfileSection';
-import type { GamificationContextValue, User } from '@/contexts/AppContext';
+import type { GamificationContextValue, User } from '@velobits/app-core/types/context';
 
 const mockResendVerification = vi.fn();
 

@@ -7,8 +7,6 @@ import { federation } from '@module-federation/vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const shellSrc = path.resolve(__dirname, '../shell/src')
-
 export default defineConfig({
   plugins: [
     federation({
@@ -34,7 +32,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': shellSrc,
+      '@': path.resolve(__dirname, 'src'),
       '@velobits/app-core': path.resolve(__dirname, '../../packages/app-core/src'),
       '@velobits/design-system': path.resolve(__dirname, '../../packages/design-system/src'),
       '@velobits/api-client': path.resolve(__dirname, '../../packages/api-client/src'),
