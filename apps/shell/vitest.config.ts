@@ -26,7 +26,7 @@ export default defineConfig({
       reporter: ['text', 'text-summary', 'lcov', 'json-summary'],
       reportsDirectory: './coverage',
       exclude: ['node_modules/', 'dist/', 'src/test/', '**/*.config.js', 'src/index.jsx'],
-      thresholds: { lines: 68, branches: 59, functions: 60, statements: 66 },
+      thresholds: { lines: 87, branches: 72, functions: 87, statements: 85 },
     },
     include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
   },

@@ -27,6 +27,9 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 // and dashboard link here ('/about', '/pricing').
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
+// In-app authenticated share view at /app/share/:id. The public, SSR/SEO share page
+// is served separately by apps/content at /share/:id.
+const SharePage = lazy(() => import('./pages/SharePage'));
 
 // Remote surfaces — loaded from their independently deployed MFE builds.
 // No local fallback: if a remote is down, RemoteBoundary shows the error state.
@@ -110,6 +113,7 @@ function AppInner() {
             path={ROUTES.PRICING}
             element={<PricingPage showAlert={showAlert} subscription={subscription} />}
           />
+          <Route path={ROUTES.SHARE} element={<SharePage showAlert={showAlert} />} />
           <Route
             path={ROUTES.DASHBOARD}
             element={

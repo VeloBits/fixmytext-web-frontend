@@ -95,9 +95,6 @@ vi.mock('@velobits/app-core/hooks/useSubscription', () => ({
 vi.mock('editor-remote/EditorPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'home-page' }),
 }));
-vi.mock('./pages/Home', () => ({
-  default: () => React.createElement('div', { 'data-testid': 'home-page' }),
-}));
 vi.mock('./pages/AboutPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'about-page' }),
 }));
@@ -112,9 +109,8 @@ vi.mock('./pages/ForgotPasswordPage', () => ({
 }));
 // ResetPasswordPage and VerifyEmailPage are not in the router (Keycloak handles these flows).
 // Mocks omitted — no routes exist to test.
-vi.mock('./pages/DashboardPage', () => ({
-  default: () => React.createElement('div', { 'data-testid': 'dashboard-page' }),
-}));
+// DashboardPage lives in analytics-remote now; its route renders analytics-remote/AnalyticsPage
+// (resolved via the vitest alias), so no ./pages/DashboardPage mock is needed.
 vi.mock('./pages/PricingPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'pricing-page' }),
 }));

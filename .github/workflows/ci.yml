@@ -50,6 +50,12 @@ jobs:
         run: npm run build -w @velobits/shell
         env:
           VITE_API_URL: http://localhost:8000
+          # Federation remote entry points — Vite bakes these into the host bundle at
+          # build time. Use repo vars for the real deployment URLs; fall back to the
+          # local router path so the build check still exercises a prefixed (non-localhost)
+          # remoteEntry URL rather than the vite.config localhost:3101/3102 defaults.
+          VITE_EDITOR_REMOTE_ENTRY: ${{ vars.VITE_EDITOR_REMOTE_ENTRY || 'http://localhost:3000/remotes/editor/remoteEntry.js' }}
+          VITE_ANALYTICS_REMOTE_ENTRY: ${{ vars.VITE_ANALYTICS_REMOTE_ENTRY || 'http://localhost:3000/remotes/analytics/remoteEntry.js' }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
@@ -102,6 +108,75 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage -w @velobits/shell
 
+  test-remotes:
+    name: Tests & Coverage (${{ matrix.remote }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        remote:
+          - editor-remote
+          - analytics-remote
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage -w @velobits/${{ matrix.remote }}
+
+  federation-smoke:
+    name: Federation Smoke (host↔remote contract)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright (chromium)
+        run: npm run test:e2e:install
+
+      # Bring up the production simulation: built shell + remotes behind the nginx
+      # router on :3000 — the topology that actually exercises the remote `base` paths
+      # and the shell's baked VITE_*_REMOTE_ENTRY URLs (Phase 6.1/6.2). The backend +
+      # Keycloak are mocked inside the smoke spec, so no real services are needed.
+      - name: Start prod compose stack
+        run: |
+          cp .env.docker.prod.example .env.docker.prod
+          docker compose --profile prod up --build -d
+
+      - name: Wait for router (shell at /app)
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:3000/app; then
+              echo "router up"; exit 0
+            fi
+            sleep 5
+          done
+          echo "router did not become ready" >&2
+          docker compose --profile prod logs --no-color | tail -100 >&2
+          exit 1
+
+      - name: Run federation smoke
+        run: npm run test:smoke -w @velobits/shell
+
+      - name: Tear down
+        if: always()
+        run: docker compose --profile prod down -v
+
   build-content:
     name: Build Check (content app)
     runs-on: ubuntu-latest
@@ -131,6 +206,7 @@ jobs:
     strategy:
       matrix:
         package:
+          - app-core
           - design-system
           - api-client
           - auth-shared

@@ -7,7 +7,13 @@ import { federation } from '@module-federation/vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default defineConfig({
+// In a production build the remote is served behind the router at /remotes/analytics/
+// (nginx + the CF Worker strip that prefix), so the prefix must be baked into every
+// asset/chunk URL in remoteEntry.js — otherwise chunks request /assets/* and fall
+// through the `/`→content route. The dev server is reached port-direct (3102) at
+// root, so dev keeps base '/'. See docs/architecture.md + docker/nginx.router.*.conf.
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/remotes/analytics/' : '/',
   plugins: [
     federation({
       name: 'analytics-remote',
@@ -20,8 +26,8 @@ export default defineConfig({
         react: { singleton: true, requiredVersion: '^19.0.0' },
         'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
         'react-router-dom': { singleton: true, requiredVersion: '^7.0.0' },
-        '@reduxjs/toolkit': { singleton: true },
-        'react-redux': { singleton: true },
+        '@reduxjs/toolkit': { singleton: true, requiredVersion: '^2.0.0' },
+        'react-redux': { singleton: true, requiredVersion: '^9.0.0' },
         '@sentry/react': { singleton: true },
         // Singleton: the host provides the one store/api instance at runtime.
         '@velobits/app-core': { singleton: true, requiredVersion: '*' },
@@ -44,4 +50,4 @@ export default defineConfig({
   build: {
     sourcemap: true,
   },
-})
+}))

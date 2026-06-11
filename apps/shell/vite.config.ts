@@ -52,8 +52,8 @@ export default defineConfig({
         react: { singleton: true, requiredVersion: '^19.0.0' },
         'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
         'react-router-dom': { singleton: true, requiredVersion: '^7.0.0' },
-        '@reduxjs/toolkit': { singleton: true },
-        'react-redux': { singleton: true },
+        '@reduxjs/toolkit': { singleton: true, requiredVersion: '^2.0.0' },
+        'react-redux': { singleton: true, requiredVersion: '^9.0.0' },
         '@sentry/react': { singleton: true },
         // Shared as a singleton so the Redux store / RTK Query api objects are a
         // single instance across shell + remotes (remote hooks dispatch to the
