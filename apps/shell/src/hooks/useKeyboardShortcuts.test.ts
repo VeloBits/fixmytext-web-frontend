@@ -10,12 +10,12 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(() => null),
 }));
 
-vi.mock('@/store/api/userDataApi', () => ({
+vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetUiSettingsQuery: vi.fn(() => ({ data: undefined })),
   useUpdateUiSettingsMutation: () => [vi.fn(() => ({ unwrap: () => Promise.resolve({}) }))],
 }));
 
-vi.mock('@/constants/tools', () => ({
+vi.mock('@velobits/app-core/constants/tools', () => ({
   TOOLS: [
     { id: 'uppercase', label: 'UPPERCASE' },
     { id: 'lowercase', label: 'lowercase' },

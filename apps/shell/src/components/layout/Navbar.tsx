@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
 export interface NavbarProps {

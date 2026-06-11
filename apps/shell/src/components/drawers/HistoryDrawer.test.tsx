@@ -11,7 +11,7 @@ vi.mock('react-redux', () => ({
 }));
 
 // Mock useOidcAuth — HistoryDrawer uses this for isAuthenticated
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
     isLoading: false,
@@ -23,13 +23,13 @@ vi.mock('@/auth/useOidcAuth', () => ({
 }));
 
 // Mock RTK Query hooks
-vi.mock('@/store/api/historyApi', () => ({
+vi.mock('@velobits/app-core/store/api/historyApi', () => ({
   useGetHistoryQuery: vi.fn(() => ({ data: null, isFetching: false })),
   useDeleteHistoryEntryMutation: vi.fn(() => [vi.fn(), {}]),
   useClearHistoryMutation: vi.fn(() => [vi.fn(), {}]),
 }));
 
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('HistoryDrawer', () => {
@@ -136,7 +136,7 @@ describe('HistoryDrawer', () => {
 
   it('shows saved history items and calls setText/showAlert on restore', async () => {
     const { useSelector } = await import('react-redux');
-    const { useGetHistoryQuery } = await import('../../store/api/historyApi');
+    const { useGetHistoryQuery } = await import('@velobits/app-core/store/api/historyApi');
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, accessToken: 'token123', oidcUser: null, login: vi.fn(), logout: vi.fn() });
     (vi.mocked(useGetHistoryQuery) as AnyMock).mockReturnValue({
@@ -170,7 +170,7 @@ describe('HistoryDrawer', () => {
   it('calls delete on saved history item', async () => {
     const { useSelector } = await import('react-redux');
     const { useGetHistoryQuery, useDeleteHistoryEntryMutation } = await import(
-      '../../store/api/historyApi'
+      '@velobits/app-core/store/api/historyApi'
     );
     const mockDelete = vi.fn().mockReturnValue({ unwrap: () => Promise.resolve() });
     (vi.mocked(useDeleteHistoryEntryMutation) as AnyMock).mockReturnValue([mockDelete, {}]);
@@ -204,7 +204,7 @@ describe('HistoryDrawer', () => {
   it('clicks Clear All button in server history view', async () => {
     const { useSelector } = await import('react-redux');
     const { useGetHistoryQuery, useClearHistoryMutation } = await import(
-      '../../store/api/historyApi'
+      '@velobits/app-core/store/api/historyApi'
     );
     const mockClear = vi.fn().mockReturnValue({ unwrap: () => Promise.resolve() });
     (vi.mocked(useClearHistoryMutation) as AnyMock).mockReturnValue([mockClear, {}]);

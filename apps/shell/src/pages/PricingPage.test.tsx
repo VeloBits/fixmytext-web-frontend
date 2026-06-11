@@ -47,7 +47,7 @@ vi.mock('react-redux', () => ({
 }));
 
 // ── useOidcAuth mock ──
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: true,
     isLoading: false,
@@ -59,18 +59,18 @@ vi.mock('@/auth/useOidcAuth', () => ({
 }));
 
 // ── hooks mock ──
-vi.mock('@/hooks/useSubscription', () => ({
+vi.mock('@velobits/app-core/hooks/useSubscription', () => ({
   default: () => defaultSubscription,
 }));
 
 // ── API mock ──
 const mockCatalogQuery = vi.fn();
-vi.mock('@/store/api/passesApi', () => ({
+vi.mock('@velobits/app-core/store/api/passesApi', () => ({
   useGetPassCatalogQuery: () => mockCatalogQuery(),
 }));
 
 // ── formatPrice mock ──
-vi.mock('@/utils/formatPrice', () => ({
+vi.mock('@velobits/app-core/utils/formatPrice', () => ({
   default: (price: number) => `$${price}`,
 }));
 
@@ -147,7 +147,7 @@ function renderPricing(
 
 import PricingPage from './PricingPage';
 import { expectNoA11yViolations } from '@/test/axeHelper';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('PricingPage', () => {

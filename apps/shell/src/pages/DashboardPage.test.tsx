@@ -46,23 +46,23 @@ vi.mock('react-redux', () => ({
 }));
 
 // ── API mocks ──
-vi.mock('@/store/api/passesApi', () => ({
+vi.mock('@velobits/app-core/store/api/passesApi', () => ({
   useGetPassCatalogQuery: () => ({ data: null, isLoading: false, error: null }),
 }));
-vi.mock('@/store/api/userDataApi', () => ({
+vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetToolStatsQuery: () => ({ data: null, isLoading: false }),
 }));
-vi.mock('@/store/api/authApi', () => ({
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [vi.fn(), { isLoading: false }],
 }));
 
 // ── SpinWheel mock ──
-vi.mock('@/components/gamification/SpinWheel', () => ({
+vi.mock('@velobits/app-core/gamification/SpinWheel', () => ({
   default: () => React.createElement('div', { 'data-testid': 'spin-wheel' }, 'SpinWheel'),
 }));
 
 // ── formatPrice mock ──
-vi.mock('@/utils/formatPrice', () => ({
+vi.mock('@velobits/app-core/utils/formatPrice', () => ({
   default: (price: number) => `$${price}`,
 }));
 

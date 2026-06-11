@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetPassCatalogQuery } from '@/store/api/passesApi';
-import formatPriceUtil from '@/utils/formatPrice';
+import { useGetPassCatalogQuery } from '@velobits/app-core/store/api/passesApi';
+import formatPriceUtil from '@velobits/app-core/utils/formatPrice';
 import type { SubscriptionContextValue, ToolUsage } from '@/contexts/AppContext';
-import type { ToolDefinition } from '@/types/tools';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
 

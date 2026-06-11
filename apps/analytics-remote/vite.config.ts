@@ -25,6 +25,8 @@ export default defineConfig({
         '@reduxjs/toolkit': { singleton: true },
         'react-redux': { singleton: true },
         '@sentry/react': { singleton: true },
+        // Singleton: the host provides the one store/api instance at runtime.
+        '@velobits/app-core': { singleton: true, requiredVersion: false },
       },
     }),
     react(),
@@ -33,6 +35,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': shellSrc,
+      '@velobits/app-core': path.resolve(__dirname, '../../packages/app-core/src'),
       '@velobits/design-system': path.resolve(__dirname, '../../packages/design-system/src'),
       '@velobits/api-client': path.resolve(__dirname, '../../packages/api-client/src'),
       '@velobits/auth-shared': path.resolve(__dirname, '../../packages/auth-shared/src'),

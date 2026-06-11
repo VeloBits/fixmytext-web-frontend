@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetPassCatalogQuery } from '@/store/api/passesApi';
-import useSubscription from '@/hooks/useSubscription';
-import formatPriceUtil from '@/utils/formatPrice';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useGetPassCatalogQuery } from '@velobits/app-core/store/api/passesApi';
+import useSubscription from '@velobits/app-core/hooks/useSubscription';
+import formatPriceUtil from '@velobits/app-core/utils/formatPrice';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import type { AlertLevel } from '@/contexts/AlertContext';
 import type { SubscriptionContextValue } from '@/contexts/AppContext';
-import type { components } from '@/types/openapi';
+import type { components } from '@velobits/app-core/types/openapi';
 
 type PassCatalogItem = components['schemas']['PassCatalogItem'];
 type CreditPackItem = components['schemas']['CreditPackItem'];

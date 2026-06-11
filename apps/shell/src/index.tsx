@@ -3,10 +3,10 @@ import { initSentry } from '@/lib/sentry';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { store } from './store/store';
+import { store } from '@velobits/app-core/store/store';
 import App from './App';
 import ErrorBoundary from './components/layout/ErrorBoundary';
-import { initVisitorId } from './hooks/useFingerprint';
+import { initVisitorId } from '@velobits/app-core/hooks/useFingerprint';
 
 // Sentry must init before React mounts
 initSentry();

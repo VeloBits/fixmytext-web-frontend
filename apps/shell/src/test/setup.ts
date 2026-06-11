@@ -21,7 +21,7 @@ vi.mock('@sentry/react', () => ({
 // Prevent oidc-client-ts from attempting real network calls to Keycloak
 // during tests. signinRedirect / signinSilent would try to fetch the OIDC
 // discovery document from localhost:8080 which isn't running in CI/tests.
-vi.mock('@/auth/userManager', () => ({
+vi.mock('@velobits/app-core/auth/userManager', () => ({
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     storeUser: vi.fn().mockResolvedValue(undefined),

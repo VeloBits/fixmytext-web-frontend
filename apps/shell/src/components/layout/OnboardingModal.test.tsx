@@ -28,7 +28,7 @@ function filterMotionProps(props: Record<string, unknown>) {
   return filtered;
 }
 
-vi.mock('@/constants/tools', () => ({
+vi.mock('@velobits/app-core/constants/tools', () => ({
   PERSONAS: {
     writer: { label: 'Writer / Blogger', icon: 'Wr', defaultTab: 'writing' },
     student: { label: 'Student', icon: 'St', defaultTab: 'writing' },

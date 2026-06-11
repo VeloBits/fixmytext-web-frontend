@@ -7,7 +7,7 @@ import Navbar from './Navbar';
 import { expectNoA11yViolations } from '@/test/axeHelper';
 
 // Mock useOidcAuth so we can control isAuthenticated per test
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
     isLoading: false,
@@ -18,7 +18,7 @@ vi.mock('@/auth/useOidcAuth', () => ({
   }),
 }));
 
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 function makeStore(accessToken: string | null = null) {

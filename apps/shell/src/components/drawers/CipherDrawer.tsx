@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ENDPOINTS } from '@/constants/endpoints';
+import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 

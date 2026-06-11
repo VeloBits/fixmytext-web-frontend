@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { PERSONAS } from '@/constants/tools';
+import { PERSONAS } from '@velobits/app-core/constants/tools';
 import type { GamificationContextValue, User } from '@/contexts/AppContext';
 import type { AlertLevel } from '@/contexts/AlertContext';
-import type { Persona } from '@/types/tools';
+import type { Persona } from '@velobits/app-core/types/tools';
 
 
 interface ProfileSectionProps {

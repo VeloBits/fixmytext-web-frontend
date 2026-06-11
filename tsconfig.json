@@ -3,6 +3,7 @@
   "references": [
     { "path": "./apps/shell" },
     { "path": "./apps/content" },
+    { "path": "./packages/app-core" },
     { "path": "./packages/design-system" },
     { "path": "./packages/api-client" },
     { "path": "./packages/auth-shared" },

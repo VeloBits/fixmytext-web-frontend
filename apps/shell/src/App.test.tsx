@@ -50,7 +50,7 @@ vi.mock('react-redux', () => ({
 }));
 
 // ── API mocks (authApi needed because AppContext calls useGetMeQuery) ──
-vi.mock('@/store/api/authApi', () => ({
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useGetMeQuery: vi.fn().mockReturnValue({ data: null, isLoading: false }),
   authApi: { reducerPath: 'authApi' },
 }));
@@ -63,7 +63,7 @@ vi.mock('./hooks/useTheme', () => ({
   useTheme: () => ({ mode: 'light', setMode: vi.fn() }),
 }));
 // AppContext uses useOidcAuth + useGetMeQuery directly (no legacy useAuth hook).
-vi.mock('./hooks/useGamification', () => ({
+vi.mock('@velobits/app-core/hooks/useGamification', () => ({
   default: () => ({
     onboarded: true,
     setPersona: vi.fn(),
@@ -73,7 +73,7 @@ vi.mock('./hooks/useGamification', () => ({
     totalOps: 0,
   }),
 }));
-vi.mock('./hooks/useSubscription', () => ({
+vi.mock('@velobits/app-core/hooks/useSubscription', () => ({
   default: () => ({
     showUpgradeModal: false,
     dismissUpgradeModal: vi.fn(),

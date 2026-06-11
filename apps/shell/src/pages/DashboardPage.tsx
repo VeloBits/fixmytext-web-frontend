@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '@/constants/tools';
-import { useGetToolStatsQuery } from '@/store/api/userDataApi';
+import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '@velobits/app-core/constants/tools';
+import { useGetToolStatsQuery } from '@velobits/app-core/store/api/userDataApi';
 import type { AlertLevel } from '@/contexts/AlertContext';
 import type {
   GamificationContextValue,

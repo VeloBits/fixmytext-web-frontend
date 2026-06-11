@@ -2,7 +2,7 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SmartSuggestions from './SmartSuggestions';
-import type { ToolDefinition } from '@/types/tools';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 vi.mock('framer-motion', () => {
   const m =

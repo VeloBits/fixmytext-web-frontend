@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useTransformTextMutation } from '@/store/api/textApi';
-import { ENDPOINTS } from '@/constants/endpoints';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useTransformTextMutation } from '@velobits/app-core/store/api/textApi';
+import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import type { AlertType } from './useAlert';
 
 interface ToolError {

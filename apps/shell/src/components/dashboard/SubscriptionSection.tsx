@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useGetPassCatalogQuery } from '@/store/api/passesApi';
-import formatPriceUtil from '@/utils/formatPrice';
+import { useGetPassCatalogQuery } from '@velobits/app-core/store/api/passesApi';
+import formatPriceUtil from '@velobits/app-core/utils/formatPrice';
 import type { SubscriptionContextValue } from '@/contexts/AppContext';
 import type { AlertLevel } from '@/contexts/AlertContext';
 import type { NavigateFunction } from 'react-router-dom';

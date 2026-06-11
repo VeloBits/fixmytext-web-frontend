@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react';
-import { TOOLS } from '@/constants/tools';
-import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@/store/api/userDataApi';
-import { useOidcAuth } from '@/auth/useOidcAuth';
-import type { ToolDefinition } from '@/types/tools';
+import { TOOLS } from '@velobits/app-core/constants/tools';
+import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@velobits/app-core/store/api/userDataApi';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 /* ═══════════════════════════════════════════════════════
    useKeyboardShortcuts — Customizable power-user hotkeys

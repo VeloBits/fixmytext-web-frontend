@@ -5,7 +5,7 @@ const mockTransformText = vi.fn();
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: true,
     isLoading: false,
@@ -15,10 +15,10 @@ vi.mock('@/auth/useOidcAuth', () => ({
     logout: vi.fn(),
   }),
 }));
-vi.mock('@/store/api/textApi', () => ({
+vi.mock('@velobits/app-core/store/api/textApi', () => ({
   useTransformTextMutation: () => [mockTransformText],
 }));
-vi.mock('@/constants/endpoints', () => ({
+vi.mock('@velobits/app-core/constants/endpoints', () => ({
   ENDPOINTS: {
     GENERATE_HASHTAGS: '/hashtags',
     GENERATE_SEO_TITLES: '/seo',
@@ -94,7 +94,7 @@ vi.mock('@/constants/endpoints', () => ({
   },
 }));
 
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 

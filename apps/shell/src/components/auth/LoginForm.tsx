@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginValues } from '@/auth/schemas';
-import { passwordGrant } from '@/auth/keycloakClient';
+import { loginSchema, type LoginValues } from '@velobits/app-core/auth/schemas';
+import { passwordGrant } from '@velobits/app-core/auth/keycloakClient';
 
 interface LoginFormProps {
   onSuccess: () => void;

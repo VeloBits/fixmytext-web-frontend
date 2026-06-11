@@ -1,24 +1,12 @@
-// Type declarations for Module Federation remote imports.
+// Type declarations for Module Federation remote imports (host side).
 // These tell TypeScript what each remote exposes so imports type-check cleanly.
 // The actual module loading happens at runtime via the MF runtime.
+// Prop shapes come from the shared @velobits/app-core contract so the host and
+// each remote are typed against a single definition.
 
 declare module 'editor-remote/EditorPage' {
   import type { ComponentType } from 'react';
-  import type {
-    GamificationContextValue,
-    SubscriptionContextValue,
-    User,
-  } from '@/contexts/AppContext';
-
-  interface EditorPageProps {
-    mode: string;
-    setMode: (mode: string) => void;
-    showAlert: (message: string, type: string) => void;
-    gamification: GamificationContextValue;
-    user: User | null;
-    isAuthenticated: boolean;
-    subscription: SubscriptionContextValue;
-  }
+  import type { EditorPageProps } from '@velobits/app-core/contract';
 
   const EditorPage: ComponentType<EditorPageProps>;
   export default EditorPage;
@@ -26,22 +14,7 @@ declare module 'editor-remote/EditorPage' {
 
 declare module 'analytics-remote/AnalyticsPage' {
   import type { ComponentType } from 'react';
-  import type { AlertLevel } from '@/contexts/AlertContext';
-  import type {
-    GamificationContextValue,
-    SubscriptionContextValue,
-    User,
-  } from '@/contexts/AppContext';
-
-  interface AnalyticsPageProps {
-    gamification: GamificationContextValue;
-    user: User | null;
-    isAuthenticated: boolean;
-    showAlert: (message: string, type: AlertLevel) => void;
-    mode: string;
-    setMode: (mode: string) => void;
-    subscription: SubscriptionContextValue;
-  }
+  import type { AnalyticsPageProps } from '@velobits/app-core/contract';
 
   const AnalyticsPage: ComponentType<AnalyticsPageProps>;
   export default AnalyticsPage;

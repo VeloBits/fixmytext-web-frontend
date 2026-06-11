@@ -3,9 +3,9 @@ import {
   useGetHistoryQuery,
   useDeleteHistoryEntryMutation,
   useClearHistoryMutation,
-} from '@/store/api/historyApi';
-import type { HistoryEntry } from '@/hooks/useHistory';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+} from '@velobits/app-core/store/api/historyApi';
+import type { HistoryEntry } from '@velobits/app-core/hooks/useHistory';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 

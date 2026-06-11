@@ -8,19 +8,25 @@ import PageSkeleton from './components/layout/PageSkeleton';
 import RemoteBoundary from './components/layout/RemoteBoundary';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
-import { AuthCallback } from './auth/AuthCallback';
-import { SilentCallback } from './auth/SilentCallback';
-import { useOidcAuth } from './auth/useOidcAuth';
+import { AuthCallback } from '@velobits/app-core/auth/AuthCallback';
+import { SilentCallback } from '@velobits/app-core/auth/SilentCallback';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
 import { AppProvider, useAppContext } from './contexts/AppContext';
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 import PassPurchaseModal from './components/subscription/PassPurchaseModal';
-import { ROUTES } from './constants';
+import { ROUTES } from '@velobits/app-core/constants';
 
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+// In-app (authenticated) marketing pages. Distinct from the public SSR/SEO
+// versions in apps/content — these let logged-in users browse the full pass/credit
+// catalog and purchase via Razorpay without leaving the SPA. The navbar, editor,
+// and dashboard link here ('/about', '/pricing').
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
 
 // Remote surfaces — loaded from their independently deployed MFE builds.
 // No local fallback: if a remote is down, RemoteBoundary shows the error state.
@@ -99,6 +105,11 @@ function AppInner() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/auth/silent-callback" element={<SilentCallback />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path={ROUTES.ABOUT} element={<AboutPage />} />
+          <Route
+            path={ROUTES.PRICING}
+            element={<PricingPage showAlert={showAlert} subscription={subscription} />}
+          />
           <Route
             path={ROUTES.DASHBOARD}
             element={

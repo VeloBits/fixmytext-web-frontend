@@ -10,7 +10,7 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn(() => ({
     isAuthenticated: mockIsAuthenticated,
     isLoading: mockIsLoading,
@@ -21,7 +21,7 @@ vi.mock('@/auth/useOidcAuth', () => ({
   })),
 }));
 
-vi.mock('@/auth/userManager', () => ({
+vi.mock('@velobits/app-core/auth/userManager', () => ({
   userManager: {
     signinRedirect: vi.fn(),
   },

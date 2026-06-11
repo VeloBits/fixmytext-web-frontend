@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      '@velobits/app-core': path.resolve(__dirname, '../../packages/app-core/src'),
       '@': path.resolve(__dirname, 'src'),
       // Remote modules resolved to the thin entry packages for tests.
       // @/ alias above makes these resolve through apps/shell/src correctly.

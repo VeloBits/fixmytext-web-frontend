@@ -19,7 +19,7 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
     isLoading: false,
@@ -30,11 +30,11 @@ vi.mock('@/auth/useOidcAuth', () => ({
   }),
 }));
 
-vi.mock('@/store/api/authApi', () => ({
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
 }));
 
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 function setAuth({ accessToken = null, user = null }: Partial<MockAuthState> = {}) {

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PassPurchaseModal from './PassPurchaseModal';
 import type { PassPurchaseModalProps } from './PassPurchaseModal';
-import type { ToolDefinition } from '@/types/tools';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 import type { SubscriptionContextValue } from '@/contexts/AppContext';
 
 vi.mock('framer-motion', () => {
@@ -24,7 +24,7 @@ vi.mock('react-router-dom', () => ({
   useParams: () => ({}),
 }));
 
-vi.mock('@/store/api/passesApi', () => ({
+vi.mock('@velobits/app-core/store/api/passesApi', () => ({
   useGetPassCatalogQuery: vi.fn(() => ({
     data: {
       passes: [
@@ -43,7 +43,7 @@ vi.mock('@/store/api/passesApi', () => ({
   })),
 }));
 
-vi.mock('@/utils/formatPrice', () => ({
+vi.mock('@velobits/app-core/utils/formatPrice', () => ({
   default: (price: number) => `$${(price / 100).toFixed(2)}`,
 }));
 

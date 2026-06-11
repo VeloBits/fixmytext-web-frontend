@@ -1,23 +1,23 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense, type ReactNode, type Ref, type RefObject } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransformTextMutation } from '@/store/api/textApi';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useTransformTextMutation } from '@velobits/app-core/store/api/textApi';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import {
   useGetHistoryQuery,
   useDeleteHistoryEntryMutation,
   useClearHistoryMutation,
-} from '@/store/api/historyApi';
-import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@/store/api/userDataApi';
+} from '@velobits/app-core/store/api/historyApi';
+import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@velobits/app-core/store/api/userDataApi';
 import {
   TOOLS,
   PERSONAS,
   QUEST_TEMPLATES,
   USE_CASE_TABS,
   ACHIEVEMENTS,
-} from '@/constants/tools';
-import type { ToolDefinition, ToolTab } from '@/types/tools';
-import { ENDPOINTS } from '@/constants/endpoints';
-import { ROUTES } from '@/constants';
+} from '@velobits/app-core/constants/tools';
+import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
+import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
+import { ROUTES } from '@velobits/app-core/constants';
 
 // Hooks
 import useFindReplace from '@/hooks/useFindReplace';
@@ -29,13 +29,13 @@ import useSpeech from '@/hooks/useSpeech';
 import useExport from '@/hooks/useExport';
 import useRegexTester from '@/hooks/useRegexTester';
 import useTemplates from '@/hooks/useTemplates';
-import useHistory from '@/hooks/useHistory';
+import useHistory from '@velobits/app-core/hooks/useHistory';
 import useWordFrequency from '@/hooks/useWordFrequency';
 import usePipeline from '@/hooks/usePipeline';
 import useSmartSuggestions from '@/hooks/useSmartSuggestions';
 import useToolSearch from '@/hooks/useToolSearch';
 import useResize from '@/hooks/useResize';
-import useTrialLimit from '@/hooks/useTrialLimit';
+import useTrialLimit from '@velobits/app-core/hooks/useTrialLimit';
 import useDrawerState from '@/hooks/useDrawerState';
 import useKeyboardShortcuts from '@/hooks/useKeyboardShortcuts';
 import useHashTools from '@/hooks/useHashTools';
@@ -112,7 +112,7 @@ import SmartSuggestions from './SmartSuggestions';
 import BottomPanel from './BottomPanel';
 import CommandPalette from '@/components/layout/CommandPalette';
 import KeyboardShortcuts from '@/components/layout/KeyboardShortcuts';
-import AchievementToast from '@/components/gamification/AchievementToast';
+import AchievementToast from '@velobits/app-core/gamification/AchievementToast';
 
 import { motion, AnimatePresence } from 'framer-motion';
 

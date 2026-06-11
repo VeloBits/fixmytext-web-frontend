@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { ToolDefinition } from '@/types/tools';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 interface CommandPaletteSearch {
   isOpen: boolean;

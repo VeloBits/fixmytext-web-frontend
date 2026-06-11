@@ -141,7 +141,7 @@ const useHashTools = ({
       return m.keccak256(t);
     });
     const handleRipemd160 = createHashHandler('ripemd160', 'RIPEMD-160 Hash', async (t) => {
-      const { default: ripemd160 } = await import('../utils/ripemd160');
+      const { default: ripemd160 } = await import('@velobits/app-core/utils/ripemd160');
       return ripemd160(t);
     });
     const handleBlake2b = createHashHandler('blake2b', 'BLAKE2b Hash', async (t) => {

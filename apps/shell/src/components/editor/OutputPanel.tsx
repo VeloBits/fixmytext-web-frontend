@@ -4,8 +4,8 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { useCreateShareMutation } from '@/store/api/shareApi';
-import type { ToolDefinition } from '@/types/tools';
+import { useCreateShareMutation } from '@velobits/app-core/store/api/shareApi';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 interface AiResult {
   label: string;

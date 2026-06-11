@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import OutputPanel from './OutputPanel';
-import type { ToolDefinition } from '@/types/tools';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 import { expectNoA11yViolations } from '@/test/axeHelper';
 
 // Mock framer-motion
@@ -46,7 +46,7 @@ vi.mock('@emoji-mart/react', () => ({
 }));
 
 // Mock shareApi
-vi.mock('@/store/api/shareApi', () => ({
+vi.mock('@velobits/app-core/store/api/shareApi', () => ({
   useCreateShareMutation: () => [
     vi.fn().mockResolvedValue({ share_url: 'http://example.com/share/1' }),
     { isLoading: false },
@@ -255,7 +255,7 @@ describe('OutputPanel', () => {
 
   it('shows Sharing... text when isSharing', () => {
     // Override the mock to show isLoading = true
-    vi.doMock('../../store/api/shareApi', () => ({
+    vi.doMock('@velobits/app-core/store/api/shareApi', () => ({
       useCreateShareMutation: () => [vi.fn(), { isLoading: true }],
     }));
     // Render default version - just verify Share button exists

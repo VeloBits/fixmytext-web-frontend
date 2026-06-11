@@ -1,4 +1,4 @@
-import { userManager } from '@/auth/userManager';
+import { userManager } from '@velobits/app-core/auth/userManager';
 
 const ENABLED_PROVIDERS = (import.meta.env.VITE_KEYCLOAK_ENABLED_PROVIDERS ?? '')
   .split(',')
@@ -43,7 +43,7 @@ export function SocialButtons({ showMagicLink = true }: { showMagicLink?: boolea
           onClick={() => {
             const email = prompt('Enter your email for a sign-in link:');
             if (email) {
-              void import('@/auth/keycloakClient').then((m) => m.sendMagicLink(email));
+              void import('@velobits/app-core/auth/keycloakClient').then((m) => m.sendMagicLink(email));
             }
           }}
         >

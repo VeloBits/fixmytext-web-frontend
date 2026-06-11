@@ -3,6 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["../shell/src/*"],
+      "@velobits/app-core": ["../../packages/app-core/src/index.ts"],
+      "@velobits/app-core/*": ["../../packages/app-core/src/*"],
       "@velobits/design-system": ["../../packages/design-system/src/index.ts"],
       "@velobits/design-system/*": ["../../packages/design-system/src/*"],
       "@velobits/api-client": ["../../packages/api-client/src/index.ts"],

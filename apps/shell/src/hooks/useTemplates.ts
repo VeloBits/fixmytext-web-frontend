@@ -4,8 +4,8 @@ import {
   useCreateTemplateMutation,
   useUpdateTemplateMutation,
   useDeleteTemplateMutation,
-} from '@/store/api/userDataApi';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+} from '@velobits/app-core/store/api/userDataApi';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 
 const STORAGE_KEY = 'tu-templates';
 

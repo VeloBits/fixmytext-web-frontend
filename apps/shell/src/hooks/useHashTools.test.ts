@@ -24,7 +24,7 @@ vi.mock('js-sha3', () => ({
   keccak256: vi.fn((t) => `keccak256-of-${t}`),
 }));
 
-vi.mock('@/utils/ripemd160', () => ({
+vi.mock('@velobits/app-core/utils/ripemd160', () => ({
   default: vi.fn((t) => `ripemd160-of-${t}`),
 }));
 

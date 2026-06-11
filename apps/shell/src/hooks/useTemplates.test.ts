@@ -8,7 +8,7 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
     isLoading: false,
@@ -19,7 +19,7 @@ vi.mock('@/auth/useOidcAuth', () => ({
   }),
 }));
 
-vi.mock('@/store/api/userDataApi', () => ({
+vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetTemplatesQuery: vi.fn(() => ({ data: undefined })),
   useCreateTemplateMutation: () => [mockApiCreate],
   useUpdateTemplateMutation: () => [mockApiUpdate],
@@ -27,8 +27,8 @@ vi.mock('@/store/api/userDataApi', () => ({
 }));
 
 import { useSelector } from 'react-redux';
-import { useGetTemplatesQuery } from '@/store/api/userDataApi';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useGetTemplatesQuery } from '@velobits/app-core/store/api/userDataApi';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import useTemplates from './useTemplates';
 
 const mockUseSelector = vi.mocked(useSelector);

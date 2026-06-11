@@ -5,11 +5,11 @@ import type { GamificationContextValue, User } from '@/contexts/AppContext';
 
 const mockResendVerification = vi.fn();
 
-vi.mock('@/store/api/authApi', () => ({
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
 }));
 
-vi.mock('@/constants/tools', () => ({
+vi.mock('@velobits/app-core/constants/tools', () => ({
   PERSONAS: {
     writer: { label: 'Writer', icon: 'W' },
   },

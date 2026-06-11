@@ -44,25 +44,25 @@ vi.mock('react-router-dom', () => ({
 }));
 
 // ── RTK Query API mocks ──
-vi.mock('@/store/api/textApi', () => ({
+vi.mock('@velobits/app-core/store/api/textApi', () => ({
   useTransformTextMutation: () => [
     vi.fn().mockResolvedValue({ result: 'transformed' }),
     { isLoading: false },
   ],
 }));
-vi.mock('@/store/api/authApi', () => ({
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useLogoutMutation: () => [vi.fn().mockResolvedValue(undefined), {}],
 }));
-vi.mock('@/store/api/historyApi', () => ({
+vi.mock('@velobits/app-core/store/api/historyApi', () => ({
   useGetHistoryQuery: () => ({ data: null, isFetching: false }),
   useDeleteHistoryEntryMutation: () => [vi.fn(), {}],
   useClearHistoryMutation: () => [vi.fn(), {}],
 }));
-vi.mock('@/store/api/userDataApi', () => ({
+vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetUiSettingsQuery: () => ({ data: null }),
   useUpdateUiSettingsMutation: () => [vi.fn().mockResolvedValue(undefined), {}],
 }));
-vi.mock('@/store/api/shareApi', () => ({
+vi.mock('@velobits/app-core/store/api/shareApi', () => ({
   useCreateShareMutation: () => [
     vi.fn().mockResolvedValue({ share_url: 'http://example.com/share/1' }),
     { isLoading: false },
@@ -251,7 +251,7 @@ vi.mock('@/hooks/useTemplates', () => ({
     saveDirectly: vi.fn(),
   }),
 }));
-vi.mock('@/hooks/useHistory', () => ({
+vi.mock('@velobits/app-core/hooks/useHistory', () => ({
   default: () => ({
     history: [],
     pushHistory: vi.fn(),
@@ -297,7 +297,7 @@ vi.mock('@/hooks/useResize', () => ({
     onMouseDown: vi.fn(),
   }),
 }));
-vi.mock('@/hooks/useTrialLimit', () => ({
+vi.mock('@velobits/app-core/hooks/useTrialLimit', () => ({
   default: () => ({
     checkTrial: vi.fn(() => true),
     showSignInGate: false,
@@ -401,7 +401,7 @@ vi.mock('@/components/layout/CommandPalette', () => ({
 vi.mock('@/components/layout/KeyboardShortcuts', () => ({
   default: () => React.createElement('div', { 'data-testid': 'keyboard-shortcuts' }),
 }));
-vi.mock('@/components/gamification/AchievementToast', () => ({
+vi.mock('@velobits/app-core/gamification/AchievementToast', () => ({
   default: () => React.createElement('div', { 'data-testid': 'achievement-toast' }),
 }));
 
@@ -706,7 +706,7 @@ describe('TextForm', () => {
   });
 
   it('shows sign-in gate modal when trial.showSignInGate is true', () => {
-    vi.doMock('../../hooks/useTrialLimit', () => ({
+    vi.doMock('@velobits/app-core/hooks/useTrialLimit', () => ({
       default: () => ({
         checkTrial: vi.fn(() => true),
         showSignInGate: true,

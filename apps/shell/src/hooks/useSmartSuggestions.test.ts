@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import useSmartSuggestions from './useSmartSuggestions';
 
-vi.mock('@/constants/tools', () => ({
+vi.mock('@velobits/app-core/constants/tools', () => ({
   SMART_SUGGESTION_RULES: [
     {
       test: (t: string) => t.includes('json'),

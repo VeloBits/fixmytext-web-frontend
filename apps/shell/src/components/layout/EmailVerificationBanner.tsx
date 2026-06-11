@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useOidcAuth } from '@/auth/useOidcAuth';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import type { RootState } from '@velobits/app-core/store/store';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
 const DISMISSAL_KEY = 'fmt:email-verify-dismissed-until';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ToolDefinition } from '@/types/tools';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 type FakeFormat = 'text' | 'json' | 'csv';

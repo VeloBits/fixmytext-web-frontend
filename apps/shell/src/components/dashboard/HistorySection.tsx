@@ -1,6 +1,6 @@
-import { TOOLS } from '@/constants/tools';
+import { TOOLS } from '@velobits/app-core/constants/tools';
 import type { GamificationContextValue } from '@/contexts/AppContext';
-import type { QuestOp } from '@/types/tools';
+import type { QuestOp } from '@velobits/app-core/types/tools';
 
 interface HistorySectionProps {
   g: GamificationContextValue;

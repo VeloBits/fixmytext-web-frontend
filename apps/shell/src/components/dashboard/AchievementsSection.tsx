@@ -1,4 +1,4 @@
-import { ACHIEVEMENTS } from '@/constants/tools';
+import { ACHIEVEMENTS } from '@velobits/app-core/constants/tools';
 import type { GamificationContextValue } from '@/contexts/AppContext';
 
 interface AchievementsSectionProps {

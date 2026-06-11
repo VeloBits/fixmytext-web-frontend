@@ -55,6 +55,10 @@ export default defineConfig({
         '@reduxjs/toolkit': { singleton: true },
         'react-redux': { singleton: true },
         '@sentry/react': { singleton: true },
+        // Shared as a singleton so the Redux store / RTK Query api objects are a
+        // single instance across shell + remotes (remote hooks dispatch to the
+        // host's store). This is the linchpin of the source split.
+        '@velobits/app-core': { singleton: true, requiredVersion: false },
       },
     }),
     react(),
@@ -70,7 +74,13 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: { '@': path.resolve(__dirname, 'src') },
+    // Array form: app-core resolved before the '@' alias. app-core is a brand-new
+    // workspace package (no node_modules symlink baked into older installs), so we
+    // alias it to source directly — same pattern the remotes use for shared packages.
+    alias: [
+      { find: '@velobits/app-core', replacement: path.resolve(__dirname, '../../packages/app-core/src') },
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
+    ],
   },
   base: '/app',
   server: { port: 3100, host: true },
