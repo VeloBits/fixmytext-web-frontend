@@ -62,7 +62,9 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () {
+      return mockRecognition;
+    });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -86,7 +88,9 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () {
+      return mockRecognition;
+    });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -110,7 +114,9 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () {
+      return mockRecognition;
+    });
 
     const { result } = renderHook(() => useSpeech('', setText, showAlert));
     act(() => {
@@ -123,7 +129,10 @@ describe('useSpeech', () => {
       results: {
         0: result1,
         length: 1,
-        [Symbol.iterator]: function* (this: { length: number; [key: number]: unknown }): Generator<unknown> {
+        [Symbol.iterator]: function* (this: {
+          length: number;
+          [key: number]: unknown;
+        }): Generator<unknown> {
           for (let i = 0; i < this.length; i++) yield (this as Record<number, unknown>)[i];
         },
       },
@@ -147,7 +156,9 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () {
+      return mockRecognition;
+    });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -172,7 +183,9 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    win.SpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.SpeechRecognition = vi.fn(function () {
+      return mockRecognition;
+    });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
@@ -198,12 +211,62 @@ describe('useSpeech', () => {
       onerror: null,
       onend: null,
     };
-    win.webkitSpeechRecognition = vi.fn(function () { return mockRecognition; });
+    win.webkitSpeechRecognition = vi.fn(function () {
+      return mockRecognition;
+    });
 
     const { result } = renderHook(() => useSpeech('hello', setText, showAlert));
     act(() => {
       result.current.handleSpeechToText();
     });
     expect(mockRecognition.start).toHaveBeenCalled();
+  });
+
+  it('setText updater appends transcript to existing text (both branches)', () => {
+    // Make setText actually invoke the functional updater so we cover
+    // the (prev) => prev ? prev + ' ' + transcript : transcript branches
+    const capturedUpdaters: Array<(prev: string) => string> = [];
+    setText = vi.fn((updater: unknown) => {
+      if (typeof updater === 'function') capturedUpdaters.push(updater as (prev: string) => string);
+    });
+
+    const mockRecognition = {
+      start: vi.fn(),
+      stop: vi.fn(),
+      continuous: false,
+      interimResults: false,
+      lang: '',
+      onresult: null as unknown,
+      onerror: null,
+      onend: null,
+    };
+    win.SpeechRecognition = vi.fn(function () {
+      return mockRecognition;
+    });
+
+    const { result } = renderHook(() => useSpeech('', setText, showAlert));
+    act(() => {
+      result.current.handleSpeechToText();
+    });
+
+    const resultObj = { 0: { transcript: 'hello' }, length: 1 };
+    const event = {
+      results: {
+        0: resultObj,
+        length: 1,
+        [Symbol.iterator]: function* (this: Record<number, unknown> & { length: number }) {
+          for (let i = 0; i < this.length; i++) yield this[i];
+        },
+      },
+    };
+    act(() => {
+      (mockRecognition.onresult as (e: unknown) => void)(event);
+    });
+
+    expect(capturedUpdaters.length).toBeGreaterThan(0);
+    // Branch 1: prev is empty string → returns just transcript
+    expect(capturedUpdaters[0]!('')).toBe('hello');
+    // Branch 2: prev is non-empty → appends with space
+    expect(capturedUpdaters[0]!('existing')).toBe('existing hello');
   });
 });

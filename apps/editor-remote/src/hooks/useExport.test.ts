@@ -23,19 +23,24 @@ vi.mock('docx', () => ({
     return t;
   }),
   Packer: {
-    toBlob: vi.fn(async () => new Blob(['docx'], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })),
+    toBlob: vi.fn(
+      async () =>
+        new Blob(['docx'], {
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        })
+    ),
   },
 }));
 
 describe('useExport', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setLoading: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      showAlert: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    showAlert: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockCreateObjectURL: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockRevokeObjectURL: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockRevokeObjectURL: any;
 
   beforeEach(() => {
     vi.clearAllMocks();

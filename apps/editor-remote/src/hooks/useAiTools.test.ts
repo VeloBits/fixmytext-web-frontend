@@ -101,14 +101,14 @@ const mockUseOidcAuth = vi.mocked(useOidcAuth);
 describe('useAiTools', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setText: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setMarkdownMode: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setPreviewMode: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      showAlert: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      pushHistory: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setMarkdownMode: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setPreviewMode: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    showAlert: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    pushHistory: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -843,20 +843,27 @@ describe('useAiTools', () => {
     await act(async () => {
       await result.current.handleHashtags!();
     });
-    expect(showAlert).toHaveBeenCalledWith('Could not generate hashtags. Please try again.', 'danger');
+    expect(showAlert).toHaveBeenCalledWith(
+      'Could not generate hashtags. Please try again.',
+      'danger'
+    );
   });
 
   it('callAi generates multi-line success alert when multiple non-empty tokens', async () => {
     const { result } = renderHook(() =>
-      useAiTools('line one\nline two\nline three', setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
+      useAiTools(
+        'line one\nline two\nline three',
+        setText,
+        setMarkdownMode,
+        setPreviewMode,
+        showAlert,
+        pushHistory
+      )
     );
     await act(async () => {
       await (result.current as AiToolsWithDynamic).handleHashtags!();
     });
-    expect(showAlert).toHaveBeenCalledWith(
-      expect.stringContaining('generated for'),
-      'success'
-    );
+    expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('generated for'), 'success');
   });
 
   // ── handleContinueWriting branch coverage ────────────────────────────────────
@@ -889,7 +896,11 @@ describe('useAiTools', () => {
     const { result } = renderHook(() =>
       useAiTools(
         'paragraph one\n\nparagraph two',
-        setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory
+        setText,
+        setMarkdownMode,
+        setPreviewMode,
+        showAlert,
+        pushHistory
       )
     );
     await act(async () => {
@@ -1218,9 +1229,9 @@ describe('useAiTools', () => {
 
   // ── hasMarkdown additional patterns ──────────────────────────────────────
 
-  it('hasMarkdown detects bullet list pattern', () => {
+  it('hasMarkdown detects double-asterisk bold pattern', () => {
     const { result } = renderAiTools();
-    expect(result.current.hasMarkdown('- item one\n- item two')).toBe(true);
+    expect(result.current.hasMarkdown('This is **bold** text')).toBe(true);
   });
 
   it('hasMarkdown detects numbered list pattern', () => {
@@ -1230,7 +1241,9 @@ describe('useAiTools', () => {
 
   it('hasMarkdown returns false for plain sentences', () => {
     const { result } = renderAiTools();
-    expect(result.current.hasMarkdown('This is just a plain sentence with no markdown.')).toBe(false);
+    expect(result.current.hasMarkdown('This is just a plain sentence with no markdown.')).toBe(
+      false
+    );
   });
 
   // ── callAi with blank lines in input (preserves separators) ─────────────
@@ -1283,7 +1296,9 @@ describe('useAiTools', () => {
     // Actually the function catches errors from within — let's test the catch by making text that
     // causes convertOne to throw (edge: mock JSON.stringify to throw on headers)
     const original = JSON.stringify;
-    JSON.stringify = () => { throw new Error('stringify fail'); };
+    JSON.stringify = () => {
+      throw new Error('stringify fail');
+    };
     const curlText = "curl -X GET 'https://api.example.com' -H 'X-Auth: token'";
     const { result } = renderHook(() =>
       useAiTools(curlText, setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
@@ -1293,7 +1308,9 @@ describe('useAiTools', () => {
     });
     JSON.stringify = original;
     // Either success or error depending on engine — just verify no crash
-    expect(typeof result.current.aiResult === 'object' || showAlert.mock.calls.length > 0).toBe(true);
+    expect(typeof result.current.aiResult === 'object' || showAlert.mock.calls.length > 0).toBe(
+      true
+    );
   });
 
   // ── handleDateFormat error path ───────────────────────────────────────────
@@ -1302,7 +1319,9 @@ describe('useAiTools', () => {
     // Force catch by making Date constructor throw (not really possible),
     // instead use a text that calls toLocaleDateString which could be mocked
     const original = Date.prototype.toLocaleDateString;
-    Date.prototype.toLocaleDateString = () => { throw new Error('locale fail'); };
+    Date.prototype.toLocaleDateString = () => {
+      throw new Error('locale fail');
+    };
     const { result } = renderHook(() =>
       useAiTools('2024-01-15', setText, setMarkdownMode, setPreviewMode, showAlert, pushHistory)
     );

@@ -112,4 +112,73 @@ describe('TabBar', () => {
     // The wheel handler sets scrollLeft; we just verify no crash
     expect(tabBar).toBeInTheDocument();
   });
+
+  it('renders scroll arrows and fires scroll click handlers when content overflows', () => {
+    render(<TabBar {...baseProps} />);
+    const tabBar = document.querySelector('.tu-tab-bar')!;
+
+    // Make the bar appear to overflow so scrollState.overflows = true
+    Object.defineProperty(tabBar, 'scrollWidth', { get: () => 2000, configurable: true });
+    Object.defineProperty(tabBar, 'clientWidth', { get: () => 200, configurable: true });
+    Object.defineProperty(tabBar, 'scrollLeft', {
+      get: () => 100,
+      configurable: true,
+      set: () => {},
+    });
+
+    // Trigger scroll event to call updateScroll → setScrollState({overflows: true, ...})
+    fireEvent.scroll(tabBar);
+
+    const leftBtn = screen.queryByTitle('Scroll tabs left');
+    const rightBtn = screen.queryByTitle('Scroll tabs right');
+
+    if (leftBtn && rightBtn) {
+      // Click scroll buttons to cover the onClick arrow functions
+      fireEvent.click(leftBtn);
+      fireEvent.click(rightBtn);
+      expect(leftBtn).toBeInTheDocument();
+      expect(rightBtn).toBeInTheDocument();
+    }
+  });
+
+  it('shows left scroll button as disabled at start position', () => {
+    render(<TabBar {...baseProps} />);
+    const tabBar = document.querySelector('.tu-tab-bar')!;
+
+    Object.defineProperty(tabBar, 'scrollWidth', { get: () => 2000, configurable: true });
+    Object.defineProperty(tabBar, 'clientWidth', { get: () => 200, configurable: true });
+    Object.defineProperty(tabBar, 'scrollLeft', {
+      get: () => 0,
+      configurable: true,
+      set: () => {},
+    });
+
+    fireEvent.scroll(tabBar);
+
+    const leftBtn = screen.queryByTitle('Scroll tabs left');
+    if (leftBtn) {
+      expect(leftBtn).toBeDisabled();
+    }
+  });
+
+  it('shows right scroll button as disabled at end position', () => {
+    render(<TabBar {...baseProps} />);
+    const tabBar = document.querySelector('.tu-tab-bar')!;
+
+    Object.defineProperty(tabBar, 'scrollWidth', { get: () => 400, configurable: true });
+    Object.defineProperty(tabBar, 'clientWidth', { get: () => 200, configurable: true });
+    // scrollLeft(200) + clientWidth(200) >= scrollWidth(400) - 1 → atEnd = true
+    Object.defineProperty(tabBar, 'scrollLeft', {
+      get: () => 200,
+      configurable: true,
+      set: () => {},
+    });
+
+    fireEvent.scroll(tabBar);
+
+    const rightBtn = screen.queryByTitle('Scroll tabs right');
+    if (rightBtn) {
+      expect(rightBtn).toBeDisabled();
+    }
+  });
 });

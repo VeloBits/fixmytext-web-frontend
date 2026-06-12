@@ -890,7 +890,9 @@ describe('useClientTools', () => {
     });
 
     it('converts markdown headings to HTML', () => {
-      const { handlers, setToolResults, showAlert } = setup('# Heading 1\n## Heading 2\n### Heading 3');
+      const { handlers, setToolResults, showAlert } = setup(
+        '# Heading 1\n## Heading 2\n### Heading 3'
+      );
       handlers.handleMdToHtml();
       const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});
@@ -1112,8 +1114,7 @@ describe('useClientTools', () => {
 
   describe('handleJwtDecode', () => {
     // A minimal valid JWT with header {alg:"none"} and payload {sub:"1234"}
-    const validJwt =
-      'eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0In0.';
+    const validJwt = 'eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0In0.';
 
     it('does nothing when text is empty', () => {
       const { handlers, setPreviewMode } = setup('');
@@ -1126,19 +1127,14 @@ describe('useClientTools', () => {
       handlers.handleJwtDecode();
       expect(setLocalLoading).toHaveBeenCalledWith(true);
       expect(setLocalLoading).toHaveBeenCalledWith(false);
-      expect(setAiResult).toHaveBeenCalledWith(
-        expect.objectContaining({ label: 'JWT Decoded' })
-      );
+      expect(setAiResult).toHaveBeenCalledWith(expect.objectContaining({ label: 'JWT Decoded' }));
       expect(showAlert).toHaveBeenCalledWith('JWT decoded', 'success');
     });
 
     it('shows danger for a token with wrong number of parts', () => {
       const { handlers, showAlert } = setup('only.two');
       handlers.handleJwtDecode();
-      expect(showAlert).toHaveBeenCalledWith(
-        expect.stringContaining('3 dot-separated'),
-        'danger'
-      );
+      expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('3 dot-separated'), 'danger');
     });
 
     it('shows danger for a token with invalid base64', () => {
@@ -1150,9 +1146,13 @@ describe('useClientTools', () => {
     it('shows danger for a token whose payload is not JSON', () => {
       // header and payload are valid base64url but payload decodes to plain text
       const header = btoa(JSON.stringify({ alg: 'none' }))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
       const notJson = btoa('this is not json')
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
       const { handlers, showAlert } = setup(`${header}.${notJson}.sig`);
       handlers.handleJwtDecode();
       expect(showAlert).toHaveBeenCalledWith(expect.any(String), 'danger');

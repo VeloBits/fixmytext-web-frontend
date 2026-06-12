@@ -40,7 +40,10 @@ describe('CipherDrawer', () => {
 
   it('uses password input type for aes tools', () => {
     renderCipher({ activeTool: { id: 'aes_encrypt' } });
-    expect(screen.getByPlaceholderText('Enter a secret key here')).toHaveAttribute('type', 'password');
+    expect(screen.getByPlaceholderText('Enter a secret key here')).toHaveAttribute(
+      'type',
+      'password'
+    );
   });
 
   it('shows warning when no text', () => {
@@ -125,5 +128,201 @@ describe('CipherDrawer', () => {
   it('handles no activeTool gracefully', () => {
     renderCipher({ activeTool: null });
     expect(screen.getByPlaceholderText('Key, e.g. SECRET')).toBeInTheDocument();
+  });
+
+  it('shows text input (not password) for substitution cipher', () => {
+    renderCipher({ activeTool: { id: 'substitution_cipher' } });
+    const input = screen.getByPlaceholderText(/Substitution alphabet/);
+    expect((input as HTMLInputElement).type).toBe('text');
+  });
+
+  it('shows password input for non-substitution ciphers', () => {
+    renderCipher({ activeTool: { id: 'vigenere_enc' } });
+    const input = screen.getByPlaceholderText('Key, e.g. SECRET');
+    expect((input as HTMLInputElement).type).toBe('password');
+  });
+
+  it('shows aes placeholder for aes_encrypt', () => {
+    renderCipher({ activeTool: { id: 'aes_encrypt' } });
+    expect(screen.getByPlaceholderText('Enter a secret key here')).toBeInTheDocument();
+  });
+
+  it('pressing Enter key triggers handleApply', async () => {
+    const showAlert = vi.fn();
+    render(
+      <CipherDrawer
+        activeTool={{ id: 'vigenere_enc' }}
+        text=""
+        onResult={vi.fn()}
+        showAlert={showAlert}
+        transformText={vi.fn()}
+      />
+    );
+    const input = screen.getByPlaceholderText('Key, e.g. SECRET');
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    await vi.waitFor(() => {
+      expect(showAlert).toHaveBeenCalledWith('Enter text first', 'warning');
+    });
+  });
+
+  it('AES encrypt succeeds with mocked crypto.subtle', async () => {
+    const onResult = vi.fn();
+    const showAlert = vi.fn();
+
+    const fakeKeyMaterial = {};
+    const fakeEncrypted = new Uint8Array([10, 20, 30]).buffer;
+    const mockImportKey = vi.fn(async () => fakeKeyMaterial);
+    const mockEncrypt = vi.fn(async () => fakeEncrypted);
+    const mockGetRandVals = vi.fn(<T extends ArrayBufferView>(arr: T) => {
+      (arr as unknown as Uint8Array).fill(0);
+      return arr;
+    });
+
+    Object.defineProperty(globalThis, 'crypto', {
+      value: {
+        subtle: { importKey: mockImportKey, encrypt: mockEncrypt },
+        getRandomValues: mockGetRandVals,
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    render(
+      <CipherDrawer
+        activeTool={{ id: 'aes_encrypt' }}
+        text="Hello world"
+        onResult={onResult}
+        showAlert={showAlert}
+        transformText={vi.fn()}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Enter a secret key here'), {
+      target: { value: 'mysecretpassword' },
+    });
+    fireEvent.click(screen.getByTitle('Apply'));
+
+    await vi.waitFor(() => {
+      expect(showAlert).toHaveBeenCalledWith('Text encrypted', 'success');
+    });
+    expect(onResult).toHaveBeenCalledWith('AES Encrypted', expect.any(String));
+  });
+
+  it('AES decrypt succeeds with mocked crypto.subtle', async () => {
+    const onResult = vi.fn();
+    const showAlert = vi.fn();
+
+    const fakeKeyMaterial = {};
+    const decryptedText = new TextEncoder().encode('decrypted!');
+    const mockImportKey = vi.fn(async () => fakeKeyMaterial);
+    const mockDecrypt = vi.fn(async () => decryptedText.buffer);
+
+    Object.defineProperty(globalThis, 'crypto', {
+      value: {
+        subtle: { importKey: mockImportKey, decrypt: mockDecrypt },
+        getRandomValues: vi.fn(),
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    // Create valid base64 with 12+ bytes for IV
+    const dummyData = new Uint8Array(20).fill(5);
+    const b64Input = btoa(String.fromCharCode(...dummyData));
+
+    render(
+      <CipherDrawer
+        activeTool={{ id: 'aes_decrypt' }}
+        text={b64Input}
+        onResult={onResult}
+        showAlert={showAlert}
+        transformText={vi.fn()}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Enter a secret key here'), {
+      target: { value: 'mysecretpassword' },
+    });
+    fireEvent.click(screen.getByTitle('Apply'));
+
+    await vi.waitFor(() => {
+      expect(showAlert).toHaveBeenCalledWith('Text decrypted', 'success');
+    });
+    expect(onResult).toHaveBeenCalledWith('AES Decrypted', 'decrypted!');
+  });
+
+  it('AES encrypt shows danger on crypto failure', async () => {
+    const showAlert = vi.fn();
+
+    Object.defineProperty(globalThis, 'crypto', {
+      value: {
+        subtle: {
+          importKey: vi.fn(async () => {
+            throw new Error('fail');
+          }),
+        },
+        getRandomValues: vi.fn(),
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    render(
+      <CipherDrawer
+        activeTool={{ id: 'aes_encrypt' }}
+        text="Hello"
+        onResult={vi.fn()}
+        showAlert={showAlert}
+        transformText={vi.fn()}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Enter a secret key here'), {
+      target: { value: 'key' },
+    });
+    fireEvent.click(screen.getByTitle('Apply'));
+
+    await vi.waitFor(() => {
+      expect(showAlert).toHaveBeenCalledWith('Encryption failed', 'danger');
+    });
+  });
+
+  it('AES decrypt shows danger on crypto failure', async () => {
+    const showAlert = vi.fn();
+
+    Object.defineProperty(globalThis, 'crypto', {
+      value: {
+        subtle: {
+          importKey: vi.fn(async () => {
+            throw new Error('bad key');
+          }),
+        },
+        getRandomValues: vi.fn(),
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    const dummyData = new Uint8Array(20).fill(0);
+    const b64Input = btoa(String.fromCharCode(...dummyData));
+
+    render(
+      <CipherDrawer
+        activeTool={{ id: 'aes_decrypt' }}
+        text={b64Input}
+        onResult={vi.fn()}
+        showAlert={showAlert}
+        transformText={vi.fn()}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Enter a secret key here'), {
+      target: { value: 'key' },
+    });
+    fireEvent.click(screen.getByTitle('Apply'));
+
+    await vi.waitFor(() => {
+      expect(showAlert).toHaveBeenCalledWith('Decryption failed — wrong passphrase?', 'danger');
+    });
   });
 });

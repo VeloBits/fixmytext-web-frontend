@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import ParagraphGutter from './ParagraphGutter';
 
 // ResizeObserver is not available in jsdom — provide a minimal stub.
@@ -78,7 +78,9 @@ describe('ParagraphGutter', () => {
     const { rerender, container } = render(
       <ParagraphGutter textareaRef={ref} text="line one" scrollTop={0} />
     );
-    rerender(<ParagraphGutter textareaRef={ref} text="line one\nline two\nline three" scrollTop={0} />);
+    rerender(
+      <ParagraphGutter textareaRef={ref} text="line one\nline two\nline three" scrollTop={0} />
+    );
     expect(container.querySelector('.tu-paragraph-gutter')).toBeTruthy();
   });
 
@@ -104,5 +106,43 @@ describe('ParagraphGutter', () => {
     expect(disconnectSpy).toHaveBeenCalled();
     document.body.removeChild(textarea);
     disconnectSpy.mockRestore();
+  });
+
+  it('triggers ResizeObserver callback without crashing (covers setPositions spread)', () => {
+    // Track every ResizeObserverStub instance created so we can call trigger().
+    const instances: ResizeObserverStub[] = [];
+
+    class TrackingResizeObserver extends ResizeObserverStub {
+      constructor(cb: ResizeObserverCallback) {
+        super(cb);
+        instances.push(this);
+      }
+    }
+
+    vi.stubGlobal('ResizeObserver', TrackingResizeObserver);
+
+    const textarea = document.createElement('textarea');
+    document.body.appendChild(textarea);
+    const ref = { current: textarea } as React.RefObject<HTMLTextAreaElement | null>;
+
+    const { container } = render(
+      <ParagraphGutter textareaRef={ref} text="paragraph one\n\nparagraph two" scrollTop={0} />
+    );
+
+    // The useEffect that sets up ResizeObserver runs after mount.
+    // instances[0] is the observer created for this render.
+    expect(instances.length).toBeGreaterThan(0);
+
+    // Firing the callback exercises the `setPositions((p) => [...p])` line.
+    act(() => {
+      instances[instances.length - 1]!.trigger();
+    });
+
+    // Component must still be in the DOM — no crash.
+    expect(container.querySelector('.tu-paragraph-gutter')).toBeTruthy();
+
+    document.body.removeChild(textarea);
+    // Restore the original stub (set in beforeAll) so other tests are unaffected.
+    vi.stubGlobal('ResizeObserver', ResizeObserverStub);
   });
 });

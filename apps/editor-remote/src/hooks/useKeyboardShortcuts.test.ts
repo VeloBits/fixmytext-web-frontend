@@ -11,7 +11,11 @@ vi.mock('react-redux', () => ({
 }));
 
 const mockUpdateUiSettings = vi.fn(() => ({ unwrap: () => Promise.resolve({}) }));
-const mockGetUiSettingsQuery = vi.fn(() => ({ data: undefined }));
+// Typed to accept any args and return a loose shape so mockReturnValue can supply
+// either `{ data: undefined }` or `{ data: { keybindings: ... } }`.
+const mockGetUiSettingsQuery = vi.fn(
+  (..._args: unknown[]): { data: unknown } => ({ data: undefined })
+);
 
 vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetUiSettingsQuery: (...args: unknown[]) => mockGetUiSettingsQuery(...args),
@@ -523,7 +527,12 @@ describe('useKeyboardShortcuts — additional keyboard cases', () => {
 
   it('Alt+2 through Alt+5 trigger goToTab with correct index', () => {
     renderHook(() => useKeyboardShortcuts(actions));
-    for (const [key, expected] of [['2', 1], ['3', 2], ['4', 3], ['5', 4]] as [string, number][]) {
+    for (const [key, expected] of [
+      ['2', 1],
+      ['3', 2],
+      ['4', 3],
+      ['5', 4],
+    ] as [string, number][]) {
       fireKey(key, { altKey: true });
       expect(actions.goToTab).toHaveBeenCalledWith(expected);
     }
@@ -532,7 +541,12 @@ describe('useKeyboardShortcuts — additional keyboard cases', () => {
 
   it('Alt+6 through Alt+9 trigger goToTab with correct index', () => {
     renderHook(() => useKeyboardShortcuts(actions));
-    for (const [key, expected] of [['6', 5], ['7', 6], ['8', 7], ['9', 8]] as [string, number][]) {
+    for (const [key, expected] of [
+      ['6', 5],
+      ['7', 6],
+      ['8', 7],
+      ['9', 8],
+    ] as [string, number][]) {
       fireKey(key, { altKey: true });
       expect(actions.goToTab).toHaveBeenCalledWith(expected);
     }
@@ -663,6 +677,37 @@ describe('useKeyboardShortcuts — authenticated paths', () => {
     const { result } = renderHook(() => useKeyboardShortcuts(actions));
     // overrides remains what was in localStorage (empty)
     expect(result.current.overrides).toEqual({});
+  });
+
+  it('updateBinding catch callback swallows API errors silently', async () => {
+    mockUpdateUiSettings.mockReturnValue({ unwrap: () => Promise.reject(new Error('API fail')) });
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    // Should not throw even when updateUiSettings rejects
+    await act(async () => {
+      result.current.updateBinding('palette', { keys: 'p', ctrl: true });
+      await new Promise((r) => setTimeout(r, 0)); // flush microtasks
+    });
+    expect(result.current.overrides.palette).toBeDefined();
+  });
+
+  it('resetAll catch callback swallows API errors silently', async () => {
+    mockUpdateUiSettings.mockReturnValue({ unwrap: () => Promise.reject(new Error('fail')) });
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    await act(async () => {
+      result.current.resetAll();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(result.current.overrides).toEqual({});
+  });
+
+  it('resetOne catch callback swallows API errors silently', async () => {
+    mockUpdateUiSettings.mockReturnValue({ unwrap: () => Promise.reject(new Error('fail')) });
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    await act(async () => {
+      result.current.resetOne('palette');
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(result.current.overrides.palette).toBeUndefined();
   });
 
   it('resets hydration flag on logout', () => {
