@@ -134,6 +134,13 @@ jobs:
   federation-smoke:
     name: Federation Smoke (host↔remote contract)
     runs-on: ubuntu-latest
+    # Heavy E2E gate — runs only for `main` (pushes to main + PRs targeting main).
+    # Skipped on `develop`: push to develop has github.ref refs/heads/develop;
+    # a PR into develop has github.base_ref == 'develop'. Both are excluded here.
+    if: github.ref != 'refs/heads/develop' && github.base_ref != 'develop'
+    # Fail fast if a step hangs (e.g. a stalled Playwright CDN download) instead of
+    # sitting until GitHub's 6-hour default — which makes the run look permanently stuck.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
@@ -146,8 +153,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright (chromium)
-        run: npm run test:e2e:install
+      # Cache the downloaded browser binaries (~270 MB) keyed on the resolved
+      # Playwright version. On a cache hit we skip the slow CDN download entirely
+      # and only run install-deps (apt) below.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}
+
+      # Cache hit: browsers already present, only install the OS deps (fast).
+      # Cache miss: download chromium + headless shell + ffmpeg, then deps.
+      - name: Install Playwright browser (on cache miss)
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Install Playwright OS dependencies
+        run: npx playwright install-deps chromium
 
       # Bring up the production simulation: built shell + remotes behind the nginx
       # router on :3000 — the topology that actually exercises the remote `base` paths
