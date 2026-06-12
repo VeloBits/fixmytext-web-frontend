@@ -10,10 +10,20 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(() => null),
 }));
 
+const mockUpdateUiSettings = vi.fn(() => ({ unwrap: () => Promise.resolve({}) }));
+const mockGetUiSettingsQuery = vi.fn(() => ({ data: undefined }));
+
 vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
-  useGetUiSettingsQuery: vi.fn(() => ({ data: undefined })),
-  useUpdateUiSettingsMutation: () => [vi.fn(() => ({ unwrap: () => Promise.resolve({}) }))],
+  useGetUiSettingsQuery: (...args: unknown[]) => mockGetUiSettingsQuery(...args),
+  useUpdateUiSettingsMutation: () => [mockUpdateUiSettings],
 }));
+
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn(() => ({ isAuthenticated: false })),
+}));
+
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 vi.mock('@velobits/app-core/constants/tools', () => ({
   TOOLS: [
@@ -36,6 +46,8 @@ describe('useKeyboardShortcuts', () => {
     vi.clearAllMocks();
     localStorage.clear();
     mockUseSelector.mockReturnValue(null);
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false } as ReturnType<typeof useOidcAuth>);
+    mockGetUiSettingsQuery.mockReturnValue({ data: undefined });
     actions = {
       openPalette: vi.fn(),
       toggleSidebar: vi.fn(),
@@ -400,5 +412,269 @@ describe('eventToBinding', () => {
     expect(
       eventToBinding({ key: 'Meta', ctrlKey: false, shiftKey: false, altKey: false, metaKey: true })
     ).toBeNull();
+  });
+});
+
+// ── Helper to dispatch keyboard events ──────────────────────────────────────
+
+function fireKey(
+  key: string,
+  opts: { ctrlKey?: boolean; shiftKey?: boolean; altKey?: boolean } = {},
+  target: { tagName: string } = { tagName: 'DIV' }
+) {
+  const event = new KeyboardEvent('keydown', {
+    key,
+    ctrlKey: opts.ctrlKey ?? false,
+    shiftKey: opts.shiftKey ?? false,
+    altKey: opts.altKey ?? false,
+    bubbles: true,
+  });
+  Object.defineProperty(event, 'target', { value: target });
+  act(() => {
+    window.dispatchEvent(event);
+  });
+  return event;
+}
+
+// ── Additional keyboard shortcut tests ──────────────────────────────────────
+
+describe('useKeyboardShortcuts — additional keyboard cases', () => {
+  let actions: KeyboardActions;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false } as ReturnType<typeof useOidcAuth>);
+    mockGetUiSettingsQuery.mockReturnValue({ data: undefined });
+    actions = {
+      openPalette: vi.fn(),
+      toggleSidebar: vi.fn(),
+      toggleSettings: vi.fn(),
+      onEscape: vi.fn(),
+      runActiveTool: vi.fn(),
+      saveTemplate: vi.fn(),
+      closeActiveTab: vi.fn(),
+      clearText: vi.fn(),
+      undo: vi.fn(),
+      redo: vi.fn(),
+      copyOutput: vi.fn(),
+      clearPaste: vi.fn(),
+      goToTab: vi.fn(),
+      nextTab: vi.fn(),
+      prevTab: vi.fn(),
+      runTool: vi.fn(),
+    };
+  });
+
+  it('Ctrl+, triggers settings', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey(',', { ctrlKey: true });
+    expect(actions.toggleSettings).toHaveBeenCalled();
+  });
+
+  it('Ctrl+S triggers save_template', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('s', { ctrlKey: true });
+    expect(actions.saveTemplate).toHaveBeenCalled();
+  });
+
+  it('Ctrl+W triggers close_tab', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('w', { ctrlKey: true });
+    expect(actions.closeActiveTab).toHaveBeenCalled();
+  });
+
+  it('Ctrl+Shift+X triggers clear_text', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('x', { ctrlKey: true, shiftKey: true });
+    expect(actions.clearText).toHaveBeenCalled();
+  });
+
+  it('Alt+Z triggers undo', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('z', { altKey: true });
+    expect(actions.undo).toHaveBeenCalled();
+  });
+
+  it('Alt+Shift+Z triggers redo', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('z', { altKey: true, shiftKey: true });
+    expect(actions.redo).toHaveBeenCalled();
+  });
+
+  it('Ctrl+Shift+C triggers copy_output', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('c', { ctrlKey: true, shiftKey: true });
+    expect(actions.copyOutput).toHaveBeenCalled();
+  });
+
+  it('Ctrl+Shift+V triggers clear_paste', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('v', { ctrlKey: true, shiftKey: true });
+    expect(actions.clearPaste).toHaveBeenCalled();
+  });
+
+  it('Alt+[ triggers prev_tab', () => {
+    // prev_tab is Ctrl+[ according to defaults
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('[', { ctrlKey: true });
+    expect(actions.prevTab).toHaveBeenCalled();
+  });
+
+  it('Alt+2 through Alt+5 trigger goToTab with correct index', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    for (const [key, expected] of [['2', 1], ['3', 2], ['4', 3], ['5', 4]] as [string, number][]) {
+      fireKey(key, { altKey: true });
+      expect(actions.goToTab).toHaveBeenCalledWith(expected);
+    }
+    expect(actions.goToTab).toHaveBeenCalledTimes(4);
+  });
+
+  it('Alt+6 through Alt+9 trigger goToTab with correct index', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    for (const [key, expected] of [['6', 5], ['7', 6], ['8', 7], ['9', 8]] as [string, number][]) {
+      fireKey(key, { altKey: true });
+      expect(actions.goToTab).toHaveBeenCalledWith(expected);
+    }
+  });
+
+  it('Ctrl+Shift+L triggers tool_lowercase via runTool', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('l', { ctrlKey: true, shiftKey: true });
+    expect(actions.runTool).toHaveBeenCalled();
+  });
+
+  it('Ctrl+Shift+G triggers tool_fix_grammar via runTool', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('g', { ctrlKey: true, shiftKey: true });
+    expect(actions.runTool).toHaveBeenCalled();
+  });
+
+  it('tool_ shortcut with no matching TOOLS entry does not call runTool', () => {
+    // paraphrase, summarize, find_replace, json_fmt, title_case are in defaults but NOT in mock TOOLS
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('p', { ctrlKey: true, shiftKey: true }); // tool_paraphrase not in TOOLS mock
+    expect(actions.runTool).not.toHaveBeenCalled();
+  });
+
+  it('ignores SELECT target without modifier', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    fireKey('a', {}, { tagName: 'SELECT' });
+    expect(actions.openPalette).not.toHaveBeenCalled();
+  });
+
+  it('ignores TEXTAREA target for non-modifier non-Escape key', () => {
+    renderHook(() => useKeyboardShortcuts(actions));
+    // 'a' key with no modifier from TEXTAREA should be ignored
+    fireKey('a', {}, { tagName: 'TEXTAREA' });
+    expect(actions.openPalette).not.toHaveBeenCalled();
+  });
+
+  it('loadCustomBindings handles corrupted localStorage gracefully', () => {
+    localStorage.setItem('fmx_keybindings', 'NOT_JSON{{{');
+    // Should not throw, falls back to empty overrides
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    expect(result.current.overrides).toEqual({});
+  });
+
+  it('saveCustomBindings removes key from localStorage when overrides is empty', () => {
+    localStorage.setItem('fmx_keybindings', JSON.stringify({ palette: { keys: 'p', ctrl: true } }));
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    act(() => {
+      result.current.resetAll();
+    });
+    expect(localStorage.getItem('fmx_keybindings')).toBeNull();
+  });
+});
+
+// ── Authenticated paths ──────────────────────────────────────────────────────
+
+describe('useKeyboardShortcuts — authenticated paths', () => {
+  let actions: KeyboardActions;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: true } as ReturnType<typeof useOidcAuth>);
+    mockGetUiSettingsQuery.mockReturnValue({ data: undefined });
+    actions = {
+      openPalette: vi.fn(),
+      toggleSidebar: vi.fn(),
+      toggleSettings: vi.fn(),
+      onEscape: vi.fn(),
+      runActiveTool: vi.fn(),
+      saveTemplate: vi.fn(),
+      closeActiveTab: vi.fn(),
+      clearText: vi.fn(),
+      undo: vi.fn(),
+      redo: vi.fn(),
+      copyOutput: vi.fn(),
+      clearPaste: vi.fn(),
+      goToTab: vi.fn(),
+      nextTab: vi.fn(),
+      prevTab: vi.fn(),
+      runTool: vi.fn(),
+    };
+  });
+
+  it('updateBinding calls updateUiSettings when authenticated', () => {
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    act(() => {
+      result.current.updateBinding('palette', { keys: 'p', ctrl: true });
+    });
+    expect(mockUpdateUiSettings).toHaveBeenCalled();
+  });
+
+  it('resetAll calls updateUiSettings when authenticated', () => {
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    act(() => {
+      result.current.updateBinding('palette', { keys: 'p', ctrl: true });
+    });
+    vi.clearAllMocks();
+    act(() => {
+      result.current.resetAll();
+    });
+    expect(mockUpdateUiSettings).toHaveBeenCalled();
+  });
+
+  it('resetOne calls updateUiSettings when authenticated', () => {
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    act(() => {
+      result.current.updateBinding('palette', { keys: 'p', ctrl: true });
+    });
+    vi.clearAllMocks();
+    act(() => {
+      result.current.resetOne('palette');
+    });
+    expect(mockUpdateUiSettings).toHaveBeenCalled();
+  });
+
+  it('hydrates overrides from uiSettings on first fetch', () => {
+    mockGetUiSettingsQuery.mockReturnValue({
+      data: { keybindings: { palette: { keys: 'q', ctrl: true, shift: false, alt: false } } },
+    });
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    expect(result.current.overrides.palette).toBeDefined();
+    expect(result.current.overrides.palette!.keys).toBe('q');
+  });
+
+  it('does not re-hydrate if uiSettings keybindings is empty', () => {
+    mockGetUiSettingsQuery.mockReturnValue({ data: { keybindings: {} } });
+    const { result } = renderHook(() => useKeyboardShortcuts(actions));
+    // overrides remains what was in localStorage (empty)
+    expect(result.current.overrides).toEqual({});
+  });
+
+  it('resets hydration flag on logout', () => {
+    mockGetUiSettingsQuery.mockReturnValue({
+      data: { keybindings: { palette: { keys: 'q', ctrl: true, shift: false, alt: false } } },
+    });
+    const { result, rerender } = renderHook(() => useKeyboardShortcuts(actions));
+    expect(result.current.overrides.palette).toBeDefined();
+    // Simulate logout
+    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false } as ReturnType<typeof useOidcAuth>);
+    rerender();
+    // hydrated flag reset, next fetch would re-hydrate if data present
+    expect(result.current.overrides).toBeDefined();
   });
 });

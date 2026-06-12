@@ -1183,4 +1183,139 @@ describe('useClientTools', () => {
       expect(showAlert).toHaveBeenCalledWith('ULIDs generated', 'success');
     });
   });
+
+  // ─── handleNumToWords edge cases ─────────────────────────────────────────
+
+  describe('handleNumToWords edge cases', () => {
+    it('converts tens-only (20)', () => {
+      const { handlers, setToolResults } = setup('20');
+      handlers.handleNumToWords();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('twenty');
+    });
+
+    it('converts 100', () => {
+      const { handlers, setToolResults } = setup('100');
+      handlers.handleNumToWords();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('hundred');
+    });
+
+    it('converts 19 (below 20 path)', () => {
+      const { handlers, setToolResults } = setup('19');
+      handlers.handleNumToWords();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('nineteen');
+    });
+
+    it('converts 21 (tens + units path)', () => {
+      const { handlers, setToolResults } = setup('21');
+      handlers.handleNumToWords();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('twenty');
+      expect(r['ws-1']).toContain('one');
+    });
+  });
+
+  // ─── handleColorConvert edge cases ────────────────────────────────────────
+
+  describe('handleColorConvert edge cases', () => {
+    it('converts black (#000000) where max === min', () => {
+      const { handlers, setToolResults } = setup('#000000');
+      handlers.handleColorConvert();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('HEX: #000000');
+      expect(r['ws-1']).toContain('hsl(0, 0%, 0%)');
+    });
+
+    it('converts pure green (#00FF00) to exercise max===gn branch', () => {
+      const { handlers, setToolResults } = setup('#00FF00');
+      handlers.handleColorConvert();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('HEX: #00FF00');
+    });
+
+    it('converts pure blue (#0000FF) to exercise max===bn branch', () => {
+      const { handlers, setToolResults } = setup('#0000FF');
+      handlers.handleColorConvert();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('HEX: #0000FF');
+    });
+
+    it('converts dark color where l > 0.5 (saturation path)', () => {
+      // l = (max+min)/2 > 0.5 when max+min > 1. E.g. #FFAAAA: r=1, g=0.67, b=0.67
+      const { handlers, setToolResults } = setup('#FFAAAA');
+      handlers.handleColorConvert();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('HEX: #FFAAAA');
+    });
+  });
+
+  // ─── handleCronExplain — day-of-week Sunday (7) ──────────────────────────
+
+  describe('handleCronExplain — dow edge cases', () => {
+    it('maps dow 7 to Sunday', () => {
+      const { handlers, setToolResults } = setup('0 9 * * 7');
+      handlers.handleCronExplain();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('Sunday');
+    });
+
+    it('maps unknown dow to raw value', () => {
+      const { handlers, setToolResults } = setup('0 9 * * 10');
+      handlers.handleCronExplain();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('10');
+    });
+  });
+
+  // ─── handleJsonToTs — array of objects path ───────────────────────────────
+
+  describe('handleJsonToTs — array of objects', () => {
+    it('generates type for array of objects', () => {
+      const { handlers, setToolResults } = setup('[{"id":1,"name":"x"}]');
+      handlers.handleJsonToTs();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      // inferType at depth=0 with array of objects
+      expect(r['ws-1']).toContain('Item');
+    });
+
+    it('generates boolean type', () => {
+      const { handlers, setToolResults } = setup('{"active":true}');
+      handlers.handleJsonToTs();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('active: boolean');
+    });
+  });
+
+  // ─── handleJwtDecode — invalid base64url chars ────────────────────────────
+
+  describe('handleJwtDecode — invalid base64', () => {
+    it('shows danger for JWT header with invalid base64url chars', () => {
+      const { handlers, showAlert } = setup('header!!!.payload.sig');
+      handlers.handleJwtDecode();
+      expect(showAlert).toHaveBeenCalledWith(expect.any(String), 'danger');
+    });
+  });
+
+  // ─── handleTextToTable — empty cells ─────────────────────────────────────
+
+  describe('handleTextToTable — empty cells', () => {
+    it('handles rows with missing columns gracefully', () => {
+      const { handlers, setPreviewMode } = setup('A,B,C\n1,2');
+      handlers.handleTextToTable();
+      expect(setPreviewMode).toHaveBeenCalledWith('result');
+    });
+  });
+
+  // ─── handleTimestampConvert — relative dates ──────────────────────────────
+
+  describe('handleTimestampConvert — now keyword variants', () => {
+    it('converts NOW (uppercase) using now regex', () => {
+      const { handlers, setToolResults } = setup('NOW');
+      handlers.handleTimestampConvert();
+      const r = setToolResults.mock.calls[0]![0]!({});
+      expect(r['ws-1']).toContain('ISO 8601:');
+    });
+  });
 });

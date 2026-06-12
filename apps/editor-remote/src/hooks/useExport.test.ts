@@ -1,6 +1,32 @@
 import { renderHook, act } from '@testing-library/react';
 import useExport from './useExport';
 
+// Top-level mocks for dynamic imports used inside the export handlers
+vi.mock('jspdf', () => ({
+  jsPDF: vi.fn(function () {
+    return {
+      splitTextToSize: vi.fn(() => ['line1', 'line2']),
+      text: vi.fn(),
+      save: vi.fn(),
+    };
+  }),
+}));
+
+vi.mock('docx', () => ({
+  Document: vi.fn(function (opts) {
+    return opts;
+  }),
+  Paragraph: vi.fn(function (opts) {
+    return opts;
+  }),
+  TextRun: vi.fn(function (t) {
+    return t;
+  }),
+  Packer: {
+    toBlob: vi.fn(async () => new Blob(['docx'], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })),
+  },
+}));
+
 describe('useExport', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setLoading: any,
@@ -144,5 +170,79 @@ describe('useExport', () => {
     expect(setLoading).toHaveBeenCalledWith(true);
     expect(setLoading).toHaveBeenCalledWith(false);
     expect(showAlert).toHaveBeenCalled();
+  });
+
+  it('handleDownloadPdf succeeds with mocked jsPDF', async () => {
+    const { result } = renderExp();
+    act(() => {
+      result.current.setOutputText('pdf content here');
+    });
+    const clickSpy = vi.fn();
+    vi.spyOn(document, 'createElement').mockReturnValue({
+      href: '',
+      download: '',
+      click: clickSpy,
+    } as unknown as HTMLElement);
+    await act(async () => {
+      await result.current.handleDownloadPdf();
+    });
+    expect(setLoading).toHaveBeenCalledWith(true);
+    expect(setLoading).toHaveBeenCalledWith(false);
+    expect(showAlert).toHaveBeenCalledWith('Downloaded as PDF', 'success');
+    vi.restoreAllMocks();
+  });
+
+  it('handleDownloadPdf shows danger when jsPDF throws', async () => {
+    const jspdfMod = await import('jspdf');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (jspdfMod.jsPDF as unknown as any).mockImplementationOnce(() => {
+      throw new Error('PDF fail');
+    });
+    const { result } = renderExp();
+    act(() => {
+      result.current.setOutputText('text');
+    });
+    await act(async () => {
+      await result.current.handleDownloadPdf();
+    });
+    expect(setLoading).toHaveBeenCalledWith(true);
+    expect(setLoading).toHaveBeenCalledWith(false);
+    expect(showAlert).toHaveBeenCalledWith('PDF export failed', 'danger');
+  });
+
+  it('handleDownloadDocx succeeds with mocked docx', async () => {
+    const { result } = renderExp();
+    act(() => {
+      result.current.setOutputText('line one\nline two');
+    });
+    const clickSpy = vi.fn();
+    vi.spyOn(document, 'createElement').mockReturnValue({
+      href: '',
+      download: '',
+      click: clickSpy,
+    } as unknown as HTMLElement);
+    await act(async () => {
+      await result.current.handleDownloadDocx();
+    });
+    expect(setLoading).toHaveBeenCalledWith(true);
+    expect(setLoading).toHaveBeenCalledWith(false);
+    expect(showAlert).toHaveBeenCalledWith('Downloaded as DOCX', 'success');
+    vi.restoreAllMocks();
+  });
+
+  it('handleDownloadDocx shows danger when Packer.toBlob throws', async () => {
+    const docxMod = await import('docx');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (docxMod.Packer.toBlob as unknown as any).mockRejectedValueOnce(new Error('DOCX fail'));
+    const { result } = renderExp();
+    act(() => {
+      result.current.setOutputText('text');
+    });
+    await act(async () => {
+      await result.current.handleDownloadDocx();
+    });
+    expect(setLoading).toHaveBeenCalledWith(true);
+    expect(setLoading).toHaveBeenCalledWith(false);
+    expect(showAlert).toHaveBeenCalledWith('DOCX export failed', 'danger');
   });
 });
