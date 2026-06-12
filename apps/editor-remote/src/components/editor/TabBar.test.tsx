@@ -117,6 +117,11 @@ describe('TabBar', () => {
     render(<TabBar {...baseProps} />);
     const tabBar = document.querySelector('.tu-tab-bar')!;
 
+    // jsdom does not implement Element.scrollBy — stub it so the onClick handlers
+    // don't throw an unhandled exception (which would fail the whole run).
+    const scrollBySpy = vi.fn();
+    (tabBar as unknown as { scrollBy: typeof scrollBySpy }).scrollBy = scrollBySpy;
+
     // Make the bar appear to overflow so scrollState.overflows = true
     Object.defineProperty(tabBar, 'scrollWidth', { get: () => 2000, configurable: true });
     Object.defineProperty(tabBar, 'clientWidth', { get: () => 200, configurable: true });
@@ -136,8 +141,8 @@ describe('TabBar', () => {
       // Click scroll buttons to cover the onClick arrow functions
       fireEvent.click(leftBtn);
       fireEvent.click(rightBtn);
-      expect(leftBtn).toBeInTheDocument();
-      expect(rightBtn).toBeInTheDocument();
+      expect(scrollBySpy).toHaveBeenCalledWith({ left: -200, behavior: 'smooth' });
+      expect(scrollBySpy).toHaveBeenCalledWith({ left: 200, behavior: 'smooth' });
     }
   });
 
