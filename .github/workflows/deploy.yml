@@ -16,13 +16,19 @@
 # (Confirm the CF Pages project names in package.json deploy:* scripts match your account.)
 name: Deploy (Cloudflare)
 
+# Deploy ONLY after the "Frontend CI" workflow completes successfully on main —
+# never on a raw push. This gates lint/typecheck/tests/federation-smoke/npm-audit
+# before anything reaches production (H-6). Manual re-deploys go through
+# workflow_dispatch.
 on:
-  push:
+  workflow_run:
+    workflows: ["Frontend CI"]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: deploy-${{ github.event.workflow_run.head_branch || github.ref }}
   cancel-in-progress: false
 
 env:
@@ -33,6 +39,10 @@ jobs:
   deploy-remotes:
     name: Deploy remote (${{ matrix.remote }})
     runs-on: ubuntu-latest
+    # Only run for a successful CI run or a manual dispatch.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         remote:
@@ -40,6 +50,10 @@ jobs:
           - analytics
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          # Deploy the exact commit that passed CI (workflow_run.head_sha);
+          # fall back to the triggering ref for a manual dispatch.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
@@ -54,8 +68,15 @@ jobs:
     name: Deploy shell (host)
     runs-on: ubuntu-latest
     needs: deploy-remotes
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          # Deploy the exact commit that passed CI (workflow_run.head_sha);
+          # fall back to the triggering ref for a manual dispatch.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
@@ -80,8 +101,15 @@ jobs:
   deploy-content:
     name: Deploy content (Worker / OpenNext)
     runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          # Deploy the exact commit that passed CI (workflow_run.head_sha);
+          # fall back to the triggering ref for a manual dispatch.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
@@ -100,8 +128,15 @@ jobs:
     # The router stitches the deployed units together — deploy it last so it never
     # routes to a unit that hasn't been published yet.
     needs: [deploy-remotes, deploy-shell, deploy-content]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          # Deploy the exact commit that passed CI (workflow_run.head_sha);
+          # fall back to the triggering ref for a manual dispatch.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
