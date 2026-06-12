@@ -689,8 +689,9 @@ describe('useClientTools', () => {
       expect(showAlert).toHaveBeenCalledWith('Overused words analyzed', 'success');
     });
 
-    it('reports no overused words when none exceed threshold', () => {
-      const { handlers, setToolResults } = setup('alpha beta gamma delta epsilon');
+    it('reports no overused words when all words are stopwords (filtered out)', () => {
+      // All stopwords are removed by the filter, so total = 0 → no overused output.
+      const { handlers, setToolResults } = setup('the and but for with this that');
       handlers.handleOverusedWords();
       const updater = setToolResults.mock.calls[0]![0]!;
       const result = updater({});

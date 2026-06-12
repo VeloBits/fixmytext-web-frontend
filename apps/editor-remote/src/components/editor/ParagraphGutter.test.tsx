@@ -93,12 +93,16 @@ describe('ParagraphGutter', () => {
 
   it('disconnects ResizeObserver on unmount', () => {
     const disconnectSpy = vi.spyOn(ResizeObserverStub.prototype, 'disconnect');
-    const ref = makeTextareaRef();
+    // Must provide a real element so useEffect doesn't return early on `!ta`
+    const textarea = document.createElement('textarea');
+    document.body.appendChild(textarea);
+    const ref = { current: textarea } as React.RefObject<HTMLTextAreaElement | null>;
     const { unmount } = render(
       <ParagraphGutter textareaRef={ref} text="some text" scrollTop={0} />
     );
     unmount();
     expect(disconnectSpy).toHaveBeenCalled();
+    document.body.removeChild(textarea);
     disconnectSpy.mockRestore();
   });
 });
