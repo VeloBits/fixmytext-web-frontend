@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 type AlertType = 'warning' | 'danger' | 'success' | 'info';
 
@@ -87,17 +89,12 @@ interface MarkdownPreviewDrawerProps {
 }
 
 export function MarkdownPreviewDrawer({ text }: MarkdownPreviewDrawerProps) {
+  // Render Markdown via `marked`, then DOMPurify-sanitize before injecting —
+  // mirrors OutputPanel's sanitized path so editor text can't inject HTML/JS
+  // (FE-XSS-01). The previous hand-rolled regex fed straight into
+  // dangerouslySetInnerHTML with no sanitization.
   const htmlContent = text
-    ? text
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/`(.+?)`/g, '<code>$1</code>')
-        .replace(/^- (.+)$/gm, '<li>$1</li>')
-        .replace(/\n\n/g, '<br/><br/>')
-        .replace(/\n/g, '<br/>')
+    ? DOMPurify.sanitize(marked.parse(text) as string)
     : '<p style="color: var(--text-3)">Enter Markdown in the editor to preview...</p>';
 
   return (

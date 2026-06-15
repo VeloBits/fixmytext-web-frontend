@@ -1,89 +1,41 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginValues } from '@velobits/app-core/auth/schemas';
-import { passwordGrant } from '@velobits/app-core/auth/keycloakClient';
+import { userManager } from '@velobits/app-core/auth/userManager';
 
-interface LoginFormProps {
-  onSuccess: () => void;
-}
+/**
+ * Sign-in entry point. H-9: the SPA no longer collects email/password — sign-in
+ * happens on Keycloak's hosted login page (which owns the credential and runs
+ * MFA / brute-force protection), reached via signinRedirect — the same flow the
+ * social buttons use.
+ */
+export function LoginForm() {
+  const [error, setError] = useState<string | null>(null);
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
-  const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
-
-  const onSubmit = async (data: LoginValues) => {
-    setServerError(null);
+  const onSignIn = async () => {
+    setError(null);
     try {
-      await passwordGrant(data.email, data.password);
-      onSuccess();
+      await userManager.signinRedirect();
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : 'Sign in failed. Please try again.');
+      setError(
+        err instanceof Error ? err.message : 'Could not start sign-in. Please try again.',
+      );
     }
   };
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className="auth-field">
-        <label htmlFor="login-email">Email</label>
-        <input
-          id="login-email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          {...register('email')}
-        />
-        {errors.email && <span className="auth-hint--weak">{errors.email.message}</span>}
-      </div>
+    <div className="auth-form">
+      <p className="auth-redirect-note">
+        You&apos;ll sign in securely on the VeloBits account page.
+      </p>
 
-      <div className="auth-field">
-        <label htmlFor="login-password">Password</label>
-        <div className="auth-password-wrapper">
-          <input
-            id="login-password"
-            type={showPassword ? 'text' : 'password'}
-            autoComplete="current-password"
-            placeholder="••••••••"
-            {...register('password')}
-          />
-          <button
-            type="button"
-            className="auth-password-toggle"
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-            onClick={() => setShowPassword((s) => !s)}
-          >
-            {showPassword ? '🙈' : '👁'}
-          </button>
-        </div>
-        {errors.password && <span className="auth-hint--weak">{errors.password.message}</span>}
-      </div>
-
-      {serverError && (
+      {error && (
         <div className="auth-hint--weak" role="alert">
-          {serverError}
+          {error}
         </div>
       )}
 
-      <button type="submit" className="auth-btn--primary" disabled={isSubmitting}>
-        {isSubmitting ? 'Signing in…' : 'Sign in'}
+      <button type="button" className="auth-btn--primary" onClick={onSignIn}>
+        Sign in
       </button>
-
-      <a
-        href="#"
-        className="auth-forgot-link"
-        onClick={(e) => {
-          e.preventDefault();
-          window.location.href = '/forgot-password';
-        }}
-      >
-        Forgot password?
-      </a>
-    </form>
+    </div>
   );
 }

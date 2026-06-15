@@ -23,10 +23,6 @@ export function AuthPage({ defaultTab = 'signin' }: AuthPageProps) {
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  const handleSuccess = () => {
-    navigate('/', { replace: true });
-  };
-
   if (isLoading) return null;
 
   return (
@@ -56,11 +52,7 @@ export function AuthPage({ defaultTab = 'signin' }: AuthPageProps) {
         </div>
 
         <div role="tabpanel">
-          {activeTab === 'signin' ? (
-            <LoginForm onSuccess={handleSuccess} />
-          ) : (
-            <SignupForm onSuccess={handleSuccess} />
-          )}
+          {activeTab === 'signin' ? <LoginForm /> : <SignupForm />}
         </div>
 
         <SocialButtons />

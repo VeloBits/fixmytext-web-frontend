@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { User as OidcUser } from 'oidc-client-ts';
 import * as Sentry from '@sentry/react';
 import { clearSession } from '@velobits/api-client';
-import { userManager } from './userManager';
+import { loadUser, resetLoadUser, userManager } from './userManager';
 
 export interface OidcAuthState {
   isAuthenticated: boolean;
@@ -18,8 +18,11 @@ export function useOidcAuth(): OidcAuthState {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load existing session on mount
-    userManager.getUser().then((u) => {
+    let cancelled = false;
+    // Load the session on mount: in-memory user, else a silent renew from the
+    // Keycloak SSO cookie (H-8 — no persisted refresh token to re-hydrate from).
+    loadUser().then((u) => {
+      if (cancelled) return;
       setOidcUser(u);
       if (u) Sentry.setUser({ id: u.profile.sub, email: u.profile.email });
       setIsLoading(false);
@@ -40,6 +43,7 @@ export function useOidcAuth(): OidcAuthState {
     userManager.events.addUserSignedOut(onUnloaded);
 
     return () => {
+      cancelled = true;
       userManager.events.removeUserLoaded(onLoaded);
       userManager.events.removeUserUnloaded(onUnloaded);
       userManager.events.removeUserSignedOut(onUnloaded);
@@ -52,6 +56,7 @@ export function useOidcAuth(): OidcAuthState {
     // Keycloak end-session which clears the SSO cookie.
     // Order matters: if signoutRedirect runs first the page navigates away
     // before clearSession completes.
+    resetLoadUser(); // drop the cached bootstrap so a later load re-evaluates
     await clearSession();
     await userManager.signoutRedirect({
       post_logout_redirect_uri: `${window.location.origin}/login`,

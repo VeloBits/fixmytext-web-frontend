@@ -1,95 +1,42 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { signupSchema, type SignupValues } from '@velobits/app-core/auth/schemas';
-import { registerUser, passwordGrant } from '@velobits/app-core/auth/keycloakClient';
+import { userManager } from '@velobits/app-core/auth/userManager';
 
-interface SignupFormProps {
-  onSuccess: () => void;
-}
+/**
+ * Sign-up entry point. H-9: registration happens on Keycloak's hosted page, not
+ * in the SPA. `prompt=create` lands the user on Keycloak's registration form
+ * (Keycloak 21+); older versions show the login page, which links to "Register".
+ * The account is created in Keycloak and JIT-provisioned in the backend on first
+ * authenticated request — so the SPA never handles the password.
+ */
+export function SignupForm() {
+  const [error, setError] = useState<string | null>(null);
 
-export function SignupForm({ onSuccess }: SignupFormProps) {
-  const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SignupValues>({ resolver: zodResolver(signupSchema) });
-
-  const onSubmit = async (data: SignupValues) => {
-    setServerError(null);
+  const onSignUp = async () => {
+    setError(null);
     try {
-      await registerUser(data.email, data.password, data.display_name);
-      await passwordGrant(data.email, data.password);
-      onSuccess();
+      await userManager.signinRedirect({ extraQueryParams: { prompt: 'create' } });
     } catch (err) {
-      setServerError(
-        err instanceof Error ? err.message : 'Registration failed. Please try again.',
+      setError(
+        err instanceof Error ? err.message : 'Could not start sign-up. Please try again.',
       );
     }
   };
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className="auth-field">
-        <label htmlFor="signup-name">Display name</label>
-        <input
-          id="signup-name"
-          type="text"
-          autoComplete="name"
-          placeholder="Your name"
-          {...register('display_name')}
-        />
-        {errors.display_name && (
-          <span className="auth-hint--weak">{errors.display_name.message}</span>
-        )}
-      </div>
+    <div className="auth-form">
+      <p className="auth-redirect-note">
+        Create your account securely on the VeloBits account page.
+      </p>
 
-      <div className="auth-field">
-        <label htmlFor="signup-email">Email</label>
-        <input
-          id="signup-email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          {...register('email')}
-        />
-        {errors.email && <span className="auth-hint--weak">{errors.email.message}</span>}
-      </div>
-
-      <div className="auth-field">
-        <label htmlFor="signup-password">Password</label>
-        <div className="auth-password-wrapper">
-          <input
-            id="signup-password"
-            type={showPassword ? 'text' : 'password'}
-            autoComplete="new-password"
-            placeholder="Min. 8 characters"
-            {...register('password')}
-          />
-          <button
-            type="button"
-            className="auth-password-toggle"
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-            onClick={() => setShowPassword((s) => !s)}
-          >
-            {showPassword ? '🙈' : '👁'}
-          </button>
-        </div>
-        {errors.password && <span className="auth-hint--weak">{errors.password.message}</span>}
-      </div>
-
-      {serverError && (
+      {error && (
         <div className="auth-hint--weak" role="alert">
-          {serverError}
+          {error}
         </div>
       )}
 
-      <button type="submit" className="auth-btn--primary" disabled={isSubmitting}>
-        {isSubmitting ? 'Creating account…' : 'Create account'}
+      <button type="button" className="auth-btn--primary" onClick={onSignUp}>
+        Create account
       </button>
-    </form>
+    </div>
   );
 }
