@@ -68,15 +68,14 @@
     "openapi-typescript": "^7.13.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3",
-    "vite": "^8.0.12",
+    "vite": "^8.0.16",
     "vitest": "^4.1.6",
     "vitest-axe": "^0.1.0"
   },
   "overrides": {
     "ws": "8.21.0",
-    "@module-federation/dts-plugin": {
-      "ws": "8.21.0"
-    },
+    "esbuild": "^0.28.1",
+    "form-data": "^4.0.6",
     "next": {
       "postcss": "^8.5.15"
     }

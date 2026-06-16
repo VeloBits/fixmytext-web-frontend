@@ -11,6 +11,10 @@ vi.mock('@velobits/api-client', async (importOriginal) => {
 });
 
 vi.mock('./userManager', () => ({
+  // useOidcAuth bootstraps the session via loadUser() on mount (H-8 in-memory
+  // session). Resolve null so the hook settles into the unauthenticated state.
+  loadUser: vi.fn().mockResolvedValue(null),
+  resetLoadUser: vi.fn(),
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     signinRedirect: vi.fn().mockResolvedValue(undefined),

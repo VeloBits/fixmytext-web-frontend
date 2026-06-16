@@ -22,6 +22,11 @@ vi.mock('@sentry/react', () => ({
 // during tests. signinRedirect / signinSilent would try to fetch the OIDC
 // discovery document from localhost:8080 which isn't running in CI/tests.
 vi.mock('../auth/userManager', () => ({
+  // loadUser/resetLoadUser back the in-memory session bootstrap (H-8); useOidcAuth
+  // calls loadUser() on mount. Resolve null so tests stay unauthenticated and never
+  // reach the real silent-renew path.
+  loadUser: vi.fn().mockResolvedValue(null),
+  resetLoadUser: vi.fn(),
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     storeUser: vi.fn().mockResolvedValue(undefined),

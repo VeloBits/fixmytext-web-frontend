@@ -63,6 +63,19 @@ vi.mock('./hooks/useTheme', () => ({
   useTheme: () => ({ mode: 'light', setMode: vi.fn() }),
 }));
 // AppContext uses useOidcAuth + useGetMeQuery directly (no legacy useAuth hook).
+// Mock it so tests render a deterministic unauthenticated state instead of
+// triggering the real OIDC bootstrap (loadUser -> signinSilent iframe), which
+// resolves asynchronously after render and trips React's act() warnings.
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
+  useOidcAuth: () => ({
+    isAuthenticated: false,
+    isLoading: false,
+    accessToken: null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
 vi.mock('@velobits/app-core/hooks/useGamification', () => ({
   default: () => ({
     onboarded: true,
