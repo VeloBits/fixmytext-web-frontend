@@ -30,7 +30,9 @@ export default defineConfig(({ mode }) => ({
         'react-redux': { singleton: true, requiredVersion: '^9.0.0' },
         '@sentry/react': { singleton: true },
         // Singleton: the host provides the one store/api instance at runtime.
-        '@velobits/app-core': { singleton: true, requiredVersion: '*' },
+        // Pinned (not '*') so a breaking app-core change forces a coordinated
+        // rebuild instead of silent version skew (M-2).
+        '@velobits/app-core': { singleton: true, requiredVersion: '^0.1.0' },
       },
     }),
     react(),
