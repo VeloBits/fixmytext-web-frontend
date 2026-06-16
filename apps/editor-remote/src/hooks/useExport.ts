@@ -1,6 +1,19 @@
 import { useRef } from 'react';
 import type { AlertLevel as AlertType } from '@velobits/app-core/types/alert';
 
+/**
+ * CSV / spreadsheet formula-injection guard (FE-CSV-01): a cell that begins
+ * with `= + - @` (or a leading tab/CR some apps treat as a cell break) is
+ * executed as a formula by Excel/Sheets. Prefix any such line with a single
+ * quote so it's rendered as literal text.
+ */
+function escapeCsvFormulas(text: string): string {
+  return text
+    .split('\n')
+    .map((line) => (/^[=+\-@\t\r]/.test(line) ? `'${line}` : line))
+    .join('\n');
+}
+
 export interface ExportValue {
   setOutputText: (text: string) => void;
   handleDownloadTxt: () => void;
@@ -80,7 +93,10 @@ export default function useExport(
   };
 
   const handleDownloadCsv = (): void => {
-    triggerDownload(new Blob([outputRef.current], { type: 'text/csv' }), 'fixmytext-output.csv');
+    triggerDownload(
+      new Blob([escapeCsvFormulas(outputRef.current)], { type: 'text/csv' }),
+      'fixmytext-output.csv'
+    );
     showAlert('Downloaded as CSV', 'success');
   };
 

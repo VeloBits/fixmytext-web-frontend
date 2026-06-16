@@ -6,6 +6,10 @@
 
 const API_BASE = process.env.CONTENT_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://api-dev.velobits.dev';
 
+// Share ids are UUIDs. Validate before building the upstream URL so the raw
+// `[id]` route param can't be used for path/SSRF injection (FE-SSRF-01).
+const SHARE_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export interface ShareResult {
   id: string;
   tool_id: string;
@@ -19,8 +23,9 @@ export interface ShareResult {
  * Returns null on 404 and throws on network errors.
  */
 export async function getShareResult(id: string): Promise<ShareResult | null> {
+  if (!SHARE_ID_RE.test(id)) return null; // not a share id — don't hit the API
   try {
-    const res = await fetch(`${API_BASE}/api/v1/share/${id}`, {
+    const res = await fetch(`${API_BASE}/api/v1/share/${encodeURIComponent(id)}`, {
       next: { revalidate: 300 },
     });
     if (res.status === 404 || res.status === 410) return null;

@@ -106,8 +106,8 @@
     "typecheck": "npm run --workspaces --if-present typecheck",
     "prepare": "husky",
     "deploy:shell": "npm run build:shell && npx wrangler pages deploy apps/shell/dist --project-name fixmytext-shell",
-    "deploy:editor": "npm run build:editor && npx wrangler pages deploy apps/editor-remote/dist --project-name fixmytext-editor-remote",
-    "deploy:analytics": "npm run build:analytics && npx wrangler pages deploy apps/analytics-remote/dist --project-name fixmytext-analytics-remote",
+    "deploy:editor": "npm run build:editor && find apps/editor-remote/dist -name '*.map' -delete && npx wrangler pages deploy apps/editor-remote/dist --project-name fixmytext-editor-remote",
+    "deploy:analytics": "npm run build:analytics && find apps/analytics-remote/dist -name '*.map' -delete && npx wrangler pages deploy apps/analytics-remote/dist --project-name fixmytext-analytics-remote",
     "deploy:content": "npm run build:cf -w @velobits/content-app && cd apps/content && npx wrangler deploy",
     "deploy:worker": "npm run deploy -w @velobits/cf-router-worker"
   }

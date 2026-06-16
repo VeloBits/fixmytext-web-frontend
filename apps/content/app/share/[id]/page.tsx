@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: 'Shared Result Not Found',
       description: 'This shared result may have expired or been removed.',
+      robots: { index: false, follow: false },
     };
   }
 
@@ -35,6 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${toolName} — Shared Result`,
     description: preview || `Text transformed with ${toolName} on FixMyText.`,
+    // User-generated shared output must not be search-indexed — keeps private
+    // shares out of search results / crawlers (FE-SHARE-01). OG/Twitter cards
+    // still render for explicit link unfurling.
+    robots: { index: false, follow: false },
     openGraph: {
       title: `${toolName} — Shared via FixMyText`,
       description: preview || `Processed with ${toolName}`,

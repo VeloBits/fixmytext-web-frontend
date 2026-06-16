@@ -42,9 +42,20 @@ export function createAuthBaseQuery(extraHeaders?: ExtraHeadersFn): RtkBaseQuery
 
 const defaultBaseQuery = createAuthBaseQuery();
 
+/** True for safe/idempotent requests (string args are GETs). */
+function isIdempotent(args: string | FetchArgs): boolean {
+  if (typeof args === 'string') return true;
+  const method = (args.method ?? 'GET').toUpperCase();
+  return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
+}
+
 /**
  * Creates a baseQueryWithReauth that wraps a given rawBaseQuery.
- * On 401, attempts a silent renew via oidc-client-ts, then retries once.
+ * On 401, attempts a silent renew via oidc-client-ts. The refreshed token is
+ * available for subsequent requests, but the original request is auto-retried
+ * ONLY when it is idempotent — retrying a mutation after reauth can
+ * double-submit (the first attempt may have already succeeded), so mutations
+ * surface the 401 and the caller re-issues with the fresh token (FE-AUTH-04).
  * Falls back to redirect-to-login if silent renew fails.
  */
 function createReauthQuery(rawBaseQuery: RtkBaseQuery): RtkBaseQuery {
@@ -59,8 +70,10 @@ function createReauthQuery(rawBaseQuery: RtkBaseQuery): RtkBaseQuery {
         await userManager.signinRedirect();
         return result;
       }
-      // Retry original request with refreshed token
-      result = await rawBaseQuery(args, api, extraOptions);
+      // Retry only safe/idempotent requests; never auto-retry a mutation.
+      if (isIdempotent(args)) {
+        result = await rawBaseQuery(args, api, extraOptions);
+      }
     }
 
     return result;

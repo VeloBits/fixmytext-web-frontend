@@ -48,6 +48,9 @@ export default defineConfig(({ mode }) => ({
   },
   server: { port: 3102, host: true },
   build: {
-    sourcemap: true,
+    // 'hidden' emits maps without referencing them in the bundle; the deploy
+    // script deletes them so they're never published to Cloudflare Pages (M-11 —
+    // a parsed .map leaks the original TypeScript source).
+    sourcemap: 'hidden',
   },
 }))
