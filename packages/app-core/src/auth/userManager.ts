@@ -2,18 +2,15 @@ import {
   InMemoryWebStorage,
   UserManager,
   WebStorageStateStore,
+  type UserManagerSettings,
   type User,
 } from 'oidc-client-ts';
+import { KEYCLOAK_CLIENT_ID, KEYCLOAK_REALM, KEYCLOAK_URL } from './keycloakConfig';
 
-// Defaults to the Velobits-Dev realm at auth-dev.velobits.dev (resolved via /etc/hosts in local dev).
-// Production overrides via VITE_KEYCLOAK_URL = https://auth.velobits.dev,
-// VITE_KEYCLOAK_REALM = Velobits-Prod, VITE_KEYCLOAK_CLIENT_ID = fixmytext.
-const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL ?? 'http://auth-dev.velobits.dev';
-const KEYCLOAK_REALM = import.meta.env.VITE_KEYCLOAK_REALM ?? 'Velobits-Dev';
-const KEYCLOAK_CLIENT_ID = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'develop-fixmytext';
+const REALM_BASE = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
 
-export const userManager = new UserManager({
-  authority: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`,
+const baseSettings: UserManagerSettings = {
+  authority: REALM_BASE,
   client_id: KEYCLOAK_CLIENT_ID,
   redirect_uri: `${window.location.origin}/app/auth/callback`,
   silent_redirect_uri: `${window.location.origin}/app/auth/silent-callback`,
@@ -27,6 +24,29 @@ export const userManager = new UserManager({
   // renew (see loadUser). The PKCE state store is left at its default
   // (localStorage) because it must survive the full-page redirect to Keycloak.
   userStore: new WebStorageStateStore({ store: new InMemoryWebStorage() }),
+};
+
+export const userManager = new UserManager(baseSettings);
+
+// Dedicated manager that starts the flow on Keycloak's REGISTRATION form.
+//
+// The OIDC `prompt=create` param is NOT honored by our Keycloak build (it
+// silently falls back to the login page — verified live), so we instead point
+// the authorization step at Keycloak's dedicated `/registrations` endpoint,
+// which takes the exact same params as `/auth` but renders the sign-up form.
+// We supply explicit `metadata` (skipping discovery) so only the authorization
+// endpoint differs; the PKCE state is written to the same default localStorage
+// stateStore, so the callback is still completed by the main `userManager`.
+export const signupUserManager = new UserManager({
+  ...baseSettings,
+  metadata: {
+    issuer: REALM_BASE,
+    authorization_endpoint: `${REALM_BASE}/protocol/openid-connect/registrations`,
+    token_endpoint: `${REALM_BASE}/protocol/openid-connect/token`,
+    userinfo_endpoint: `${REALM_BASE}/protocol/openid-connect/userinfo`,
+    end_session_endpoint: `${REALM_BASE}/protocol/openid-connect/logout`,
+    jwks_uri: `${REALM_BASE}/protocol/openid-connect/certs`,
+  },
 });
 
 // One-time auth bootstrap, deduped across all hook instances. Reads the

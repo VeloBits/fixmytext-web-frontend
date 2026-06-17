@@ -6,9 +6,7 @@
 // pages via userManager.signinRedirect (see LoginForm / SignupForm), so
 // Keycloak owns the credential and runs MFA / brute-force protection.
 
-const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080';
-const KEYCLOAK_REALM = import.meta.env.VITE_KEYCLOAK_REALM ?? 'fixmytext';
-const KEYCLOAK_CLIENT_ID = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'fixmytext-frontend';
+import { KEYCLOAK_CLIENT_ID, KEYCLOAK_REALM, KEYCLOAK_URL } from './keycloakConfig';
 
 /** Trigger Keycloak's "reset password" flow as a magic-link substitute.
  *  Keycloak sends an email with a link that authenticates + prompts password set.

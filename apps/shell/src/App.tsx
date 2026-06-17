@@ -46,7 +46,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (isLoading) return <PageSkeleton />;
   if (!isAuthenticated) {
     login();
-    return null;
+    // login() triggers a full-page redirect to Keycloak; keep the skeleton up
+    // until the browser navigates away so there's no white flash.
+    return <PageSkeleton />;
   }
   return <>{children}</>;
 }

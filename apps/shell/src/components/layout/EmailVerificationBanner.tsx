@@ -1,6 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import {
+  KEYCLOAK_CLIENT_ID,
+  KEYCLOAK_REALM,
+  KEYCLOAK_URL,
+} from '@velobits/app-core/auth/keycloakConfig';
 import type { RootState } from '@velobits/app-core/store/store';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
@@ -78,8 +83,8 @@ function CloseIcon() {
  * Renders nothing when the user is verified, signed out, still loading, or
  * has dismissed the banner within the soft-cooldown window (1 hour).
  *
- * `showAlert` is required and is used to report the outcome of resend
- * requests — the banner itself stays minimal.
+ * `showAlert` is required and is used to report a fallback when we can't build
+ * the Keycloak verification link — the banner itself stays minimal.
  */
 export interface EmailVerificationBannerProps {
   showAlert: (message: string, type: AlertLevel) => void;
@@ -89,8 +94,6 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
   const user = useSelector((s: RootState) => s.auth.user);
   const { isAuthenticated } = useOidcAuth();
 
-  // TODO: resend-verification endpoint removed in Keycloak migration. Email verification is now handled by Keycloak.
-  const [isLoading] = useState(false);
   const [dismissed, setDismissed] = useState(() => {
     try {
       const until = Number(localStorage.getItem(DISMISSAL_KEY) || 0);
@@ -99,42 +102,32 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
       return false;
     }
   });
-  const [cooldownUntil] = useState(0);
-  const [, forceTick] = useState(0);
-  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const isVisible = isAuthenticated && !!user && !user.is_email_verified && !dismissed;
   useChromeOffset(bannerRef, isVisible);
 
-  // Tick once a second while a cooldown is active so the countdown updates.
-  useEffect(() => {
-    if (cooldownUntil <= Date.now()) {
-      if (tickRef.current) clearInterval(tickRef.current);
-      tickRef.current = null;
-      return;
-    }
-    tickRef.current = setInterval(() => {
-      forceTick((n) => n + 1);
-      if (cooldownUntil <= Date.now() && tickRef.current) {
-        clearInterval(tickRef.current);
-        tickRef.current = null;
-      }
-    }, 1000);
-    return () => {
-      if (tickRef.current) clearInterval(tickRef.current);
-      tickRef.current = null;
-    };
-  }, [cooldownUntil]);
-
   if (!isVisible) {
     return null;
   }
 
-  const handleResend = async () => {
-    // TODO: Email verification resend is now handled by Keycloak.
-    // Redirect the user to Keycloak to resend the verification email.
-    showAlert('Please check your Keycloak account to resend the verification email.', 'info');
+  // Email verification is owned by Keycloak (the SPA no longer has a resend
+  // endpoint — H-9). Send the user to Keycloak's hosted reset-credentials
+  // action pre-filled with their email; for an unverified account Keycloak
+  // runs its required actions (incl. "Verify Email") and re-sends the link.
+  // Same pattern as keycloakClient.sendMagicLink / ForgotPasswordPage, built
+  // from the shared keycloakConfig so dev/prod realms never diverge.
+  const handleResend = () => {
+    if (!user?.email) {
+      // Shouldn't happen (banner only renders with a user), but never build a
+      // malformed Keycloak URL — fall back to an informational alert.
+      showAlert('Please sign in again to resend your verification email.', 'info');
+      return;
+    }
+    const url = new URL(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/login-actions/reset-credentials`);
+    url.searchParams.set('client_id', KEYCLOAK_CLIENT_ID);
+    url.searchParams.set('login_hint', user.email);
+    window.location.assign(url.toString());
   };
 
   const handleDismiss = () => {
@@ -147,10 +140,6 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
     }
     setDismissed(true);
   };
-
-  const cooldownSecs = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
-  const buttonLabel =
-    cooldownSecs > 0 ? `Resend in ${cooldownSecs}s` : isLoading ? 'Sending...' : 'Resend email';
 
   return (
     <div
@@ -172,13 +161,8 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
         </div>
       </div>
       <div className="verify-banner__actions">
-        <button
-          type="button"
-          className="verify-banner__resend"
-          onClick={handleResend}
-          disabled={isLoading || cooldownSecs > 0}
-        >
-          {buttonLabel}
+        <button type="button" className="verify-banner__resend" onClick={handleResend}>
+          Resend email
         </button>
         <button
           type="button"

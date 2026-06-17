@@ -1,62 +1,45 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import SignupPage from './SignupPage';
 
-const mockNavigate = vi.fn();
-let mockIsAuthenticated = false;
-let mockIsLoading = false;
-
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-}));
-
-vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
-  useOidcAuth: vi.fn(() => ({
-    isAuthenticated: mockIsAuthenticated,
-    isLoading: mockIsLoading,
-    accessToken: null,
-    oidcUser: null,
-    login: vi.fn(),
-    logout: vi.fn(),
-  })),
-}));
+const { mockSigninRedirect } = vi.hoisted(() => ({ mockSigninRedirect: vi.fn() }));
 
 vi.mock('@velobits/app-core/auth/userManager', () => ({
-  userManager: {
-    signinRedirect: vi.fn(),
-  },
+  signupUserManager: { signinRedirect: mockSigninRedirect },
 }));
 
-// Mock auth form sub-components to avoid unrelated dependency errors
-vi.mock('@/components/auth/LoginForm', () => ({
-  LoginForm: () => <div data-testid="login-form">Login Form</div>,
-}));
-vi.mock('@/components/auth/SignupForm', () => ({
-  SignupForm: () => <div data-testid="signup-form">Signup Form</div>,
-}));
-vi.mock('@/components/auth/SocialButtons', () => ({
-  SocialButtons: () => <div data-testid="social-buttons">Social Buttons</div>,
+vi.mock('@/components/layout/PageSkeleton', () => ({
+  default: () => <div data-testid="page-skeleton" />,
 }));
 
 describe('SignupPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockIsAuthenticated = false;
-    mockIsLoading = false;
+    mockSigninRedirect.mockResolvedValue(undefined);
   });
 
-  it('renders the auth page with sign-up tab active', () => {
+  it('starts the registration redirect on mount and shows the skeleton', () => {
     render(<SignupPage />);
-    // SignupPage renders AuthPage with defaultTab="signup"
-    expect(screen.getByRole('tab', { name: 'Sign up' })).toBeInTheDocument();
-    expect(screen.getByTestId('signup-form')).toBeInTheDocument();
+    expect(mockSigninRedirect).toHaveBeenCalledTimes(1);
+    // signupUserManager targets Keycloak's /registrations endpoint, so the
+    // call takes no args (no prompt=create — that param is ignored by Keycloak).
+    expect(mockSigninRedirect).toHaveBeenCalledWith();
+    expect(screen.getByTestId('page-skeleton')).toBeInTheDocument();
   });
 
-  it('navigates home when already authenticated', async () => {
-    mockIsAuthenticated = true;
+  it('renders an error state with a Try again button when the redirect fails', async () => {
+    mockSigninRedirect.mockRejectedValueOnce(new Error('Keycloak unreachable'));
     render(<SignupPage />);
-    await vi.waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
-    });
+
+    expect(await screen.findByText(/couldn.t reach sign-in\. please try again/i)).toBeInTheDocument();
+    const retry = screen.getByRole('button', { name: /try again/i });
+    expect(retry).toBeInTheDocument();
+
+    // Retry re-invokes the registration redirect.
+    mockSigninRedirect.mockResolvedValueOnce(undefined);
+    fireEvent.click(retry);
+    expect(mockSigninRedirect).toHaveBeenCalledTimes(2);
+    expect(mockSigninRedirect).toHaveBeenLastCalledWith();
+    await waitFor(() => expect(screen.getByTestId('page-skeleton')).toBeInTheDocument());
   });
 });

@@ -1,63 +1,44 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import LoginPage from './LoginPage';
 
-const mockNavigate = vi.fn();
-let mockIsAuthenticated = false;
-let mockIsLoading = false;
-
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-}));
-
-vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
-  useOidcAuth: vi.fn(() => ({
-    isAuthenticated: mockIsAuthenticated,
-    isLoading: mockIsLoading,
-    accessToken: null,
-    oidcUser: null,
-    login: vi.fn(),
-    logout: vi.fn(),
-  })),
-}));
+const { mockSigninRedirect } = vi.hoisted(() => ({ mockSigninRedirect: vi.fn() }));
 
 vi.mock('@velobits/app-core/auth/userManager', () => ({
-  userManager: {
-    signinRedirect: vi.fn(),
-  },
+  userManager: { signinRedirect: mockSigninRedirect },
 }));
 
-// Mock auth form sub-components to avoid unrelated dependency errors
-vi.mock('@/components/auth/LoginForm', () => ({
-  LoginForm: () => <div data-testid="login-form">Login Form</div>,
-}));
-vi.mock('@/components/auth/SignupForm', () => ({
-  SignupForm: () => <div data-testid="signup-form">Signup Form</div>,
-}));
-vi.mock('@/components/auth/SocialButtons', () => ({
-  SocialButtons: () => <div data-testid="social-buttons">Social Buttons</div>,
+vi.mock('@/components/layout/PageSkeleton', () => ({
+  default: () => <div data-testid="page-skeleton" />,
 }));
 
 describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockIsAuthenticated = false;
-    mockIsLoading = false;
+    mockSigninRedirect.mockResolvedValue(undefined);
   });
 
-  it('renders the auth page with sign-in tab active', () => {
+  it('calls signinRedirect on mount and shows the skeleton', () => {
     render(<LoginPage />);
-    // AuthPage renders tabs; Sign in tab should be active by default
-    expect(screen.getByRole('tab', { name: 'Sign in' })).toBeInTheDocument();
-    expect(screen.getByTestId('login-form')).toBeInTheDocument();
+    expect(mockSigninRedirect).toHaveBeenCalledTimes(1);
+    // LoginPage calls signinRedirect() with no arguments (plain hosted login).
+    expect(mockSigninRedirect).toHaveBeenCalledWith();
+    expect(screen.getByTestId('page-skeleton')).toBeInTheDocument();
   });
 
-  it('navigates home when already authenticated', async () => {
-    mockIsAuthenticated = true;
+  it('renders an error state with a Try again button when the redirect fails', async () => {
+    mockSigninRedirect.mockRejectedValueOnce(new Error('Keycloak unreachable'));
     render(<LoginPage />);
-    // useEffect with navigate('/', { replace: true }) should fire
-    await vi.waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
-    });
+
+    // Error card replaces the skeleton.
+    expect(await screen.findByText(/couldn.t reach sign-in\. please try again/i)).toBeInTheDocument();
+    const retry = screen.getByRole('button', { name: /try again/i });
+    expect(retry).toBeInTheDocument();
+
+    // Clicking "Try again" re-invokes the redirect; on success the skeleton returns.
+    mockSigninRedirect.mockResolvedValueOnce(undefined);
+    fireEvent.click(retry);
+    expect(mockSigninRedirect).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(screen.getByTestId('page-skeleton')).toBeInTheDocument());
   });
 });
