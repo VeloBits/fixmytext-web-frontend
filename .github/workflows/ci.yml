@@ -268,15 +268,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Gate on the FULL dependency tree (prod + dev) at high/critical via audit-ci,
-      # which waives only the documented, deploy-toolchain-only advisories listed in
-      # audit-ci.jsonc (wrangler/miniflare/@opennextjs -> esbuild/ws/form-data). Those
-      # never ship in the browser bundle and have no forward fix; see the config for
-      # per-advisory justifications and the review-by date. A new high in any other
-      # package still fails this job.
-      - name: Audit dependencies (gating, allowlist in audit-ci.jsonc)
-        run: npx audit-ci --config audit-ci.jsonc
-
-      - name: Full audit (informational, non-gating)
-        if: always()
-        run: npm audit --audit-level=high || true
+      - name: Audit for vulnerabilities
+        run: npm audit --audit-level=high
