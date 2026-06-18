@@ -59,7 +59,7 @@ export function useOidcAuth(): OidcAuthState {
     resetLoadUser(); // drop the cached bootstrap so a later load re-evaluates
     await clearSession();
     await userManager.signoutRedirect({
-      post_logout_redirect_uri: `${window.location.origin}/login`,
+      post_logout_redirect_uri: `${window.location.origin}/app/login`,
     });
   }, []);
 

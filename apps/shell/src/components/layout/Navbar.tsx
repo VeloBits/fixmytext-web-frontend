@@ -41,17 +41,17 @@ export default function Navbar({ showAlert }: NavbarProps) {
             window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
           }}
         >
-          <span className="text-[0.82rem] text-[#a0a0a0] whitespace-nowrap overflow-hidden text-ellipsis flex-1">
+          <span className="text-[0.82rem] text-[#adadad] whitespace-nowrap overflow-hidden text-ellipsis flex-1">
             Search tools...
           </span>
-          <kbd className="text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-sm bg-[#2a2a2c] text-[#a0a0a0] border border-[#505052] font-[var(--font-mono)]">
+          <kbd className="text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-sm bg-[#2a2a2c] text-[#adadad] border border-[#505052] font-[var(--font-mono)]">
             Ctrl+K
           </kbd>
         </button>
 
         {/* About */}
         <Link
-          className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] text-[#a0a0a0] text-[0.82rem] no-underline whitespace-nowrap transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
+          className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] text-[#adadad] text-[0.82rem] no-underline whitespace-nowrap transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
           to="/about"
           title="About FixMyText"
         >
@@ -65,7 +65,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
 
         {/* Share website link */}
         <button
-          className="flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] cursor-pointer text-[#a0a0a0] text-[0.82rem] font-[inherit] whitespace-nowrap no-underline transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] cursor-pointer text-[#adadad] text-[0.82rem] font-[inherit] whitespace-nowrap no-underline transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
           onClick={handleShare}
           aria-label="Share website link"
           title="Share website link"
@@ -82,7 +82,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
 
         {/* GitHub */}
         <a
-          className="flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] text-[#a0a0a0] text-[0.82rem] no-underline whitespace-nowrap transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] text-[#adadad] text-[0.82rem] no-underline whitespace-nowrap transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
           href="https://github.com/sojitra-nency/FixMyText"
           target="_blank"
           rel="noopener noreferrer"
@@ -97,7 +97,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
         {/* Upgrade (when logged in) */}
         {isAuthenticated && (
           <Link
-            className="hidden md:flex items-center px-3 py-1 rounded-md border border-[var(--accent)] bg-transparent text-[var(--accent)] text-[0.75rem] font-semibold no-underline whitespace-nowrap transition-all hover:bg-[var(--accent)] hover:text-white"
+            className="hidden md:flex items-center px-3 py-1 rounded-md border border-[var(--accent)] bg-transparent text-white text-[0.75rem] font-semibold no-underline whitespace-nowrap transition-all hover:bg-[var(--accent)] hover:text-white"
             to="/pricing"
             title="View plans & pricing"
           >

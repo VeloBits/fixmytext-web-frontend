@@ -148,7 +148,7 @@
   text-align: center;
   border-radius: 8px;
   background: var(--sidebar-highlight, rgba(255, 255, 255, 0.08));
-  color: var(--text-3);
+  color: var(--text-2);
   flex-shrink: 0;
 }
 .tu-group-items {

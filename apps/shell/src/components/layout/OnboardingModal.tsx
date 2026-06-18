@@ -42,7 +42,7 @@ const PERSONA_META: PersonaMetaMap = {
   },
   explorer: {
     gradient: 'linear-gradient(135deg, #007ACC 0%, #4EC9B0 100%)',
-    accent: '#007ACC',
+    accent: '#3399DD',
     tools: ['Everything!'],
     tagline: 'Discover all 70+ tools',
   },
@@ -112,6 +112,9 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 
       <motion.div
         className="tu-onboard"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Welcome to FixMyText"
         initial={{ opacity: 0, y: 40, scale: 0.92 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 22, delay: 0.1 }}

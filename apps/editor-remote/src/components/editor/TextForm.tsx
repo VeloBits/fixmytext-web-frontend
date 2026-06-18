@@ -1369,7 +1369,8 @@ export default function TextForm(props: TextFormProps) {
 
   return (
     <>
-      <div
+      <main
+        role="main"
         className={`tu-forge${sidebarOpen ? '' : ' tu-forge--sidebar-collapsed'}`}
         style={
           sidebarOpen ? { gridTemplateColumns: `48px ${sidebarResize.size}px 1fr` } : undefined
@@ -2124,10 +2125,10 @@ export default function TextForm(props: TextFormProps) {
                   <div className="tu-landing-dash-grid">
                     {/* Daily quest card */}
                     <div className="tu-landing-card tu-landing-card--quest">
-                      <h3 className="tu-landing-card-title">
+                      <h2 className="tu-landing-card-title">
                         <span className="tu-landing-card-icon">&#x2728;</span>
                         Daily Quest
-                      </h3>
+                      </h2>
                       {gamification?.dailyQuest?.id ? (
                         (() => {
                           const quest = QUEST_TEMPLATES.find(
@@ -2156,10 +2157,10 @@ export default function TextForm(props: TextFormProps) {
 
                     {/* Stats card */}
                     <div className="tu-landing-card tu-landing-card--stats">
-                      <h3 className="tu-landing-card-title">
+                      <h2 className="tu-landing-card-title">
                         <span className="tu-landing-card-icon">&#x1F4CA;</span>
                         Your Stats
-                      </h3>
+                      </h2>
                       <div className="tu-landing-mini-stats">
                         <div className="tu-landing-mini-stat">
                           <span className="tu-landing-mini-stat-val">
@@ -2190,10 +2191,10 @@ export default function TextForm(props: TextFormProps) {
 
                     {/* Achievements card */}
                     <div className="tu-landing-card tu-landing-card--achievements">
-                      <h3 className="tu-landing-card-title">
+                      <h2 className="tu-landing-card-title">
                         <span className="tu-landing-card-icon">&#x1F3C6;</span>
                         Recent Badges
-                      </h3>
+                      </h2>
                       <div className="tu-landing-badge-row">
                         {gamification?.achievements?.length > 0 ? (
                           (gamification?.achievements as string[])
@@ -2224,10 +2225,10 @@ export default function TextForm(props: TextFormProps) {
                   <div className="tu-landing-tools-row">
                     {/* Favourites */}
                     <div className="tu-landing-card tu-landing-card--wide">
-                      <h3 className="tu-landing-card-title">
+                      <h2 className="tu-landing-card-title">
                         <span className="tu-landing-card-icon">&#x2764;</span>
                         {gamification?.favorites?.length > 0 ? 'Your Favourites' : 'Popular Tools'}
-                      </h3>
+                      </h2>
                       <div className="tu-landing-tool-grid">
                         {((gamification?.favorites?.length ?? 0) > 0
                           ? ((gamification?.favorites ?? []) as string[])
@@ -2263,10 +2264,10 @@ export default function TextForm(props: TextFormProps) {
 
                     {/* Most used */}
                     <div className="tu-landing-card tu-landing-card--wide">
-                      <h3 className="tu-landing-card-title">
+                      <h2 className="tu-landing-card-title">
                         <span className="tu-landing-card-icon">&#x1F525;</span>
                         Most Used
-                      </h3>
+                      </h2>
                       <div className="tu-landing-tool-grid">
                         {(() => {
                           const used = (gamification?.toolsUsed || {}) as Record<string, number>;
@@ -2305,7 +2306,7 @@ export default function TextForm(props: TextFormProps) {
                   {/* Category grid + Shortcuts */}
                   <div className="tu-landing-bottom">
                     <div className="tu-landing-categories">
-                      <h3 className="tu-landing-heading">Explore categories</h3>
+                      <h2 className="tu-landing-heading">Explore categories</h2>
                       <div className="tu-landing-cat-grid">
                         {USE_CASE_TABS.filter((t) => t.id !== 'all').map((tab) => {
                           const count = TOOLS.filter((t) => t.tabs?.includes(tab.id)).length;
@@ -2330,7 +2331,7 @@ export default function TextForm(props: TextFormProps) {
                     </div>
 
                     <div className="tu-landing-shortcuts">
-                      <h3 className="tu-landing-heading">Keyboard shortcuts</h3>
+                      <h2 className="tu-landing-heading">Keyboard shortcuts</h2>
                       <div className="tu-landing-shortcut-list">
                         <div className="tu-landing-shortcut">
                           <kbd>Ctrl</kbd>
@@ -3330,7 +3331,7 @@ export default function TextForm(props: TextFormProps) {
             </>
           )}
         </div>
-      </div>
+      </main>
 
       {/* Settings menu (rendered outside .tu-forge to escape overflow:hidden) */}
       {settingsOpen && (

@@ -24,17 +24,22 @@ export function initSentry(): void {
     dsn,
     environment: (import.meta.env.VITE_SENTRY_ENVIRONMENT as string) || 'development',
     release: import.meta.env.VITE_SENTRY_RELEASE as string | undefined,
-    integrations: [
-      Sentry.reactRouterV7BrowserTracingIntegration({
-        useEffect,
-        useLocation,
-        useNavigationType,
-        createRoutesFromChildren,
-        matchRoutes,
-      }),
-    ],
+    integrations:
+      import.meta.env.VITE_SENTRY_ENVIRONMENT === 'production'
+        ? [
+            Sentry.reactRouterV7BrowserTracingIntegration({
+              useEffect,
+              useLocation,
+              useNavigationType,
+              createRoutesFromChildren,
+              matchRoutes,
+            }),
+          ]
+        : [],
     tracesSampleRate:
-      import.meta.env.VITE_SENTRY_ENVIRONMENT === 'production' ? 0.1 : 1.0,
+      import.meta.env.VITE_SENTRY_ENVIRONMENT === 'production' ? 0.1 : 0,
+    autoSessionTracking:
+      import.meta.env.VITE_SENTRY_ENVIRONMENT === 'production',
     tracePropagationTargets: [
       /^\/api\//,
       new RegExp(`^${(import.meta.env.VITE_API_URL as string) || 'http://localhost:8000'}`),
