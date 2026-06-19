@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
-import { userManager } from './userManager';
+import { broadcastAuthMessage, userManager } from './userManager';
 
 // React 19 StrictMode fires useEffect 3+ times per mount via multiple
 // doubleInvokeEffectsOnFiber passes. Strategy:
@@ -28,6 +28,10 @@ export function AuthCallback() {
       .signinRedirectCallback()
       .then(() => {
         _callbackSettled = true;
+        // Notify other open tabs so they silently acquire tokens without a
+        // page refresh. Only the initiating tab broadcasts — silent renewals
+        // triggered by this message do not re-broadcast, avoiding a loop.
+        broadcastAuthMessage({ type: 'user_loaded' });
         // Client-side navigation (NOT window.location.replace): a full reload
         // would wipe the just-stored in-memory tokens (H-8). React Router keeps
         // the SPA — and the in-memory user — alive.

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { User as OidcUser } from 'oidc-client-ts';
 import * as Sentry from '@sentry/react';
 import { clearSession } from '@velobits/api-client';
-import { loadUser, resetLoadUser, userManager } from './userManager';
+import { broadcastAuthMessage, loadUser, resetLoadUser, userManager } from './userManager';
 
 export interface OidcAuthState {
   isAuthenticated: boolean;
@@ -57,7 +57,12 @@ export function useOidcAuth(): OidcAuthState {
     // Order matters: if signoutRedirect runs first the page navigates away
     // before clearSession completes.
     resetLoadUser(); // drop the cached bootstrap so a later load re-evaluates
-    await clearSession();
+    broadcastAuthMessage({ type: 'user_signed_out' }); // notify other open tabs
+    try {
+      await clearSession();
+    } catch {
+      // best-effort — always proceed to Keycloak SSO signout regardless
+    }
     await userManager.signoutRedirect({
       post_logout_redirect_uri: `${window.location.origin}/app/login`,
     });
