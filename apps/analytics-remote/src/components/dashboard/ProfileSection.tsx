@@ -23,7 +23,10 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
   const [nameInput, setNameInput] = useState(user?.display_name || '');
   const nameRef = useRef<HTMLInputElement>(null);
 
-  // TODO: Email verification resend is now handled by Keycloak.
+  // TODO(partial-impl): resend-verification is stubbed. `resending` is hardcoded false
+  // and `cooldownUntil` never advances, so the button never reflects real state. Either
+  // wire account-svc POST /api/v1/auth/resend-verification (keycloak_admin.send_verification_email)
+  // with a server cooldown, or remove the button entirely. See docs/PARTIAL_IMPLEMENTATIONS.md (#4).
   const resending = false;
   const [cooldownUntil] = useState(0);
   const [, forceTick] = useState(0);
@@ -48,7 +51,8 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
   }, [cooldownUntil]);
 
   const handleResendVerification = async () => {
-    // TODO: Email verification resend is now handled by Keycloak.
+    // TODO(partial-impl): placeholder — only shows an info alert instead of triggering a
+    // resend. Backend endpoint does not exist yet (see resend stub above, #4).
     showAlert('Please check your Keycloak account to resend the verification email.', 'info');
   };
 
@@ -72,6 +76,9 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
             {user?.display_name?.charAt(0)?.toUpperCase() || 'G'}
           </div>
           <div className="tu-dash-profile-large-info">
+            {/* TODO(partial-impl): display-name edit is not persisted — both Save paths
+                below only show "(local only)" and never call the backend, so the change
+                is lost on reload. Wire account-svc PATCH /api/v1/user (display_name). */}
             {editingName ? (
               <div className="tu-dash-profile-edit-row">
                 <input

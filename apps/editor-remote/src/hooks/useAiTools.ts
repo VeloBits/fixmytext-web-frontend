@@ -531,6 +531,10 @@ export default function useAiTools(
    * @param {string} errorMsg - Fallback error message.
    * @param {string} [toolId] - Optional tool identifier for history tracking.
    */
+  // TODO(partial-impl): all AI tools use the non-streaming transformText mutation. The
+  // backend exposes POST /api/v1/ai/{tool_id}/stream (SSE) and the OpenAPI types include
+  // it, but there is no streaming caller here — long AI calls block until complete. Add a
+  // useAiStream path + progressive output. See docs/PARTIAL_IMPLEMENTATIONS.md (#6).
   const callAi = useCallback(
     async (endpoint: string, label: string, errorMsg: string, toolId?: string): Promise<void> => {
       if (!text) return;

@@ -11,6 +11,11 @@ import { KEYCLOAK_CLIENT_ID, KEYCLOAK_REALM, KEYCLOAK_URL } from './keycloakConf
 /** Trigger Keycloak's "reset password" flow as a magic-link substitute.
  *  Keycloak sends an email with a link that authenticates + prompts password set.
  *  This is a browser redirect to Keycloak (no credentials handled in the SPA).
+ *
+ *  TODO(partial-impl): this is a workaround, not a true magic link — the user is also
+ *  forced to set/reset a password. Install the `keycloak-magic-link` extension for a
+ *  frictionless flow if magic-link friction becomes a measurable problem.
+ *  See docs/PARTIAL_IMPLEMENTATIONS.md (#3).
  */
 export async function sendMagicLink(email: string): Promise<void> {
   const params = new URLSearchParams({

@@ -47,6 +47,9 @@ export const errorMiddleware: Middleware = (_api) => (next) => (action) => {
 
     // Only fire for unhandled query failures
     const error = action.payload as RtkErrorPayload | undefined;
+    // TODO(audit:FE-ERR-01): raw backend `detail` strings are surfaced directly to the
+    // user for unhandled query failures (info-leak / inconsistent UX). Map known error
+    // shapes to generic, user-facing copy instead of echoing the server message.
     const detail = error?.data?.detail;
     const message = typeof detail === 'string' ? detail : 'Something went wrong. Please try again.';
 
