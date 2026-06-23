@@ -9,26 +9,23 @@ interface Env {
 
 // Content-Security-Policy for the whole origin (FE-AUTH-06 / DO-08).
 //
-// Shipped as Report-Only first: a strict `script-src 'self'` can break a Vite
-// build's modulepreload inline script, and `frame-src` must allow Keycloak for
-// the silent-renew iframe (H-8). Validate against real traffic, add hashes/
-// nonces for any inline scripts, then rename the header below to
-// `Content-Security-Policy` to enforce.
-//
-// connect-src/frame-src/form-action allow *.velobits.dev (Keycloak + API) and
-// Sentry ingest. Remotes load same-origin under /remotes/* so they need no
-// extra script-src entry.
+// script-src allows checkout.razorpay.com (CDN SDK loaded in index.html).
+// style-src allows fonts.googleapis.com (Google Fonts stylesheet).
+// font-src allows fonts.gstatic.com (Google Fonts files).
+// frame-src/connect-src allow *.razorpay.com (checkout iframe + XHR).
+// frame-src also allows *.velobits.dev for the Keycloak silent-renew iframe.
+// Remotes load same-origin under /remotes/* — no extra script-src entry needed.
 const DEFAULT_CSP = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'self'",
-  "script-src 'self'",
-  "style-src 'self' 'unsafe-inline'",
+  "script-src 'self' https://checkout.razorpay.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: https:",
-  "font-src 'self' data:",
-  "connect-src 'self' https://*.velobits.dev https://*.ingest.sentry.io https://sentry.io",
-  "frame-src 'self' https://*.velobits.dev",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "connect-src 'self' https://*.velobits.dev https://*.ingest.sentry.io https://sentry.io https://*.razorpay.com",
+  "frame-src 'self' https://*.velobits.dev https://*.razorpay.com",
   "form-action 'self' https://*.velobits.dev",
 ].join('; ');
 
@@ -41,7 +38,7 @@ function withSecurityHeaders(res: Response, env: Env): Response {
   h.set('X-Frame-Options', 'SAMEORIGIN');
   h.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   h.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
-  h.set('Content-Security-Policy-Report-Only', env.CSP ?? DEFAULT_CSP);
+  h.set('Content-Security-Policy', env.CSP ?? DEFAULT_CSP);
   return out;
 }
 
