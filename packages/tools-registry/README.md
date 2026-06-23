@@ -3,7 +3,7 @@
 Single source of truth for all 254 FixMyText tool definitions.
 
 Used by:
-- `apps/web` — the Vite editor dispatches tools from this registry
+- `apps/shell` + `apps/editor-remote` — the Vite editor surface dispatches tools from this registry (via the `@velobits/app-core/constants/tools` re-export)
 - `apps/content` — Next.js generates 254 SSG pages via `getAllSlugs()`
 
 ## Usage

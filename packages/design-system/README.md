@@ -23,8 +23,8 @@ import { Button, Card, Input, ToolCard } from '@velobits/design-system';
 
 ## Design tokens
 
-`theme.css` defines Tailwind v4 `@theme` tokens sourced from the VSCode Dark+ color palette. All CSS variables (e.g. `var(--accent)`, `var(--bg)`, `var(--text)`) are set by `tokens.css` in `apps/web`.
+`theme.css` defines Tailwind v4 `@theme` tokens sourced from the VSCode Dark+ color palette. All CSS variables (e.g. `var(--accent)`, `var(--bg)`, `var(--text)`) are set by `tokens.css` in `apps/shell` (`apps/shell/src/assets/css/tokens.css`).
 
 ## Tailwind usage
 
-Both `apps/web` (Vite) and `apps/content` (Next.js) consume this package. Neither app writes design tokens — they only import `theme.css` and use Tailwind utility classes.
+Both the Vite editor surface (`apps/shell` + remotes) and `apps/content` (Next.js) consume this package. No app writes design tokens — they only import `theme.css` and use Tailwind utility classes.

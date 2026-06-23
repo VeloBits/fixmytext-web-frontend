@@ -13,7 +13,7 @@ const result = await apiFetch('/api/v1/text/uppercase', {
   body: JSON.stringify({ text: 'hello' }),
 });
 
-// In RTK Query baseQuery — see apps/web/src/store/api/baseQuery.ts
+// In RTK Query baseQuery — see packages/app-core/src/store/api/baseQuery.ts
 // ENDPOINTS provides typed path constants for all 254+ tools
 const path = ENDPOINTS.UPPERCASE; // '/api/v1/text/uppercase'
 

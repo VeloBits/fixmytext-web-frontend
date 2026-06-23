@@ -2,7 +2,7 @@
 
 > The content surface of FixMyText: SEO-optimised pages, OG cards, and marketing content.
 
-## Why Next.js here and Vite in `apps/web/`?
+## Why Next.js here and Vite in `apps/shell/` (+ remotes)?
 
 The content app handles pages where SSR/SSG matters:
 - `/about` — static marketing content (SSG at build time)
@@ -40,7 +40,7 @@ Traefik routes by path within `develop-fixmytext.velobits.dev`:
 | Path | → App | Port |
 |---|---|---|
 | `/about`, `/pricing`, `/share/*` | content-app | 3001 |
-| `/app/*`, `/` | web-app | 3000 |
+| `/app/*`, `/` | shell | 3000 |
 
 Both apps can also be accessed directly by port during development.
 

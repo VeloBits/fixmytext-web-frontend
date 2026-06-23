@@ -67,8 +67,8 @@ npm install           # installs all apps + links all workspace packages
 Copy env files:
 
 ```bash
-cp apps/shell/.env.example apps/shell/.env
-cp apps/content/.env.example apps/content/.env
+cp .env.example .env                       # Vite apps (shell + remotes) read these VITE_* vars
+cp apps/content/.env.example apps/content/.env.local   # Next.js content app
 ```
 
 ## Dev servers
@@ -156,7 +156,8 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `VITE_API_URL` | Yes | `http://api-dev.velobits.dev` | Backend API base URL (Kong gateway) |
-| `VITE_KEYCLOAK_URL` | Yes | `http://auth-dev.velobits.dev/realms/Velobits-Dev` | Keycloak realm OIDC endpoint |
+| `VITE_KEYCLOAK_URL` | Yes | `http://auth-dev.velobits.dev` | Keycloak server base URL (realm path is derived) |
+| `VITE_KEYCLOAK_REALM` | Yes | `Velobits-Dev` | Keycloak realm name |
 | `VITE_KEYCLOAK_CLIENT_ID` | Yes | `develop-fixmytext` | Keycloak client ID |
 
 ### `apps/content` (Next.js)
