@@ -1634,6 +1634,28 @@ export default function TextForm(props: TextFormProps) {
             </div>
           </div>
 
+          {/* Mobile: the activity bar (which switches these panels on desktop)
+              is hidden, so surface its non-category panels as sheet tabs */}
+          {isMobile && (
+            <div className="tu-sheet-tabs">
+              {[
+                { id: '_new', label: "What's New", icon: '✨' },
+                { id: '_favourites', label: 'Favourites', icon: '♥' },
+                { id: '_templates', label: 'Templates', icon: '▤' },
+                { id: '_history', label: 'History', icon: '↺' },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  className={`tu-sheet-tab${activeTab === t.id ? ' tu-sheet-tab--active' : ''}`}
+                  onClick={() => setActiveTab(activeTab === t.id ? 'all' : t.id)}
+                  aria-pressed={activeTab === t.id}
+                >
+                  <span aria-hidden="true">{t.icon}</span> {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Tool panel — when a tool category is active */}
           {activeTab && !activeTab.startsWith('_') && (
             <ToolPanel
@@ -1652,7 +1674,7 @@ export default function TextForm(props: TextFormProps) {
                 }
                 return null;
               })()}
-              hideTabs
+              hideTabs={!isMobile}
               viewMode={toolViewMode}
               suggestedToolIds={suggestions.suggestions.map((t) => t.id)}
             />

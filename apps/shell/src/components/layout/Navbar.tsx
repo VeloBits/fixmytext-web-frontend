@@ -2,20 +2,30 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import type { AlertLevel } from '@/contexts/AlertContext';
+import type { ThemeMode } from '@/contexts/ThemeContext';
 
 export interface NavbarProps {
   showAlert?: (message: string, type: AlertLevel) => void;
+  /* Account/appearance data for the mobile menu — on desktop the editor's
+     activity-bar avatar menu covers these, but that bar is hidden ≤768px */
+  user?: { display_name?: string; email?: string } | null;
+  mode?: ThemeMode;
+  setMode?: (mode: ThemeMode) => void;
 }
 
-export default function Navbar({ showAlert }: NavbarProps) {
+export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated } = useOidcAuth();
+  const { isAuthenticated, logout } = useOidcAuth();
 
   const handleShare = () => {
     navigator.clipboard
       .writeText(window.location.origin)
       .then(() => showAlert?.('Website link copied to clipboard!', 'success'))
       .catch(() => showAlert?.('Failed to copy link', 'danger'));
+  };
+
+  const openSearch = () => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
   };
 
   return (
@@ -37,9 +47,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
         {/* Search trigger */}
         <button
           className="hidden md:flex items-center gap-2 px-3.5 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] cursor-pointer min-w-[180px] max-w-[280px] transition-colors hover:border-[var(--accent)]"
-          onClick={() => {
-            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
-          }}
+          onClick={openSearch}
         >
           <span className="text-[0.82rem] text-[#adadad] whitespace-nowrap overflow-hidden text-ellipsis flex-1">
             Search tools...
@@ -116,11 +124,34 @@ export default function Navbar({ showAlert }: NavbarProps) {
           </Link>
         )}
 
+        {/* Mobile search (opens the Ctrl+K tool palette) */}
+        <button
+          className="md:hidden w-11 h-11 -my-1 rounded-sm border-none bg-transparent cursor-pointer flex items-center justify-center text-[var(--titlebar-fg)] transition-colors hover:bg-white/[0.08]"
+          onClick={openSearch}
+          aria-label="Search tools"
+        >
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+
         {/* Mobile hamburger */}
         <button
-          className="md:hidden w-7 h-7 rounded-sm border-none bg-transparent cursor-pointer flex items-center justify-center text-[0.85rem] text-[var(--titlebar-fg)] transition-colors hover:bg-white/[0.08]"
+          className="md:hidden w-11 h-11 -my-1 rounded-sm border-none bg-transparent cursor-pointer flex items-center justify-center text-[1rem] text-[var(--titlebar-fg)] transition-colors hover:bg-white/[0.08]"
           onClick={() => setMenuOpen((o) => !o)}
           aria-label="Toggle menu"
+          aria-expanded={menuOpen}
         >
           {menuOpen ? '✕' : '☰'}
         </button>
@@ -128,18 +159,42 @@ export default function Navbar({ showAlert }: NavbarProps) {
 
       {/* Mobile dropdown — tu-mobile-menu class kept for test selectors */}
       {menuOpen && (
-        <div className="tu-mobile-menu absolute top-11 left-0 right-0 bg-[var(--surface)] border-b border-[var(--border)] flex flex-col p-1 z-[200]">
-          <Link className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/" onClick={() => setMenuOpen(false)}>
+        <div className="tu-mobile-menu absolute top-11 left-0 right-0 bg-[var(--surface)] border-b border-[var(--border)] flex flex-col p-1 z-[200] max-h-[calc(100dvh-44px)] overflow-y-auto">
+          {/* Account header (signed-in) */}
+          {isAuthenticated && (
+            <>
+              <div className="flex items-center gap-3 px-3 py-2.5">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-[#007acc] to-[#4ec9b0] text-white text-[0.95rem] font-bold">
+                  {user?.display_name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[0.85rem] font-semibold text-[var(--text)] truncate">
+                    {user?.display_name || 'Account'}
+                  </span>
+                  <span className="text-[0.72rem] text-[var(--text-3)] truncate">
+                    {user?.email || ''}
+                  </span>
+                </div>
+              </div>
+              <div className="h-px bg-[var(--border)] mx-2 my-1" />
+            </>
+          )}
+          <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/" onClick={() => setMenuOpen(false)}>
             Home
           </Link>
-          <Link className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/about" onClick={() => setMenuOpen(false)}>
+          {isAuthenticated && (
+            <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/dashboard" onClick={() => setMenuOpen(false)}>
+              Dashboard
+            </Link>
+          )}
+          <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/about" onClick={() => setMenuOpen(false)}>
             About
           </Link>
-          <Link className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/pricing" onClick={() => setMenuOpen(false)}>
+          <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/pricing" onClick={() => setMenuOpen(false)}>
             Pricing
           </Link>
           <button
-            className="tu-mobile-link px-3 py-1.5 rounded-sm border-none bg-transparent cursor-pointer text-left font-[inherit] text-[var(--text-2)] text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+            className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm border-none bg-transparent cursor-pointer text-left font-[inherit] text-[var(--text-2)] text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
             onClick={() => {
               handleShare();
               setMenuOpen(false);
@@ -148,7 +203,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
             Share
           </button>
           <a
-            className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+            className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
             href="https://github.com/sojitra-nency/FixMyText"
             target="_blank"
             rel="noopener noreferrer"
@@ -156,10 +211,35 @@ export default function Navbar({ showAlert }: NavbarProps) {
           >
             GitHub
           </a>
+          {setMode && (
+            <button
+              className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm border-none bg-transparent cursor-pointer text-left font-[inherit] text-[var(--text-2)] text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+              onClick={() => {
+                setMode(mode === 'dark' ? 'light' : 'dark');
+                setMenuOpen(false);
+              }}
+            >
+              {mode === 'dark' ? 'Light Theme' : 'Dark Theme'}
+            </button>
+          )}
           {!isAuthenticated && (
-            <Link className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/login" onClick={() => setMenuOpen(false)}>
+            <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/login" onClick={() => setMenuOpen(false)}>
               Sign In
             </Link>
+          )}
+          {isAuthenticated && (
+            <>
+              <div className="h-px bg-[var(--border)] mx-2 my-1" />
+              <button
+                className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm border-none bg-transparent cursor-pointer text-left font-[inherit] text-[#f48771] text-[0.82rem] transition-all hover:bg-[var(--list-hover)]"
+                onClick={() => {
+                  setMenuOpen(false);
+                  logout();
+                }}
+              >
+                Sign Out
+              </button>
+            </>
           )}
         </div>
       )}

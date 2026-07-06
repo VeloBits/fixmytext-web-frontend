@@ -1171,4 +1171,23 @@ describe('TextForm mobile (max-width: 768px)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
     expect(document.querySelector('.tu-sidebar-header-count')).toBeInTheDocument();
   });
+
+  it('exposes the activity-bar panels as sheet tabs', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
+    const tabs = document.querySelectorAll('.tu-sheet-tab');
+    expect(tabs.length).toBe(4);
+    const historyTab = Array.from(tabs).find((t) => t.textContent?.includes('History'));
+    fireEvent.click(historyTab as HTMLElement);
+    // sidebar header title switches to the History panel
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('History');
+  });
+
+  it('renders the tool panel inside the open sheet', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
+    expect(
+      document.querySelector('.tu-forge-sidebar [data-testid="tool-panel"]')
+    ).toBeInTheDocument();
+  });
 });

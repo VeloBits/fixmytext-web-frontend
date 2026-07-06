@@ -2573,6 +2573,41 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
     z-index: 395;
     background: rgba(0, 0, 0, 0.45);
   }
+  /* Sheet: quick access to the activity-bar panels + touch-sized controls */
+  .tu-sheet-tabs {
+    display: flex;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .tu-sheet-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 44px;
+    padding: 0 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .tu-sheet-tab--active {
+    color: var(--accent);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+  .tu-sidebar-header-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .tu-tpanel-tab {
+    min-height: 40px;
+  }
   .tu-editor-split {
     grid-template-columns: 1fr !important;
   }

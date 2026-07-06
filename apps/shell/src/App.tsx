@@ -83,7 +83,7 @@ function AppInner() {
         <OnboardingModal onComplete={handleOnboardingComplete} />
       )}
 
-      <Navbar showAlert={showAlert} />
+      <Navbar showAlert={showAlert} user={user} mode={mode} setMode={setMode} />
       <EmailVerificationBanner showAlert={showAlert} />
       <Alert alerts={alerts} dismissAlert={dismissAlert} />
       <PassPurchaseModal
