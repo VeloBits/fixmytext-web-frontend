@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TextForm from './TextForm';
 import { expectNoA11yViolations } from '@/test/axeHelper';
@@ -1108,5 +1108,67 @@ describe('TextForm', () => {
       fireEvent.click(backdrop);
       expect(mockDismissGate).toHaveBeenCalled();
     }
+  });
+});
+
+describe('TextForm mobile (max-width: 768px)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorageMock.getItem.mockReturnValue(null);
+    if (!window.ResizeObserver) {
+      window.ResizeObserver = class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      } as unknown as typeof ResizeObserver;
+    }
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(max-width: 768px)',
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof window.matchMedia;
+  });
+
+  afterEach(() => {
+    // restore jsdom's default (no matchMedia) so other suites see the guard path
+    delete (window as { matchMedia?: unknown }).matchMedia;
+  });
+
+  it('starts with the tool sheet closed', () => {
+    render(<TextForm {...defaultProps} />);
+    expect(document.querySelector('.tu-forge--sidebar-collapsed')).toBeInTheDocument();
+  });
+
+  it('does not apply the desktop inline grid style', () => {
+    render(<TextForm {...defaultProps} />);
+    const forge = document.querySelector('.tu-forge') as HTMLElement;
+    expect(forge.style.gridTemplateColumns).toBe('');
+  });
+
+  it('opens the tool sheet from the Browse tools FAB', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
+    expect(document.querySelector('.tu-forge--sidebar-collapsed')).not.toBeInTheDocument();
+    expect(document.querySelector('.tu-sheet-backdrop')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Close tool browser' })).toBeInTheDocument();
+  });
+
+  it('closes the tool sheet when the backdrop is tapped', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
+    fireEvent.click(document.querySelector('.tu-sheet-backdrop') as HTMLElement);
+    expect(document.querySelector('.tu-forge--sidebar-collapsed')).toBeInTheDocument();
+    expect(document.querySelector('.tu-sheet-backdrop')).not.toBeInTheDocument();
+  });
+
+  it('opens the sheet on the ALL tools category when none was selected', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
+    expect(document.querySelector('.tu-sidebar-header-count')).toBeInTheDocument();
   });
 });

@@ -591,9 +591,5 @@
   font-size: 0.7rem;
 }
 
-/* ── Responsive: hide panel on mobile ─────────────── */
-@media (max-width: 768px) {
-  .tu-tpanel {
-    display: none;
-  }
-}
+/* On mobile the panel lives inside the .tu-forge-sidebar bottom sheet
+   (see editor.css) — no mobile hiding needed here */

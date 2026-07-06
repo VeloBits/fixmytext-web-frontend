@@ -22,3 +22,13 @@ body {
   min-height: 100vh;
   overflow: hidden;
 }
+
+/* Mobile: the fixed-viewport IDE layout switches to a document-flow layout
+   (.tu-forge gets height auto), so the page must scroll natively instead of
+   relying on inner scroll panes */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}

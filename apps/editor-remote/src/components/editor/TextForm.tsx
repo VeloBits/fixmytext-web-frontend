@@ -313,13 +313,24 @@ export default function TextForm(props: TextFormProps) {
   const { activePanel, setActivePanel, togglePanel } = useDrawerState();
   const [previewMode, setPreviewMode] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Must match the mobile breakpoint in editor.css — inline resize sizes would
+  // otherwise override the media query and collapse the layout on small screens
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  // Desktop: sidebar visible by default; mobile: it's a bottom sheet, start closed
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [toolViewMode, setToolViewMode] = useState(
     () => localStorage.getItem('fmx_tool_view') || 'grid'
   );
   const [workspaceTabs, setWorkspaceTabs] = useState<WorkspaceTab[]>([]);
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
+  useEffect(() => {
+    if (isMobile) setSidebarOpen(false);
+  }, [isMobile]);
+  // Mobile: picking a tool opens a workspace — dismiss the sheet so the editor shows
+  useEffect(() => {
+    if (isMobile && activeWorkspaceId) setSidebarOpen(false);
+  }, [isMobile, activeWorkspaceId]);
   const [toolResults, setToolResults] = useState<Record<string, unknown>>({}); // keyed by tab ID, not tool ID
   const [inputScrollTop, setInputScrollTop] = useState(0);
   const aiResultSourceRef = useRef<string | null>(null); // tracks which toolId/panelId produced the current ai.aiResult
@@ -481,9 +492,6 @@ export default function TextForm(props: TextFormProps) {
     setAiResult: ai.setAiResult,
     pushHistory: history.pushHistory,
   });
-  // Must match the mobile breakpoint in editor.css — inline resize sizes would
-  // otherwise override the media query and collapse the layout on small screens
-  const isMobile = useMediaQuery('(max-width: 768px)');
   const sidebarResize = useResize('horizontal', 240, {
     min: 160,
     max: 480,
@@ -3355,6 +3363,47 @@ export default function TextForm(props: TextFormProps) {
           )}
         </div>
       </main>
+
+      {/* Mobile: the sidebar is a bottom sheet — this FAB is its always-visible
+          entry point (the activity bar that opens it on desktop is hidden) */}
+      {isMobile && (
+        <>
+          {sidebarOpen && (
+            <div
+              className="tu-sheet-backdrop"
+              onClick={() => setSidebarOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+          <button
+            className="tu-tools-fab"
+            onClick={() => {
+              if (!sidebarOpen && !activeTab) setActiveTab('all');
+              setSidebarOpen((o) => !o);
+            }}
+            aria-expanded={sidebarOpen}
+            aria-label={sidebarOpen ? 'Close tool browser' : 'Browse tools'}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg>
+            Tools
+          </button>
+        </>
+      )}
 
       {/* Settings menu (rendered outside .tu-forge to escape overflow:hidden) */}
       {settingsOpen && (

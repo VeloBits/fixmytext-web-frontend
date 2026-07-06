@@ -2515,8 +2515,63 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   .tu-activity-bar {
     display: none;
   }
-  .tu-forge-sidebar {
+  /* Sidebar becomes a slide-up bottom sheet (toggled by the Tools FAB and
+     the landing category cards via the existing sidebarOpen state) */
+  .tu-forge .tu-forge-sidebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    /* definite height: the panel list inside relies on flex:1 to size+scroll */
+    height: 75vh;
+    height: 75dvh;
+    z-index: 400;
+    border-right: none;
+    border-top: 1px solid var(--border-strong);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.45);
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s;
+    overscroll-behavior: contain;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tu-forge:not(.tu-forge--sidebar-collapsed) .tu-forge-sidebar {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  .tu-resize-handle--sidebar {
     display: none;
+  }
+  .tu-tools-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 390;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+  }
+  .tu-tools-fab:active {
+    background: var(--accent-hover);
+  }
+  .tu-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 395;
+    background: rgba(0, 0, 0, 0.45);
   }
   .tu-editor-split {
     grid-template-columns: 1fr !important;
