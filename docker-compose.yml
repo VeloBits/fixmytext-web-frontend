@@ -160,6 +160,15 @@ services:
       - .:/app
       - /app/node_modules
     env_file: .env.docker.dev
+    environment:
+      # Server-side fetches (apps/content/lib/api.ts) run inside this container,
+      # where Kong's host-published 127.0.0.1:8000 is unreachable — talk to Kong
+      # directly over the backend compose network instead. Requires the backend
+      # stack to be up first (it owns the external network below).
+      CONTENT_API_URL: http://kong:8000
+    networks:
+      - default
+      - backend
     restart: unless-stopped
 
   # ── Content — prod ─────────────────────────────────────────────────────────────
@@ -177,3 +186,11 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+
+# ── Networks ──────────────────────────────────────────────────────────────────
+# The backend stack (backend/docker-compose.yml) owns this network; content-dev
+# joins it so server-side rendering can reach Kong at http://kong:8000.
+networks:
+  backend:
+    name: backend_fixmytext-net
+    external: true

@@ -157,9 +157,11 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
   );
 
   const refetchAll = useCallback((): void => {
+    // The status query is skipped while signed out; refetching it then throws.
+    if (!isAuthenticated) return;
     refetchStatus();
     passes.refetchPasses();
-  }, [refetchStatus, passes.refetchPasses]);
+  }, [isAuthenticated, refetchStatus, passes.refetchPasses]);
 
   return {
     tier,

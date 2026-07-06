@@ -9,6 +9,16 @@ function getRazorpayOpts(mock: Mock): RazorpayOptions {
   return (mock.mock as any).calls[0][0] as RazorpayOptions;
 }
 
+// jsdom never fetches external scripts, so tests drive the injected tag's
+// load/error events by hand.
+const SCRIPT_SELECTOR = 'script[src="https://checkout.razorpay.com/v1/checkout.js"]';
+
+function getInjectedScript(): HTMLScriptElement {
+  const script = document.querySelector<HTMLScriptElement>(SCRIPT_SELECTOR);
+  if (!script) throw new Error('Razorpay SDK script was not injected');
+  return script;
+}
+
 describe('openRazorpayCheckout', () => {
   let onSuccess: Mock<(response: RazorpayPaymentResponse) => void>;
   let onFailure: Mock<(msg: string) => void>;
@@ -21,24 +31,47 @@ describe('openRazorpayCheckout', () => {
   afterEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).Razorpay = undefined;
+    document.querySelectorAll(SCRIPT_SELECTOR).forEach((s) => s.remove());
   });
 
-  it('calls onFailure when Razorpay is not loaded', () => {
-    openRazorpayCheckout({ onSuccess, onFailure });
-    expect(onFailure).toHaveBeenCalledWith('Payment service unavailable. Please refresh the page.');
+  it('calls onFailure when the SDK script fails to load', async () => {
+    const promise = openRazorpayCheckout({ onSuccess, onFailure });
+    getInjectedScript().dispatchEvent(new Event('error'));
+    await promise;
+    expect(onFailure).toHaveBeenCalledWith(
+      'Payment service unavailable. Please check your connection and try again.'
+    );
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  it('does not throw when Razorpay missing and no onFailure', () => {
-    expect(() => openRazorpayCheckout({ onSuccess })).not.toThrow();
+  it('resolves without throwing when script fails and no onFailure', async () => {
+    const promise = openRazorpayCheckout({ onSuccess });
+    getInjectedScript().dispatchEvent(new Event('error'));
+    await expect(promise).resolves.toBeUndefined();
   });
 
-  it('creates Razorpay instance and calls open', () => {
+  it('injects the SDK on demand and opens checkout once loaded', async () => {
+    const openMock = vi.fn();
+    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
+
+    const promise = openRazorpayCheckout({ orderId: 'o', onSuccess, onFailure });
+    const script = getInjectedScript();
+    // Simulate the CDN script executing, then firing load.
+    window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
+    script.dispatchEvent(new Event('load'));
+    await promise;
+
+    expect(RazorpayMock).toHaveBeenCalledTimes(1);
+    expect(openMock).toHaveBeenCalledTimes(1);
+    expect(onFailure).not.toHaveBeenCalled();
+  });
+
+  it('creates Razorpay instance and calls open', async () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
-    openRazorpayCheckout({
+    await openRazorpayCheckout({
       orderId: 'order_123',
       amount: 1000,
       currency: 'inr',
@@ -62,12 +95,12 @@ describe('openRazorpayCheckout', () => {
     expect(opts.name).toBe('FixMyText');
   });
 
-  it('calls onSuccess via handler', () => {
+  it('calls onSuccess via handler', async () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
-    openRazorpayCheckout({
+    await openRazorpayCheckout({
       orderId: 'o',
       amount: 1,
       currency: 'usd',
@@ -82,12 +115,12 @@ describe('openRazorpayCheckout', () => {
     expect(onSuccess).toHaveBeenCalledWith(response);
   });
 
-  it('calls onFailure on modal dismiss', () => {
+  it('calls onFailure on modal dismiss', async () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
-    openRazorpayCheckout({
+    await openRazorpayCheckout({
       orderId: 'o',
       amount: 1,
       currency: 'usd',
@@ -101,12 +134,12 @@ describe('openRazorpayCheckout', () => {
     expect(onFailure).toHaveBeenCalledWith('Payment cancelled');
   });
 
-  it('uses default description when not provided', () => {
+  it('uses default description when not provided', async () => {
     const openMock = vi.fn();
     const RazorpayMock = vi.fn(function () { return { open: openMock }; });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
-    openRazorpayCheckout({
+    await openRazorpayCheckout({
       orderId: 'o',
       amount: 1,
       currency: 'usd',

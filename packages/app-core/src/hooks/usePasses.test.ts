@@ -54,10 +54,16 @@ vi.mock('../utils/razorpay', () => ({
   executeCheckoutFlow: mocks.mockExecuteCheckoutFlow,
 }));
 
+vi.mock('../auth/useOidcAuth', () => ({
+  useOidcAuth: vi.fn(),
+}));
+
 import { useSelector } from 'react-redux';
+import { useOidcAuth } from '../auth/useOidcAuth';
 import usePasses from './usePasses';
 
 const mockUseSelector = vi.mocked(useSelector);
+const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('usePasses', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,6 +73,14 @@ describe('usePasses', () => {
     vi.clearAllMocks();
     showAlert = vi.fn();
     mockUseSelector.mockReturnValue({ accessToken: 'tok' });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: 'tok',
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mocks.mockSpinWheel.mockReturnValue({ unwrap: () => Promise.resolve({ prize: 'bonus' }) });
     mocks.mockExecuteCheckoutFlow.mockResolvedValue(undefined);
     activePassesData = {
@@ -223,6 +237,26 @@ describe('usePasses', () => {
       result.current.refetchSpinHistory();
     });
     expect(mocks.mockRefetchSpinHistory).toHaveBeenCalled();
+  });
+
+  // Regression: the queries are skipped while signed out, and RTK Query throws
+  // "Cannot refetch a query that has not been started yet" if refetched then.
+  it('refetch functions no-op when not authenticated', async () => {
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    const { result } = renderHook(() => usePasses({ showAlert }));
+    act(() => {
+      result.current.refetchPasses();
+      result.current.refetchSpinHistory();
+    });
+    expect(mocks.mockRefetch).not.toHaveBeenCalled();
+    expect(mocks.mockRefetchSpinHistory).not.toHaveBeenCalled();
   });
 
   it('hasPassFor returns false when pass does not cover tool by id', () => {

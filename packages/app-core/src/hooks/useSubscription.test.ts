@@ -311,4 +311,23 @@ describe('useSubscription', () => {
     });
     expect(mockRefetchStatus).toHaveBeenCalled();
   });
+
+  // Regression: the status query is skipped while signed out, and RTK Query
+  // throws "Cannot refetch a query that has not been started yet" if refetched
+  // then (hit on every tool run by anonymous users via TextForm).
+  it('refetchStatus no-ops when not authenticated', async () => {
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    const { result } = renderHook(() => useSubscription({ showAlert }));
+    await act(async () => {
+      result.current.refetchStatus();
+    });
+    expect(mockRefetchStatus).not.toHaveBeenCalled();
+  });
 });

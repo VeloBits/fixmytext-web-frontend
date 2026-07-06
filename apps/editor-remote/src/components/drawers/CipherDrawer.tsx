@@ -28,7 +28,7 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
   const toolId = activeTool?.id || '';
 
   const handleApply = async () => {
-    if (!text) {
+    if (!text.trim()) {
       showAlert('Enter text first', 'warning');
       return;
     }

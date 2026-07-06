@@ -65,7 +65,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
 
         {/* Share website link */}
         <button
-          className="flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] cursor-pointer text-[#adadad] text-[0.82rem] font-[inherit] whitespace-nowrap no-underline transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
+          className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] cursor-pointer text-[#adadad] text-[0.82rem] font-[inherit] whitespace-nowrap no-underline transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
           onClick={handleShare}
           aria-label="Share website link"
           title="Share website link"
@@ -82,7 +82,7 @@ export default function Navbar({ showAlert }: NavbarProps) {
 
         {/* GitHub */}
         <a
-          className="flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] text-[#adadad] text-[0.82rem] no-underline whitespace-nowrap transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
+          className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md border border-[#505052] bg-[#3c3c3e] text-[#adadad] text-[0.82rem] no-underline whitespace-nowrap transition-all hover:border-[var(--accent)] hover:text-[#e0e0e0] hover:bg-[#454547] active:bg-[#505052]"
           href="https://github.com/sojitra-nency/FixMyText"
           target="_blank"
           rel="noopener noreferrer"
@@ -138,6 +138,24 @@ export default function Navbar({ showAlert }: NavbarProps) {
           <Link className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/pricing" onClick={() => setMenuOpen(false)}>
             Pricing
           </Link>
+          <button
+            className="tu-mobile-link px-3 py-1.5 rounded-sm border-none bg-transparent cursor-pointer text-left font-[inherit] text-[var(--text-2)] text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+            onClick={() => {
+              handleShare();
+              setMenuOpen(false);
+            }}
+          >
+            Share
+          </button>
+          <a
+            className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+            href="https://github.com/sojitra-nency/FixMyText"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMenuOpen(false)}
+          >
+            GitHub
+          </a>
           {!isAuthenticated && (
             <Link className="tu-mobile-link px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/login" onClick={() => setMenuOpen(false)}>
               Sign In

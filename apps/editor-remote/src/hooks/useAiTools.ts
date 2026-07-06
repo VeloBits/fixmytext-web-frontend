@@ -522,6 +522,15 @@ export default function useAiTools(
 
   const [transformText] = useTransformTextMutation();
 
+  // Whitespace-only input is not runnable (backend rejects it with 422 and it
+  // must never burn a use). Prompt only when something was typed — fully-empty
+  // input keeps the silent no-op so auto-run paths stay quiet.
+  const guardText = useCallback((): boolean => {
+    if (text.trim()) return true;
+    if (text) showAlert('Please enter some text', 'warning');
+    return false;
+  }, [text, showAlert]);
+
   const hasMarkdown = (str: string): boolean => /[|#*-]{2,}|^\s*[•\-\d]+[.)]\s|^\|.+\|$/m.test(str);
 
   /**
@@ -537,7 +546,7 @@ export default function useAiTools(
   // useAiStream path + progressive output. See docs/PARTIAL_IMPLEMENTATIONS.md (#6).
   const callAi = useCallback(
     async (endpoint: string, label: string, errorMsg: string, toolId?: string): Promise<void> => {
-      if (!text) return;
+      if (!guardText()) return;
       if (!isAuthenticated) {
         showAlert('Please log in to use AI tools', 'warning');
         return;
@@ -598,7 +607,7 @@ export default function useAiTools(
         showAlert(message, tone);
       }
     },
-    [text, isAuthenticated, transformText, setAiResult, setPreviewMode, pushHistory, showAlert]
+    [text, guardText, isAuthenticated, transformText, setAiResult, setPreviewMode, pushHistory, showAlert]
   );
 
   /**
@@ -625,7 +634,7 @@ export default function useAiTools(
    * continuation block — the user sees output for the second paragraph only.
    */
   const handleContinueWriting = async (): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     if (!isAuthenticated) {
       showAlert('Please log in to use AI tools', 'warning');
       return;
@@ -660,7 +669,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional format value override. */
   const handleChangeFormat = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const fmt = overrideVal ?? formatSetting;
     try {
@@ -688,7 +697,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional tone value override. */
   const handleChangeTone = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const tone = overrideVal ?? toneSetting;
     try {
@@ -709,7 +718,7 @@ export default function useAiTools(
 
   /** Detect the language of the current text. */
   const handleDetectLanguage = async (): Promise<string | null | undefined> => {
-    if (!text) return;
+    if (!guardText()) return;
     try {
       const data = await transformText({ endpoint: ENDPOINTS.DETECT_LANGUAGE, text }).unwrap();
       setDetectedLang(data.result);
@@ -722,7 +731,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional target language override. */
   const handleTranslate = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const lang = overrideVal ?? translateLang;
     try {
@@ -754,7 +763,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional target language override. */
   const handleTransliterate = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const lang = overrideVal ?? translitLang;
     try {
@@ -782,7 +791,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional delimiter override. */
   const handleSplitToLines = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const delVal = overrideVal ?? splitDelimiter;
     try {
@@ -808,7 +817,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional separator override. */
   const handleJoinLines = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const sep = overrideVal ?? joinSeparator;
     try {
@@ -833,7 +842,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional Caesar shift override. */
   const handleCaesarCipher = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const shift = parseInt(overrideVal ?? caesarShift, 10);
     try {
@@ -854,7 +863,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional rail count override. */
   const handleRailFenceEnc = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const rails = parseInt(overrideVal ?? railCount, 10);
     try {
@@ -879,7 +888,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional rail count override. */
   const handleRailFenceDec = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const rails = parseInt(overrideVal ?? railCount, 10);
     try {
@@ -904,7 +913,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional target language override. */
   const handleCurlToCode = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const target = overrideVal ?? curlTarget;
 
@@ -991,7 +1000,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional date format type override. */
   const handleDateFormat = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const fmt = overrideVal ?? dateFormatType;
     try {
@@ -1043,7 +1052,7 @@ export default function useAiTools(
 
   /** @param {string} [overrideVal] - Optional alignment override. */
   const handlePadLines = async (overrideVal?: string): Promise<void> => {
-    if (!text) return;
+    if (!guardText()) return;
     const original = text;
     const align = overrideVal ?? padAlign;
     try {

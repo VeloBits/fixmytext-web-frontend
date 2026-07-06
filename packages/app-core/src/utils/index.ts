@@ -4,7 +4,7 @@ export { default as formatPriceDefault } from './formatPrice';
 export { detectBrowserRegion, BROWSER_REGION } from './region';
 export type { BrowserRegion } from './region';
 
-export { openRazorpayCheckout, executeCheckoutFlow } from './razorpay';
+export { loadRazorpayScript, openRazorpayCheckout, executeCheckoutFlow } from './razorpay';
 export type {
   RazorpayPaymentResponse,
   RazorpayOptions,

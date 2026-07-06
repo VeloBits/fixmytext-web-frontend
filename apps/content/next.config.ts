@@ -20,7 +20,9 @@ const nextConfig: NextConfig = {
       "base-uri 'self'",
       "object-src 'none'",
       "frame-ancestors 'none'",
-      "script-src 'self'",
+      // The sha256 hash allow-lists the share viewer's pre-paint theme-init
+      // inline script (app/share/[id]/layout.tsx) — keep the two in sync.
+      "script-src 'self' 'sha256-bIvnsZiLYYbrTPbl1Pa25fSaxmN+KG7t7TkGSDdnCNE='",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",

@@ -9,7 +9,8 @@ interface Env {
 
 // Content-Security-Policy for the whole origin (FE-AUTH-06 / DO-08).
 //
-// script-src allows checkout.razorpay.com (CDN SDK loaded in index.html).
+// script-src allows checkout.razorpay.com (CDN SDK injected on demand by
+// app-core's loadRazorpayScript when a checkout starts).
 // style-src allows fonts.googleapis.com (Google Fonts stylesheet).
 // font-src allows fonts.gstatic.com (Google Fonts files).
 // frame-src/connect-src allow *.razorpay.com (checkout iframe + XHR).

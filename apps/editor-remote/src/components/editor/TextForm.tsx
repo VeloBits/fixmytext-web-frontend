@@ -35,6 +35,7 @@ import usePipeline from '@/hooks/usePipeline';
 import useSmartSuggestions from '@/hooks/useSmartSuggestions';
 import useToolSearch from '@/hooks/useToolSearch';
 import useResize from '@/hooks/useResize';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import useTrialLimit from '@velobits/app-core/hooks/useTrialLimit';
 import useDrawerState from '@/hooks/useDrawerState';
 import useKeyboardShortcuts from '@/hooks/useKeyboardShortcuts';
@@ -480,6 +481,9 @@ export default function TextForm(props: TextFormProps) {
     setAiResult: ai.setAiResult,
     pushHistory: history.pushHistory,
   });
+  // Must match the mobile breakpoint in editor.css — inline resize sizes would
+  // otherwise override the media query and collapse the layout on small screens
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const sidebarResize = useResize('horizontal', 240, {
     min: 160,
     max: 480,
@@ -592,7 +596,13 @@ export default function TextForm(props: TextFormProps) {
   // ── Generic API handler (RTK Query) ─────────────────────
   const callApi = async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
     const t = textRef.current;
-    if (!t) return;
+    // Whitespace-only input is not runnable (backend rejects it with 422 and it
+    // must never burn a free use). Prompt only when something was typed —
+    // fully-empty input keeps the silent no-op so tab-switch auto-runs stay quiet.
+    if (!t.trim()) {
+      if (t) showAlert('Please enter some text', 'warning');
+      return;
+    }
     const original = t;
     try {
       const data = await transformText({ endpoint, text: t }).unwrap();
@@ -603,7 +613,11 @@ export default function TextForm(props: TextFormProps) {
       showAlert(successMsg, 'success');
       return { success: true, result: data.result };
     } catch (err) {
-      showAlert((err as { data?: { detail?: string } }).data?.detail || 'Something went wrong. Please try again.', 'danger');
+      const detail = (err as { data?: { detail?: unknown } }).data?.detail;
+      const message = typeof detail === 'string'
+        ? detail
+        : (detail as { message?: string } | null)?.message || 'Something went wrong. Please try again.';
+      showAlert(message, 'danger');
       return { success: false };
     }
   };
@@ -611,7 +625,10 @@ export default function TextForm(props: TextFormProps) {
   // ── Generic API handler with extra params (for drawer tools) ──
   const callApiWithParams = async (endpoint: string, successMsg: string, extraParams: Record<string, unknown>, toolMeta?: Record<string, unknown>) => {
     const t = textRef.current;
-    if (!t) return;
+    if (!t.trim()) {
+      if (t) showAlert('Please enter some text', 'warning');
+      return;
+    }
     const original = t;
     try {
       const data = await transformText({ endpoint, text: t, ...extraParams }).unwrap();
@@ -622,7 +639,11 @@ export default function TextForm(props: TextFormProps) {
       showAlert(successMsg, 'success');
       return { success: true, result: data.result };
     } catch (err) {
-      showAlert((err as { data?: { detail?: string } }).data?.detail || 'Something went wrong. Please try again.', 'danger');
+      const detail = (err as { data?: { detail?: unknown } }).data?.detail;
+      const message = typeof detail === 'string'
+        ? detail
+        : (detail as { message?: string } | null)?.message || 'Something went wrong. Please try again.';
+      showAlert(message, 'danger');
       return { success: false };
     }
   };
@@ -1300,7 +1321,7 @@ export default function TextForm(props: TextFormProps) {
   } = useKeyboardShortcuts(keyboardActions);
 
   // ── Derived stats ───────────────────────────────────────
-  const disabled = text.length === 0 || loading;
+  const disabled = text.trim().length === 0 || loading;
   const { words, chars, sentences } = useMemo(
     () => ({
       words: text.split(/\s+/).filter(Boolean).length,
@@ -1373,7 +1394,9 @@ export default function TextForm(props: TextFormProps) {
         role="main"
         className={`tu-forge${sidebarOpen ? '' : ' tu-forge--sidebar-collapsed'}`}
         style={
-          sidebarOpen ? { gridTemplateColumns: `48px ${sidebarResize.size}px 1fr` } : undefined
+          sidebarOpen && !isMobile
+            ? { gridTemplateColumns: `48px ${sidebarResize.size}px 1fr` }
+            : undefined
         }
       >
         {/* ─── Activity Bar (far left icons) ─── */}
@@ -3317,7 +3340,7 @@ export default function TextForm(props: TextFormProps) {
                 history={history}
                 text={text}
                 gamification={gamification}
-                style={{ height: bottomResize.size }}
+                style={isMobile ? undefined : { height: bottomResize.size }}
               />
 
               {/* Smart Suggestions — below bottom panel */}

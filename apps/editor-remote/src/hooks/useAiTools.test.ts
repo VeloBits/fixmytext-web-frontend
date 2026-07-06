@@ -168,6 +168,25 @@ describe('useAiTools', () => {
       await result.current.handleHashtags!();
     });
     expect(mockTransformText).not.toHaveBeenCalled();
+    expect(showAlert).not.toHaveBeenCalled();
+  });
+
+  it('callAi blocks whitespace-only text with a prompt and no API call', async () => {
+    const { result } = renderAiTools('   \n\t  ');
+    await act(async () => {
+      await result.current.handleHashtags!();
+    });
+    expect(mockTransformText).not.toHaveBeenCalled();
+    expect(showAlert).toHaveBeenCalledWith('Please enter some text', 'warning');
+  });
+
+  it('parameterized handlers block whitespace-only text', async () => {
+    const { result } = renderAiTools('   ');
+    await act(async () => {
+      await result.current.handleCaesarCipher!();
+    });
+    expect(mockTransformText).not.toHaveBeenCalled();
+    expect(showAlert).toHaveBeenCalledWith('Please enter some text', 'warning');
   });
 
   it('callAi shows warning when not authenticated', async () => {

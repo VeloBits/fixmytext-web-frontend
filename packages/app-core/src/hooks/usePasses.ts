@@ -53,9 +53,20 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
   const [verifyPayment] = useVerifyPaymentMutation();
   const [spinWheel, { isLoading: spinLoading }] = useSpinWheelMutation();
 
-  const { data: spinHistoryData, refetch: refetchSpinHistory } = useGetSpinHistoryQuery(undefined, {
+  const { data: spinHistoryData, refetch: refetchSpinHistoryQuery } = useGetSpinHistoryQuery(undefined, {
     skip: !isAuthenticated,
   });
+
+  // The queries above are skipped while signed out, and RTK Query's refetch()
+  // throws on a query that never started — so refetches must no-op when
+  // unauthenticated.
+  const refetchPasses = useCallback((): void => {
+    if (isAuthenticated) refetch();
+  }, [isAuthenticated, refetch]);
+
+  const refetchSpinHistory = useCallback((): void => {
+    if (isAuthenticated) refetchSpinHistoryQuery();
+  }, [isAuthenticated, refetchSpinHistoryQuery]);
 
   const activePasses: ActivePass[] = activeData?.passes || [];
   const activeCredits: ActiveCredit[] = activeData?.credits || [];
@@ -194,6 +205,6 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
     spinLoading,
     spinHistory: spinHistoryData?.spins || [],
     refetchSpinHistory,
-    refetchPasses: refetch,
+    refetchPasses,
   };
 }

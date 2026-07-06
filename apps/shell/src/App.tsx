@@ -6,7 +6,7 @@ import Navbar from './components/layout/Navbar';
 import OnboardingModal from './components/layout/OnboardingModal';
 import PageSkeleton from './components/layout/PageSkeleton';
 import RemoteBoundary from './components/layout/RemoteBoundary';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useMatch } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { AuthCallback } from '@velobits/app-core/auth/AuthCallback';
 import { SilentCallback } from '@velobits/app-core/auth/SilentCallback';
@@ -72,9 +72,16 @@ function AppInner() {
     gamification.setPersona(personaId as unknown as Parameters<typeof gamification.setPersona>[0]);
   };
 
+  // A share link is often someone's first visit; the persona picker has no
+  // dismiss affordance and its overlay blocks the whole page, so a recipient
+  // couldn't even read/copy the share. Onboard them when they enter the editor.
+  const isShareView = useMatch(ROUTES.SHARE) !== null;
+
   return (
     <>
-      {!gamification.onboarded && <OnboardingModal onComplete={handleOnboardingComplete} />}
+      {!gamification.onboarded && !isShareView && (
+        <OnboardingModal onComplete={handleOnboardingComplete} />
+      )}
 
       <Navbar showAlert={showAlert} />
       <EmailVerificationBanner showAlert={showAlert} />

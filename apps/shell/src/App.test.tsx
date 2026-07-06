@@ -1,6 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mutable state consumed by hoisted vi.mock factories below.
+const mockState = vi.hoisted(() => ({
+  onboarded: true,
+  shareRouteMatch: null as object | null,
+}));
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -34,6 +40,7 @@ vi.mock('react-router-dom', () => ({
     React.createElement('div', { 'data-testid': 'router' }, children),
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/', search: '' }),
+  useMatch: () => mockState.shareRouteMatch,
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
   Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
   MemoryRouter: ({ children }: { children?: React.ReactNode }) => children,
@@ -78,7 +85,7 @@ vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
 }));
 vi.mock('@velobits/app-core/hooks/useGamification', () => ({
   default: () => ({
-    onboarded: true,
+    onboarded: mockState.onboarded,
     setPersona: vi.fn(),
     xp: 0,
     level: 1,
@@ -149,6 +156,11 @@ vi.mock('./components/subscription/PassPurchaseModal', () => ({
 import App from './App';
 
 describe('App', () => {
+  beforeEach(() => {
+    mockState.onboarded = true;
+    mockState.shareRouteMatch = null;
+  });
+
   it('renders without crashing', () => {
     render(<App />);
   });
@@ -174,10 +186,17 @@ describe('App', () => {
   });
 
   it('shows OnboardingModal when not onboarded', () => {
-    // This test checks the behavior when onboarded=false — the mock already returns onboarded:true
-    // so we verify the opposite is also logical by checking the default doesn't show it
+    mockState.onboarded = false;
     render(<App />);
-    // onboarded is true in default mock, so modal should NOT be present
+    expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
+  });
+
+  it('does not show OnboardingModal on the share viewer even when not onboarded', () => {
+    // A share recipient may be a first-time visitor; the persona picker must not
+    // block the read-only share page (its overlay swallows all pointer events).
+    mockState.onboarded = false;
+    mockState.shareRouteMatch = { pathname: '/share/some-id' };
+    render(<App />);
     expect(screen.queryByTestId('onboarding-modal')).not.toBeInTheDocument();
   });
 

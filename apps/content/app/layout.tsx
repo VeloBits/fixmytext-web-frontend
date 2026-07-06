@@ -24,7 +24,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      {/* The share viewer's theme-init script adds `dark` to <body> before
+          hydration (see app/share/[id]/layout.tsx) — suppress the resulting
+          className mismatch warning. */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

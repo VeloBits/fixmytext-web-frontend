@@ -33,6 +33,37 @@ declare global {
   }
 }
 
+// ── loadRazorpayScript ───────────────────────────────────────────────────────
+
+const RAZORPAY_SCRIPT_URL = 'https://checkout.razorpay.com/v1/checkout.js';
+
+let razorpayScriptPromise: Promise<boolean> | null = null;
+
+/**
+ * Injects the Razorpay checkout SDK on demand (it is not loaded in index.html
+ * to keep it off the critical path). Concurrent calls share one in-flight
+ * load; the cache clears once settled so a failed load can be retried.
+ */
+export function loadRazorpayScript(): Promise<boolean> {
+  if (window.Razorpay) return Promise.resolve(true);
+  if (!razorpayScriptPromise) {
+    razorpayScriptPromise = new Promise<boolean>((resolve) => {
+      const script = document.createElement('script');
+      script.src = RAZORPAY_SCRIPT_URL;
+      script.async = true;
+      script.onload = (): void => resolve(true);
+      script.onerror = (): void => {
+        script.remove();
+        resolve(false);
+      };
+      document.head.appendChild(script);
+    }).finally(() => {
+      razorpayScriptPromise = null;
+    });
+  }
+  return razorpayScriptPromise;
+}
+
 // ── openRazorpayCheckout ─────────────────────────────────────────────────────
 
 export interface OpenRazorpayCheckoutParams {
@@ -49,8 +80,9 @@ export interface OpenRazorpayCheckoutParams {
 
 /**
  * Opens the Razorpay checkout modal for one-time payments (passes/credits).
+ * Loads the SDK on first use; never rejects — failures go to onFailure.
  */
-export function openRazorpayCheckout({
+export async function openRazorpayCheckout({
   orderId,
   amount,
   currency,
@@ -60,9 +92,10 @@ export function openRazorpayCheckout({
   description,
   onSuccess,
   onFailure,
-}: OpenRazorpayCheckoutParams): void {
-  if (!window.Razorpay) {
-    onFailure?.('Payment service unavailable. Please refresh the page.');
+}: OpenRazorpayCheckoutParams): Promise<void> {
+  const loaded = await loadRazorpayScript();
+  if (!loaded || !window.Razorpay) {
+    onFailure?.('Payment service unavailable. Please check your connection and try again.');
     return;
   }
   const options: RazorpayOptions = {
@@ -92,7 +125,7 @@ export function openRazorpayCheckout({
 
 export interface ExecuteCheckoutFlowParams {
   createOrder: () => Promise<Record<string, unknown>>;
-  openCheckout: (params: Record<string, unknown>) => void;
+  openCheckout: (params: Record<string, unknown>) => void | Promise<void>;
   verifyPayment: (response: RazorpayPaymentResponse) => Promise<unknown>;
   successPath: string;
   failPath: string;
@@ -117,7 +150,7 @@ export async function executeCheckoutFlow({
 }: ExecuteCheckoutFlowParams): Promise<void> {
   try {
     const orderData = await createOrder();
-    openCheckout({
+    await openCheckout({
       ...orderData,
       onSuccess: async (response: RazorpayPaymentResponse): Promise<void> => {
         try {
