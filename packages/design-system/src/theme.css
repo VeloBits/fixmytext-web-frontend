@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════
+   VeloBits Design System — Tailwind v4 Theme
+   VSCode Dark+ inspired. Ported from tokens.css.
+   ═══════════════════════════════════════════════════════ */
+
+@theme {
+  /* Accent palette */
+  --color-accent: #007acc;
+  --color-accent-hover: #1c8cd9;
+  --color-accent-glow: rgba(0, 122, 204, 0.18);
+
+  /* Named semantic colors */
+  --color-violet: #c586c0;
+  --color-pink: #c586c0;
+  --color-cyan: #4ec9b0;
+  --color-emerald: #4ec9b0;
+  --color-amber: #dcdcaa;
+  --color-rose: #f44747;
+  --color-teal: #4ec9b0;
+  --color-indigo: #569cd6;
+  --color-purple: #c586c0;
+  --color-orange: #ce9178;
+  --color-green: #6a9955;
+  --color-yellow: #d7ba7d;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-pill: 999px;
+
+  /* Transition */
+  --transition-base: 0.12s ease;
+
+  /* Fonts */
+  --font-display: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+  /* Custom animations */
+  --animate-blink-cursor: blink-cursor 1s step-end infinite;
+}
+
+/* Custom keyframes */
+@keyframes blink-cursor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   Scrollbar — VSCode style (applied globally when theme is imported)
+   ═══════════════════════════════════════════════════════ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-width, 8px);
+  height: var(--scrollbar-width, 8px);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, transparent);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #c1c1c1);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, #a0a0a0);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track, transparent);
+}

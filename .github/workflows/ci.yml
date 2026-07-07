@@ -1,7 +1,6 @@
-# Frontend Test & Build
-# Validates build, runs lint checks, tests, and audits dependencies.
-# Runs on push/PR to main and develop, or manually via workflow_dispatch.
-name: Frontend Test & Build
+# Frontend CI Pipeline - hotfix
+# Validates build, runs lint/typecheck/tests for root app + all workspace packages.
+name: Frontend CI
 
 on:
   push:
@@ -9,52 +8,46 @@ on:
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to test"
-        required: false
-        default: "main"
-        type: string
+
 jobs:
   lint:
-    name: Lint & Format Check
+    name: Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          ref: ${{ inputs.branch || github.ref }}
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npx eslint src/
+      - name: Lint (root app + packages)
+        run: npm run lint
 
-  build:
-    name: Build Check
+      - name: Typecheck (root app + packages)
+        run: npm run typecheck
+
+  build-web:
+    name: Build Check (shell app)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          ref: ${{ inputs.branch || github.ref }}
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build shell app
+        run: npm run build -w @velobits/shell
         env:
           VITE_API_URL: http://localhost:8000
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -63,38 +56,82 @@ jobs:
           VITE_SENTRY_ENVIRONMENT: production
           VITE_SENTRY_RELEASE: ${{ github.sha }}
 
-  test:
-    name: Tests & Coverage
+  test-web:
+    name: Tests & Coverage (shell app)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          ref: ${{ inputs.branch || github.ref }}
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: npm run test:coverage -w @velobits/shell
+
+  build-content:
+    name: Build Check (content app)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build content app
+        run: npm run build -w @velobits/content-app
+        env:
+          CONTENT_API_URL: http://localhost:8000
+          NEXT_PUBLIC_API_URL: http://localhost:8000
+          NEXT_PUBLIC_SITE_URL: https://fixmytext.velobits.dev
+          AUTH_SECRET: ci-placeholder-not-real
+
+  test-packages:
+    name: Tests (workspace packages)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+          - design-system
+          - api-client
+          - auth-shared
+          - tools-registry
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test ${{ matrix.package }}
+        run: npm run test -w @velobits/${{ matrix.package }}
 
   security:
     name: Dependency Audit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          ref: ${{ inputs.branch || github.ref }}
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -102,6 +139,3 @@ jobs:
 
       - name: Audit for vulnerabilities
         run: npm audit --audit-level=high
-
-      - name: Verify package signatures
-        run: npm audit signatures

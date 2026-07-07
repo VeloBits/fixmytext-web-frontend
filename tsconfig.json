@@ -1,26 +1,11 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "noImplicitAny": true,
-    "noUncheckedIndexedAccess": true,
-    "allowJs": false,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": ["vitest/globals", "@testing-library/jest-dom"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "coverage", "e2e"]
+  "files": [],
+  "references": [
+    { "path": "./apps/shell" },
+    { "path": "./apps/content" },
+    { "path": "./packages/design-system" },
+    { "path": "./packages/api-client" },
+    { "path": "./packages/auth-shared" },
+    { "path": "./packages/tools-registry" }
+  ]
 }

@@ -1,0 +1,140 @@
+import { lazy, Suspense, useEffect } from 'react';
+import './assets/css/App.css';
+import Alert from './components/layout/Alert';
+import EmailVerificationBanner from './components/layout/EmailVerificationBanner';
+import Navbar from './components/layout/Navbar';
+import OnboardingModal from './components/layout/OnboardingModal';
+import PageSkeleton from './components/layout/PageSkeleton';
+import RemoteBoundary from './components/layout/RemoteBoundary';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
+import { AuthCallback } from './auth/AuthCallback';
+import { SilentCallback } from './auth/SilentCallback';
+import { useOidcAuth } from './auth/useOidcAuth';
+import { AlertProvider, useAlertContext } from './contexts/AlertContext';
+import type { AlertLevel } from './contexts/AlertContext';
+import { AppProvider, useAppContext } from './contexts/AppContext';
+import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
+import PassPurchaseModal from './components/subscription/PassPurchaseModal';
+import { ROUTES } from './constants';
+
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SignupPage = lazy(() => import('./pages/SignupPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+
+// Remote surfaces — loaded from their independently deployed MFE builds.
+// No local fallback: if a remote is down, RemoteBoundary shows the error state.
+const EditorPage = lazy(() =>
+  import('editor-remote/EditorPage').then((m) => ({ default: m.default }))
+);
+
+const DashboardPage = lazy(() =>
+  import('analytics-remote/AnalyticsPage').then((m) => ({ default: m.default }))
+);
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading, login } = useOidcAuth();
+  if (isLoading) return <PageSkeleton />;
+  if (!isAuthenticated) {
+    login();
+    return null;
+  }
+  return <>{children}</>;
+}
+
+function AppInner() {
+  const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
+  const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
+  const { mode, setMode } = useThemeContext();
+  const { user, isAuthenticated, gamification, subscription } = useAppContext();
+  const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
+
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ message: string; type: string }>) => {
+      showAlert(e.detail.message, e.detail.type as Parameters<typeof showAlert>[1]);
+    };
+    window.addEventListener('rtk-api-error', handler as EventListener);
+    return () => window.removeEventListener('rtk-api-error', handler as EventListener);
+  }, [showAlert]);
+
+  const handleOnboardingComplete = (personaId: string) => {
+    gamification.setPersona(personaId as unknown as Parameters<typeof gamification.setPersona>[0]);
+  };
+
+  return (
+    <>
+      {!gamification.onboarded && <OnboardingModal onComplete={handleOnboardingComplete} />}
+
+      <Navbar showAlert={showAlert} />
+      <EmailVerificationBanner showAlert={showAlert} />
+      <Alert alerts={alerts} dismissAlert={dismissAlert} />
+      <PassPurchaseModal
+        show={subscription.showUpgradeModal}
+        onDismiss={subscription.dismissUpgradeModal}
+        blockedTool={subscription.blockedTool}
+        subscription={subscription}
+      />
+
+      {/* Non-remote routes share a single Suspense boundary */}
+      <Suspense fallback={<PageSkeleton />}>
+        <SentryRoutes>
+          <Route
+            path={ROUTES.HOME}
+            element={
+              <RemoteBoundary name="Editor">
+                <EditorPage
+                  mode={mode}
+                  setMode={setMode as (mode: string) => void}
+                  showAlert={showAlert as (message: string, type: string) => void}
+                  gamification={gamification}
+                  user={user}
+                  isAuthenticated={isAuthenticated}
+                  subscription={subscription}
+                />
+              </RemoteBoundary>
+            }
+          />
+          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/silent-callback" element={<SilentCallback />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route
+            path={ROUTES.DASHBOARD}
+            element={
+              <ProtectedRoute>
+                <RemoteBoundary name="Dashboard">
+                  <DashboardPage
+                    gamification={gamification}
+                    user={user}
+                    isAuthenticated={isAuthenticated}
+                    showAlert={showAlert}
+                    mode={mode}
+                    setMode={setMode as (mode: string) => void}
+                    subscription={subscription}
+                  />
+                </RemoteBoundary>
+              </ProtectedRoute>
+            }
+          />
+        </SentryRoutes>
+      </Suspense>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router basename="/app">
+      <AlertProvider>
+        <ThemeProvider>
+          <AppProvider>
+            <AppInner />
+          </AppProvider>
+        </ThemeProvider>
+      </AlertProvider>
+    </Router>
+  );
+}
+
+export default App;
