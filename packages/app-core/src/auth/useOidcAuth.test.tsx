@@ -15,6 +15,7 @@ vi.mock('./userManager', () => ({
   // session). Resolve null so the hook settles into the unauthenticated state.
   loadUser: vi.fn().mockResolvedValue(null),
   resetLoadUser: vi.fn(),
+  broadcastAuthMessage: vi.fn(),
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     signinRedirect: vi.fn().mockResolvedValue(undefined),
@@ -70,6 +71,30 @@ describe('useOidcAuth', () => {
     expect(mockClearSession).toHaveBeenCalledTimes(1);
     expect(mockSignoutRedirect).toHaveBeenCalledWith(
       expect.objectContaining({
+        post_logout_redirect_uri: expect.stringContaining('/login'),
+      })
+    );
+  });
+
+  it('logout passes the captured id_token as id_token_hint', async () => {
+    // The 'user_signed_out' broadcast in logout() is also delivered to this
+    // tab's channel listener, whose removeUser() can win the race against
+    // signoutRedirect's internal user lookup — so logout must capture the
+    // id_token up front and pass it explicitly.
+    vi.mocked(userManager.getUser).mockResolvedValueOnce({
+      id_token: 'test-id-token',
+    } as Awaited<ReturnType<typeof userManager.getUser>>);
+
+    const { result } = renderHook(() => useOidcAuth());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.logout();
+    });
+
+    expect(mockSignoutRedirect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id_token_hint: 'test-id-token',
         post_logout_redirect_uri: expect.stringContaining('/login'),
       })
     );
