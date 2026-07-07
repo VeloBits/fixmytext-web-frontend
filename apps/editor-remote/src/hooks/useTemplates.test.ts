@@ -11,6 +11,7 @@ vi.mock('react-redux', () => ({
 vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -60,6 +61,7 @@ describe('useTemplates', () => {
     // Default: not authenticated (must re-set after vi.clearAllMocks() wipes mockReturnValue)
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,
@@ -215,6 +217,7 @@ describe('useTemplates', () => {
       mockUseSelector.mockReturnValue('tok');
       mockUseOidcAuth.mockReturnValue({
         isAuthenticated: true,
+        wasAuthenticated: true,
         isLoading: false,
         accessToken: 'tok',
         oidcUser: null,
@@ -343,6 +346,7 @@ describe('useTemplates', () => {
       mockUseSelector.mockReturnValue('tok');
       mockUseOidcAuth.mockReturnValue({
         isAuthenticated: true,
+        wasAuthenticated: true,
         isLoading: false,
         accessToken: 'tok',
         oidcUser: null,
@@ -361,6 +365,7 @@ describe('useTemplates', () => {
       mockUseSelector.mockReturnValue('tok');
       mockUseOidcAuth.mockReturnValue({
         isAuthenticated: true,
+        wasAuthenticated: true,
         isLoading: false,
         accessToken: 'tok',
         oidcUser: null,
@@ -386,6 +391,7 @@ describe('useTemplates', () => {
       mockUseSelector.mockReturnValue('tok');
       mockUseOidcAuth.mockReturnValue({
         isAuthenticated: true,
+        wasAuthenticated: true,
         isLoading: false,
         accessToken: 'tok',
         oidcUser: null,

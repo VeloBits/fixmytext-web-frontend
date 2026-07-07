@@ -8,6 +8,7 @@ vi.mock('react-redux', () => ({
 vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: true,
+    wasAuthenticated: true,
     isLoading: false,
     accessToken: 'tok123',
     oidcUser: null,
@@ -120,6 +121,7 @@ describe('useAiTools', () => {
     // Default: authenticated via OIDC
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok123',
       oidcUser: null,
@@ -192,6 +194,7 @@ describe('useAiTools', () => {
   it('callAi shows warning when not authenticated', async () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,
@@ -898,6 +901,7 @@ describe('useAiTools', () => {
   it('handleContinueWriting shows warning when not authenticated', async () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,

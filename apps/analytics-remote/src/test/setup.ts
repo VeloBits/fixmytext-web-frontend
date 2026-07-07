@@ -16,6 +16,7 @@ vi.mock('@sentry/react', () => ({
 }));
 
 vi.mock('@velobits/app-core/auth/userManager', () => ({
+  hasAuthHint: vi.fn(() => false), // no persisted session hint in tests
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     storeUser: vi.fn().mockResolvedValue(undefined),

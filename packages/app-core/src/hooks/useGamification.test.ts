@@ -12,6 +12,7 @@ vi.mock('react-redux', () => ({
 vi.mock('../auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: true,
+    wasAuthenticated: true,
     isLoading: false,
     accessToken: 'fake-token',
     oidcUser: null,
@@ -33,15 +34,30 @@ vi.mock('../store/api/userDataApi', () => ({
 }));
 
 import { useSelector } from 'react-redux';
+import { useOidcAuth } from '../auth/useOidcAuth';
 import useGamification from './useGamification';
 
 const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
+const mockUseOidcAuth = useOidcAuth as unknown as ReturnType<typeof vi.fn>;
+
+function mockAuth(isAuthenticated: boolean) {
+  mockUseOidcAuth.mockReturnValue({
+    isAuthenticated,
+    isLoading: false,
+    accessToken: isAuthenticated ? 'fake-token' : null,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  });
+}
 
 describe('useGamification', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
     localStorage.clear();
+    sessionStorage.clear();
+    mockAuth(true);
     mockUseSelector.mockReturnValue('fake-token');
     mockSyncToDb.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSyncPrefs.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -139,6 +155,33 @@ describe('useGamification', () => {
       result.current.setPersona('writer' as unknown as Parameters<typeof result.current.setPersona>[0]);
     });
     expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'writer' });
+  });
+
+  it('setPersona does not write guest sessionStorage when authenticated', () => {
+    const { result } = renderHook(() => useGamification());
+    act(() => {
+      result.current.setPersona('writer' as unknown as Parameters<typeof result.current.setPersona>[0]);
+    });
+    expect(sessionStorage.getItem('fmx_guest_persona')).toBeNull();
+  });
+
+  it('setPersona persists to sessionStorage for guests instead of the API', () => {
+    mockAuth(false);
+    const { result } = renderHook(() => useGamification());
+    act(() => {
+      result.current.setPersona('developer' as unknown as Parameters<typeof result.current.setPersona>[0]);
+    });
+    expect(result.current.persona).toBe('developer');
+    expect(sessionStorage.getItem('fmx_guest_persona')).toBe('developer');
+    expect(mockSyncPrefs).not.toHaveBeenCalled();
+  });
+
+  it('restores guest persona from sessionStorage on init', () => {
+    mockAuth(false);
+    sessionStorage.setItem('fmx_guest_persona', 'writer');
+    const { result } = renderHook(() => useGamification());
+    expect(result.current.persona).toBe('writer');
+    expect(result.current.onboarded).toBe(true);
   });
 
   it('dismissAchievement clears the newAchievement', () => {

@@ -10,6 +10,7 @@ import { expectNoA11yViolations } from '@/test/axeHelper';
 vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -34,6 +35,7 @@ function renderNavbar(props = {}, accessToken: string | null = null) {
   // and also update the OIDC mock since Navbar uses useOidcAuth.
   mockUseOidcAuth.mockReturnValue({
     isAuthenticated: !!accessToken,
+    wasAuthenticated: !!accessToken,
     isLoading: false,
     accessToken,
     oidcUser: null,

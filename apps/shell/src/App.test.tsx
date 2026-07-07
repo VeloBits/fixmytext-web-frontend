@@ -6,6 +6,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mockState = vi.hoisted(() => ({
   onboarded: true,
   shareRouteMatch: null as object | null,
+  auth: {
+    isAuthenticated: false,
+    wasAuthenticated: false,
+    isLoading: false,
+    accessToken: null as string | null,
+  },
+  reduxUser: null as object | null,
 }));
 
 // ── framer-motion mock ──
@@ -50,8 +57,9 @@ vi.mock('react-router-dom', () => ({
 }));
 
 // ── react-redux mock ──
+// AppContext's only selector reads s.auth.user (the /auth/me profile).
 vi.mock('react-redux', () => ({
-  useSelector: vi.fn(() => ({ accessToken: null })),
+  useSelector: vi.fn(() => mockState.reduxUser),
   useDispatch: () => vi.fn(),
   Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
@@ -75,9 +83,7 @@ vi.mock('./hooks/useTheme', () => ({
 // resolves asynchronously after render and trips React's act() warnings.
 vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: () => ({
-    isAuthenticated: false,
-    isLoading: false,
-    accessToken: null,
+    ...mockState.auth,
     oidcUser: null,
     login: vi.fn(),
     logout: vi.fn(),
@@ -159,6 +165,13 @@ describe('App', () => {
   beforeEach(() => {
     mockState.onboarded = true;
     mockState.shareRouteMatch = null;
+    mockState.auth = {
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+    };
+    mockState.reduxUser = null;
   });
 
   it('renders without crashing', () => {
@@ -236,5 +249,49 @@ describe('App', () => {
     unmount();
     expect(removeEventListenerSpy).toHaveBeenCalledWith('rtk-api-error', expect.any(Function));
     removeEventListenerSpy.mockRestore();
+  });
+
+  // ── auth-restore gate (guest-flash-on-refresh regression) ──
+  // H-8 keeps tokens in memory, so a refresh of a signed-in session silently
+  // re-acquires them. Until that settles the shell must hold the skeleton, not
+  // paint guest chrome that flips to signed-in a moment later.
+
+  it('holds the skeleton during session restore when a previous session existed', () => {
+    mockState.auth = { ...mockState.auth, isLoading: true, wasAuthenticated: true };
+    const { container } = render(<App />);
+    expect(container.querySelector('.page-skeleton')).toBeInTheDocument();
+    expect(screen.queryByTestId('navbar')).not.toBeInTheDocument();
+  });
+
+  it('renders guest UI immediately when no previous session existed', () => {
+    mockState.auth = { ...mockState.auth, isLoading: true, wasAuthenticated: false };
+    render(<App />);
+    expect(screen.getByTestId('navbar')).toBeInTheDocument();
+  });
+
+  it('keeps the skeleton up until /auth/me lands after the token restore', () => {
+    mockState.auth = {
+      isAuthenticated: true,
+      wasAuthenticated: true,
+      isLoading: false,
+      accessToken: 'token',
+    };
+    mockState.reduxUser = null; // profile fetch still in flight
+    const { container } = render(<App />);
+    expect(container.querySelector('.page-skeleton')).toBeInTheDocument();
+    expect(screen.queryByTestId('navbar')).not.toBeInTheDocument();
+  });
+
+  it('renders the app once the restored session and profile are both loaded', () => {
+    mockState.auth = {
+      isAuthenticated: true,
+      wasAuthenticated: true,
+      isLoading: false,
+      accessToken: 'token',
+    };
+    mockState.reduxUser = { display_name: 'Logout Tester' };
+    render(<App />);
+    expect(screen.getByTestId('navbar')).toBeInTheDocument();
+    expect(screen.getByTestId('home-page')).toBeInTheDocument();
   });
 });

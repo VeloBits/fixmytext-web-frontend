@@ -2,11 +2,16 @@ import { useCallback, useEffect, useState } from 'react';
 import type { User as OidcUser } from 'oidc-client-ts';
 import * as Sentry from '@sentry/react';
 import { clearSession } from '@velobits/api-client';
-import { broadcastAuthMessage, loadUser, resetLoadUser, userManager } from './userManager';
+import { broadcastAuthMessage, hasAuthHint, loadUser, resetLoadUser, userManager } from './userManager';
 
 export interface OidcAuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** A session existed in this browser before this page load (persisted,
+   * non-sensitive hint). While isLoading it distinguishes "probably signed in,
+   * restore in flight" from a genuine guest — render a loading state for the
+   * former instead of logged-out chrome. */
+  wasAuthenticated: boolean;
   accessToken: string | null;
   oidcUser: OidcUser | null;
   login: () => Promise<void>;
@@ -16,6 +21,9 @@ export interface OidcAuthState {
 export function useOidcAuth(): OidcAuthState {
   const [oidcUser, setOidcUser] = useState<OidcUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Snapshot once per mount: this answers "was there a session when the page
+  // loaded", not "is there one now" (isAuthenticated answers that).
+  const [wasAuthenticated] = useState(hasAuthHint);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,6 +87,7 @@ export function useOidcAuth(): OidcAuthState {
   return {
     isAuthenticated: !!oidcUser && !oidcUser.expired,
     isLoading,
+    wasAuthenticated,
     accessToken: oidcUser?.access_token ?? null,
     oidcUser,
     login,

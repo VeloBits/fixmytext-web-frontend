@@ -16,6 +16,7 @@ vi.mock('./userManager', () => ({
   loadUser: vi.fn().mockResolvedValue(null),
   resetLoadUser: vi.fn(),
   broadcastAuthMessage: vi.fn(),
+  hasAuthHint: vi.fn().mockReturnValue(false),
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     signinRedirect: vi.fn().mockResolvedValue(undefined),

@@ -14,6 +14,7 @@ vi.mock('react-redux', () => ({
 vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -47,6 +48,7 @@ describe('HistoryDrawer', () => {
     // Default: not authenticated
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,
@@ -103,6 +105,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,
@@ -119,6 +122,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,
@@ -135,6 +139,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,
@@ -161,6 +166,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,
@@ -204,6 +210,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,
@@ -244,6 +251,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,
@@ -319,6 +327,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'tok' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,
@@ -360,6 +369,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'tok' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,
@@ -394,6 +404,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'tok' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,
@@ -432,6 +443,7 @@ describe('HistoryDrawer', () => {
     vi.mocked(useSelector).mockReturnValue({ accessToken: 'token123' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,

@@ -16,6 +16,7 @@ vi.mock('@sentry/react', () => ({
 }));
 
 vi.mock('@velobits/app-core/auth/userManager', () => ({
+  hasAuthHint: vi.fn(() => false), // no persisted session hint in tests
   // loadUser/resetLoadUser are the in-memory session bootstrap added with the
   // H-8 tokens-off-sessionStorage change; useOidcAuth calls loadUser() on mount.
   // Resolve to null (unauthenticated) so tests don't hit the real silent-renew.

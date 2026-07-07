@@ -75,6 +75,7 @@ describe('usePasses', () => {
     mockUseSelector.mockReturnValue({ accessToken: 'tok' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,
@@ -244,6 +245,7 @@ describe('usePasses', () => {
   it('refetch functions no-op when not authenticated', async () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,

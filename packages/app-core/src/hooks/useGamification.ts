@@ -27,6 +27,9 @@ import type {
 
 // localStorage is a read-cache for pre-auth display speed only — never the source of truth.
 const STORAGE_KEY = 'fmx_gamification';
+// Guest persona lives in sessionStorage so the onboarding picker shows at most once
+// per tab session for unauthenticated users; signed-in users persist via /user/preferences.
+const GUEST_PERSONA_KEY = 'fmx_guest_persona';
 
 // Pre-compute static tool ID sets (TOOLS never changes)
 const AI_TOOL_IDS = TOOLS.filter((t) => t.tabs?.includes('ai')).map((t) => t.id);
@@ -56,6 +59,14 @@ function loadState(): Partial<GamificationState> | null {
     /* ignore */
   }
   return null;
+}
+
+function loadGuestPersona(): Persona | null {
+  try {
+    return sessionStorage.getItem(GUEST_PERSONA_KEY) as unknown as Persona | null;
+  } catch {
+    return null;
+  }
 }
 
 function today(): string {
@@ -139,7 +150,8 @@ const DEFAULT_STATE: GamificationState = {
 export default function useGamification(): GamificationContextValue {
   const [state, setState] = useState<GamificationState>(() => {
     const saved = loadState();
-    return saved ? { ...DEFAULT_STATE, ...saved, sessionOps: [] } : { ...DEFAULT_STATE };
+    const base = saved ? { ...DEFAULT_STATE, ...saved, sessionOps: [] } : { ...DEFAULT_STATE };
+    return base.persona ? base : { ...base, persona: loadGuestPersona() };
   });
 
   const speedTimestamps = useRef<number[]>([]);
@@ -378,6 +390,12 @@ export default function useGamification(): GamificationContextValue {
         syncPrefs({ persona: persona as unknown as string })
           .unwrap()
           .catch(() => {});
+      } else {
+        try {
+          sessionStorage.setItem(GUEST_PERSONA_KEY, persona as unknown as string);
+        } catch {
+          /* ignore */
+        }
       }
     },
     [isAuthenticated, syncPrefs]

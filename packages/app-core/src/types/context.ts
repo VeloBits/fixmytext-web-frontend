@@ -105,6 +105,10 @@ export interface SubscriptionContextValue {
 export interface AppContextValue {
   user: User | null;
   isAuthenticated: boolean;
+  /** True while signed in but the first /auth/me fetch hasn't settled (user is
+   * still null). Identity UI (avatar, name) should treat this as loading, not
+   * as a guest. Optional so existing mock/context builders stay valid. */
+  userResolving?: boolean;
   gamification: GamificationContextValue;
   subscription: SubscriptionContextValue;
 }

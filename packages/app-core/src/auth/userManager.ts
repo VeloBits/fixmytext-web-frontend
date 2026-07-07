@@ -49,6 +49,39 @@ export const signupUserManager = new UserManager({
   },
 });
 
+// ── Persisted session hint ──────────────────────────────────────────────────
+// H-8 keeps tokens in memory only, so every hard reload starts logged-out and
+// needs a silent-renew round trip before isAuthenticated flips true. This
+// boolean ("a session existed in this browser") carries no token material, so
+// persisting it doesn't weaken H-8 — it lets the UI hold a loading state
+// during the restore instead of flashing logged-out chrome that corrects
+// itself a second later.
+const AUTH_HINT_KEY = 'fmx_auth_hint';
+
+export function hasAuthHint(): boolean {
+  try {
+    return localStorage.getItem(AUTH_HINT_KEY) === '1';
+  } catch {
+    return false; // storage unavailable — behave as before the hint existed
+  }
+}
+
+function setAuthHint(present: boolean): void {
+  try {
+    if (present) localStorage.setItem(AUTH_HINT_KEY, '1');
+    else localStorage.removeItem(AUTH_HINT_KEY);
+  } catch {
+    // storage unavailable — the hint is best-effort
+  }
+}
+
+// Covers every way a session starts (redirect callback, silent renew, token
+// refresh, cross-tab pickup) and ends (signoutRedirect's removeUser, cross-tab
+// signout, Keycloak-side session end).
+userManager.events.addUserLoaded(() => setAuthHint(true));
+userManager.events.addUserUnloaded(() => setAuthHint(false));
+userManager.events.addUserSignedOut(() => setAuthHint(false));
+
 // One-time auth bootstrap, deduped across all hook instances. Reads the
 // in-memory user; if it's absent (e.g. after a hard reload) it attempts a
 // silent renew using the Keycloak SSO cookie, so the session is restored
@@ -69,8 +102,13 @@ export function loadUser(): Promise<User | null> {
       const existing = await userManager.getUser();
       if (existing && !existing.expired) return existing;
       try {
-        return await userManager.signinSilent();
+        // Success also fires userLoaded (→ hint set); the explicit set covers
+        // signinSilent resolving null without throwing.
+        const restored = await userManager.signinSilent();
+        setAuthHint(!!restored);
+        return restored;
       } catch {
+        setAuthHint(false); // stale hint — the SSO session is gone
         return null; // no live SSO session — caller treats as logged out
       }
     })();

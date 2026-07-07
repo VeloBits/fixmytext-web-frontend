@@ -57,7 +57,8 @@ function AppInner() {
   const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
   const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
-  const { user, isAuthenticated, gamification, subscription } = useAppContext();
+  const { user, isAuthenticated, userResolving, gamification, subscription } = useAppContext();
+  const { isLoading: authLoading, wasAuthenticated } = useOidcAuth();
   const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
 
   useEffect(() => {
@@ -76,6 +77,17 @@ function AppInner() {
   // dismiss affordance and its overlay blocks the whole page, so a recipient
   // couldn't even read/copy the share. Onboard them when they enter the editor.
   const isShareView = useMatch(ROUTES.SHARE) !== null;
+
+  // A session existed here before this page load (H-8 keeps tokens in memory,
+  // so a refresh must silently re-acquire them from the Keycloak SSO cookie,
+  // then fetch /auth/me). Until both settle, hold the skeleton instead of
+  // painting guest chrome (Sign In button, 'G' avatar) that flips moments
+  // later. Genuine guests have no hint and render immediately. The auth
+  // callback routes resolve authLoading instantly (loadUser short-circuits),
+  // so this never blocks login completion.
+  if (wasAuthenticated && (authLoading || userResolving)) {
+    return <PageSkeleton />;
+  }
 
   return (
     <>

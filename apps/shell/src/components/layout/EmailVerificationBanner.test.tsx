@@ -20,6 +20,7 @@ vi.mock('react-redux', () => ({
 vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -36,6 +37,7 @@ function setAuth({ accessToken = null, user = null }: Partial<MockAuthState> = {
   // Keep OIDC in sync with Redux mock state
   mockUseOidcAuth.mockReturnValue({
     isAuthenticated: !!accessToken,
+    wasAuthenticated: !!accessToken,
     isLoading: false,
     accessToken,
     oidcUser: null,

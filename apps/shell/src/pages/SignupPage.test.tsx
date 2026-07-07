@@ -5,6 +5,7 @@ import SignupPage from './SignupPage';
 const { mockSigninRedirect } = vi.hoisted(() => ({ mockSigninRedirect: vi.fn() }));
 
 vi.mock('@velobits/app-core/auth/userManager', () => ({
+  hasAuthHint: vi.fn(() => false), // no persisted session hint in tests
   signupUserManager: { signinRedirect: mockSigninRedirect },
 }));
 

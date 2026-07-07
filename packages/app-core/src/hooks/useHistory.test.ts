@@ -12,6 +12,7 @@ vi.mock('react-redux', () => ({
 vi.mock('../auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -43,6 +44,7 @@ describe('useHistory', () => {
     // Default: not authenticated
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,
@@ -161,6 +163,7 @@ describe('useHistory', () => {
   it('records operation to backend when authenticated', () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok123',
       oidcUser: null,
@@ -191,6 +194,7 @@ describe('useHistory', () => {
   it('clears server history when authenticated', () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,

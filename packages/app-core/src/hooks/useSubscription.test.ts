@@ -26,6 +26,7 @@ vi.mock('react-redux', () => ({
 vi.mock('../auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: true,
+    wasAuthenticated: true,
     isLoading: false,
     accessToken: 'tok',
     oidcUser: null,
@@ -88,6 +89,7 @@ describe('useSubscription', () => {
     mockUseSelector.mockReturnValue({ accessToken: 'tok' });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,
@@ -131,6 +133,7 @@ describe('useSubscription', () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,
@@ -318,6 +321,7 @@ describe('useSubscription', () => {
   it('refetchStatus no-ops when not authenticated', async () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,

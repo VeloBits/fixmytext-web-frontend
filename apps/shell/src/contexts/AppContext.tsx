@@ -35,13 +35,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, accessToken } = useOidcAuth();
   const user = useSelector((s: RootState) => s.auth.user) as User | null;
   // Trigger /auth/me fetch when authenticated so Redux user state is populated.
-  useGetMeQuery(undefined, { skip: !accessToken });
+  const { isError: meFailed } = useGetMeQuery(undefined, { skip: !accessToken });
+  // Signed in but the profile hasn't landed in Redux yet (and the fetch hasn't
+  // failed) — identity UI should show loading, not guest. The !meFailed guard
+  // keeps a broken /auth/me from wedging consumers in a permanent loading state.
+  const userResolving = isAuthenticated && !user && !meFailed;
   const gamification = useGamification() as unknown as GamificationContextValue;
   const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 
   const value = useMemo(
-    () => ({ user, isAuthenticated, gamification, subscription }),
-    [user, isAuthenticated, gamification, subscription]
+    () => ({ user, isAuthenticated, userResolving, gamification, subscription }),
+    [user, isAuthenticated, userResolving, gamification, subscription]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
