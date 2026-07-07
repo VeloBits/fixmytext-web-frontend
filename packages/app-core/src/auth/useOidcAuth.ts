@@ -57,6 +57,13 @@ export function useOidcAuth(): OidcAuthState {
     // Order matters: if signoutRedirect runs first the page navigates away
     // before clearSession completes.
     resetLoadUser(); // drop the cached bootstrap so a later load re-evaluates
+    // Capture the id_token BEFORE broadcasting: the 'user_signed_out' message
+    // is also delivered to THIS tab's module-level channel listener, whose
+    // removeUser() races signoutRedirect's own read of the stored user. If it
+    // wins, the end-session request goes out without an id_token_hint and
+    // Keycloak interrupts the logout with a confirmation page instead of
+    // silently redirecting to /app/login.
+    const user = await userManager.getUser();
     broadcastAuthMessage({ type: 'user_signed_out' }); // notify other open tabs
     try {
       await clearSession();
@@ -64,6 +71,7 @@ export function useOidcAuth(): OidcAuthState {
       // best-effort — always proceed to Keycloak SSO signout regardless
     }
     await userManager.signoutRedirect({
+      id_token_hint: user?.id_token,
       post_logout_redirect_uri: `${window.location.origin}/app/login`,
     });
   }, []);
