@@ -47,7 +47,7 @@ export function useTheme(): ThemeContextValue {
         localStorage.setItem(MODE_KEY, dbMode);
       }
     }
-  }, [prefs]);
+  }, [prefs, mode]);
 
   // Reset hydration on logout
   useEffect(() => {

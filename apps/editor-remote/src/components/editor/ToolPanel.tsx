@@ -270,7 +270,7 @@ export default memo(function ToolPanel({
 
   // Group tools — each group contains tools sorted alphabetically
   // Favorites are pinned at the top as their own group
-  const favorites = gamification?.favorites || [];
+  const favorites = useMemo(() => gamification?.favorites || [], [gamification]);
   const groupedTools = useMemo(() => {
     const groups: { id: string; label: string; tools: ToolDefinition[] }[] = [];
     const groupMap: Record<string, ToolDefinition[]> = {};

@@ -176,8 +176,8 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
   const [selectedCredit, setSelectedCredit] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
 
-  const passes = catalog?.passes || [];
-  const creditPacks = catalog?.credit_packs || [];
+  const passes = useMemo(() => catalog?.passes || [], [catalog]);
+  const creditPacks = useMemo(() => catalog?.credit_packs || [], [catalog]);
   const symbol = passes[0]?.symbol || '$';
   const currency = (passes[0]?.currency || 'usd') as SupportedCurrency;
 

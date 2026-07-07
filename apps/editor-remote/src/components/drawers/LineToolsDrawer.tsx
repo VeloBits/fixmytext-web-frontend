@@ -23,7 +23,8 @@ function useDebouncedPreview(
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, deps); // deps is intentionally dynamic (passed by callers)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deps is intentionally caller-supplied; onPreview/computeFn are fresh closures whose inputs are covered by deps
+  }, deps);
 }
 
 // ── Match helper (shared by JS preview + badge count) ───────────────

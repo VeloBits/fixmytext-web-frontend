@@ -1,5 +1,33 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { apiFetch, clearSession } from '../src/client';
+import type * as ClientModule from '../src/client';
+import type { loadNative as LoadNative } from './native-loader';
+
+// Vitest inlines `import.meta.env` (including the dev container's VITE_API_URL)
+// into the Vite-transformed module at transform time, so the copy imported above
+// can never reach getDefaultBaseUrl's process.env / localhost fallbacks (the
+// `viteEnv?.VITE_API_URL` check always returns early). To exercise those
+// branches we load a SECOND copy of the module through Node's own ESM loader
+// (native TypeScript type-stripping, no Vite transform): there
+// `import.meta.env` is undefined. The `?native` query gives the copy a distinct
+// V8 script URL so its coverage is remapped against the original source and
+// merged into src/client.ts. native-loader.ts must itself be require()d
+// natively so its dynamic import() runs on Node's loader (Vitest's module
+// runner has no dynamic-import callback for raw file URLs).
+// Note: node builtins are imported dynamically because this package's tsconfig
+// only loads "vitest/globals" ambient types (no @types/node).
+const testDir = (import.meta as unknown as { dirname?: string }).dirname ?? '';
+const nativeClientUrl = `file://${testDir.replace(/\/tests$/, '')}/src/client.ts?native`;
+let nativeClient: typeof ClientModule;
+
+beforeAll(async () => {
+  const nodeModule = (await import(/* @vite-ignore */ 'node' + ':module')) as unknown as {
+    createRequire: (filename: string) => (id: string) => unknown;
+  };
+  const nativeRequire = nodeModule.createRequire(`${testDir}/client.test.ts`);
+  const { loadNative } = nativeRequire('./native-loader.ts') as { loadNative: typeof LoadNative };
+  nativeClient = await loadNative<typeof ClientModule>(nativeClientUrl);
+});
 
 const mockFetch = vi.fn();
 globalThis.fetch = mockFetch;
@@ -111,5 +139,114 @@ describe('clearSession', () => {
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
     expect(url).toContain('/api/v1/auth/session/clear');
+  });
+});
+
+describe('default base URL resolution', () => {
+  const viteEnvUrl = (import.meta as unknown as { env?: Record<string, string> }).env
+    ?.VITE_API_URL;
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  // Only meaningful when the environment provides VITE_API_URL (the dev
+  // container does); the transformed module copy sees the same inlined env.
+  it.runIf(viteEnvUrl)('uses VITE_API_URL when set', async () => {
+    mockFetch.mockResolvedValue(makeResponse({}, 204));
+
+    await clearSession();
+
+    const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${viteEnvUrl}/api/v1/auth/session/clear`);
+  });
+
+  it('falls back to NEXT_PUBLIC_API_URL when import.meta.env is unavailable', async () => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://next-env:8888');
+    mockFetch.mockResolvedValue(makeResponse({}, 204));
+
+    await nativeClient.clearSession();
+
+    const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://next-env:8888/api/v1/auth/session/clear');
+  });
+
+  it('falls back to http://localhost:8000 when no env URL is set', async () => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', '');
+    mockFetch.mockResolvedValue(makeResponse({}, 204));
+
+    await nativeClient.clearSession();
+
+    const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://localhost:8000/api/v1/auth/session/clear');
+  });
+
+  it('ignores a process global without NEXT_PUBLIC_API_URL', async () => {
+    vi.stubGlobal('process', undefined);
+    mockFetch.mockResolvedValue(makeResponse({}, 204));
+
+    await nativeClient.clearSession();
+
+    vi.unstubAllGlobals();
+    const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://localhost:8000/api/v1/auth/session/clear');
+  });
+});
+
+describe('apiFetch — defaults and edge cases', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it('uses the default base URL when options are omitted entirely', async () => {
+    mockFetch.mockResolvedValue(makeResponse({ ok: true }));
+
+    const result = await apiFetch<{ ok: boolean }>('/health');
+
+    const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toMatch(/\/health$/);
+    expect(result.ok).toBe(true);
+  });
+
+  it('preserves an explicit Content-Type header', async () => {
+    mockFetch.mockResolvedValue(makeResponse({}));
+
+    await apiFetch('/upload', {
+      baseUrl: 'http://localhost:8000',
+      headers: { 'Content-Type': 'text/plain' },
+    });
+
+    const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    const headers = options.headers as Headers;
+    expect(headers.get('Content-Type')).toBe('text/plain');
+  });
+
+  it('falls back to a req-<timestamp> request id when crypto is unavailable', async () => {
+    vi.stubGlobal('crypto', undefined);
+    mockFetch.mockResolvedValue(makeResponse({}));
+
+    await apiFetch('/health', { baseUrl: 'http://localhost:8000' });
+
+    const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    const headers = options.headers as Headers;
+    expect(headers.get('X-Request-ID')).toMatch(/^req-\d+$/);
+  });
+
+  it('sets detail to undefined when the error body is not JSON', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      json: () => Promise.reject(new Error('not json')),
+    } as unknown as Response);
+
+    await expect(
+      apiFetch('/broken', { baseUrl: 'http://localhost:8000' })
+    ).rejects.toMatchObject({
+      status: 500,
+      message: 'Internal Server Error',
+      detail: undefined,
+    });
   });
 });

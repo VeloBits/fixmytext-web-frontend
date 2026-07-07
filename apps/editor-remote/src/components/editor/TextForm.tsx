@@ -438,34 +438,6 @@ export default function TextForm(props: TextFormProps) {
   const [updateUiSettings] = useUpdateUiSettingsMutation();
   const uiSettingsHydrated = useRef(false);
 
-  // Hydrate tool_view and panel sizes from server on login
-  useEffect(() => {
-    if (uiSettings && !uiSettingsHydrated.current) {
-      uiSettingsHydrated.current = true;
-      if (uiSettings.tool_view) {
-        setToolViewMode(uiSettings.tool_view);
-        localStorage.setItem('fmx_tool_view', uiSettings.tool_view);
-      }
-      const ps = uiSettings.panel_sizes || {};
-      if (ps.fmx_sidebar_w) {
-        localStorage.setItem('fmx_sidebar_w', String(ps.fmx_sidebar_w));
-        sidebarResize.setSize(Number(ps.fmx_sidebar_w));
-      }
-      if (ps.fmx_split_pct) {
-        localStorage.setItem('fmx_split_pct', String(ps.fmx_split_pct));
-        splitResize.setSize(Number(ps.fmx_split_pct));
-      }
-      if (ps.fmx_bottom_h) {
-        localStorage.setItem('fmx_bottom_h', String(ps.fmx_bottom_h));
-        bottomResize.setSize(Number(ps.fmx_bottom_h));
-      }
-    }
-  }, [uiSettings]);
-
-  useEffect(() => {
-    if (!isAuthenticated) uiSettingsHydrated.current = false;
-  }, [isAuthenticated]);
-
   // Resizable panels
   const splitRef = useRef<HTMLElement>(null);
   const gutterRef = useRef<HTMLElement>(null);
@@ -510,6 +482,34 @@ export default function TextForm(props: TextFormProps) {
     storageKey: 'fmx_bottom_h',
   });
 
+  // Hydrate tool_view and panel sizes from server on login
+  useEffect(() => {
+    if (uiSettings && !uiSettingsHydrated.current) {
+      uiSettingsHydrated.current = true;
+      if (uiSettings.tool_view) {
+        setToolViewMode(uiSettings.tool_view);
+        localStorage.setItem('fmx_tool_view', uiSettings.tool_view);
+      }
+      const ps = uiSettings.panel_sizes || {};
+      if (ps.fmx_sidebar_w) {
+        localStorage.setItem('fmx_sidebar_w', String(ps.fmx_sidebar_w));
+        sidebarResize.setSize(Number(ps.fmx_sidebar_w));
+      }
+      if (ps.fmx_split_pct) {
+        localStorage.setItem('fmx_split_pct', String(ps.fmx_split_pct));
+        splitResize.setSize(Number(ps.fmx_split_pct));
+      }
+      if (ps.fmx_bottom_h) {
+        localStorage.setItem('fmx_bottom_h', String(ps.fmx_bottom_h));
+        bottomResize.setSize(Number(ps.fmx_bottom_h));
+      }
+    }
+  }, [uiSettings, sidebarResize, splitResize, bottomResize]);
+
+  useEffect(() => {
+    if (!isAuthenticated) uiSettingsHydrated.current = false;
+  }, [isAuthenticated]);
+
   // Sync panel sizes to server when authenticated (debounced)
   const panelSizeSyncTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const syncPanelSizes = useCallback(
@@ -533,7 +533,7 @@ export default function TextForm(props: TextFormProps) {
       fmx_split_pct: splitResize.size,
       fmx_bottom_h: bottomResize.size,
     });
-  }, [sidebarResize.size, splitResize.size, bottomResize.size]);
+  }, [isAuthenticated, syncPanelSizes, sidebarResize.size, splitResize.size, bottomResize.size]);
 
   // Set default tab from persona
   useEffect(() => {
@@ -602,7 +602,7 @@ export default function TextForm(props: TextFormProps) {
   }, []);
 
   // ── Generic API handler (RTK Query) ─────────────────────
-  const callApi = async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
+  const callApi = useCallback(async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
     const t = textRef.current;
     // Whitespace-only input is not runnable (backend rejects it with 422 and it
     // must never burn a free use). Prompt only when something was typed —
@@ -628,7 +628,7 @@ export default function TextForm(props: TextFormProps) {
       showAlert(message, 'danger');
       return { success: false };
     }
-  };
+  }, [transformText, ai, history, showAlert]);
 
   // ── Generic API handler with extra params (for drawer tools) ──
   const callApiWithParams = async (endpoint: string, successMsg: string, extraParams: Record<string, unknown>, toolMeta?: Record<string, unknown>) => {
@@ -685,37 +685,37 @@ export default function TextForm(props: TextFormProps) {
   };
 
   // ── Encoding ────────────────────────────────────────────
-  const handleBase64Encode = () => callApi(ENDPOINTS.BASE64_ENCODE, 'Base64 encoded');
-  const handleBase64Decode = () => callApi(ENDPOINTS.BASE64_DECODE, 'Base64 decoded');
-  const handleUrlEncode = () => callApi(ENDPOINTS.URL_ENCODE, 'URL encoded');
-  const handleUrlDecode = () => callApi(ENDPOINTS.URL_DECODE, 'URL decoded');
-  const handleHexEncode = () => callApi(ENDPOINTS.HEX_ENCODE, 'Hex encoded');
-  const handleHexDecode = () => callApi(ENDPOINTS.HEX_DECODE, 'Hex decoded');
-  const handleMorseEncode = () => callApi(ENDPOINTS.MORSE_ENCODE, 'Morse encoded');
-  const handleMorseDecode = () => callApi(ENDPOINTS.MORSE_DECODE, 'Morse decoded');
-  const handleBinaryEncode = () => callApi(ENDPOINTS.BINARY_ENCODE, 'Binary encoded');
-  const handleBinaryDecode = () => callApi(ENDPOINTS.BINARY_DECODE, 'Binary decoded');
-  const handleOctalEncode = () => callApi(ENDPOINTS.OCTAL_ENCODE, 'Octal encoded');
-  const handleOctalDecode = () => callApi(ENDPOINTS.OCTAL_DECODE, 'Octal decoded');
-  const handleDecimalEncode = () => callApi(ENDPOINTS.DECIMAL_ENCODE, 'Decimal encoded');
-  const handleDecimalDecode = () => callApi(ENDPOINTS.DECIMAL_DECODE, 'Decimal decoded');
-  const handleUnicodeEscape = () => callApi(ENDPOINTS.UNICODE_ESCAPE, 'Unicode escaped');
-  const handleUnicodeUnescape = () => callApi(ENDPOINTS.UNICODE_UNESCAPE, 'Unicode unescaped');
-  const handleAtbash = () => callApi(ENDPOINTS.ATBASH, 'Atbash cipher applied');
-  const handleBrainfuckEncode = () => callApi(ENDPOINTS.BRAINFUCK_ENCODE, 'Brainfuck encoded');
-  const handleBrainfuckDecode = () => callApi(ENDPOINTS.BRAINFUCK_DECODE, 'Brainfuck decoded');
+  const handleBase64Encode = useCallback(() => callApi(ENDPOINTS.BASE64_ENCODE, 'Base64 encoded'), [callApi]);
+  const handleBase64Decode = useCallback(() => callApi(ENDPOINTS.BASE64_DECODE, 'Base64 decoded'), [callApi]);
+  const handleUrlEncode = useCallback(() => callApi(ENDPOINTS.URL_ENCODE, 'URL encoded'), [callApi]);
+  const handleUrlDecode = useCallback(() => callApi(ENDPOINTS.URL_DECODE, 'URL decoded'), [callApi]);
+  const handleHexEncode = useCallback(() => callApi(ENDPOINTS.HEX_ENCODE, 'Hex encoded'), [callApi]);
+  const handleHexDecode = useCallback(() => callApi(ENDPOINTS.HEX_DECODE, 'Hex decoded'), [callApi]);
+  const handleMorseEncode = useCallback(() => callApi(ENDPOINTS.MORSE_ENCODE, 'Morse encoded'), [callApi]);
+  const handleMorseDecode = useCallback(() => callApi(ENDPOINTS.MORSE_DECODE, 'Morse decoded'), [callApi]);
+  const handleBinaryEncode = useCallback(() => callApi(ENDPOINTS.BINARY_ENCODE, 'Binary encoded'), [callApi]);
+  const handleBinaryDecode = useCallback(() => callApi(ENDPOINTS.BINARY_DECODE, 'Binary decoded'), [callApi]);
+  const handleOctalEncode = useCallback(() => callApi(ENDPOINTS.OCTAL_ENCODE, 'Octal encoded'), [callApi]);
+  const handleOctalDecode = useCallback(() => callApi(ENDPOINTS.OCTAL_DECODE, 'Octal decoded'), [callApi]);
+  const handleDecimalEncode = useCallback(() => callApi(ENDPOINTS.DECIMAL_ENCODE, 'Decimal encoded'), [callApi]);
+  const handleDecimalDecode = useCallback(() => callApi(ENDPOINTS.DECIMAL_DECODE, 'Decimal decoded'), [callApi]);
+  const handleUnicodeEscape = useCallback(() => callApi(ENDPOINTS.UNICODE_ESCAPE, 'Unicode escaped'), [callApi]);
+  const handleUnicodeUnescape = useCallback(() => callApi(ENDPOINTS.UNICODE_UNESCAPE, 'Unicode unescaped'), [callApi]);
+  const handleAtbash = useCallback(() => callApi(ENDPOINTS.ATBASH, 'Atbash cipher applied'), [callApi]);
+  const handleBrainfuckEncode = useCallback(() => callApi(ENDPOINTS.BRAINFUCK_ENCODE, 'Brainfuck encoded'), [callApi]);
+  const handleBrainfuckDecode = useCallback(() => callApi(ENDPOINTS.BRAINFUCK_DECODE, 'Brainfuck decoded'), [callApi]);
 
   // ── Escape / Unescape ───────────────────────────────────
-  const handleJsonEscape = () => callApi(ENDPOINTS.JSON_ESCAPE, 'JSON escaped');
-  const handleJsonUnescape = () => callApi(ENDPOINTS.JSON_UNESCAPE, 'JSON unescaped');
-  const handleHtmlEscape = () => callApi(ENDPOINTS.HTML_ESCAPE, 'HTML escaped');
-  const handleHtmlUnescape = () => callApi(ENDPOINTS.HTML_UNESCAPE, 'HTML unescaped');
+  const handleJsonEscape = useCallback(() => callApi(ENDPOINTS.JSON_ESCAPE, 'JSON escaped'), [callApi]);
+  const handleJsonUnescape = useCallback(() => callApi(ENDPOINTS.JSON_UNESCAPE, 'JSON unescaped'), [callApi]);
+  const handleHtmlEscape = useCallback(() => callApi(ENDPOINTS.HTML_ESCAPE, 'HTML escaped'), [callApi]);
+  const handleHtmlUnescape = useCallback(() => callApi(ENDPOINTS.HTML_UNESCAPE, 'HTML unescaped'), [callApi]);
 
   // ── Developer Tools ─────────────────────────────────────
-  const handleJsonFormat = () => callApi(ENDPOINTS.FORMAT_JSON, 'JSON formatted');
-  const handleJsonToYaml = () => callApi(ENDPOINTS.JSON_TO_YAML, 'Converted to YAML');
-  const handleCsvToJson = () => callApi(ENDPOINTS.CSV_TO_JSON, 'CSV converted to JSON');
-  const handleJsonToCsv = () => callApi(ENDPOINTS.JSON_TO_CSV, 'JSON converted to CSV');
+  const handleJsonFormat = useCallback(() => callApi(ENDPOINTS.FORMAT_JSON, 'JSON formatted'), [callApi]);
+  const handleJsonToYaml = useCallback(() => callApi(ENDPOINTS.JSON_TO_YAML, 'Converted to YAML'), [callApi]);
+  const handleCsvToJson = useCallback(() => callApi(ENDPOINTS.CSV_TO_JSON, 'CSV converted to JSON'), [callApi]);
+  const handleJsonToCsv = useCallback(() => callApi(ENDPOINTS.JSON_TO_CSV, 'JSON converted to CSV'), [callApi]);
 
   // ── Accessibility ───────────────────────────────────────
   const handleDyslexiaMode = () => {
@@ -727,7 +727,7 @@ export default function TextForm(props: TextFormProps) {
       return next;
     });
   };
-  const handleMarkdownMode = () => {
+  const handleMarkdownMode = useCallback(() => {
     setMarkdownMode((prev) => {
       const next = !prev;
       showAlert(next ? 'Markdown preview on' : 'Markdown preview off', 'info');
@@ -735,7 +735,7 @@ export default function TextForm(props: TextFormProps) {
       else if (previewMode === 'markdown') setPreviewMode(null);
       return next;
     });
-  };
+  }, [showAlert, previewMode]);
 
   // ── Local tool handlers extracted to useClientTools & useHashTools hooks ──
 
@@ -918,11 +918,6 @@ export default function TextForm(props: TextFormProps) {
       handleExtractUrls: clientTools.handleExtractUrls,
       handleExtractNumbers: clientTools.handleExtractNumbers,
     }),
-
-     
-    // TODO: Wrap individual handler functions in useCallback to remove this disable.
-    // The 30+ handlers defined above are recreated on every render, causing the
-    // useMemo to re-run unnecessarily. Tracked in PARTIAL_IMPLEMENTATIONS.md.
     [
       callApi,
       ai,
@@ -986,7 +981,7 @@ export default function TextForm(props: TextFormProps) {
       ai.setAiResult(null);
       setPreviewMode(null);
     },
-    [toolTexts]
+    [ai]
   );
 
   // ── Open tool by ID and seed with content (used by templates) ──
@@ -1025,7 +1020,7 @@ export default function TextForm(props: TextFormProps) {
     setPreviewMode(null);
     // Schedule auto-run after text is set
     pendingAutoRun.current = tool;
-  }, []);
+  }, [ai]);
 
   // Keep template helpers ref up to date
   templateHelpersRef.current = {
@@ -1089,7 +1084,7 @@ export default function TextForm(props: TextFormProps) {
         togglePanel(tool.panelId!);
       }
     },
-    [text, gamification?.recordToolUse, trial.checkTrial, subscription?.checkToolAccess]
+    [trial, subscription, gamification, callApi, pipeline, handlerMap, togglePanel]
   );
 
   // ── Unified tool click handler ──────────────────────────
@@ -1143,7 +1138,7 @@ export default function TextForm(props: TextFormProps) {
         }
       }
     },
-    [openToolTab, executeToolAction, text, gamification?.recordToolUse]
+    [openToolTab, executeToolAction, text, gamification, compare, setActivePanel]
   );
 
   // ── Auto-run tool on first open (when text was seeded) ──
@@ -1184,6 +1179,7 @@ export default function TextForm(props: TextFormProps) {
       if (ws.tool) executeToolAction(ws.tool as ToolDefinition);
     }, 2000);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce must re-arm only on text/tab change; other deps re-running the effect would cancel the pending timer
   }, [text, activeWorkspaceId]);
 
   // ── Auto-run formatter when config changes ───────────
@@ -1197,6 +1193,7 @@ export default function TextForm(props: TextFormProps) {
     if (!ws.tool || !['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)) return;
     const timer = setTimeout(() => { if (ws.tool) executeToolAction(ws.tool as ToolDefinition); }, 300);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs only when the formatter config changes by design; fmtCfgRef guards re-entry
   }, [formatter.fmtCfg]);
 
   // ── ?tool=<id> deep-link from /tools/[slug] CTA ─────────

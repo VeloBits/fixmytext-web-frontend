@@ -830,10 +830,12 @@ describe('TextForm', () => {
     expect(document.querySelector('.tu-tpanel')).toBeInTheDocument();
   });
 
+  // axe over the full TextForm tree needs more than the default 5s
+  // when running under coverage instrumentation.
   it('has no axe violations', async () => {
     const { container } = render(<TextForm {...defaultProps} />);
     await expectNoA11yViolations(container);
-  });
+  }, 30000);
 
   // ── Settings menu: Command Palette button ────────────────────────────
   it('calls search.open() when Command Palette settings item is clicked', async () => {
