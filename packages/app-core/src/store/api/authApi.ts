@@ -13,7 +13,13 @@ export const authApi = createApi({
       query: () => '/api/v1/auth/me',
       providesTags: ['Me'],
     }),
+    resendVerification: builder.mutation<void, void>({
+      query: () => ({
+        url: '/api/v1/auth/resend-verification',
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
-export const { useGetMeQuery } = authApi;
+export const { useGetMeQuery, useResendVerificationMutation } = authApi;

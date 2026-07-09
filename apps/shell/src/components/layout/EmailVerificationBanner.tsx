@@ -1,11 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
-import {
-  KEYCLOAK_CLIENT_ID,
-  KEYCLOAK_REALM,
-  KEYCLOAK_URL,
-} from '@velobits/app-core/auth/keycloakConfig';
+import { useResendVerificationMutation } from '@velobits/app-core/store/api/authApi';
 import type { RootState } from '@velobits/app-core/store/store';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
@@ -93,6 +89,7 @@ export interface EmailVerificationBannerProps {
 export default function EmailVerificationBanner({ showAlert }: EmailVerificationBannerProps) {
   const user = useSelector((s: RootState) => s.auth.user);
   const { isAuthenticated } = useOidcAuth();
+  const [resendVerification, { isLoading: isResending }] = useResendVerificationMutation();
 
   const [dismissed, setDismissed] = useState(() => {
     try {
@@ -111,23 +108,18 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
     return null;
   }
 
-  // Email verification is owned by Keycloak (the SPA no longer has a resend
-  // endpoint — H-9). Send the user to Keycloak's hosted reset-credentials
-  // action pre-filled with their email; for an unverified account Keycloak
-  // runs its required actions (incl. "Verify Email") and re-sends the link.
-  // Same pattern as keycloakClient.sendMagicLink / ForgotPasswordPage, built
-  // from the shared keycloakConfig so dev/prod realms never diverge.
-  const handleResend = () => {
-    if (!user?.email) {
-      // Shouldn't happen (banner only renders with a user), but never build a
-      // malformed Keycloak URL — fall back to an informational alert.
-      showAlert('Please sign in again to resend your verification email.', 'info');
-      return;
+  // account-svc owns the resend: with the realm's blocking verify-email
+  // requirement disabled, Keycloak's reset-credentials screen is a plain
+  // password reset and would NOT re-send the verification link. The endpoint
+  // calls Keycloak Admin's send-verify-email for the current user instead —
+  // no page navigation, the user stays in the app.
+  const handleResend = async () => {
+    try {
+      await resendVerification().unwrap();
+      showAlert(`Verification email sent to ${user?.email}.`, 'success');
+    } catch {
+      showAlert('Could not send the verification email. Please try again later.', 'danger');
     }
-    const url = new URL(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/login-actions/reset-credentials`);
-    url.searchParams.set('client_id', KEYCLOAK_CLIENT_ID);
-    url.searchParams.set('login_hint', user.email);
-    window.location.assign(url.toString());
   };
 
   const handleDismiss = () => {
@@ -161,8 +153,13 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
         </div>
       </div>
       <div className="verify-banner__actions">
-        <button type="button" className="verify-banner__resend" onClick={handleResend}>
-          Resend email
+        <button
+          type="button"
+          className="verify-banner__resend"
+          onClick={handleResend}
+          disabled={isResending}
+        >
+          {isResending ? 'Sending…' : 'Resend email'}
         </button>
         <button
           type="button"

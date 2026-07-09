@@ -157,12 +157,14 @@ describe('useGamification', () => {
     expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'writer' });
   });
 
-  it('setPersona does not write guest sessionStorage when authenticated', () => {
+  it('setPersona also writes guest sessionStorage when authenticated', () => {
+    // The guest copy must survive logout: the hook falls back to guest state
+    // then, and without it the welcome picker reappears right after sign-out.
     const { result } = renderHook(() => useGamification());
     act(() => {
       result.current.setPersona('writer' as unknown as Parameters<typeof result.current.setPersona>[0]);
     });
-    expect(sessionStorage.getItem('fmx_guest_persona')).toBeNull();
+    expect(sessionStorage.getItem('fmx_guest_persona')).toBe('writer');
   });
 
   it('setPersona persists to sessionStorage for guests instead of the API', () => {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
-import { broadcastAuthMessage, userManager } from './userManager';
+import { broadcastAuthMessage, hasAuthHint, userManager } from './userManager';
 
 // React 19 StrictMode fires useEffect 3+ times per mount via multiple
 // doubleInvokeEffectsOnFiber passes. Strategy:
@@ -42,6 +42,19 @@ export function AuthCallback() {
       .catch((err) => {
         _callbackSettled = true;
         _callbackPromise = null;
+        // A reloaded/replayed callback URL fails here ("No matching state
+        // found in storage") because the state was already consumed by the
+        // successful pass. When this browser has a session (auth hint set),
+        // bounce home with a FULL page load — unlike the success path there
+        // are no in-memory tokens to preserve, and loadUser() short-circuits
+        // (and caches null) while on a callback route, so a client-side
+        // navigate would land home still looking signed out. The fresh load
+        // restores the session silently from the Keycloak SSO cookie.
+        if (hasAuthHint()) {
+          console.warn('OIDC callback replay detected — recovering via existing session', err);
+          window.location.replace(window.location.pathname.replace(/auth\/callback.*/, ''));
+          return;
+        }
         Sentry.captureException(err);
         console.error('OIDC callback error', err);
         setError(true);

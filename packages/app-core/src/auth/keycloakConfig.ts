@@ -1,11 +1,12 @@
 // Single source of truth for the Keycloak realm coordinates.
 //
 // Both the oidc-client-ts UserManager (userManager.ts) and the raw Keycloak
-// URL builders (keycloakClient.ts, the shell's ForgotPasswordPage) read from
-// here. Keeping one copy avoids the class of bug where userManager pointed at
-// Velobits-Dev/develop-fixmytext while keycloakClient defaulted to a stale
-// localhost:8080/fixmytext realm — silently breaking password reset (and any
-// other direct Keycloak link) whenever a VITE_KEYCLOAK_* var was unset.
+// URL builders (the shell's ForgotPasswordPage) read from here. Keeping one
+// copy avoids the class of bug where userManager pointed at
+// Velobits-Dev/develop-fixmytext while another URL builder defaulted to a
+// stale localhost:8080/fixmytext realm — silently breaking password reset
+// (and any other direct Keycloak link) whenever a VITE_KEYCLOAK_* var was
+// unset.
 //
 // Defaults target the Velobits-Dev realm at auth-dev.velobits.dev (resolved via
 // /etc/hosts in local dev). Production overrides via:

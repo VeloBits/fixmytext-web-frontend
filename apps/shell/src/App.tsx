@@ -6,7 +6,7 @@ import Navbar from './components/layout/Navbar';
 import OnboardingModal from './components/layout/OnboardingModal';
 import PageSkeleton from './components/layout/PageSkeleton';
 import RemoteBoundary from './components/layout/RemoteBoundary';
-import { BrowserRouter as Router, Routes, Route, useMatch } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useMatch } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { AuthCallback } from '@velobits/app-core/auth/AuthCallback';
 import { SilentCallback } from '@velobits/app-core/auth/SilentCallback';
@@ -78,6 +78,17 @@ function AppInner() {
   // couldn't even read/copy the share. Onboard them when they enter the editor.
   const isShareView = useMatch(ROUTES.SHARE) !== null;
 
+  // Same blocking problem on auth screens: they render their own status and
+  // error cards ("Couldn't reach sign-in" with Retry, callback errors), and
+  // the persona overlay would sit on top and make those buttons unclickable
+  // for a first-time visitor. Onboarding waits until the user is on app content.
+  const { pathname } = useLocation();
+  const isAuthScreen =
+    pathname === ROUTES.LOGIN ||
+    pathname === ROUTES.SIGNUP ||
+    pathname === ROUTES.FORGOT_PASSWORD ||
+    pathname.startsWith('/auth/');
+
   // A session existed here before this page load (H-8 keeps tokens in memory,
   // so a refresh must silently re-acquire them from the Keycloak SSO cookie,
   // then fetch /auth/me). Until both settle, hold the skeleton instead of
@@ -91,7 +102,7 @@ function AppInner() {
 
   return (
     <>
-      {!gamification.onboarded && !isShareView && (
+      {!gamification.onboarded && !isShareView && !isAuthScreen && (
         <OnboardingModal onComplete={handleOnboardingComplete} />
       )}
 

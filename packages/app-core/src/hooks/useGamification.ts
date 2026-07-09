@@ -187,6 +187,17 @@ export default function useGamification(): GamificationContextValue {
         }
         return merged;
       });
+      // Mirror the DB persona into the guest sessionStorage copy: after logout
+      // this tab falls back to guest state, and without the copy the welcome
+      // picker would reappear for a user who onboarded long ago elsewhere.
+      const personaFromDb = (dbPrefs as { persona?: Persona } | undefined)?.persona;
+      if (personaFromDb) {
+        try {
+          sessionStorage.setItem(GUEST_PERSONA_KEY, personaFromDb as unknown as string);
+        } catch {
+          /* ignore */
+        }
+      }
     }
   }, [dbGamification, dbPrefs]);
 
@@ -386,16 +397,18 @@ export default function useGamification(): GamificationContextValue {
   const setPersona = useCallback(
     (persona: Persona): void => {
       setState((prev) => ({ ...prev, persona }));
+      // Always keep the guest copy too, even when authenticated: after logout
+      // the hook falls back to guest state, and without it the welcome picker
+      // would reappear on the logged-out home right after signing out.
+      try {
+        sessionStorage.setItem(GUEST_PERSONA_KEY, persona as unknown as string);
+      } catch {
+        /* ignore */
+      }
       if (isAuthenticated) {
         syncPrefs({ persona: persona as unknown as string })
           .unwrap()
           .catch(() => {});
-      } else {
-        try {
-          sessionStorage.setItem(GUEST_PERSONA_KEY, persona as unknown as string);
-        } catch {
-          /* ignore */
-        }
       }
     },
     [isAuthenticated, syncPrefs]

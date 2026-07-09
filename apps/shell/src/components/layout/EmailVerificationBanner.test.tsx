@@ -29,6 +29,14 @@ vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   }),
 }));
 
+// Resend is an account-svc mutation (POST /auth/resend-verification), not a
+// Keycloak page navigation — mock the RTK hook so no store Provider is needed.
+const mockResendTrigger = vi.fn();
+let mockIsResending = false;
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
+  useResendVerificationMutation: () => [mockResendTrigger, { isLoading: mockIsResending }],
+}));
+
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
@@ -48,29 +56,13 @@ function setAuth({ accessToken = null, user = null }: Partial<MockAuthState> = {
 
 describe('EmailVerificationBanner', () => {
   const showAlert = vi.fn();
-  const assignSpy = vi.fn();
-  const originalLocation = window.location;
 
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    mockIsResending = false;
+    mockResendTrigger.mockReturnValue({ unwrap: () => Promise.resolve() });
     setAuth(); // resets both mockState and mockUseOidcAuth to unauthenticated
-    // Resend now performs a full-page redirect to Keycloak. jsdom's
-    // window.location.assign is non-configurable, so swap the whole location
-    // object for a stub that records the navigation target.
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      writable: true,
-      value: { ...originalLocation, assign: assignSpy },
-    });
-  });
-
-  afterEach(() => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      writable: true,
-      value: originalLocation,
-    });
   });
 
   it('renders nothing when the user is signed out', () => {
@@ -95,7 +87,7 @@ describe('EmailVerificationBanner', () => {
     expect(screen.getByRole('button', { name: 'Resend email' })).toBeInTheDocument();
   });
 
-  it('resend redirects to the Keycloak reset-credentials action with login_hint', async () => {
+  it('resend calls the account-svc mutation and confirms via alert', async () => {
     setAuth({
       accessToken: 'tok',
       user: { email: 'u@example.com', is_email_verified: false },
@@ -104,27 +96,36 @@ describe('EmailVerificationBanner', () => {
     render(<EmailVerificationBanner showAlert={showAlert} />);
     fireEvent.click(screen.getByRole('button', { name: 'Resend email' }));
 
-    await waitFor(() => expect(assignSpy).toHaveBeenCalledTimes(1));
-    const target = String(assignSpy.mock.calls[0]?.[0] ?? '');
-    expect(target).toContain('/realms/');
-    expect(target).toContain('/login-actions/reset-credentials');
-    expect(target).toContain('login_hint=u%40example.com');
-    expect(target).toContain('client_id=');
-    // Keycloak owns the flow now — no in-app alert is shown on the happy path.
-    expect(showAlert).not.toHaveBeenCalled();
+    await waitFor(() => expect(mockResendTrigger).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('u@example.com'), 'success')
+    );
   });
 
-  it('resend button has no cooldown / disabled state (Keycloak owns the flow)', () => {
+  it('resend failure surfaces a danger alert instead of throwing', async () => {
+    mockResendTrigger.mockReturnValue({ unwrap: () => Promise.reject(new Error('502')) });
     setAuth({
       accessToken: 'tok',
       user: { email: 'u@example.com', is_email_verified: false },
     });
 
     render(<EmailVerificationBanner showAlert={showAlert} />);
-    const btn = screen.getByRole('button', { name: 'Resend email' });
-    expect(btn).not.toBeDisabled();
-    // No countdown label in the new implementation.
-    expect(screen.queryByRole('button', { name: /resend in \d+s/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Resend email' }));
+
+    await waitFor(() =>
+      expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('Could not send'), 'danger')
+    );
+  });
+
+  it('resend button is disabled while the request is in flight', () => {
+    mockIsResending = true;
+    setAuth({
+      accessToken: 'tok',
+      user: { email: 'u@example.com', is_email_verified: false },
+    });
+
+    render(<EmailVerificationBanner showAlert={showAlert} />);
+    expect(screen.getByRole('button', { name: 'Sending…' })).toBeDisabled();
   });
 
   it('dismiss button hides the banner and persists the dismissal', () => {
