@@ -17,7 +17,10 @@ export default function useWordFrequency(
   showAlert: (msg: string, variant: string) => void,
   setAiResult: (result: AiResult) => void,
   setPreviewMode: (mode: string) => void,
-  pushHistory: ((label: string, input: string, output: string, meta: PushHistoryMeta) => void) | null | undefined
+  pushHistory:
+    | ((label: string, input: string, output: string, meta: PushHistoryMeta) => void)
+    | null
+    | undefined
 ): UseWordFrequencyReturn {
   const handleWordFrequency = (): void => {
     if (!text) return;

@@ -63,7 +63,7 @@ describe('textApi endpoint execution', () => {
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    const request = mockFetch.mock.calls[0][0] as Request;
+    const request = mockFetch.mock.calls[0]![0] as Request;
     expect(request.url).toContain('/api/v1/text/uppercase');
     expect(request.method).toBe('POST');
   });
@@ -78,7 +78,7 @@ describe('textApi endpoint execution', () => {
       })
     );
 
-    const request = mockFetch.mock.calls[0][0] as Request;
+    const request = mockFetch.mock.calls[0]![0] as Request;
     expect(request.headers.get('X-Visitor-Id')).toBe('test-visitor-id');
   });
 });

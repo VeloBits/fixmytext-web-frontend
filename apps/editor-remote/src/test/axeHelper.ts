@@ -19,7 +19,7 @@ interface RuleObject {
  */
 export async function expectNoA11yViolations(
   container: Element,
-  ruleOverrides: Record<string, RuleObject> = {},
+  ruleOverrides: Record<string, RuleObject> = {}
 ): Promise<void> {
   const results = await axe(container, {
     rules: {

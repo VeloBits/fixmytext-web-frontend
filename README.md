@@ -22,15 +22,15 @@ frontend/
 
 ### Path routing (via Cloudflare Worker + Traefik at `develop-fixmytext.velobits.dev`)
 
-| URL prefix | App | Framework |
-|---|---|---|
-| `/app/*` | `apps/shell` | Vite + React (host) |
-| `/remotes/editor/*` | `apps/editor-remote` | Vite + Module Federation remote |
-| `/remotes/analytics/*` | `apps/analytics-remote` | Vite + Module Federation remote |
-| `/tools/[slug]` | `apps/content` | Next.js 15 SSG |
-| `/share/[id]` | `apps/content` | Next.js 15 SSR |
-| `/about`, `/pricing` | `apps/content` | Next.js 15 |
-| `/` | `apps/content` | Next.js 15 (redirects to `/app`) |
+| URL prefix             | App                     | Framework                        |
+| ---------------------- | ----------------------- | -------------------------------- |
+| `/app/*`               | `apps/shell`            | Vite + React (host)              |
+| `/remotes/editor/*`    | `apps/editor-remote`    | Vite + Module Federation remote  |
+| `/remotes/analytics/*` | `apps/analytics-remote` | Vite + Module Federation remote  |
+| `/tools/[slug]`        | `apps/content`          | Next.js 15 SSG                   |
+| `/share/[id]`          | `apps/content`          | Next.js 15 SSR                   |
+| `/about`, `/pricing`   | `apps/content`          | Next.js 15                       |
+| `/`                    | `apps/content`          | Next.js 15 (redirects to `/app`) |
 
 ## Prerequisites
 
@@ -114,62 +114,63 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 
 ### Root workspace (runs across all apps + packages)
 
-| Command | Description |
-|---------|-------------|
+| Command             | Description                            |
+| ------------------- | -------------------------------------- |
 | `npm run typecheck` | TypeScript check (all apps + packages) |
-| `npm run lint` | ESLint (all apps + packages) |
+| `npm run lint`      | ESLint (all apps + packages)           |
 
 ### Per-app / per-package (use `-w <name>`)
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev -w @velobits/shell` | Start shell dev server (port 3000) |
-| `npm run build -w @velobits/shell` | Production build (shell) |
-| `npm run test -w @velobits/shell` | Vitest unit tests (shell) |
-| `npm run test:coverage -w @velobits/shell` | Vitest with coverage (thresholds enforced) |
-| `npm run test:e2e -w @velobits/shell` | Playwright E2E tests |
-| `npm run dev -w @velobits/editor-remote` | Start editor remote dev server (port 3101) |
-| `npm run build -w @velobits/editor-remote` | Production build (editor remote) |
-| `npm run test:coverage -w @velobits/editor-remote` | Vitest with coverage |
-| `npm run dev -w @velobits/analytics-remote` | Start analytics remote dev server (port 3102) |
-| `npm run build -w @velobits/analytics-remote` | Production build (analytics remote) |
-| `npm run test:coverage -w @velobits/analytics-remote` | Vitest with coverage |
-| `npm run dev -w @velobits/content-app` | Start Next.js dev server (port 3001) |
-| `npm run build -w @velobits/content-app` | Next.js production build |
-| `npm run test:coverage -w @velobits/api-client` | Package coverage (thresholds enforced) |
-| `npm run gen:types -w @velobits/api-client` | Regenerate OpenAPI types from `backend/openapi.json` |
+| Command                                               | Description                                          |
+| ----------------------------------------------------- | ---------------------------------------------------- |
+| `npm run dev -w @velobits/shell`                      | Start shell dev server (port 3000)                   |
+| `npm run build -w @velobits/shell`                    | Production build (shell)                             |
+| `npm run test -w @velobits/shell`                     | Vitest unit tests (shell)                            |
+| `npm run test:coverage -w @velobits/shell`            | Vitest with coverage (thresholds enforced)           |
+| `npm run test:e2e -w @velobits/shell`                 | Playwright E2E tests                                 |
+| `npm run dev -w @velobits/editor-remote`              | Start editor remote dev server (port 3101)           |
+| `npm run build -w @velobits/editor-remote`            | Production build (editor remote)                     |
+| `npm run test:coverage -w @velobits/editor-remote`    | Vitest with coverage                                 |
+| `npm run dev -w @velobits/analytics-remote`           | Start analytics remote dev server (port 3102)        |
+| `npm run build -w @velobits/analytics-remote`         | Production build (analytics remote)                  |
+| `npm run test:coverage -w @velobits/analytics-remote` | Vitest with coverage                                 |
+| `npm run dev -w @velobits/content-app`                | Start Next.js dev server (port 3001)                 |
+| `npm run build -w @velobits/content-app`              | Next.js production build                             |
+| `npm run test:coverage -w @velobits/api-client`       | Package coverage (thresholds enforced)               |
+| `npm run gen:types -w @velobits/api-client`           | Regenerate OpenAPI types from `backend/openapi.json` |
 
 ## Workspace packages
 
-| Package | Purpose |
-|---------|---------|
-| `@velobits/app-core` | Redux store, RTK Query API slices, shared data hooks, gamification UI (federation singleton) |
-| `@velobits/design-system` | Tailwind v4 `@theme` tokens + Button, Card, Input, ToolCard components |
-| `@velobits/api-client` | `apiFetch()` wrapper, `ENDPOINTS` catalog, OpenAPI types, `WEB_APP_BASE_URL` constant |
-| `@velobits/auth-shared` | `SessionClaims` type, `parseSession()`, session cookie name, auth route constants |
-| `@velobits/tools-registry` | All 254 `ToolDefinition` objects + `getToolBySlug()`, `getAllSlugs()`, `getToolsByGroup()` |
+| Package                    | Purpose                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------- |
+| `@velobits/app-core`       | Redux store, RTK Query API slices, shared data hooks, gamification UI (federation singleton) |
+| `@velobits/design-system`  | Tailwind v4 `@theme` tokens + Button, Card, Input, ToolCard components                       |
+| `@velobits/api-client`     | `apiFetch()` wrapper, `ENDPOINTS` catalog, OpenAPI types, `WEB_APP_BASE_URL` constant        |
+| `@velobits/auth-shared`    | `SessionClaims` type, `parseSession()`, session cookie name, auth route constants            |
+| `@velobits/tools-registry` | All 254 `ToolDefinition` objects + `getToolBySlug()`, `getAllSlugs()`, `getToolsByGroup()`   |
 
 ## Environment Variables
 
 ### `apps/shell` (Vite)
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `VITE_API_URL` | Yes | `http://api-dev.velobits.dev` | Backend API base URL (Kong gateway) |
-| `VITE_KEYCLOAK_URL` | Yes | `http://auth-dev.velobits.dev` | Keycloak server base URL (realm path is derived) |
-| `VITE_KEYCLOAK_REALM` | Yes | `Velobits-Dev` | Keycloak realm name |
-| `VITE_KEYCLOAK_CLIENT_ID` | Yes | `develop-fixmytext` | Keycloak client ID |
+| Variable                  | Required | Default                        | Description                                      |
+| ------------------------- | -------- | ------------------------------ | ------------------------------------------------ |
+| `VITE_API_URL`            | Yes      | `http://api-dev.velobits.dev`  | Backend API base URL (Kong gateway)              |
+| `VITE_KEYCLOAK_URL`       | Yes      | `http://auth-dev.velobits.dev` | Keycloak server base URL (realm path is derived) |
+| `VITE_KEYCLOAK_REALM`     | Yes      | `Velobits-Dev`                 | Keycloak realm name                              |
+| `VITE_KEYCLOAK_CLIENT_ID` | Yes      | `develop-fixmytext`            | Keycloak client ID                               |
 
 ### `apps/content` (Next.js)
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `NEXT_PUBLIC_SITE_URL` | No | `https://fixmytext.velobits.dev` | Canonical site URL for OG/sitemap |
-| `API_URL` | Yes | `http://api-dev.velobits.dev` | Backend API base URL (server-side) |
+| Variable               | Required | Default                          | Description                        |
+| ---------------------- | -------- | -------------------------------- | ---------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | No       | `https://fixmytext.velobits.dev` | Canonical site URL for OG/sitemap  |
+| `API_URL`              | Yes      | `http://api-dev.velobits.dev`    | Backend API base URL (server-side) |
 
 ## Tech Stack
 
 ### `apps/shell` (MFE host)
+
 - **React 19** + react-router-dom 7 (basename `/app`)
 - **Vite 8** + `@module-federation/vite` — host that loads editor-remote and analytics-remote at runtime
 - **TypeScript 6** — strict mode
@@ -180,10 +181,12 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 - **Playwright** — end-to-end tests (in `apps/shell/e2e/`)
 
 ### `apps/editor-remote` + `apps/analytics-remote` (MFE remotes)
+
 - **React 19** + Module Federation remote — independently deployed bundles
 - Each owns its full surface source; runtime store is the singleton from `@velobits/app-core`
 
 ### `apps/content` (Next.js)
+
 - **Next.js 15** App Router + React 19
 - **Tailwind CSS v4** — via `@tailwindcss/postcss`
 - **SSG** — per-tool pages generated at build time from `@velobits/tools-registry`
@@ -193,16 +196,16 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 
 All routes are relative to the `/app` basename (react-router):
 
-| Route | Component | Auth Required |
-|-------|-----------|---------------|
-| `/` (→ `/app/`) | Home (editor, via editor-remote) | No |
-| `/login` | LoginPage | No |
-| `/signup` | SignupPage | No |
-| `/forgot-password` | ForgotPasswordPage | No |
-| `/dashboard` | DashboardPage (via analytics-remote) | Yes |
-| `/about` | AboutPage | No |
-| `/pricing` | PricingPage | No |
-| `/auth/callback` | AuthCallback | No |
-| `/auth/silent-callback` | SilentCallback | No |
+| Route                   | Component                            | Auth Required |
+| ----------------------- | ------------------------------------ | ------------- |
+| `/` (→ `/app/`)         | Home (editor, via editor-remote)     | No            |
+| `/login`                | LoginPage                            | No            |
+| `/signup`               | SignupPage                           | No            |
+| `/forgot-password`      | ForgotPasswordPage                   | No            |
+| `/dashboard`            | DashboardPage (via analytics-remote) | Yes           |
+| `/about`                | AboutPage                            | No            |
+| `/pricing`              | PricingPage                          | No            |
+| `/auth/callback`        | AuthCallback                         | No            |
+| `/auth/silent-callback` | SilentCallback                       | No            |
 
 Routes `/share/:id` and public marketing pages are served by `apps/content` (Next.js).

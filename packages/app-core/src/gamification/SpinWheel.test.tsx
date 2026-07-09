@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import SpinWheel from './SpinWheel';
 
 vi.mock('framer-motion', () => {
-    const m =
+  const m =
     (tag: string) =>
     ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
       React.createElement(tag || 'div', props, children);

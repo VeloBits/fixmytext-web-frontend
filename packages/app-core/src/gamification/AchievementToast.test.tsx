@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import AchievementToast from './AchievementToast';
 
 vi.mock('framer-motion', () => {
-    const m =
+  const m =
     (tag: string) =>
     ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
       React.createElement(tag || 'div', props, children);

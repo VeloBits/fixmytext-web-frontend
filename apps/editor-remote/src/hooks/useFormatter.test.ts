@@ -15,10 +15,10 @@ vi.mock('prettier/parser-postcss', () => ({ default: {} }));
 describe('useFormatter', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setLoading: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      showAlert: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onResult: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    showAlert: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onResult: any;
 
   beforeEach(() => {
     setLoading = vi.fn();

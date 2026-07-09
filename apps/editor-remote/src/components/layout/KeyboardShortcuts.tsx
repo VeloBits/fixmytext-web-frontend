@@ -22,7 +22,14 @@ interface ShortcutRowProps {
   conflict: ShortcutDef | null;
 }
 
-function ShortcutRow({ sc, isCustomized, onStartRecording, onReset, recording, conflict }: ShortcutRowProps) {
+function ShortcutRow({
+  sc,
+  isCustomized,
+  onStartRecording,
+  onReset,
+  recording,
+  conflict,
+}: ShortcutRowProps) {
   return (
     <div
       className={`tu-shortcuts-row${recording ? ' tu-shortcuts-row--recording' : ''}${

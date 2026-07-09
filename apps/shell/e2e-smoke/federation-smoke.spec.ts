@@ -16,20 +16,17 @@ import { test, expect, type Response } from '@playwright/test';
  * It does NOT assert data flow (that needs a real backend — see e2e.yml).
  */
 
-const REMOTE_ENTRIES = [
-  '/remotes/editor/remoteEntry.js',
-  '/remotes/analytics/remoteEntry.js',
-];
+const REMOTE_ENTRIES = ['/remotes/editor/remoteEntry.js', '/remotes/analytics/remoteEntry.js'];
 
 // Stub the backend + Keycloak so the public home route boots deterministically without
 // a real API. Home is not auth-gated, so OIDC silent-renew failing is fine — but we mock
 // it to keep the run quiet and fast.
 async function stubBackend(page: import('@playwright/test').Page) {
   await page.route('**/api/v1/**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: '{}' }),
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{}' })
   );
   await page.route(/realms|openid-connect/, (route) =>
-    route.fulfill({ status: 401, contentType: 'application/json', body: '{}' }),
+    route.fulfill({ status: 401, contentType: 'application/json', body: '{}' })
   );
 }
 

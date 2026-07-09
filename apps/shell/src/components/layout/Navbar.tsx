@@ -63,7 +63,17 @@ export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) 
           to="/about"
           title="About FixMyText"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="flex-shrink-0"
+          >
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="16" x2="12" y2="12" />
             <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -78,7 +88,17 @@ export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) 
           aria-label="Share website link"
           title="Share website link"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="flex-shrink-0"
+          >
             <circle cx="18" cy="5" r="3" />
             <circle cx="6" cy="12" r="3" />
             <circle cx="18" cy="19" r="3" />
@@ -96,7 +116,13 @@ export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) 
           rel="noopener noreferrer"
           title="Contribute on GitHub"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="flex-shrink-0"
+          >
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
           </svg>
           <span className="font-medium">GitHub</span>
@@ -179,18 +205,34 @@ export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) 
               <div className="h-px bg-[var(--border)] mx-2 my-1" />
             </>
           )}
-          <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/" onClick={() => setMenuOpen(false)}>
+          <Link
+            className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+            to="/"
+            onClick={() => setMenuOpen(false)}
+          >
             Home
           </Link>
           {isAuthenticated && (
-            <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/dashboard" onClick={() => setMenuOpen(false)}>
+            <Link
+              className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+              to="/dashboard"
+              onClick={() => setMenuOpen(false)}
+            >
               Dashboard
             </Link>
           )}
-          <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/about" onClick={() => setMenuOpen(false)}>
+          <Link
+            className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+            to="/about"
+            onClick={() => setMenuOpen(false)}
+          >
             About
           </Link>
-          <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/pricing" onClick={() => setMenuOpen(false)}>
+          <Link
+            className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+            to="/pricing"
+            onClick={() => setMenuOpen(false)}
+          >
             Pricing
           </Link>
           <button
@@ -223,7 +265,11 @@ export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) 
             </button>
           )}
           {!isAuthenticated && (
-            <Link className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]" to="/login" onClick={() => setMenuOpen(false)}>
+            <Link
+              className="tu-mobile-link flex items-center min-h-[44px] px-3 py-1.5 rounded-sm text-[var(--text-2)] no-underline text-[0.82rem] transition-all hover:bg-[var(--list-hover)] hover:text-[var(--text)]"
+              to="/login"
+              onClick={() => setMenuOpen(false)}
+            >
               Sign In
             </Link>
           )}

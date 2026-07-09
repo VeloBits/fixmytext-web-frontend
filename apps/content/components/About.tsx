@@ -277,7 +277,10 @@ export default function About() {
           <div className="about-features">
             {FEATURES.map((f, i) => (
               <motion.div key={f.title} className="about-feature" {...scaleIn(i * 0.06)}>
-                <div className="about-feature-icon-wrap" style={{ '--feature-color': f.color } as CSSVars}>
+                <div
+                  className="about-feature-icon-wrap"
+                  style={{ '--feature-color': f.color } as CSSVars}
+                >
                   <span className="about-feature-icon">{f.icon}</span>
                 </div>
                 <h3 className="about-feature-title">{f.title}</h3>
@@ -391,7 +394,10 @@ export default function About() {
               <div className="about-cta-glow" />
               <h2 className="about-cta-title">Ready to start?</h2>
               <p className="about-cta-text">No install. No sign-up. Just open and type.</p>
-              <a href={EDITOR_URL} className="about-cta-btn about-cta-btn--primary about-cta-btn--lg">
+              <a
+                href={EDITOR_URL}
+                className="about-cta-btn about-cta-btn--primary about-cta-btn--lg"
+              >
                 <svg
                   width="16"
                   height="16"

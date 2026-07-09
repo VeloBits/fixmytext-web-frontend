@@ -35,7 +35,10 @@ vi.mock('@reduxjs/toolkit/query/react', () => ({
     capturedFetchBaseQueryConfig = config;
     return mockRawBaseQuery;
   },
-  retry: (baseQueryFn: (args: unknown, api: unknown, extra: unknown) => Promise<MockBaseQueryResult>, options: MockRetryOptions) => {
+  retry: (
+    baseQueryFn: (args: unknown, api: unknown, extra: unknown) => Promise<MockBaseQueryResult>,
+    options: MockRetryOptions
+  ) => {
     // Expose the retry wrapper so we can test retryCondition directly.
     // Simulate retry behaviour: call baseQueryFn, and if it returns an error
     // that satisfies retryCondition, call it again up to maxRetries times.
@@ -73,7 +76,10 @@ async function freshImport() {
       capturedFetchBaseQueryConfig = config;
       return mockRawBaseQuery;
     },
-    retry: (baseQueryFn: (args: unknown, api: unknown, extra: unknown) => Promise<MockBaseQueryResult>, options: MockRetryOptions) => {
+    retry: (
+      baseQueryFn: (args: unknown, api: unknown, extra: unknown) => Promise<MockBaseQueryResult>,
+      options: MockRetryOptions
+    ) => {
       const wrapped = async (args: unknown, api: unknown, extraOptions: unknown) => {
         let attempt = 1;
         let result = await baseQueryFn(args, api, extraOptions);
@@ -102,11 +108,16 @@ async function freshImport() {
       signoutRedirect: vi.fn().mockResolvedValue(undefined),
       clearStaleState: vi.fn().mockResolvedValue(undefined),
       events: {
-        addUserLoaded: vi.fn(), removeUserLoaded: vi.fn(),
-        addUserUnloaded: vi.fn(), removeUserUnloaded: vi.fn(),
-        addUserSignedIn: vi.fn(), removeUserSignedIn: vi.fn(),
-        addUserSignedOut: vi.fn(), removeUserSignedOut: vi.fn(),
-        addSilentRenewError: vi.fn(), removeSilentRenewError: vi.fn(),
+        addUserLoaded: vi.fn(),
+        removeUserLoaded: vi.fn(),
+        addUserUnloaded: vi.fn(),
+        removeUserUnloaded: vi.fn(),
+        addUserSignedIn: vi.fn(),
+        removeUserSignedIn: vi.fn(),
+        addUserSignedOut: vi.fn(),
+        removeUserSignedOut: vi.fn(),
+        addSilentRenewError: vi.fn(),
+        removeSilentRenewError: vi.fn(),
       },
     },
   }));
@@ -161,7 +172,11 @@ describe('createAuthBaseQuery — prepareHeaders', () => {
 
   it('sets Authorization header when accessToken exists', async () => {
     const { userManager } = await import('../../auth/userManager');
-    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'my-access-token' } as Parameters<typeof vi.mocked<typeof userManager.getUser>>[0] extends undefined ? never : Awaited<ReturnType<typeof userManager.getUser>>);
+    vi.mocked(userManager.getUser).mockResolvedValue({
+      access_token: 'my-access-token',
+    } as Parameters<typeof vi.mocked<typeof userManager.getUser>>[0] extends undefined
+      ? never
+      : Awaited<ReturnType<typeof userManager.getUser>>);
     const { createAuthBaseQuery } = await freshImport();
     createAuthBaseQuery(); // triggers fetchBaseQuery mock → captures config
 
@@ -189,7 +204,11 @@ describe('createAuthBaseQuery — prepareHeaders', () => {
 
   it('calls extraHeaders callback when provided', async () => {
     const { userManager } = await import('../../auth/userManager');
-    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'tok' } as Parameters<typeof vi.mocked<typeof userManager.getUser>>[0] extends undefined ? never : Awaited<ReturnType<typeof userManager.getUser>>);
+    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'tok' } as Parameters<
+      typeof vi.mocked<typeof userManager.getUser>
+    >[0] extends undefined
+      ? never
+      : Awaited<ReturnType<typeof userManager.getUser>>);
     const { createAuthBaseQuery } = await freshImport();
     const extraHeaders = vi.fn();
     createAuthBaseQuery(extraHeaders);
@@ -529,7 +548,11 @@ describe('createBaseQueryWithReauth', () => {
 
   it('returns a reauth query that uses custom headers', async () => {
     const { userManager } = await import('../../auth/userManager');
-    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'tok' } as Parameters<typeof vi.mocked<typeof userManager.getUser>>[0] extends undefined ? never : Awaited<ReturnType<typeof userManager.getUser>>);
+    vi.mocked(userManager.getUser).mockResolvedValue({ access_token: 'tok' } as Parameters<
+      typeof vi.mocked<typeof userManager.getUser>
+    >[0] extends undefined
+      ? never
+      : Awaited<ReturnType<typeof userManager.getUser>>);
     const { createBaseQueryWithReauth } = await freshImport();
     const extraHeaders = vi.fn((headers) => {
       headers.set('X-Custom', 'value');

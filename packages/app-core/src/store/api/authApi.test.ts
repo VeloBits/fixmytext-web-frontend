@@ -59,7 +59,7 @@ describe('authApi endpoint execution', () => {
     await store.dispatch(authApi.endpoints.getMe.initiate());
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    const request = mockFetch.mock.calls[0][0] as Request;
+    const request = mockFetch.mock.calls[0]![0] as Request;
     expect(request.url).toContain('/api/v1/auth/me');
     expect(request.method).toBe('GET');
   });

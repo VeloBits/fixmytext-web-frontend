@@ -6,17 +6,18 @@
 
 The frontend defines all 254 tools as data objects in `src/constants/tools.js`. The UI renders tools dynamically from this array. Every new tool needs an entry here.
 
-| Tool Type | Files to Change |
-|-----------|----------------|
+| Tool Type               | Files to Change                          |
+| ----------------------- | ---------------------------------------- |
 | `api` / `ai` / `select` | `tools.js` (backend endpoint must exist) |
-| `local` | `tools.js` only (runs in browser) |
-| `action` / `drawer` | `tools.js` + possibly a new component |
+| `local`                 | `tools.js` only (runs in browser)        |
+| `action` / `drawer`     | `tools.js` + possibly a new component    |
 
 ## Step 1: Plan Your Tool
 
 Choose a unique snake_case `id` (e.g., `reverse_words`).
 
 Verify uniqueness:
+
 ```bash
 grep -c "id: 'reverse_words'" src/constants/tools.js
 # Should return 0
@@ -60,19 +61,19 @@ import { ENDPOINTS } from '../constants/endpoints';
 
 ### Field Reference
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Unique snake_case ID. Also used as `operation` in API responses |
-| `label` | string | Display name shown in the tool list and search |
-| `description` | string | Tooltip text. Also indexed for tool search |
-| `icon` | string | Icon key (see existing tools for available icons) |
-| `color` | string | Theme color for the tool card (blue, green, purple, etc.) |
-| `group` | string | Category key, one of the 14 groups listed above |
-| `tabs` | string[] | Which tabs show this tool, usually `['transform']` |
-| `type` | string | Tool type: `api`, `ai`, `local`, `select`, `action`, `drawer` |
-| `endpoint` | string | Backend route path — use the matching `ENDPOINTS.*` constant from `src/constants/endpoints.js` rather than a bare string literal |
-| `successMsg` | string | Toast notification after successful transformation |
-| `keywords` | string[] | Extra search terms beyond label and description |
+| Field         | Type     | Description                                                                                                                      |
+| ------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `id`          | string   | Unique snake_case ID. Also used as `operation` in API responses                                                                  |
+| `label`       | string   | Display name shown in the tool list and search                                                                                   |
+| `description` | string   | Tooltip text. Also indexed for tool search                                                                                       |
+| `icon`        | string   | Icon key (see existing tools for available icons)                                                                                |
+| `color`       | string   | Theme color for the tool card (blue, green, purple, etc.)                                                                        |
+| `group`       | string   | Category key, one of the 14 groups listed above                                                                                  |
+| `tabs`        | string[] | Which tabs show this tool, usually `['transform']`                                                                               |
+| `type`        | string   | Tool type: `api`, `ai`, `local`, `select`, `action`, `drawer`                                                                    |
+| `endpoint`    | string   | Backend route path — use the matching `ENDPOINTS.*` constant from `src/constants/endpoints.js` rather than a bare string literal |
+| `successMsg`  | string   | Toast notification after successful transformation                                                                               |
+| `keywords`    | string[] | Extra search terms beyond label and description                                                                                  |
 
 ## Step 3: Verify Endpoint Match
 
@@ -80,10 +81,10 @@ For `api` and `ai` tools, the `endpoint` field must exactly match the backend Fa
 
 ```javascript
 // Good
-endpoint: ENDPOINTS.REVERSE_WORDS     // resolves to '/api/v1/text/reverse-words'
+endpoint: ENDPOINTS.REVERSE_WORDS; // resolves to '/api/v1/text/reverse-words'
 
 // Avoid
-endpoint: '/api/v1/text/reverse-words'  // bare string is fragile
+endpoint: '/api/v1/text/reverse-words'; // bare string is fragile
 ```
 
 The constant maps to the same path the backend registers under `@router.post("/reverse-words")` beneath the `/api/v1/text` prefix.

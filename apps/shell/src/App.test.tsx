@@ -49,11 +49,21 @@ vi.mock('react-router-dom', () => ({
   useLocation: () => ({ pathname: '/', search: '' }),
   useMatch: () => mockState.shareRouteMatch,
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
+  Link: ({
+    children,
+    to,
+    ...p
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...p }, children),
   MemoryRouter: ({ children }: { children?: React.ReactNode }) => children,
-  Routes: ({ children }: { children?: React.ReactNode }) => React.createElement('div', { 'data-testid': 'routes' }, children),
+  Routes: ({ children }: { children?: React.ReactNode }) =>
+    React.createElement('div', { 'data-testid': 'routes' }, children),
   Route: ({ element }: { element?: React.ReactNode }) => element,
-  Navigate: ({ to }: { to: string }) => React.createElement('div', { 'data-testid': 'navigate', 'data-to': to }),
+  Navigate: ({ to }: { to: string }) =>
+    React.createElement('div', { 'data-testid': 'navigate', 'data-to': to }),
 }));
 
 // ── react-redux mock ──

@@ -156,7 +156,12 @@ export default function FakeDataDrawer({ activeTool, onResult, showAlert }: Fake
   const [format, setFormat] = useState<FakeFormat>('text');
   const toolId = activeTool?.id || 'fake_data_set';
 
-  interface FakeRecord { name: string; email: string; phone: string; address: string; }
+  interface FakeRecord {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  }
   const handleGenerate = () => {
     const results: (string | FakeRecord)[] = [];
     for (let i = 0; i < count; i++) {
@@ -189,7 +194,9 @@ export default function FakeDataDrawer({ activeTool, onResult, showAlert }: Fake
       } else if (format === 'csv') {
         output =
           'name,email,phone,address\n' +
-          (results as FakeRecord[]).map((r) => `"${r.name}","${r.email}","${r.phone}","${r.address}"`).join('\n');
+          (results as FakeRecord[])
+            .map((r) => `"${r.name}","${r.email}","${r.phone}","${r.address}"`)
+            .join('\n');
       } else {
         output = (results as FakeRecord[])
           .map((r, i) => `${i + 1}. ${r.name}\n   ${r.email}\n   ${r.phone}\n   ${r.address}`)

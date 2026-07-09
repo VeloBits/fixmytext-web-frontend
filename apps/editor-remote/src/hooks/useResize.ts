@@ -1,4 +1,11 @@
-import { useState, useCallback, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import type { RefObject } from 'react';
 
 /** Direction of resize dragging */

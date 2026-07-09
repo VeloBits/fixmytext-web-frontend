@@ -157,7 +157,9 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -515,7 +517,9 @@
   font-size: 0.7rem;
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity var(--t), background var(--t);
+  transition:
+    opacity var(--t),
+    background var(--t);
 }
 .tu-sidebar-panel-item:hover .tu-sidebar-panel-item-del,
 .tu-sidebar-panel-item:hover .tu-sidebar-panel-item-action {
@@ -552,7 +556,9 @@
   font-size: 0.7rem;
   cursor: pointer;
   text-align: center;
-  transition: color var(--t), border-color var(--t);
+  transition:
+    color var(--t),
+    border-color var(--t);
 }
 .tu-sidebar-panel-tab:hover {
   color: var(--sidebar-fg);
@@ -1308,7 +1314,9 @@
 .tu-gen-strength-fill {
   height: 100%;
   border-radius: 3px;
-  transition: width 0.3s ease, background 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
 }
 .tu-gen-strength-label {
   font-size: 0.65rem;
@@ -1845,7 +1853,9 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: color var(--t), border-color var(--t);
+  transition:
+    color var(--t),
+    border-color var(--t);
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2533,7 +2543,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
     box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.45);
     transform: translateY(100%);
     visibility: hidden;
-    transition: transform 0.25s ease, visibility 0.25s;
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s;
     overscroll-behavior: contain;
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -2733,7 +2745,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   cursor: pointer;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
   font-family: inherit;
   color: var(--text);
 }
@@ -2834,7 +2848,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   font-size: 0.8rem;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color var(--t), background var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t);
   white-space: nowrap;
 }
 
@@ -3052,7 +3068,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   border: 1px solid transparent;
   border-radius: var(--r-sm);
   cursor: pointer;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
   font-family: inherit;
   color: var(--text);
   text-align: left;
@@ -3146,7 +3164,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background var(--t), transform var(--t);
+  transition:
+    background var(--t),
+    transform var(--t);
 }
 
 .tu-landing-cta:hover {
@@ -3166,7 +3186,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   font-size: 0.85rem;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color var(--t), background var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t);
 }
 
 .tu-landing-cta-secondary:hover {
@@ -3453,7 +3475,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   border: none;
   border-radius: var(--r-sm);
   cursor: pointer;
-  transition: background var(--t), opacity var(--t);
+  transition:
+    background var(--t),
+    opacity var(--t);
 }
 
 .tu-modal-btn--primary {

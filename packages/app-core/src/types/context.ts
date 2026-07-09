@@ -6,13 +6,7 @@
 // depend on a single shared definition rather than on each other's source.
 
 import type { components } from './openapi';
-import type {
-  Persona,
-  Achievement,
-  LevelDefinition,
-  QuestOp,
-  ToolDefinition,
-} from './tools';
+import type { Persona, Achievement, LevelDefinition, QuestOp, ToolDefinition } from './tools';
 
 // ── User ─────────────────────────────────────────────────────────────────────
 

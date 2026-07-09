@@ -14,19 +14,22 @@ interface ToggleProps {
 }
 
 // Which settings are relevant per parser/tool
-const TOOL_SETTINGS: Record<string, {
-  label: string;
-  indent?: boolean;
-  semi?: boolean;
-  singleQuote?: boolean;
-  trailingComma?: boolean;
-  bracketSpacing?: boolean;
-  arrowParens?: boolean;
-  jsxSingleQuote?: boolean;
-  sortImports?: boolean;
-  bracketSameLine?: boolean;
-  htmlWhitespace?: boolean;
-}> = {
+const TOOL_SETTINGS: Record<
+  string,
+  {
+    label: string;
+    indent?: boolean;
+    semi?: boolean;
+    singleQuote?: boolean;
+    trailingComma?: boolean;
+    bracketSpacing?: boolean;
+    arrowParens?: boolean;
+    jsxSingleQuote?: boolean;
+    sortImports?: boolean;
+    bracketSameLine?: boolean;
+    htmlWhitespace?: boolean;
+  }
+> = {
   js_fmt: {
     label: 'JavaScript',
     indent: true,
@@ -262,8 +265,8 @@ export default function FmtConfigBar({ toolId, fmtCfg, setFmtCfg }: FmtConfigBar
                   key === 'default'
                     ? 'Default: 2 spaces, semicolons, double quotes, ES5 trailing commas'
                     : key === 'airbnb'
-                    ? 'Airbnb: 2 spaces, no semicolons, single quotes, all trailing commas'
-                    : 'Standard: 4 spaces, no semicolons, single quotes, ES5 trailing commas'
+                      ? 'Airbnb: 2 spaces, no semicolons, single quotes, all trailing commas'
+                      : 'Standard: 4 spaces, no semicolons, single quotes, ES5 trailing commas'
                 }
               >
                 {key.charAt(0).toUpperCase() + key.slice(1)}

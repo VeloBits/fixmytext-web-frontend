@@ -9,10 +9,9 @@
 #   docker compose --profile prod up --build
 
 services:
-
   # ── Router — dev ──────────────────────────────────────────────────────────────
   router:
-    profiles: ["dev"]
+    profiles: ['dev']
     build:
       context: .
       dockerfile: docker/Dockerfile.router
@@ -20,7 +19,7 @@ services:
         NGINX_CONF: docker/nginx.router.dev.conf
     container_name: fixmytext-router
     ports:
-      - "3000:80"
+      - '3000:80'
     depends_on:
       - shell-dev
       - editor-remote-dev
@@ -30,7 +29,7 @@ services:
 
   # ── Router — prod ─────────────────────────────────────────────────────────────
   router-prod:
-    profiles: ["prod"]
+    profiles: ['prod']
     build:
       context: .
       dockerfile: docker/Dockerfile.router
@@ -38,7 +37,7 @@ services:
         NGINX_CONF: docker/nginx.router.prod.conf
     container_name: fixmytext-router-prod
     ports:
-      - "3000:80"
+      - '3000:80'
     depends_on:
       - shell-prod
       - editor-remote-prod
@@ -48,15 +47,15 @@ services:
 
   # ── Shell — dev ────────────────────────────────────────────────────────────────
   shell-dev:
-    profiles: ["dev"]
+    profiles: ['dev']
     build:
       context: .
       dockerfile: docker/Dockerfile.vite.dev
       args:
-        APP_WORKSPACE: "@velobits/shell"
+        APP_WORKSPACE: '@velobits/shell'
     container_name: fixmytext-shell-dev
     ports:
-      - "3100:3100"
+      - '3100:3100'
     volumes:
       - .:/app
       - /app/node_modules
@@ -65,13 +64,13 @@ services:
 
   # ── Shell — prod ───────────────────────────────────────────────────────────────
   shell-prod:
-    profiles: ["prod"]
+    profiles: ['prod']
     build:
       context: .
       dockerfile: docker/Dockerfile.vite.prod
       args:
-        APP_WORKSPACE: "@velobits/shell"
-        APP_PATH: "apps/shell"
+        APP_WORKSPACE: '@velobits/shell'
+        APP_PATH: 'apps/shell'
         # Vite bakes these at BUILD time, so they must arrive as build args — the
         # `env_file` below is runtime-only (nginx) and cannot reach the build stage.
         # Defaults point at the local router (port 3000) for the prod simulation;
@@ -82,22 +81,22 @@ services:
     env_file: .env.docker.prod
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080"]
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:8080']
       interval: 30s
       timeout: 5s
       retries: 3
 
   # ── Editor Remote — dev ────────────────────────────────────────────────────────
   editor-remote-dev:
-    profiles: ["dev"]
+    profiles: ['dev']
     build:
       context: .
       dockerfile: docker/Dockerfile.vite.dev
       args:
-        APP_WORKSPACE: "@velobits/editor-remote"
+        APP_WORKSPACE: '@velobits/editor-remote'
     container_name: fixmytext-editor-dev
     ports:
-      - "3101:3101"
+      - '3101:3101'
     volumes:
       - .:/app
       - /app/node_modules
@@ -106,28 +105,28 @@ services:
 
   # ── Editor Remote — prod ───────────────────────────────────────────────────────
   editor-remote-prod:
-    profiles: ["prod"]
+    profiles: ['prod']
     build:
       context: .
       dockerfile: docker/Dockerfile.vite.prod
       args:
-        APP_WORKSPACE: "@velobits/editor-remote"
-        APP_PATH: "apps/editor-remote"
+        APP_WORKSPACE: '@velobits/editor-remote'
+        APP_PATH: 'apps/editor-remote'
     container_name: fixmytext-editor-prod
     env_file: .env.docker.prod
     restart: unless-stopped
 
   # ── Analytics Remote — dev ─────────────────────────────────────────────────────
   analytics-remote-dev:
-    profiles: ["dev"]
+    profiles: ['dev']
     build:
       context: .
       dockerfile: docker/Dockerfile.vite.dev
       args:
-        APP_WORKSPACE: "@velobits/analytics-remote"
+        APP_WORKSPACE: '@velobits/analytics-remote'
     container_name: fixmytext-analytics-dev
     ports:
-      - "3102:3102"
+      - '3102:3102'
     volumes:
       - .:/app
       - /app/node_modules
@@ -136,26 +135,26 @@ services:
 
   # ── Analytics Remote — prod ────────────────────────────────────────────────────
   analytics-remote-prod:
-    profiles: ["prod"]
+    profiles: ['prod']
     build:
       context: .
       dockerfile: docker/Dockerfile.vite.prod
       args:
-        APP_WORKSPACE: "@velobits/analytics-remote"
-        APP_PATH: "apps/analytics-remote"
+        APP_WORKSPACE: '@velobits/analytics-remote'
+        APP_PATH: 'apps/analytics-remote'
     container_name: fixmytext-analytics-prod
     env_file: .env.docker.prod
     restart: unless-stopped
 
   # ── Content — dev ──────────────────────────────────────────────────────────────
   content-dev:
-    profiles: ["dev"]
+    profiles: ['dev']
     build:
       context: .
       dockerfile: docker/Dockerfile.content.dev
     container_name: fixmytext-content-dev
     ports:
-      - "3103:3103"
+      - '3103:3103'
     volumes:
       - .:/app
       - /app/node_modules
@@ -173,7 +172,7 @@ services:
 
   # ── Content — prod ─────────────────────────────────────────────────────────────
   content-prod:
-    profiles: ["prod"]
+    profiles: ['prod']
     build:
       context: .
       dockerfile: docker/Dockerfile.content.prod
@@ -181,7 +180,7 @@ services:
     env_file: .env.docker.prod
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3103"]
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3103']
       interval: 30s
       timeout: 10s
       retries: 5

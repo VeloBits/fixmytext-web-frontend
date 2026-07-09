@@ -123,7 +123,9 @@
   font-size: 0.72rem;
   font-family: inherit;
   cursor: pointer;
-  transition: background var(--t), color var(--t);
+  transition:
+    background var(--t),
+    color var(--t);
 }
 .tu-dash-back-btn:hover {
   background: var(--sidebar-highlight);
@@ -400,7 +402,9 @@
   text-align: center;
   opacity: 0.35;
   filter: grayscale(1);
-  transition: opacity var(--t), filter var(--t);
+  transition:
+    opacity var(--t),
+    filter var(--t);
 }
 
 .tu-dash-achievement--unlocked {
@@ -640,7 +644,9 @@
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--t), opacity var(--t);
+  transition:
+    background var(--t),
+    opacity var(--t);
   white-space: nowrap;
   align-self: center;
 }
@@ -685,7 +691,9 @@
   border: none;
   color: var(--text-3);
   cursor: pointer;
-  transition: background var(--t), color var(--t);
+  transition:
+    background var(--t),
+    color var(--t);
 }
 
 .tu-dash-theme-btn--active {
@@ -945,7 +953,9 @@
   border-radius: var(--r-sm);
   display: flex;
   align-items: center;
-  transition: color var(--t), background var(--t);
+  transition:
+    color var(--t),
+    background var(--t);
 }
 .tu-dash-profile-edit-btn:hover {
   color: var(--accent);
@@ -997,7 +1007,9 @@
   border-radius: var(--r-sm);
   color: var(--text-3);
   cursor: pointer;
-  transition: background var(--t), color var(--t);
+  transition:
+    background var(--t),
+    color var(--t);
 }
 .tu-dash-profile-cancel-btn:hover {
   background: var(--surface-2);
@@ -1023,7 +1035,10 @@
   cursor: pointer;
   font-family: inherit;
   color: var(--text-2);
-  transition: border-color var(--t), background var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t),
+    box-shadow var(--t);
   position: relative;
 }
 .tu-dash-persona-card:hover {

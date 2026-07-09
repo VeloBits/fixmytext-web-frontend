@@ -29,7 +29,12 @@ function useDebouncedPreview(
 
 // ── Match helper (shared by JS preview + badge count) ───────────────
 
-function lineMatches(line: string, pattern: string, caseSensitive: boolean, useRegex: boolean): boolean {
+function lineMatches(
+  line: string,
+  pattern: string,
+  caseSensitive: boolean,
+  useRegex: boolean
+): boolean {
   if (!pattern.trim()) return false;
   if (useRegex) {
     try {
@@ -46,7 +51,13 @@ function lineMatches(line: string, pattern: string, caseSensitive: boolean, useR
 
 // ── Local preview helpers (mirror backend logic in JS) ──────────────
 
-function filterLines(text: string, pattern: string, mode: 'keep' | 'drop', caseSensitive: boolean, useRegex: boolean): string | null {
+function filterLines(
+  text: string,
+  pattern: string,
+  mode: 'keep' | 'drop',
+  caseSensitive: boolean,
+  useRegex: boolean
+): string | null {
   if (!text || !pattern.trim()) return null;
   const lines = text.split('\n');
   const result =
@@ -168,7 +179,10 @@ const RegexIcon = () => (
 
 // ── Wrap Lines ──────────────────────────────────────────────────────
 
-interface WrapApplyArg { prefix: string; suffix: string; }
+interface WrapApplyArg {
+  prefix: string;
+  suffix: string;
+}
 interface WrapLinesDrawerProps {
   onApply: (arg: WrapApplyArg) => void;
   onPreview?: (result: PreviewResult | null) => void;
@@ -243,8 +257,8 @@ export function WrapLinesDrawer({ onApply, onPreview, disabled, text = '' }: Wra
           {prefix && suffix
             ? ` with "${prefix}" … "${suffix}"`
             : prefix
-            ? ` with prefix "${prefix}"`
-            : ` with suffix "${suffix}"`}
+              ? ` with prefix "${prefix}"`
+              : ` with suffix "${suffix}"`}
         </div>
       )}
     </div>
@@ -253,7 +267,11 @@ export function WrapLinesDrawer({ onApply, onPreview, disabled, text = '' }: Wra
 
 // ── Filter / Drop Lines (with case-sensitive + regex toggles) ───────
 
-interface FilterApplyArg { pattern: string; case_sensitive: boolean; use_regex: boolean; }
+interface FilterApplyArg {
+  pattern: string;
+  case_sensitive: boolean;
+  use_regex: boolean;
+}
 interface FilterLinesDrawerProps {
   onApply: (arg: FilterApplyArg) => void;
   onPreview?: (result: PreviewResult | null) => void;
@@ -261,7 +279,13 @@ interface FilterLinesDrawerProps {
   mode?: 'keep' | 'drop';
   text?: string;
 }
-export function FilterLinesDrawer({ onApply, onPreview, disabled, mode = 'keep', text = '' }: FilterLinesDrawerProps) {
+export function FilterLinesDrawer({
+  onApply,
+  onPreview,
+  disabled,
+  mode = 'keep',
+  text = '',
+}: FilterLinesDrawerProps) {
   const [pattern, setPattern] = useState('');
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [useRegex, setUseRegex] = useState(false);
@@ -348,14 +372,21 @@ export function FilterLinesDrawer({ onApply, onPreview, disabled, mode = 'keep',
 
 // ── Truncate Lines ──────────────────────────────────────────────────
 
-interface TruncateApplyArg { max_length: number; }
+interface TruncateApplyArg {
+  max_length: number;
+}
 interface TruncateLinesDrawerProps {
   onApply: (arg: TruncateApplyArg) => void;
   onPreview?: (result: PreviewResult | null) => void;
   disabled: boolean;
   text?: string;
 }
-export function TruncateLinesDrawer({ onApply, onPreview, disabled, text = '' }: TruncateLinesDrawerProps) {
+export function TruncateLinesDrawer({
+  onApply,
+  onPreview,
+  disabled,
+  text = '',
+}: TruncateLinesDrawerProps) {
   const [maxLength, setMaxLength] = useState(80);
   const overCount = useMemo(() => {
     if (!text) return 0;
@@ -411,7 +442,10 @@ export function TruncateLinesDrawer({ onApply, onPreview, disabled, text = '' }:
 
 // ── Every Nth Line ──────────────────────────────────────────────────
 
-interface NthApplyArg { n: number; offset: number; }
+interface NthApplyArg {
+  n: number;
+  offset: number;
+}
 interface NthLineDrawerProps {
   onApply: (arg: NthApplyArg) => void;
   onPreview?: (result: PreviewResult | null) => void;

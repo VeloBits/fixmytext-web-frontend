@@ -53,8 +53,8 @@ function formatToolError(err: ToolError, fallback: string): ErrorResult {
       typeof detail === 'string'
         ? detail
         : typeof detail === 'object' && detail !== null
-        ? (detail as { message?: string }).message
-        : undefined;
+          ? (detail as { message?: string }).message
+          : undefined;
     return {
       message: msg429 || 'Daily limit reached. Please try again later.',
       tone: 'warning',
@@ -64,8 +64,8 @@ function formatToolError(err: ToolError, fallback: string): ErrorResult {
     typeof detail === 'string'
       ? detail
       : typeof detail === 'object' && detail !== null
-      ? (detail as { message?: string }).message || fallback
-      : fallback;
+        ? (detail as { message?: string }).message || fallback
+        : fallback;
   return { message: msg, tone: 'danger' };
 }
 
@@ -502,7 +502,9 @@ export default function useAiTools(
   setMarkdownMode: (v: boolean) => void,
   setPreviewMode: (mode: string) => void,
   showAlert: (msg: string, type: AlertType) => void,
-  pushHistory: ((label: string, orig: string, result: string, meta: Record<string, string>) => void) | undefined
+  pushHistory:
+    | ((label: string, orig: string, result: string, meta: Record<string, string>) => void)
+    | undefined
 ) {
   const { isAuthenticated } = useOidcAuth();
   const [aiResult, setAiResult] = useState<AiResult | null>(null);
@@ -607,7 +609,16 @@ export default function useAiTools(
         showAlert(message, tone);
       }
     },
-    [text, guardText, isAuthenticated, transformText, setAiResult, setPreviewMode, pushHistory, showAlert]
+    [
+      text,
+      guardText,
+      isAuthenticated,
+      transformText,
+      setAiResult,
+      setPreviewMode,
+      pushHistory,
+      showAlert,
+    ]
   );
 
   /**
@@ -710,7 +721,10 @@ export default function useAiTools(
       showAlert(`Tone changed to ${tone}`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err as ToolError, 'Could not change tone. Please try again.');
+        const { message, tone } = formatToolError(
+          err as ToolError,
+          'Could not change tone. Please try again.'
+        );
         showAlert(message, tone);
       }
     }
@@ -809,7 +823,10 @@ export default function useAiTools(
       showAlert('Text split to lines', 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err as ToolError, 'Could not split text. Please try again.');
+        const { message, tone } = formatToolError(
+          err as ToolError,
+          'Could not split text. Please try again.'
+        );
         showAlert(message, tone);
       }
     }
@@ -834,7 +851,10 @@ export default function useAiTools(
       showAlert('Lines joined', 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err as ToolError, 'Could not join lines. Please try again.');
+        const { message, tone } = formatToolError(
+          err as ToolError,
+          'Could not join lines. Please try again.'
+        );
         showAlert(message, tone);
       }
     }
@@ -855,7 +875,10 @@ export default function useAiTools(
       showAlert(`Caesar cipher applied (shift ${shift})`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err as ToolError, 'Could not apply Caesar cipher.');
+        const { message, tone } = formatToolError(
+          err as ToolError,
+          'Could not apply Caesar cipher.'
+        );
         showAlert(message, tone);
       }
     }
@@ -880,7 +903,10 @@ export default function useAiTools(
       showAlert(`Rail fence encrypted (${rails} rails)`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err as ToolError, 'Could not encrypt with Rail Fence.');
+        const { message, tone } = formatToolError(
+          err as ToolError,
+          'Could not encrypt with Rail Fence.'
+        );
         showAlert(message, tone);
       }
     }
@@ -905,7 +931,10 @@ export default function useAiTools(
       showAlert(`Rail fence decrypted (${rails} rails)`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err as ToolError, 'Could not decrypt Rail Fence.');
+        const { message, tone } = formatToolError(
+          err as ToolError,
+          'Could not decrypt Rail Fence.'
+        );
         showAlert(message, tone);
       }
     }
@@ -1065,7 +1094,10 @@ export default function useAiTools(
       showAlert(`Lines padded (${align})`, 'success');
     } catch (err) {
       {
-        const { message, tone } = formatToolError(err as ToolError, 'Could not pad lines. Please try again.');
+        const { message, tone } = formatToolError(
+          err as ToolError,
+          'Could not pad lines. Please try again.'
+        );
         showAlert(message, tone);
       }
     }

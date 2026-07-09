@@ -23,7 +23,8 @@ interface RtkErrorPayload {
  */
 export const errorMiddleware: Middleware = (_api) => (next) => (action) => {
   if (isRejectedWithValue(action)) {
-    const arg = (action.meta as { arg?: { type?: string; endpointName?: string } } | undefined)?.arg;
+    const arg = (action.meta as { arg?: { type?: string; endpointName?: string } } | undefined)
+      ?.arg;
     const queryType = arg?.type;
     const endpoint = arg?.endpointName;
 

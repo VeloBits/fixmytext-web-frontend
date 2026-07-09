@@ -97,7 +97,10 @@ describe('OutputPanel', () => {
 
   it('shows "Start typing" hint when activeTool is set but no result', () => {
     render(
-      <OutputPanel {...defaultProps} activeTool={{ id: 'test', label: 'Test', group: 'case' } as unknown as ToolDefinition} />
+      <OutputPanel
+        {...defaultProps}
+        activeTool={{ id: 'test', label: 'Test', group: 'case' } as unknown as ToolDefinition}
+      />
     );
     expect(screen.getByText('Start typing — output updates automatically')).toBeInTheDocument();
   });
@@ -277,7 +280,12 @@ describe('OutputPanel', () => {
       },
     });
     const aiResult = { label: 'Fixed', result: 'Editable text' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
+    const activeTool = {
+      id: 'paraphrase',
+      label: 'Paraphrase',
+      group: 'ai_writing',
+      type: 'ai',
+    } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -292,7 +300,12 @@ describe('OutputPanel', () => {
 
   it('renders plain span for non-editable tools', () => {
     const aiResult = { label: 'Encoded', result: 'SGVsbG8=' };
-    const activeTool = { id: 'base64', label: 'Base64', group: 'encoding', type: 'api' } as unknown as ToolDefinition;
+    const activeTool = {
+      id: 'base64',
+      label: 'Base64',
+      group: 'encoding',
+      type: 'api',
+    } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -427,7 +440,12 @@ describe('OutputPanel', () => {
       },
     });
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
+    const activeTool = {
+      id: 'paraphrase',
+      label: 'Paraphrase',
+      group: 'ai_writing',
+      type: 'ai',
+    } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -457,7 +475,12 @@ describe('OutputPanel', () => {
     // jsdom doesn't implement execCommand, add stub
     document.execCommand = vi.fn(() => true);
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
+    const activeTool = {
+      id: 'paraphrase',
+      label: 'Paraphrase',
+      group: 'ai_writing',
+      type: 'ai',
+    } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -484,7 +507,12 @@ describe('OutputPanel', () => {
     });
     document.execCommand = vi.fn(() => true);
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
+    const activeTool = {
+      id: 'paraphrase',
+      label: 'Paraphrase',
+      group: 'ai_writing',
+      type: 'ai',
+    } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -512,7 +540,12 @@ describe('OutputPanel', () => {
     });
     const onOutputEdit = vi.fn();
     const aiResult = { label: 'Paraphrased', result: 'Hello World' };
-    const activeTool = { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition;
+    const activeTool = {
+      id: 'paraphrase',
+      label: 'Paraphrase',
+      group: 'ai_writing',
+      type: 'ai',
+    } as unknown as ToolDefinition;
     render(
       <OutputPanel
         {...defaultProps}
@@ -539,7 +572,12 @@ describe('OutputPanel', () => {
     ...defaultProps,
     previewMode: 'result',
     aiResult: { label: 'Paraphrased', result: 'Hello World' },
-    activeTool: { id: 'paraphrase', label: 'Paraphrase', group: 'ai_writing', type: 'ai' } as unknown as ToolDefinition,
+    activeTool: {
+      id: 'paraphrase',
+      label: 'Paraphrase',
+      group: 'ai_writing',
+      type: 'ai',
+    } as unknown as ToolDefinition,
     onOutputEdit,
   });
 

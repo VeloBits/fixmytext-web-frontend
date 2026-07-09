@@ -4,7 +4,8 @@
  * and have access to the API via the internal network or the public gateway.
  */
 
-const API_BASE = process.env.CONTENT_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://api-dev.velobits.dev';
+const API_BASE =
+  process.env.CONTENT_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://api-dev.velobits.dev';
 
 // Share ids are UUIDs. Validate before building the upstream URL so the raw
 // `[id]` route param can't be used for path/SSRF injection (FE-SSRF-01).

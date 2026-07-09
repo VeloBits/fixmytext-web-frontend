@@ -71,11 +71,7 @@ export function JsonPathDrawer({ text, onResult, showAlert }: JsonPathDrawerProp
           />
         </div>
         <div className="tu-fr-actions">
-          <button
-            className="tu-fr-action tu-fr-action--text"
-            onClick={handleQuery}
-            title="Query"
-          >
+          <button className="tu-fr-action tu-fr-action--text" onClick={handleQuery} title="Query">
             Query
           </button>
         </div>

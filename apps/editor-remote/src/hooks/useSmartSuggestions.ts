@@ -34,11 +34,11 @@ export default function useSmartSuggestions(text: string): UseSmartSuggestionsRe
         }
       }
 
-      const results = ([...matched]
+      const results = [...matched]
         .filter((id) => !dismissed.has(id))
         .slice(0, 4)
         .map((id) => TOOLS.find((t) => t.id === id))
-        .filter(Boolean) as ToolDefinition[]);
+        .filter(Boolean) as ToolDefinition[];
 
       setSuggestions(results);
     }, 500);

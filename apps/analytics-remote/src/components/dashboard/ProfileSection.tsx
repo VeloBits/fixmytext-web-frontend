@@ -4,7 +4,6 @@ import type { GamificationContextValue, User } from '@velobits/app-core/types/co
 import type { AlertLevel } from '@velobits/app-core/types/alert';
 import type { Persona } from '@velobits/app-core/types/tools';
 
-
 interface ProfileSectionProps {
   user: User | null;
   isAuthenticated: boolean;
@@ -18,7 +17,14 @@ interface ProfileSectionProps {
  * Dashboard profile section.
  * Allows editing display name, selecting persona, and toggling theme.
  */
-export default function ProfileSection({ user, isAuthenticated, g, mode, setMode, showAlert }: ProfileSectionProps) {
+export default function ProfileSection({
+  user,
+  isAuthenticated,
+  g,
+  mode,
+  setMode,
+  showAlert,
+}: ProfileSectionProps) {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(user?.display_name || '');
   const nameRef = useRef<HTMLInputElement>(null);
@@ -61,8 +67,8 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
     cooldownSecs > 0
       ? `Resend in ${cooldownSecs}s`
       : resending
-      ? 'Sending...'
-      : 'Resend verification email';
+        ? 'Sending...'
+        : 'Resend verification email';
 
   return (
     <div className="tu-dash-content">
@@ -229,7 +235,9 @@ export default function ProfileSection({ user, isAuthenticated, g, mode, setMode
             >
               <span className="tu-dash-persona-icon">{p.icon}</span>
               <span className="tu-dash-persona-label">{p.label}</span>
-              {(g?.persona as unknown as string) === key && <span className="tu-dash-persona-check">✓</span>}
+              {(g?.persona as unknown as string) === key && (
+                <span className="tu-dash-persona-check">✓</span>
+              )}
             </button>
           ))}
         </div>

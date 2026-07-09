@@ -53,7 +53,7 @@ describe('passesApi endpoint execution', () => {
   }
 
   function lastRequest(): Request {
-    return mockFetch.mock.calls[mockFetch.mock.calls.length - 1][0] as Request;
+    return mockFetch.mock.calls[mockFetch.mock.calls.length - 1]![0] as Request;
   }
 
   beforeEach(() => {

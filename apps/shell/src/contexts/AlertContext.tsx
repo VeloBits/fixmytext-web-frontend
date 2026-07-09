@@ -22,11 +22,7 @@ export interface AlertContextValue {
    * Show a toast notification.
    * Returns the numeric ID of the new alert, or -1 if a duplicate was suppressed.
    */
-  showAlert: (
-    message: unknown,
-    type?: AlertLevel,
-    options?: { duration?: number }
-  ) => number;
+  showAlert: (message: unknown, type?: AlertLevel, options?: { duration?: number }) => number;
   /** Dismiss an alert by its numeric ID. */
   dismissAlert: (id: number) => void;
 }

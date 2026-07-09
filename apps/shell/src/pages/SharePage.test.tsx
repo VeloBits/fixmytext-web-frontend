@@ -3,7 +3,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import SharePage from './SharePage';
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({
+    children,
+    to,
+    ...props
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => vi.fn(),
   useParams: () => ({ id: 'share123' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
@@ -32,7 +40,9 @@ vi.mock('@velobits/app-core/constants/tools', () => ({
 }));
 
 vi.mock('@velobits/app-core/components/editor/ToolIcon', () => ({
-  default: ({ icon, toolId }: { icon?: string; toolId?: string }) => <span data-testid="tool-icon">{toolId || icon}</span>,
+  default: ({ icon, toolId }: { icon?: string; toolId?: string }) => (
+    <span data-testid="tool-icon">{toolId || icon}</span>
+  ),
 }));
 
 describe('SharePage', () => {

@@ -334,7 +334,10 @@
   flex-shrink: 0;
   max-width: 90px;
   height: 20px;
-  transition: border-color var(--t), background var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t),
+    box-shadow var(--t);
 }
 
 .tu-titem-dropdown-trigger:hover {
@@ -373,7 +376,9 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
   padding: 4px 0;
   max-height: 240px;
   overflow-y: auto;
@@ -449,7 +454,10 @@
 .tu-titem-fav--active {
   opacity: 1 !important;
   color: var(--rose);
-  transition: opacity var(--t), transform 0.2s ease, color 0.2s ease;
+  transition:
+    opacity var(--t),
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .tu-titem-fav--active:hover {
@@ -500,7 +508,9 @@
   background: transparent;
   cursor: pointer;
   position: relative;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
 }
 
 .tu-tgrid-card:hover {

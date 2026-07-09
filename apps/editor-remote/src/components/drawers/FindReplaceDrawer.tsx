@@ -1,6 +1,11 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react';
 
-function getMatchCount(text: string, findText: string, caseSensitive: boolean, useRegex: boolean): number {
+function getMatchCount(
+  text: string,
+  findText: string,
+  caseSensitive: boolean,
+  useRegex: boolean
+): number {
   if (!text || !findText) return 0;
   try {
     const flags = caseSensitive ? 'g' : 'gi';

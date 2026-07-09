@@ -14,12 +14,12 @@ import { Button, Card, Input, ToolCard } from '@velobits/design-system';
 
 ## Components
 
-| Component | Purpose |
-|-----------|---------|
-| `Button` | Primary / secondary / ghost / danger variants |
-| `Card` | Surface container with optional hover shadow |
-| `Input` | Labeled text input with error state |
-| `ToolCard` | Tool selector button (icon + label) |
+| Component  | Purpose                                       |
+| ---------- | --------------------------------------------- |
+| `Button`   | Primary / secondary / ghost / danger variants |
+| `Card`     | Surface container with optional hover shadow  |
+| `Input`    | Labeled text input with error state           |
+| `ToolCard` | Tool selector button (icon + label)           |
 
 ## Design tokens
 

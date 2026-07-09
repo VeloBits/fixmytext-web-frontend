@@ -4,8 +4,8 @@ import useGenerators from './useGenerators';
 describe('useGenerators', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setText: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      showAlert: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    showAlert: any;
 
   beforeEach(() => {
     setText = vi.fn();

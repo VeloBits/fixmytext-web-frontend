@@ -1,11 +1,11 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import { federation } from '@module-federation/vite'
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { federation } from '@module-federation/vite';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // In a production build the remote is served behind the router at /remotes/analytics/
 // (nginx + the CF Worker strip that prefix), so the prefix must be baked into every
@@ -55,4 +55,4 @@ export default defineConfig(({ mode }) => ({
     // a parsed .map leaks the original TypeScript source).
     sourcemap: 'hidden',
   },
-}))
+}));

@@ -201,7 +201,10 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
   }, [creditPacks]);
 
   const activeGroupPasses = useMemo(
-    () => (GROUP_IDS[activeGroup as keyof typeof GROUP_IDS] || []).map((id) => passMap[id]).filter((p): p is PassCatalogItem => Boolean(p)),
+    () =>
+      (GROUP_IDS[activeGroup as keyof typeof GROUP_IDS] || [])
+        .map((id) => passMap[id])
+        .filter((p): p is PassCatalogItem => Boolean(p)),
     [activeGroup, passMap]
   );
 
@@ -549,7 +552,9 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
               <div className="tu-pass-detail-left">
                 <div className="tu-pass-detail-hero">
                   <span className="tu-pass-detail-icon">
-                    {PASS_ICONS_LG[detailPass.id as keyof typeof PASS_ICONS_LG] || <DropletIcon size={52} />}
+                    {PASS_ICONS_LG[detailPass.id as keyof typeof PASS_ICONS_LG] || (
+                      <DropletIcon size={52} />
+                    )}
                   </span>
                   <h2 className="tu-pass-detail-name">{detailPass.name}</h2>
                   <span className="tu-pass-detail-price">{formatPrice(detailPass.price)}</span>
@@ -710,7 +715,9 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
               <div className="tu-pass-detail-left">
                 <div className="tu-pass-detail-hero">
                   <span className="tu-pass-detail-icon">
-                    {CREDIT_ICONS[detailCredit.id as keyof typeof CREDIT_ICONS] || <DropletIcon size={52} />}
+                    {CREDIT_ICONS[detailCredit.id as keyof typeof CREDIT_ICONS] || (
+                      <DropletIcon size={52} />
+                    )}
                   </span>
                   <h2 className="tu-pass-detail-name">{detailCredit.name}</h2>
                   <span className="tu-pass-detail-price">{formatPrice(detailCredit.price)}</span>

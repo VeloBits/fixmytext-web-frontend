@@ -74,9 +74,9 @@ export function ripemd160(message: string): string {
 
     for (let j = 0; j < 80; j++) {
       const rnd = j >> 4;
-       
+
       let tl = (al + f(j, bl, cl, dl) + w[zl[j]!]! + Kl[rnd]!) >>> 0;
-       
+
       tl = (rotl(tl, sl[j]!) + el) >>> 0;
       al = el;
       el = dl;
@@ -84,9 +84,8 @@ export function ripemd160(message: string): string {
       cl = bl;
       bl = tl;
 
-       
       let tr = (ar + f(79 - j, br, cr, dr) + w[zr[j]!]! + Kr[rnd]!) >>> 0;
-       
+
       tr = (rotl(tr, sr[j]!) + er) >>> 0;
       ar = er;
       er = dr;

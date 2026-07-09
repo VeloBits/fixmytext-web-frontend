@@ -8,9 +8,7 @@ import '@/assets/css/auth.css';
 
 export function ForgotPasswordPage() {
   useEffect(() => {
-    const url = new URL(
-      `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/login-actions/reset-credentials`,
-    );
+    const url = new URL(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/login-actions/reset-credentials`);
     url.searchParams.set('client_id', KEYCLOAK_CLIENT_ID);
     window.location.replace(url.toString());
   }, []);

@@ -13,9 +13,9 @@ vi.mock('react-redux', () => ({
 const mockUpdateUiSettings = vi.fn(() => ({ unwrap: () => Promise.resolve({}) }));
 // Typed to accept any args and return a loose shape so mockReturnValue can supply
 // either `{ data: undefined }` or `{ data: { keybindings: ... } }`.
-const mockGetUiSettingsQuery = vi.fn(
-  (..._args: unknown[]): { data: unknown } => ({ data: undefined })
-);
+const mockGetUiSettingsQuery = vi.fn((..._args: unknown[]): { data: unknown } => ({
+  data: undefined,
+}));
 
 vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetUiSettingsQuery: (...args: unknown[]) => mockGetUiSettingsQuery(...args),

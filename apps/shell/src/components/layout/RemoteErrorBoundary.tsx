@@ -67,7 +67,8 @@ export default class RemoteErrorBoundary extends Component<Props, State> {
               {this.props.name} couldn&apos;t be loaded
             </p>
             <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-3)' }}>
-              This section is temporarily unavailable. It may be deploying or there&apos;s a network issue.
+              This section is temporarily unavailable. It may be deploying or there&apos;s a network
+              issue.
             </p>
           </div>
 

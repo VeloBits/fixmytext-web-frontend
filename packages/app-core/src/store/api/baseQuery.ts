@@ -62,7 +62,10 @@ function createReauthQuery(rawBaseQuery: RtkBaseQuery): RtkBaseQuery {
   return async (args, api, extraOptions) => {
     let result = await rawBaseQuery(args, api, extraOptions);
 
-    if (result.error && (result.error as FetchBaseQueryError & { status?: number }).status === 401) {
+    if (
+      result.error &&
+      (result.error as FetchBaseQueryError & { status?: number }).status === 401
+    ) {
       try {
         await userManager.signinSilent();
       } catch {

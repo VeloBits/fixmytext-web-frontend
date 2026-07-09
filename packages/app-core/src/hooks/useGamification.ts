@@ -12,13 +12,7 @@ import {
 } from '../store/api/userDataApi';
 import { TOOLS, ACHIEVEMENTS, QUEST_TEMPLATES, LEVELS } from '../constants/tools';
 import { useOidcAuth } from '../auth/useOidcAuth';
-import type {
-  Achievement,
-  LevelDefinition,
-  QuestOp,
-  QuestTemplate,
-  Persona,
-} from '../types/tools';
+import type { Achievement, LevelDefinition, QuestOp, QuestTemplate, Persona } from '../types/tools';
 import type {
   GamificationContextValue,
   GamificationStreak,

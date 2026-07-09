@@ -274,7 +274,10 @@ export default function About() {
           <div className="about-features">
             {FEATURES.map((f, i) => (
               <motion.div key={f.title} className="about-feature" {...scaleIn(i * 0.06)}>
-                <div className="about-feature-icon-wrap" style={{ '--feature-color': f.color } as CSSVars}>
+                <div
+                  className="about-feature-icon-wrap"
+                  style={{ '--feature-color': f.color } as CSSVars}
+                >
                   <span className="about-feature-icon">{f.icon}</span>
                 </div>
                 <h3 className="about-feature-title">{f.title}</h3>

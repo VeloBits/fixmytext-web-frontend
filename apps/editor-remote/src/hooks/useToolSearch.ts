@@ -55,11 +55,11 @@ export default function useToolSearch(): UseToolSearchReturn {
       if (score > 0) scores.set(tool.id, score);
     }
 
-    return ([...scores.entries()]
+    return [...scores.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8)
       .map(([id]) => TOOLS.find((t) => t.id === id))
-      .filter(Boolean) as ToolDefinition[]);
+      .filter(Boolean) as ToolDefinition[];
   }, [query]);
 
   const open = useCallback((): void => setIsOpen(true), []);

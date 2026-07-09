@@ -45,8 +45,7 @@ export function initSentry(): void {
       // default integration keeps session tracking production-only.
       return defaultIntegrations.filter((i) => i.name !== 'BrowserSession');
     },
-    tracesSampleRate:
-      import.meta.env.VITE_SENTRY_ENVIRONMENT === 'production' ? 0.1 : 0,
+    tracesSampleRate: import.meta.env.VITE_SENTRY_ENVIRONMENT === 'production' ? 0.1 : 0,
     tracePropagationTargets: [
       /^\/api\//,
       // eslint-disable-next-line security/detect-non-literal-regexp -- build-time env constant, escaped above
@@ -63,9 +62,7 @@ export function initSentry(): void {
     ],
     beforeSend(event) {
       if (event.request?.data && typeof event.request.data === 'object') {
-        event.request.data = scrubObject(
-          event.request.data as Record<string, unknown>
-        );
+        event.request.data = scrubObject(event.request.data as Record<string, unknown>);
       }
       if (event.extra) {
         event.extra = scrubObject(event.extra as Record<string, unknown>);
@@ -73,10 +70,7 @@ export function initSentry(): void {
       return event;
     },
     beforeBreadcrumb(breadcrumb) {
-      if (
-        breadcrumb.category === 'fetch' ||
-        breadcrumb.category === 'xhr'
-      ) {
+      if (breadcrumb.category === 'fetch' || breadcrumb.category === 'xhr') {
         if (breadcrumb.data) {
           delete breadcrumb.data['body'];
           delete breadcrumb.data['response_body_size'];

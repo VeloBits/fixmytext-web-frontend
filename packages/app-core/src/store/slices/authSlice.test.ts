@@ -10,7 +10,15 @@ describe('authSlice', () => {
 
   describe('logout', () => {
     it('clears user', () => {
-      const prev: AuthState = { user: { id: 'u1', email: 'a@b.com', display_name: 'Test', subscription_tier: 'free', is_email_verified: false } };
+      const prev: AuthState = {
+        user: {
+          id: 'u1',
+          email: 'a@b.com',
+          display_name: 'Test',
+          subscription_tier: 'free',
+          is_email_verified: false,
+        },
+      };
       const state = authReducer(prev, logout());
       expect(state.user).toBeNull();
     });
@@ -24,7 +32,13 @@ describe('authSlice extraReducers integration', () => {
   it('handles getMe.matchFulfilled', () => {
     const action = {
       type: `authApi/executeQuery/fulfilled`,
-      payload: { id: 'u1', email: 'test@test.com', display_name: 'Test', subscription_tier: 'free', is_email_verified: true },
+      payload: {
+        id: 'u1',
+        email: 'test@test.com',
+        display_name: 'Test',
+        subscription_tier: 'free',
+        is_email_verified: true,
+      },
       meta: {
         arg: { endpointName: 'getMe', type: 'query' },
         requestId: '4',

@@ -8,7 +8,12 @@ import type { NavigateFunction } from 'react-router-dom';
 
 type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
 
-const PRO_PRICES: Record<SupportedCurrency, string> = { inr: '₹399', usd: '$5', gbp: '£4', eur: '€4.50' };
+const PRO_PRICES: Record<SupportedCurrency, string> = {
+  inr: '₹399',
+  usd: '$5',
+  gbp: '£4',
+  eur: '€4.50',
+};
 const POPULAR_PASS_IDS = ['day_single', 'day_triple', 'day_all', 'sprint_all'];
 
 interface SubscriptionSectionProps {

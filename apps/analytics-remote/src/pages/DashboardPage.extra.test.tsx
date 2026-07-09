@@ -41,8 +41,15 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/dashboard', search: '' }),
   useSearchParams: () => [searchParamsValue, mockSetSearchParams],
-  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) =>
-    React.createElement('a', { href: to, ...p }, children),
+  Link: ({
+    children,
+    to,
+    ...p
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...p }, children),
 }));
 
 // ── react-redux mock ──
@@ -165,7 +172,10 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     const showAlert = vi.fn();
     renderDash({ showAlert });
     expect(screen.getByText('Manage your plan and billing')).toBeInTheDocument();
-    expect(showAlert).toHaveBeenCalledWith('Welcome to Pro! Your subscription is active.', 'success');
+    expect(showAlert).toHaveBeenCalledWith(
+      'Welcome to Pro! Your subscription is active.',
+      'success'
+    );
     expect(defaultSubscription.refetchStatus).toHaveBeenCalled();
     expect(mockSetSearchParams).toHaveBeenCalledWith({}, { replace: true });
   });

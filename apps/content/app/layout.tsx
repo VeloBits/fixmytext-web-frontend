@@ -8,9 +8,7 @@ export const metadata: Metadata = {
   },
   description:
     '254+ free text transformation tools: case converters, encoders, ciphers, AI writing tools, and more. No signup required.',
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fixmytext.velobits.dev'
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fixmytext.velobits.dev'),
   openGraph: {
     siteName: 'FixMyText',
     type: 'website',

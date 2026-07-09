@@ -92,9 +92,7 @@ export function RandomTextDrawer({
             min="1"
             max="10000"
             value={textGenCount}
-            onChange={(e) =>
-              setTextGenCount(Math.min(10000, Math.max(1, Number(e.target.value))))
-            }
+            onChange={(e) => setTextGenCount(Math.min(10000, Math.max(1, Number(e.target.value))))}
           />
         </div>
         <div className="tu-fr-actions">

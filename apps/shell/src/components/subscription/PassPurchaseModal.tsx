@@ -90,7 +90,12 @@ const SparkleIcon = () => (
   </svg>
 );
 
-export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscription }: PassPurchaseModalProps) {
+export default function PassPurchaseModal({
+  show,
+  onDismiss,
+  blockedTool,
+  subscription,
+}: PassPurchaseModalProps) {
   const navigate = useNavigate();
   const { data: catalog } = useGetPassCatalogQuery(undefined, { skip: !show });
   const [buyingId, setBuyingId] = useState<string | null>(null);
@@ -108,7 +113,11 @@ export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscr
     }
   };
 
-  const usage: ToolUsage = subscription?.getToolUsage?.(blockedTool.id) || { uses: 3, max: 3, hasPass: false };
+  const usage: ToolUsage = subscription?.getToolUsage?.(blockedTool.id) || {
+    uses: 3,
+    max: 3,
+    hasPass: false,
+  };
   const passes = catalog?.passes || [];
   const creditPacks = catalog?.credit_packs || [];
   const symbol = catalog?.passes?.[0]?.symbol || '$';

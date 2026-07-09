@@ -1,6 +1,9 @@
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { TOOLS } from '@velobits/app-core/constants/tools';
-import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@velobits/app-core/store/api/userDataApi';
+import {
+  useGetUiSettingsQuery,
+  useUpdateUiSettingsMutation,
+} from '@velobits/app-core/store/api/userDataApi';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
@@ -446,7 +449,13 @@ export function formatShortcut(sc: ShortcutBinding & { label?: string; id?: stri
 
 // Parse a keydown event into a binding object
 export function eventToBinding(
-  e: { key: string; ctrlKey?: boolean; shiftKey?: boolean; altKey?: boolean; metaKey?: boolean } & Record<string, unknown>
+  e: {
+    key: string;
+    ctrlKey?: boolean;
+    shiftKey?: boolean;
+    altKey?: boolean;
+    metaKey?: boolean;
+  } & Record<string, unknown>
 ): ShortcutBinding | null {
   const ctrl = (e[MOD] as boolean | undefined) || false;
   const shift = e.shiftKey || false;

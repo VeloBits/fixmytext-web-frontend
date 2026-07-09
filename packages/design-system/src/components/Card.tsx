@@ -10,7 +10,8 @@ export function Card({ children, hoverable = false, className = '', ...props }: 
     <div
       className={[
         'bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] p-4',
-        hoverable && 'transition-shadow duration-[var(--transition-base)] hover:shadow-[var(--card-hover-shadow)] cursor-pointer',
+        hoverable &&
+          'transition-shadow duration-[var(--transition-base)] hover:shadow-[var(--card-hover-shadow)] cursor-pointer',
         className,
       ]
         .filter(Boolean)

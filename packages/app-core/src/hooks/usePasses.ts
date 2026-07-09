@@ -18,7 +18,6 @@ type ActiveCredit = components['schemas']['ActiveCredit'];
 type SpinHistoryItem = components['schemas']['SpinHistoryItem'];
 type SpinResult = components['schemas']['SpinResult'];
 
- 
 interface UsePassesOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- variadic showAlert accepts any alert params
   showAlert?: (...args: any[]) => unknown;
@@ -53,9 +52,12 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
   const [verifyPayment] = useVerifyPaymentMutation();
   const [spinWheel, { isLoading: spinLoading }] = useSpinWheelMutation();
 
-  const { data: spinHistoryData, refetch: refetchSpinHistoryQuery } = useGetSpinHistoryQuery(undefined, {
-    skip: !isAuthenticated,
-  });
+  const { data: spinHistoryData, refetch: refetchSpinHistoryQuery } = useGetSpinHistoryQuery(
+    undefined,
+    {
+      skip: !isAuthenticated,
+    }
+  );
 
   // The queries above are skipped while signed out, and RTK Query's refetch()
   // throws on a query that never started — so refetches must no-op when

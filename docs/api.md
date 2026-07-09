@@ -22,24 +22,24 @@ Auth is handled by Keycloak OIDC via `oidc-client-ts` (see `packages/app-core/sr
 
 ### Additional Headers
 
-| Header | Set By | Purpose |
-|--------|--------|---------|
-| `Authorization: Bearer <token>` | `baseQuery.ts` | Authenticated user identity (from in-memory OIDC user) |
-| `X-Visitor-Id` | `textApi.ts` | Anonymous visitor fingerprint for server-side trial tracking (sent on every text transformation request, including for logged-in users) |
+| Header                          | Set By         | Purpose                                                                                                                                 |
+| ------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `Authorization: Bearer <token>` | `baseQuery.ts` | Authenticated user identity (from in-memory OIDC user)                                                                                  |
+| `X-Visitor-Id`                  | `textApi.ts`   | Anonymous visitor fingerprint for server-side trial tracking (sent on every text transformation request, including for logged-in users) |
 
 ## API Slices
 
 All slices live in `packages/app-core/src/store/api/`.
 
-| File | Base Path | Purpose |
-|------|-----------|---------|
-| `textApi.ts` | `/api/v1/text/` | `transformText` mutation used by every text tool |
-| `authApi.ts` | `/api/v1/auth/` | Login, register, refresh, logout, me |
-| `userDataApi.ts` | `/api/v1/user-data/` | Profile, settings, gamification stats |
-| `historyApi.ts` | `/api/v1/history/` | Operation history (get, delete) |
-| `subscriptionApi.ts` | `/api/v1/subscription/` | Razorpay orders, webhook, status |
-| `passesApi.ts` | `/api/v1/passes/` | Prepaid pass purchase and balance |
-| `shareApi.ts` | `/api/v1/share/` | Create and retrieve shared results |
+| File                 | Base Path               | Purpose                                          |
+| -------------------- | ----------------------- | ------------------------------------------------ |
+| `textApi.ts`         | `/api/v1/text/`         | `transformText` mutation used by every text tool |
+| `authApi.ts`         | `/api/v1/auth/`         | Login, register, refresh, logout, me             |
+| `userDataApi.ts`     | `/api/v1/user-data/`    | Profile, settings, gamification stats            |
+| `historyApi.ts`      | `/api/v1/history/`      | Operation history (get, delete)                  |
+| `subscriptionApi.ts` | `/api/v1/subscription/` | Razorpay orders, webhook, status                 |
+| `passesApi.ts`       | `/api/v1/passes/`       | Prepaid pass purchase and balance                |
+| `shareApi.ts`        | `/api/v1/share/`        | Create and retrieve shared results               |
 
 ## Using Text Transformations
 
@@ -50,7 +50,7 @@ const [transformText, { isLoading, error }] = useTransformTextMutation();
 
 const result = await transformText({
   endpoint: '/api/v1/text/uppercase',
-  text: 'hello world'
+  text: 'hello world',
 }).unwrap();
 
 // result: { original: "hello world", result: "HELLO WORLD", operation: "uppercase" }
@@ -59,6 +59,7 @@ const result = await transformText({
 ## Standard Response Shapes
 
 **Text transformation:**
+
 ```json
 {
   "original": "input text",
@@ -68,6 +69,7 @@ const result = await transformText({
 ```
 
 **Error:**
+
 ```json
 {
   "detail": "Error message"
@@ -76,14 +78,14 @@ const result = await transformText({
 
 ## Error Handling
 
-| Status | Meaning | Frontend Behavior |
-|--------|---------|-------------------|
-| 200 | Success | Display result, show successMsg toast |
-| 401 | Token expired | Silent renew via Keycloak SSO cookie; idempotent requests auto-retried, mutations re-issued by caller |
-| 403 | Trial limit reached | Show upgrade prompt |
-| 422 | Validation error | Show error alert |
-| 429 | Rate limited | Show rate limit message |
-| 500 | Server error | Show generic error alert |
+| Status | Meaning             | Frontend Behavior                                                                                     |
+| ------ | ------------------- | ----------------------------------------------------------------------------------------------------- |
+| 200    | Success             | Display result, show successMsg toast                                                                 |
+| 401    | Token expired       | Silent renew via Keycloak SSO cookie; idempotent requests auto-retried, mutations re-issued by caller |
+| 403    | Trial limit reached | Show upgrade prompt                                                                                   |
+| 422    | Validation error    | Show error alert                                                                                      |
+| 429    | Rate limited        | Show rate limit message                                                                               |
+| 500    | Server error        | Show generic error alert                                                                              |
 
 The error middleware in `packages/app-core/src/store/middleware/` catches API errors and dispatches alerts via `useAlert`.
 

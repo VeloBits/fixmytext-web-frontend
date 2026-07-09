@@ -2,7 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import type { User as OidcUser } from 'oidc-client-ts';
 import * as Sentry from '@sentry/react';
 import { clearSession } from '@velobits/api-client';
-import { broadcastAuthMessage, hasAuthHint, loadUser, resetLoadUser, userManager } from './userManager';
+import {
+  broadcastAuthMessage,
+  hasAuthHint,
+  loadUser,
+  resetLoadUser,
+  userManager,
+} from './userManager';
 
 export interface OidcAuthState {
   isAuthenticated: boolean;

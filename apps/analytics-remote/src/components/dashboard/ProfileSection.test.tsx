@@ -103,11 +103,13 @@ describe('ProfileSection — email verification', () => {
     const showAlertLocal = vi.fn();
     render(
       <ProfileSection
-        user={{
-          email: 'x@example.com',
-          display_name: 'X',
-          is_email_verified: false,
-        } as User}
+        user={
+          {
+            email: 'x@example.com',
+            display_name: 'X',
+            is_email_verified: false,
+          } as User
+        }
         isAuthenticated
         g={{ persona: 'writer', setPersona: vi.fn() } as unknown as GamificationContextValue}
         mode="dark"

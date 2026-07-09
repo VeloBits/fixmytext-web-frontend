@@ -51,13 +51,17 @@ Copy this block when preparing a new release:
 ## [X.Y.Z] - YYYY-MM-DD
 
 ### Added
+
 -
 
 ### Changed
+
 -
 
 ### Fixed
+
 -
 
 ### Removed
+
 -

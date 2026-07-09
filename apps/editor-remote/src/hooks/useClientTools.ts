@@ -61,7 +61,7 @@ export default function useClientTools({
         const m = await import('sql-formatter');
         const result = m.format(t);
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
-      setAiResult({ label: 'Result', result: result });
+        setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('SQL formatted', 'success');
       } catch {
@@ -107,7 +107,7 @@ export default function useClientTools({
       try {
         const result = JSON.stringify(JSON.parse(t));
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
-      setAiResult({ label: 'Result', result: result });
+        setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('JSON minified', 'success');
       } catch {
@@ -139,7 +139,7 @@ export default function useClientTools({
         };
         const result = inferType(obj);
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
-      setAiResult({ label: 'Result', result: result });
+        setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('TypeScript interface generated', 'success');
       } catch {
@@ -261,9 +261,7 @@ export default function useClientTools({
       setAiResult({ label: 'Color Converter', result });
       setPreviewMode('result');
       showAlert(
-        inputs.length === 1
-          ? 'Color converted'
-          : `Converted ${valid}/${inputs.length} colors`,
+        inputs.length === 1 ? 'Color converted' : `Converted ${valid}/${inputs.length} colors`,
         'success'
       );
     };
@@ -290,7 +288,7 @@ export default function useClientTools({
       const explainOne = (expr: string): string | null => {
         const parts = expr.split(/\s+/);
         if (parts.length < 5 || parts.length > 6) return null;
-         
+
         const [min, hour, dom, month, dow] = parts as [string, string, string, string, string];
         const descs: string[] = [];
         if (min === '*') descs.push('every minute');
@@ -381,7 +379,7 @@ export default function useClientTools({
           params ? `\nQuery Parameters:\n${params}` : ''
         }`;
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
-      setAiResult({ label: 'Result', result: result });
+        setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('URL parsed', 'success');
       } catch {
@@ -749,7 +747,8 @@ export default function useClientTools({
         if (map[w as keyof typeof map] !== undefined) current += map[w as keyof typeof map]!;
         else if (w === 'hundred') current *= 100;
         else if (multipliers[w as keyof typeof multipliers]) {
-          result += current * (multipliers[w as keyof typeof multipliers]! / (w === 'hundred' ? 1 : 1));
+          result +=
+            current * (multipliers[w as keyof typeof multipliers]! / (w === 'hundred' ? 1 : 1));
           current *= multipliers[w as keyof typeof multipliers]!;
           if (w !== 'hundred') {
             result += current;
@@ -795,7 +794,7 @@ export default function useClientTools({
           }
         }
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
-      setAiResult({ label: 'Result', result: result });
+        setAiResult({ label: 'Result', result: result });
       } else {
         const roman = { M: 1000, D: 500, C: 100, L: 50, X: 10, V: 5, I: 1 };
         const upper = t.toUpperCase();
@@ -807,10 +806,10 @@ export default function useClientTools({
           else result += curr;
         }
         setToolResults((prev) => ({
-        ...prev,
-        [activeWorkspaceId]: result.toString(),
-      }));
-      setAiResult({ label: 'Result', result: result.toString() });
+          ...prev,
+          [activeWorkspaceId]: result.toString(),
+        }));
+        setAiResult({ label: 'Result', result: result.toString() });
       }
       setPreviewMode('result');
       showAlert('Roman numeral converted', 'success');
@@ -824,7 +823,7 @@ export default function useClientTools({
         const dataUrl = await QRCode.toDataURL(t, { width: 300, margin: 2 });
         const result = `[QR Code Generated]\n\nData URL (paste in browser):\n${dataUrl}`;
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: result }));
-      setAiResult({ label: 'Result', result: result });
+        setAiResult({ label: 'Result', result: result });
         setPreviewMode('result');
         showAlert('QR code generated', 'success');
       } catch {
@@ -848,7 +847,7 @@ export default function useClientTools({
           .replace(/\n\n/g, '</p>\n<p>');
         html = '<p>' + html + '</p>';
         setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: html }));
-      setAiResult({ label: 'Result', result: html });
+        setAiResult({ label: 'Result', result: html });
         setPreviewMode('result');
         showAlert('Markdown converted to HTML', 'success');
       } catch {
@@ -890,7 +889,10 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: emails.length ? emails.join('\n') : 'No email addresses found',
       }));
-      setAiResult({ label: 'Result', result: emails.length ? emails.join('\n') : 'No email addresses found' });
+      setAiResult({
+        label: 'Result',
+        result: emails.length ? emails.join('\n') : 'No email addresses found',
+      });
       setPreviewMode('result');
       showAlert(`Found ${emails.length} email(s)`, 'success');
     };
@@ -916,7 +918,10 @@ export default function useClientTools({
         ...prev,
         [activeWorkspaceId]: numbers.length ? numbers.join('\n') : 'No numbers found',
       }));
-      setAiResult({ label: 'Result', result: numbers.length ? numbers.join('\n') : 'No numbers found' });
+      setAiResult({
+        label: 'Result',
+        result: numbers.length ? numbers.join('\n') : 'No numbers found',
+      });
       setPreviewMode('result');
       showAlert(`Found ${numbers.length} number(s)`, 'success');
     };
@@ -951,7 +956,11 @@ export default function useClientTools({
         words.join('.'),
         (words[0] ?? '') + '_' + Math.floor(Math.random() * 999),
         words.join('') + Math.floor(Math.random() * 99),
-        (words[0]?.[0] ?? '') + '_' + (words[1] ?? words[0] ?? '') + '_' + Math.floor(Math.random() * 99),
+        (words[0]?.[0] ?? '') +
+          '_' +
+          (words[1] ?? words[0] ?? '') +
+          '_' +
+          Math.floor(Math.random() * 99),
         words.map((w) => w[0] ?? '').join('') + '_' + Math.floor(Math.random() * 9999),
         (words[0] ?? '') + '.codes',
         'the_' + (words[0] ?? ''),
@@ -1005,7 +1014,9 @@ export default function useClientTools({
           } catch {
             throw new Error(`Invalid base64 in JWT ${label}`);
           }
-          const jsonStr = new TextDecoder().decode(Uint8Array.from(binary, (c: string) => c.charCodeAt(0)));
+          const jsonStr = new TextDecoder().decode(
+            Uint8Array.from(binary, (c: string) => c.charCodeAt(0))
+          );
           try {
             return JSON.parse(jsonStr);
           } catch {

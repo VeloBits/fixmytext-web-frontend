@@ -22,7 +22,13 @@ interface CipherDrawerProps {
   transformText: (arg: TransformArg) => { unwrap: () => Promise<TransformResult> };
 }
 
-export default function CipherDrawer({ activeTool, text, onResult, showAlert, transformText }: CipherDrawerProps) {
+export default function CipherDrawer({
+  activeTool,
+  text,
+  onResult,
+  showAlert,
+  transformText,
+}: CipherDrawerProps) {
   const [key, setKey] = useState('');
 
   const toolId = activeTool?.id || '';
@@ -114,7 +120,8 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
   };
 
   const getPlaceholder = () => {
-    if (toolId === 'substitution_cipher') return 'Substitution alphabet (26 chars A–Z), e.g. ZYXWVUTSRQPONMLKJIHGFEDCBA';
+    if (toolId === 'substitution_cipher')
+      return 'Substitution alphabet (26 chars A–Z), e.g. ZYXWVUTSRQPONMLKJIHGFEDCBA';
     if (toolId === 'aes_encrypt' || toolId === 'aes_decrypt') return 'Enter a secret key here';
     if (toolId === 'columnar_transposition') return 'Key, e.g. ZEBRAS';
     return 'Key, e.g. SECRET';
@@ -144,11 +151,7 @@ export default function CipherDrawer({ activeTool, text, onResult, showAlert, tr
           />
         </div>
         <div className="tu-fr-actions">
-          <button
-            className="tu-fr-action tu-fr-action--text"
-            onClick={handleApply}
-            title="Apply"
-          >
+          <button className="tu-fr-action tu-fr-action--text" onClick={handleApply} title="Apply">
             Apply
           </button>
         </div>

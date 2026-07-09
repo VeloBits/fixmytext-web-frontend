@@ -48,14 +48,14 @@ docker compose --profile dev up --build
 
 Use a prefix that describes the type of change, followed by a short kebab-case description:
 
-| Prefix      | Purpose                        | Example                        |
-|-------------|--------------------------------|--------------------------------|
-| `feat/`     | New feature                    | `feat/tool-search-highlight`   |
-| `fix/`      | Bug fix                        | `fix/dark-mode-toggle`         |
-| `docs/`     | Documentation only             | `docs/add-api-reference`       |
-| `refactor/` | Code restructuring             | `refactor/extract-export-hook` |
-| `test/`     | Adding or updating tests       | `test/tool-definition-schema`  |
-| `chore/`    | Tooling, CI, deps, config      | `chore/upgrade-vite-7`         |
+| Prefix      | Purpose                   | Example                        |
+| ----------- | ------------------------- | ------------------------------ |
+| `feat/`     | New feature               | `feat/tool-search-highlight`   |
+| `fix/`      | Bug fix                   | `fix/dark-mode-toggle`         |
+| `docs/`     | Documentation only        | `docs/add-api-reference`       |
+| `refactor/` | Code restructuring        | `refactor/extract-export-hook` |
+| `test/`     | Adding or updating tests  | `test/tool-definition-schema`  |
+| `chore/`    | Tooling, CI, deps, config | `chore/upgrade-vite-7`         |
 
 ## Commit Messages
 
@@ -134,32 +134,32 @@ Open `src/constants/tools.js` and add a new object to the tools array:
 
 ### Field Reference
 
-| Field        | Type       | Required | Description                                                      |
-|--------------|------------|----------|------------------------------------------------------------------|
-| `id`         | `string`   | Yes      | Unique snake_case identifier                                     |
-| `label`      | `string`   | Yes      | Display name shown in the UI                                     |
-| `description`| `string`   | Yes      | Short description shown under the tool name                      |
-| `icon`       | `string`   | Yes      | CSS icon class for the tool card                                 |
-| `color`      | `string`   | Yes      | Theme color for the tool card (e.g., `purple`, `blue`, `green`)  |
-| `group`      | `string`   | Yes      | Category group (see list below)                                  |
-| `tabs`       | `string[]` | Yes      | Which UI tabs display this tool (e.g., `transform`, `analyze`)   |
-| `type`       | `string`   | Yes      | Execution type (see list below)                                  |
-| `endpoint`   | `string`   | For api/ai| Backend API route this tool calls                                |
-| `successMsg` | `string`   | Yes      | Toast message shown on success                                   |
-| `keywords`   | `string[]` | Yes      | Search keywords for discoverability                              |
+| Field         | Type       | Required   | Description                                                     |
+| ------------- | ---------- | ---------- | --------------------------------------------------------------- |
+| `id`          | `string`   | Yes        | Unique snake_case identifier                                    |
+| `label`       | `string`   | Yes        | Display name shown in the UI                                    |
+| `description` | `string`   | Yes        | Short description shown under the tool name                     |
+| `icon`        | `string`   | Yes        | CSS icon class for the tool card                                |
+| `color`       | `string`   | Yes        | Theme color for the tool card (e.g., `purple`, `blue`, `green`) |
+| `group`       | `string`   | Yes        | Category group (see list below)                                 |
+| `tabs`        | `string[]` | Yes        | Which UI tabs display this tool (e.g., `transform`, `analyze`)  |
+| `type`        | `string`   | Yes        | Execution type (see list below)                                 |
+| `endpoint`    | `string`   | For api/ai | Backend API route this tool calls                               |
+| `successMsg`  | `string`   | Yes        | Toast message shown on success                                  |
+| `keywords`    | `string[]` | Yes        | Search keywords for discoverability                             |
 
 **Available groups:** `case`, `cleanup`, `encoding`, `lines`, `ciphers`, `developer`, `ai_writing`, `ai_content`, `language`, `generate`, `utility`, `hashing`, `compare`, `escaping`
 
 **Available types:**
 
-| Type     | Description                                        |
-|----------|----------------------------------------------------|
-| `api`    | Calls a backend REST endpoint                      |
-| `ai`     | Calls an AI-powered backend endpoint               |
-| `local`  | Runs entirely in the browser (no backend needed)   |
-| `select` | Presents a selection UI before processing          |
-| `action` | Triggers a specific UI action                      |
-| `drawer` | Opens a drawer with additional options             |
+| Type     | Description                                      |
+| -------- | ------------------------------------------------ |
+| `api`    | Calls a backend REST endpoint                    |
+| `ai`     | Calls an AI-powered backend endpoint             |
+| `local`  | Runs entirely in the browser (no backend needed) |
+| `select` | Presents a selection UI before processing        |
+| `action` | Triggers a specific UI action                    |
+| `drawer` | Opens a drawer with additional options           |
 
 ### Step 2: Verify the Endpoint
 
@@ -182,13 +182,13 @@ E2E specs live in `frontend/e2e/` and run against the full dev compose stack (fr
 
 ### What the specs cover
 
-| Spec | Flow |
-|---|---|
-| `01-signup-verify-login.spec.js` | UI signup → email-verify via `?token=` link → UI login |
-| `02-local-tool.spec.js` | MD5 (client-side) transformation |
-| `03-ai-tool.spec.js` | Summarize tool with mocked Groq (`AI_BACKEND=fake`) |
-| `04-purchase-pass.spec.js` | Pass purchase via signed Razorpay verify (`PAYMENTS_BACKEND=fake`) |
-| `05-share-result.spec.js` | Share button → open `/share/:id` |
+| Spec                             | Flow                                                               |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `01-signup-verify-login.spec.js` | UI signup → email-verify via `?token=` link → UI login             |
+| `02-local-tool.spec.js`          | MD5 (client-side) transformation                                   |
+| `03-ai-tool.spec.js`             | Summarize tool with mocked Groq (`AI_BACKEND=fake`)                |
+| `04-purchase-pass.spec.js`       | Pass purchase via signed Razorpay verify (`PAYMENTS_BACKEND=fake`) |
+| `05-share-result.spec.js`        | Share button → open `/share/:id`                                   |
 
 ### Required backend env
 
@@ -233,11 +233,11 @@ npx playwright test e2e/02-local-tool.spec.js   # single spec
 
 ### Useful env overrides
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `E2E_FRONTEND_URL` | `http://localhost:3000` | Where Playwright points the browser |
-| `E2E_API_URL` | `http://localhost:8000` | Where helpers send direct API calls |
-| `E2E_RAZORPAY_KEY_SECRET` | `fake_secret_for_e2e` | HMAC secret for the signed-verify spec |
+| Variable                  | Default                 | Purpose                                |
+| ------------------------- | ----------------------- | -------------------------------------- |
+| `E2E_FRONTEND_URL`        | `http://localhost:3000` | Where Playwright points the browser    |
+| `E2E_API_URL`             | `http://localhost:8000` | Where helpers send direct API calls    |
+| `E2E_RAZORPAY_KEY_SECRET` | `fake_secret_for_e2e`   | HMAC secret for the signed-verify spec |
 
 ### Artifacts
 

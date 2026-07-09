@@ -23,8 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (lookup.status !== 'ok') {
     return {
-      title:
-        lookup.status === 'expired' ? 'Shared Result Expired' : 'Shared Result Not Found',
+      title: lookup.status === 'expired' ? 'Shared Result Expired' : 'Shared Result Not Found',
       description: 'This shared result may have expired or been removed.',
       robots: { index: false, follow: false },
     };

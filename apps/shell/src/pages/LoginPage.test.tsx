@@ -32,7 +32,9 @@ describe('LoginPage', () => {
     render(<LoginPage />);
 
     // Error card replaces the skeleton.
-    expect(await screen.findByText(/couldn.t reach sign-in\. please try again/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/couldn.t reach sign-in\. please try again/i)
+    ).toBeInTheDocument();
     const retry = screen.getByRole('button', { name: /try again/i });
     expect(retry).toBeInTheDocument();
 

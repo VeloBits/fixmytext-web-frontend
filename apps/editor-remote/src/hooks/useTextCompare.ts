@@ -1,4 +1,11 @@
-import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 
 type DiffType = 'same' | 'added' | 'removed';
 

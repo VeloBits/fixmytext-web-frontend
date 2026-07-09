@@ -10,8 +10,7 @@ const variantClasses: Record<Variant, string> = {
     'bg-transparent text-[var(--accent)] border-[var(--accent)] hover:bg-[var(--accent)] hover:text-white',
   ghost:
     'bg-transparent text-[var(--text-2)] border-transparent hover:bg-[var(--list-hover)] hover:text-[var(--text)]',
-  danger:
-    'bg-[var(--rose)] text-white border-transparent hover:opacity-90',
+  danger: 'bg-[var(--rose)] text-white border-transparent hover:opacity-90',
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -26,7 +25,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-export function Button({ variant = 'primary', size = 'md', className = '', children, ...props }: ButtonProps) {
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  children,
+  ...props
+}: ButtonProps) {
   return (
     <button
       className={[

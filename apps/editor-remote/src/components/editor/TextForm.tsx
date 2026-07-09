@@ -1,4 +1,15 @@
-import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense, type ReactNode, type Ref, type RefObject } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  lazy,
+  Suspense,
+  type ReactNode,
+  type Ref,
+  type RefObject,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransformTextMutation } from '@velobits/app-core/store/api/textApi';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
@@ -7,7 +18,10 @@ import {
   useDeleteHistoryEntryMutation,
   useClearHistoryMutation,
 } from '@velobits/app-core/store/api/historyApi';
-import { useGetUiSettingsQuery, useUpdateUiSettingsMutation } from '@velobits/app-core/store/api/userDataApi';
+import {
+  useGetUiSettingsQuery,
+  useUpdateUiSettingsMutation,
+} from '@velobits/app-core/store/api/userDataApi';
 import {
   TOOLS,
   PERSONAS,
@@ -456,7 +470,9 @@ export default function TextForm(props: TextFormProps) {
   });
   const clientTools = useClientTools({
     textRef,
-    setToolResults: setToolResults as (fn: (prev: Record<string, string>) => Record<string, string>) => void,
+    setToolResults: setToolResults as (
+      fn: (prev: Record<string, string>) => Record<string, string>
+    ) => void,
     setPreviewMode,
     setLocalLoading,
     showAlert,
@@ -538,7 +554,7 @@ export default function TextForm(props: TextFormProps) {
   // Set default tab from persona
   useEffect(() => {
     if (gamification?.persona && !activeTab) {
-      setActiveTab(PERSONAS[(gamification?.persona as string)]?.defaultTab || 'all');
+      setActiveTab(PERSONAS[gamification?.persona as string]?.defaultTab || 'all');
     }
   }, [gamification?.persona, activeTab]);
 
@@ -602,36 +618,46 @@ export default function TextForm(props: TextFormProps) {
   }, []);
 
   // ── Generic API handler (RTK Query) ─────────────────────
-  const callApi = useCallback(async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
-    const t = textRef.current;
-    // Whitespace-only input is not runnable (backend rejects it with 422 and it
-    // must never burn a free use). Prompt only when something was typed —
-    // fully-empty input keeps the silent no-op so tab-switch auto-runs stay quiet.
-    if (!t.trim()) {
-      if (t) showAlert('Please enter some text', 'warning');
-      return;
-    }
-    const original = t;
-    try {
-      const data = await transformText({ endpoint, text: t }).unwrap();
-      if (toolMeta?.toolId) aiResultSourceRef.current = toolMeta.toolId as string;
-      ai.setAiResult({ label: successMsg, result: data.result });
-      setPreviewMode('result');
-      history.pushHistory(successMsg, original, data.result, toolMeta);
-      showAlert(successMsg, 'success');
-      return { success: true, result: data.result };
-    } catch (err) {
-      const detail = (err as { data?: { detail?: unknown } }).data?.detail;
-      const message = typeof detail === 'string'
-        ? detail
-        : (detail as { message?: string } | null)?.message || 'Something went wrong. Please try again.';
-      showAlert(message, 'danger');
-      return { success: false };
-    }
-  }, [transformText, ai, history, showAlert]);
+  const callApi = useCallback(
+    async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
+      const t = textRef.current;
+      // Whitespace-only input is not runnable (backend rejects it with 422 and it
+      // must never burn a free use). Prompt only when something was typed —
+      // fully-empty input keeps the silent no-op so tab-switch auto-runs stay quiet.
+      if (!t.trim()) {
+        if (t) showAlert('Please enter some text', 'warning');
+        return;
+      }
+      const original = t;
+      try {
+        const data = await transformText({ endpoint, text: t }).unwrap();
+        if (toolMeta?.toolId) aiResultSourceRef.current = toolMeta.toolId as string;
+        ai.setAiResult({ label: successMsg, result: data.result });
+        setPreviewMode('result');
+        history.pushHistory(successMsg, original, data.result, toolMeta);
+        showAlert(successMsg, 'success');
+        return { success: true, result: data.result };
+      } catch (err) {
+        const detail = (err as { data?: { detail?: unknown } }).data?.detail;
+        const message =
+          typeof detail === 'string'
+            ? detail
+            : (detail as { message?: string } | null)?.message ||
+              'Something went wrong. Please try again.';
+        showAlert(message, 'danger');
+        return { success: false };
+      }
+    },
+    [transformText, ai, history, showAlert]
+  );
 
   // ── Generic API handler with extra params (for drawer tools) ──
-  const callApiWithParams = async (endpoint: string, successMsg: string, extraParams: Record<string, unknown>, toolMeta?: Record<string, unknown>) => {
+  const callApiWithParams = async (
+    endpoint: string,
+    successMsg: string,
+    extraParams: Record<string, unknown>,
+    toolMeta?: Record<string, unknown>
+  ) => {
     const t = textRef.current;
     if (!t.trim()) {
       if (t) showAlert('Please enter some text', 'warning');
@@ -648,9 +674,11 @@ export default function TextForm(props: TextFormProps) {
       return { success: true, result: data.result };
     } catch (err) {
       const detail = (err as { data?: { detail?: unknown } }).data?.detail;
-      const message = typeof detail === 'string'
-        ? detail
-        : (detail as { message?: string } | null)?.message || 'Something went wrong. Please try again.';
+      const message =
+        typeof detail === 'string'
+          ? detail
+          : (detail as { message?: string } | null)?.message ||
+            'Something went wrong. Please try again.';
       showAlert(message, 'danger');
       return { success: false };
     }
@@ -685,37 +713,118 @@ export default function TextForm(props: TextFormProps) {
   };
 
   // ── Encoding ────────────────────────────────────────────
-  const handleBase64Encode = useCallback(() => callApi(ENDPOINTS.BASE64_ENCODE, 'Base64 encoded'), [callApi]);
-  const handleBase64Decode = useCallback(() => callApi(ENDPOINTS.BASE64_DECODE, 'Base64 decoded'), [callApi]);
-  const handleUrlEncode = useCallback(() => callApi(ENDPOINTS.URL_ENCODE, 'URL encoded'), [callApi]);
-  const handleUrlDecode = useCallback(() => callApi(ENDPOINTS.URL_DECODE, 'URL decoded'), [callApi]);
-  const handleHexEncode = useCallback(() => callApi(ENDPOINTS.HEX_ENCODE, 'Hex encoded'), [callApi]);
-  const handleHexDecode = useCallback(() => callApi(ENDPOINTS.HEX_DECODE, 'Hex decoded'), [callApi]);
-  const handleMorseEncode = useCallback(() => callApi(ENDPOINTS.MORSE_ENCODE, 'Morse encoded'), [callApi]);
-  const handleMorseDecode = useCallback(() => callApi(ENDPOINTS.MORSE_DECODE, 'Morse decoded'), [callApi]);
-  const handleBinaryEncode = useCallback(() => callApi(ENDPOINTS.BINARY_ENCODE, 'Binary encoded'), [callApi]);
-  const handleBinaryDecode = useCallback(() => callApi(ENDPOINTS.BINARY_DECODE, 'Binary decoded'), [callApi]);
-  const handleOctalEncode = useCallback(() => callApi(ENDPOINTS.OCTAL_ENCODE, 'Octal encoded'), [callApi]);
-  const handleOctalDecode = useCallback(() => callApi(ENDPOINTS.OCTAL_DECODE, 'Octal decoded'), [callApi]);
-  const handleDecimalEncode = useCallback(() => callApi(ENDPOINTS.DECIMAL_ENCODE, 'Decimal encoded'), [callApi]);
-  const handleDecimalDecode = useCallback(() => callApi(ENDPOINTS.DECIMAL_DECODE, 'Decimal decoded'), [callApi]);
-  const handleUnicodeEscape = useCallback(() => callApi(ENDPOINTS.UNICODE_ESCAPE, 'Unicode escaped'), [callApi]);
-  const handleUnicodeUnescape = useCallback(() => callApi(ENDPOINTS.UNICODE_UNESCAPE, 'Unicode unescaped'), [callApi]);
-  const handleAtbash = useCallback(() => callApi(ENDPOINTS.ATBASH, 'Atbash cipher applied'), [callApi]);
-  const handleBrainfuckEncode = useCallback(() => callApi(ENDPOINTS.BRAINFUCK_ENCODE, 'Brainfuck encoded'), [callApi]);
-  const handleBrainfuckDecode = useCallback(() => callApi(ENDPOINTS.BRAINFUCK_DECODE, 'Brainfuck decoded'), [callApi]);
+  const handleBase64Encode = useCallback(
+    () => callApi(ENDPOINTS.BASE64_ENCODE, 'Base64 encoded'),
+    [callApi]
+  );
+  const handleBase64Decode = useCallback(
+    () => callApi(ENDPOINTS.BASE64_DECODE, 'Base64 decoded'),
+    [callApi]
+  );
+  const handleUrlEncode = useCallback(
+    () => callApi(ENDPOINTS.URL_ENCODE, 'URL encoded'),
+    [callApi]
+  );
+  const handleUrlDecode = useCallback(
+    () => callApi(ENDPOINTS.URL_DECODE, 'URL decoded'),
+    [callApi]
+  );
+  const handleHexEncode = useCallback(
+    () => callApi(ENDPOINTS.HEX_ENCODE, 'Hex encoded'),
+    [callApi]
+  );
+  const handleHexDecode = useCallback(
+    () => callApi(ENDPOINTS.HEX_DECODE, 'Hex decoded'),
+    [callApi]
+  );
+  const handleMorseEncode = useCallback(
+    () => callApi(ENDPOINTS.MORSE_ENCODE, 'Morse encoded'),
+    [callApi]
+  );
+  const handleMorseDecode = useCallback(
+    () => callApi(ENDPOINTS.MORSE_DECODE, 'Morse decoded'),
+    [callApi]
+  );
+  const handleBinaryEncode = useCallback(
+    () => callApi(ENDPOINTS.BINARY_ENCODE, 'Binary encoded'),
+    [callApi]
+  );
+  const handleBinaryDecode = useCallback(
+    () => callApi(ENDPOINTS.BINARY_DECODE, 'Binary decoded'),
+    [callApi]
+  );
+  const handleOctalEncode = useCallback(
+    () => callApi(ENDPOINTS.OCTAL_ENCODE, 'Octal encoded'),
+    [callApi]
+  );
+  const handleOctalDecode = useCallback(
+    () => callApi(ENDPOINTS.OCTAL_DECODE, 'Octal decoded'),
+    [callApi]
+  );
+  const handleDecimalEncode = useCallback(
+    () => callApi(ENDPOINTS.DECIMAL_ENCODE, 'Decimal encoded'),
+    [callApi]
+  );
+  const handleDecimalDecode = useCallback(
+    () => callApi(ENDPOINTS.DECIMAL_DECODE, 'Decimal decoded'),
+    [callApi]
+  );
+  const handleUnicodeEscape = useCallback(
+    () => callApi(ENDPOINTS.UNICODE_ESCAPE, 'Unicode escaped'),
+    [callApi]
+  );
+  const handleUnicodeUnescape = useCallback(
+    () => callApi(ENDPOINTS.UNICODE_UNESCAPE, 'Unicode unescaped'),
+    [callApi]
+  );
+  const handleAtbash = useCallback(
+    () => callApi(ENDPOINTS.ATBASH, 'Atbash cipher applied'),
+    [callApi]
+  );
+  const handleBrainfuckEncode = useCallback(
+    () => callApi(ENDPOINTS.BRAINFUCK_ENCODE, 'Brainfuck encoded'),
+    [callApi]
+  );
+  const handleBrainfuckDecode = useCallback(
+    () => callApi(ENDPOINTS.BRAINFUCK_DECODE, 'Brainfuck decoded'),
+    [callApi]
+  );
 
   // ── Escape / Unescape ───────────────────────────────────
-  const handleJsonEscape = useCallback(() => callApi(ENDPOINTS.JSON_ESCAPE, 'JSON escaped'), [callApi]);
-  const handleJsonUnescape = useCallback(() => callApi(ENDPOINTS.JSON_UNESCAPE, 'JSON unescaped'), [callApi]);
-  const handleHtmlEscape = useCallback(() => callApi(ENDPOINTS.HTML_ESCAPE, 'HTML escaped'), [callApi]);
-  const handleHtmlUnescape = useCallback(() => callApi(ENDPOINTS.HTML_UNESCAPE, 'HTML unescaped'), [callApi]);
+  const handleJsonEscape = useCallback(
+    () => callApi(ENDPOINTS.JSON_ESCAPE, 'JSON escaped'),
+    [callApi]
+  );
+  const handleJsonUnescape = useCallback(
+    () => callApi(ENDPOINTS.JSON_UNESCAPE, 'JSON unescaped'),
+    [callApi]
+  );
+  const handleHtmlEscape = useCallback(
+    () => callApi(ENDPOINTS.HTML_ESCAPE, 'HTML escaped'),
+    [callApi]
+  );
+  const handleHtmlUnescape = useCallback(
+    () => callApi(ENDPOINTS.HTML_UNESCAPE, 'HTML unescaped'),
+    [callApi]
+  );
 
   // ── Developer Tools ─────────────────────────────────────
-  const handleJsonFormat = useCallback(() => callApi(ENDPOINTS.FORMAT_JSON, 'JSON formatted'), [callApi]);
-  const handleJsonToYaml = useCallback(() => callApi(ENDPOINTS.JSON_TO_YAML, 'Converted to YAML'), [callApi]);
-  const handleCsvToJson = useCallback(() => callApi(ENDPOINTS.CSV_TO_JSON, 'CSV converted to JSON'), [callApi]);
-  const handleJsonToCsv = useCallback(() => callApi(ENDPOINTS.JSON_TO_CSV, 'JSON converted to CSV'), [callApi]);
+  const handleJsonFormat = useCallback(
+    () => callApi(ENDPOINTS.FORMAT_JSON, 'JSON formatted'),
+    [callApi]
+  );
+  const handleJsonToYaml = useCallback(
+    () => callApi(ENDPOINTS.JSON_TO_YAML, 'Converted to YAML'),
+    [callApi]
+  );
+  const handleCsvToJson = useCallback(
+    () => callApi(ENDPOINTS.CSV_TO_JSON, 'CSV converted to JSON'),
+    [callApi]
+  );
+  const handleJsonToCsv = useCallback(
+    () => callApi(ENDPOINTS.JSON_TO_CSV, 'JSON converted to CSV'),
+    [callApi]
+  );
 
   // ── Accessibility ───────────────────────────────────────
   const handleDyslexiaMode = () => {
@@ -965,7 +1074,16 @@ export default function TextForm(props: TextFormProps) {
       setWorkspaceTabs((tabs) => {
         if (tabs.find((t) => t.id === tabId)) return tabs;
         isNew = true;
-        return [...tabs, { id: tabId, label: tool.label, icon: tool.icon, type: 'tool', tool } as unknown as WorkspaceTab];
+        return [
+          ...tabs,
+          {
+            id: tabId,
+            label: tool.label,
+            icon: tool.icon,
+            type: 'tool',
+            tool,
+          } as unknown as WorkspaceTab,
+        ];
       });
       // Seed new tab: only from URL shared text, otherwise start empty
       if (isNew) {
@@ -985,42 +1103,60 @@ export default function TextForm(props: TextFormProps) {
   );
 
   // ── Open tool by ID and seed with content (used by templates) ──
-  const openToolById = useCallback((toolId: string | null, content: string) => {
-    const tool = toolId ? TOOLS.find((t) => t.id === toolId) : null;
-    if (!tool) {
-      // No tool_id or tool not found — load into current tab if open, otherwise open a generic tab
-      const activeId = activeTabIdRef.current;
-      if (activeId) {
-        setToolTexts((prev) => ({ ...prev, [activeId]: content }));
-      } else {
-        // No tab open — pick the first non-drawer, non-action tool as a generic text holder
-         
-        const fallback = TOOLS.find((t) => t.type === 'api' && t.group === 'case') ?? TOOLS[0]!;
-        const tabId = `tool-${fallback.id}`;
-        setWorkspaceTabs((tabs) => {
-          if (tabs.find((t) => t.id === tabId)) return tabs;
-          return [
-            ...tabs,
-            { id: tabId, label: fallback.label, icon: fallback.icon, type: 'tool', tool: fallback as unknown as WorkspaceTab['tool'] } as WorkspaceTab,
-          ];
-        });
-        setToolTexts((prev) => ({ ...prev, [tabId]: content }));
-        setActiveWorkspaceId(tabId);
+  const openToolById = useCallback(
+    (toolId: string | null, content: string) => {
+      const tool = toolId ? TOOLS.find((t) => t.id === toolId) : null;
+      if (!tool) {
+        // No tool_id or tool not found — load into current tab if open, otherwise open a generic tab
+        const activeId = activeTabIdRef.current;
+        if (activeId) {
+          setToolTexts((prev) => ({ ...prev, [activeId]: content }));
+        } else {
+          // No tab open — pick the first non-drawer, non-action tool as a generic text holder
+
+          const fallback = TOOLS.find((t) => t.type === 'api' && t.group === 'case') ?? TOOLS[0]!;
+          const tabId = `tool-${fallback.id}`;
+          setWorkspaceTabs((tabs) => {
+            if (tabs.find((t) => t.id === tabId)) return tabs;
+            return [
+              ...tabs,
+              {
+                id: tabId,
+                label: fallback.label,
+                icon: fallback.icon,
+                type: 'tool',
+                tool: fallback as unknown as WorkspaceTab['tool'],
+              } as WorkspaceTab,
+            ];
+          });
+          setToolTexts((prev) => ({ ...prev, [tabId]: content }));
+          setActiveWorkspaceId(tabId);
+        }
+        return;
       }
-      return;
-    }
-    const tabId = `tool-${tool.id}`;
-    setWorkspaceTabs((tabs) => {
-      if (tabs.find((t) => t.id === tabId)) return tabs;
-      return [...tabs, { id: tabId, label: tool.label, icon: tool.icon, type: 'tool', tool } as unknown as WorkspaceTab];
-    });
-    setToolTexts((prev) => ({ ...prev, [tabId]: content }));
-    setActiveWorkspaceId(tabId);
-    ai.setAiResult(null);
-    setPreviewMode(null);
-    // Schedule auto-run after text is set
-    pendingAutoRun.current = tool;
-  }, [ai]);
+      const tabId = `tool-${tool.id}`;
+      setWorkspaceTabs((tabs) => {
+        if (tabs.find((t) => t.id === tabId)) return tabs;
+        return [
+          ...tabs,
+          {
+            id: tabId,
+            label: tool.label,
+            icon: tool.icon,
+            type: 'tool',
+            tool,
+          } as unknown as WorkspaceTab,
+        ];
+      });
+      setToolTexts((prev) => ({ ...prev, [tabId]: content }));
+      setActiveWorkspaceId(tabId);
+      ai.setAiResult(null);
+      setPreviewMode(null);
+      // Schedule auto-run after text is set
+      pendingAutoRun.current = tool;
+    },
+    [ai]
+  );
 
   // Keep template helpers ref up to date
   templateHelpersRef.current = {
@@ -1052,18 +1188,19 @@ export default function TextForm(props: TextFormProps) {
       aiResultSourceRef.current = tool.id;
 
       if (tool.type === 'api') {
-        callApi(tool.endpoint!, tool.successMsg ?? '', { toolId: tool.id, toolType: tool.type }).then(
-          (res) => {
-            if (res?.success) pipeline.addStep(tool.id, tool.label, res.result ?? '');
-            if (subscription?.refetchStatus) subscription.refetchStatus();
-          }
-        );
-      } else if (
-        tool.type === 'ai' ||
-        tool.type === 'local' ||
-        tool.type === 'select'
-      ) {
-        const handler = tool.handlerKey ? (handlerMap[tool.handlerKey as keyof typeof handlerMap] as ((val?: string | null) => unknown) | undefined) : undefined;
+        callApi(tool.endpoint!, tool.successMsg ?? '', {
+          toolId: tool.id,
+          toolType: tool.type,
+        }).then((res) => {
+          if (res?.success) pipeline.addStep(tool.id, tool.label, res.result ?? '');
+          if (subscription?.refetchStatus) subscription.refetchStatus();
+        });
+      } else if (tool.type === 'ai' || tool.type === 'local' || tool.type === 'select') {
+        const handler = tool.handlerKey
+          ? (handlerMap[tool.handlerKey as keyof typeof handlerMap] as
+              | ((val?: string | null) => unknown)
+              | undefined)
+          : undefined;
         if (handler) {
           // For select tools, pass the freshly-clicked value from the ref to avoid stale closure
           const freshVal = selectValueRef.current;
@@ -1072,11 +1209,11 @@ export default function TextForm(props: TextFormProps) {
           const resultAsPromise = result as { then?: (fn: () => void) => void } | null;
           if (resultAsPromise && typeof resultAsPromise.then === 'function') {
             resultAsPromise.then(() => {
-              pipeline.addStep(tool.id, tool.label, "");
+              pipeline.addStep(tool.id, tool.label, '');
               if (subscription?.refetchStatus) subscription.refetchStatus();
             });
           } else {
-            pipeline.addStep(tool.id, tool.label, "");
+            pipeline.addStep(tool.id, tool.label, '');
             if (subscription?.refetchStatus) subscription.refetchStatus();
           }
         }
@@ -1131,7 +1268,12 @@ export default function TextForm(props: TextFormProps) {
         gamification?.recordToolUse(tool.id, text.length);
       } else {
         // api, ai, local, select → open as workspace tab; action is handled via executeToolAction
-        if (tool.type === 'api' || tool.type === 'ai' || tool.type === 'local' || tool.type === 'select') {
+        if (
+          tool.type === 'api' ||
+          tool.type === 'ai' ||
+          tool.type === 'local' ||
+          tool.type === 'select'
+        ) {
           openToolTab(tool);
         } else {
           executeToolAction(tool);
@@ -1191,7 +1333,9 @@ export default function TextForm(props: TextFormProps) {
     const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
     if (!ws || ws.type !== 'tool') return;
     if (!ws.tool || !['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)) return;
-    const timer = setTimeout(() => { if (ws.tool) executeToolAction(ws.tool as ToolDefinition); }, 300);
+    const timer = setTimeout(() => {
+      if (ws.tool) executeToolAction(ws.tool as ToolDefinition);
+    }, 300);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs only when the formatter config changes by design; fmtCfgRef guards re-entry
   }, [formatter.fmtCfg]);
@@ -1258,7 +1402,8 @@ export default function TextForm(props: TextFormProps) {
     undo: () => history.handleUndo(),
     redo: () => history.handleRedo(),
     copyOutput: () => {
-      const result = ((activeWorkspaceId ? toolResults[activeWorkspaceId] : undefined) || ai.aiResult) as { result?: string } | null;
+      const result = ((activeWorkspaceId ? toolResults[activeWorkspaceId] : undefined) ||
+        ai.aiResult) as { result?: string } | null;
       if (result?.result) {
         navigator.clipboard.writeText(result.result);
         showAlert('Output copied', 'success');
@@ -1309,7 +1454,8 @@ export default function TextForm(props: TextFormProps) {
       'runTool',
     ];
     keys.forEach((k) => {
-      proxy[k] = (...args: unknown[]) => (kbActionsRef.current as Record<string, (...a: unknown[]) => unknown>)?.[k]?.(...args);
+      proxy[k] = (...args: unknown[]) =>
+        (kbActionsRef.current as Record<string, (...a: unknown[]) => unknown>)?.[k]?.(...args);
     });
     return proxy;
   }, []);
@@ -1538,12 +1684,12 @@ export default function TextForm(props: TextFormProps) {
               {activeTab === '_new'
                 ? "What's New"
                 : activeTab === '_templates'
-                ? 'Templates'
-                : activeTab === '_history'
-                ? 'History'
-                : activeTab === '_favourites'
-                ? 'Favourites'
-                : USE_CASE_TABS.find((t) => t.id === activeTab)?.label || 'Explorer'}
+                  ? 'Templates'
+                  : activeTab === '_history'
+                    ? 'History'
+                    : activeTab === '_favourites'
+                      ? 'Favourites'
+                      : USE_CASE_TABS.find((t) => t.id === activeTab)?.label || 'Explorer'}
               {activeTab && !activeTab.startsWith('_') && (
                 <span className="tu-sidebar-header-count">
                   {activeTab === 'all'
@@ -2698,180 +2844,180 @@ export default function TextForm(props: TextFormProps) {
                   }`}
                 >
                   <>
-                      <div className="tu-editor-topbar">
-                        <span className="tu-editor-label" title="~/FixMyText/workspace/input.txt">
-                          INPUT
+                    <div className="tu-editor-topbar">
+                      <span className="tu-editor-label" title="~/FixMyText/workspace/input.txt">
+                        INPUT
+                      </span>
+                      <div className="tu-topbar-stats">
+                        <span className="tu-topbar-stat">
+                          <b>{words}</b> words
                         </span>
-                        <div className="tu-topbar-stats">
-                          <span className="tu-topbar-stat">
-                            <b>{words}</b> words
-                          </span>
-                          <span className="tu-topbar-stat">
-                            <b>{chars}</b> chars
-                          </span>
-                          <span className="tu-topbar-stat">
-                            <b>{sentences}</b> sentences
-                          </span>
-                        </div>
+                        <span className="tu-topbar-stat">
+                          <b>{chars}</b> chars
+                        </span>
+                        <span className="tu-topbar-stat">
+                          <b>{sentences}</b> sentences
+                        </span>
                       </div>
-                      <div className="tu-input-toolbar">
-                        <button
-                          className="tu-input-toolbar-btn"
-                          onClick={handleCopy}
-                          title="Copy"
-                          disabled={!text}
+                    </div>
+                    <div className="tu-input-toolbar">
+                      <button
+                        className="tu-input-toolbar-btn"
+                        onClick={handleCopy}
+                        title="Copy"
+                        disabled={!text}
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <rect x="9" y="9" width="13" height="13" rx="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                          <span>Copy</span>
-                        </button>
-                        <button
-                          className="tu-input-toolbar-btn"
-                          onClick={handlePaste}
-                          title="Paste"
+                          <rect x="9" y="9" width="13" height="13" rx="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        <span>Copy</span>
+                      </button>
+                      <button className="tu-input-toolbar-btn" onClick={handlePaste} title="Paste">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                            <rect x="8" y="2" width="8" height="4" rx="1" />
-                          </svg>
-                          <span>Paste</span>
-                        </button>
-                        <button
-                          className="tu-input-toolbar-btn"
-                          onClick={handleClearPaste}
-                          title="Clear + Paste"
+                          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                          <rect x="8" y="2" width="8" height="4" rx="1" />
+                        </svg>
+                        <span>Paste</span>
+                      </button>
+                      <button
+                        className="tu-input-toolbar-btn"
+                        onClick={handleClearPaste}
+                        title="Clear + Paste"
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                            <rect x="8" y="2" width="8" height="4" rx="1" />
-                            <line x1="9" y1="13" x2="15" y2="13" />
-                          </svg>
-                          <span>Clear+Paste</span>
-                        </button>
-                        <div className="tu-input-toolbar-sep" />
-                        <button
-                          className="tu-input-toolbar-btn tu-input-toolbar-btn--danger"
-                          onClick={handleClear}
-                          title="Clear"
-                          disabled={!text}
+                          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                          <rect x="8" y="2" width="8" height="4" rx="1" />
+                          <line x1="9" y1="13" x2="15" y2="13" />
+                        </svg>
+                        <span>Clear+Paste</span>
+                      </button>
+                      <div className="tu-input-toolbar-sep" />
+                      <button
+                        className="tu-input-toolbar-btn tu-input-toolbar-btn--danger"
+                        onClick={handleClear}
+                        title="Clear"
+                        disabled={!text}
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                            <path d="M10 11v6" />
-                            <path d="M14 11v6" />
-                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                          </svg>
-                          <span>Clear</span>
-                        </button>
-                        <div className="tu-input-toolbar-sep" />
-                        <button
-                          className={`tu-input-toolbar-btn${
-                            speech.listening ? ' tu-input-toolbar-btn--active' : ''
-                          }`}
-                          onClick={speech.handleTts}
-                          title="Read Aloud"
-                          disabled={!text}
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                          <path d="M10 11v6" />
+                          <path d="M14 11v6" />
+                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                        </svg>
+                        <span>Clear</span>
+                      </button>
+                      <div className="tu-input-toolbar-sep" />
+                      <button
+                        className={`tu-input-toolbar-btn${
+                          speech.listening ? ' tu-input-toolbar-btn--active' : ''
+                        }`}
+                        onClick={speech.handleTts}
+                        title="Read Aloud"
+                        disabled={!text}
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                          </svg>
-                          <span>Read Aloud</span>
-                        </button>
-                        <button
-                          className={`tu-input-toolbar-btn${
-                            speech.listening ? ' tu-input-toolbar-btn--active' : ''
-                          }`}
-                          onClick={speech.handleSpeechToText}
-                          title="Speech to Text"
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                        </svg>
+                        <span>Read Aloud</span>
+                      </button>
+                      <button
+                        className={`tu-input-toolbar-btn${
+                          speech.listening ? ' tu-input-toolbar-btn--active' : ''
+                        }`}
+                        onClick={speech.handleSpeechToText}
+                        title="Speech to Text"
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                            <line x1="12" y1="19" x2="12" y2="23" />
-                            <line x1="8" y1="23" x2="16" y2="23" />
-                          </svg>
-                          <span>Speech</span>
-                        </button>
-                        <div className="tu-input-toolbar-sep" />
-                        <button
-                          className={`tu-input-toolbar-btn${
-                            dyslexiaMode ? ' tu-input-toolbar-btn--active' : ''
-                          }`}
-                          onClick={handleDyslexiaMode}
-                          title="Dyslexia-friendly font"
-                        >
-                          <span className="tu-input-toolbar-icon-text">Aa</span>
-                          <span>Dyslexia</span>
-                        </button>
-                      </div>
-                      {/* Find & Replace bar — shown inline below toolbar */}
-                      {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
-                        'find' && (
-                        <LazyDrawer>
-                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                          <FindReplaceDrawer {...(findReplace as any)} disabled={disabled} text={text} />
-                        </LazyDrawer>
-                      )}
-                      <LazyDrawer>{(() => {
+                          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                          <line x1="12" y1="19" x2="12" y2="23" />
+                          <line x1="8" y1="23" x2="16" y2="23" />
+                        </svg>
+                        <span>Speech</span>
+                      </button>
+                      <div className="tu-input-toolbar-sep" />
+                      <button
+                        className={`tu-input-toolbar-btn${
+                          dyslexiaMode ? ' tu-input-toolbar-btn--active' : ''
+                        }`}
+                        onClick={handleDyslexiaMode}
+                        title="Dyslexia-friendly font"
+                      >
+                        <span className="tu-input-toolbar-icon-text">Aa</span>
+                        <span>Dyslexia</span>
+                      </button>
+                    </div>
+                    {/* Find & Replace bar — shown inline below toolbar */}
+                    {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId === 'find' && (
+                      <LazyDrawer>
+                        <FindReplaceDrawer
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          {...(findReplace as any)}
+                          disabled={disabled}
+                          text={text}
+                        />
+                      </LazyDrawer>
+                    )}
+                    <LazyDrawer>
+                      {(() => {
                         const panelId = workspaceTabs.find(
                           (t) => t.id === activeWorkspaceId
                         )?.panelId;
@@ -3074,157 +3220,169 @@ export default function TextForm(props: TextFormProps) {
                           default:
                             return null;
                         }
-                      })()}</LazyDrawer>
-                      {/* Formatter config bar — shown inline for formatter tools */}
-                      {(() => {
-                        const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-                        const fmtToolId =
-                          ws?.type === 'tool' && ws.tool &&
-                          ['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)
-                            ? ws.tool.id
-                            : null;
-                        return fmtToolId ? (
-                          <FmtConfigBar
-                            toolId={fmtToolId}
-                            fmtCfg={formatter.fmtCfg}
-                            setFmtCfg={(updater) => formatter.setFmtCfg(updater(formatter.fmtCfg))}
-                          />
-                        ) : null;
                       })()}
-                      {/* Select tool options bar (Format, Tone, Translate, Translit) */}
-                      {(() => {
-                        const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-                        if (ws?.type !== 'tool' || ws.tool?.type !== 'select') return null;
-                        const tool = ws.tool as ToolDefinition;
-                        const currentVal = (tool.selectKey ? (ai as Record<string, unknown>)[tool.selectKey] : undefined) || tool.options?.[0]?.[0];
-                        return (
-                          <div className="tu-fmtbar">
-                            <span className="tu-fmtbar-lang">{tool.label}</span>
-                            {tool.id === 'translate' && (
-                              <>
-                                <button
-                                  className={`tu-fmtbar-detect${
-                                    ai.autoDetectLang ? ' tu-fmtbar-detect--on' : ''
-                                  }`}
-                                  onClick={() => {
-                                    const next = !ai.autoDetectLang;
-                                    ai.setAutoDetectLang(next);
-                                    if (next && text) ai.handleDetectLanguage();
-                                    else ai.setDetectedLang(null);
-                                  }}
-                                  title="Auto-detect input language"
-                                >
-                                  <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
-                                    <circle cx="11" cy="11" r="8" />
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                                  </svg>
-                                  Auto-detect
-                                </button>
-                                {ai.autoDetectLang && ai.detectedLang && (
-                                  <span className="tu-fmtbar-detected">{ai.detectedLang}</span>
-                                )}
-                              </>
-                            )}
-                            <span className="tu-fmtbar-sep" />
-                            {(tool.options || []).map(([val, label]) => (
+                    </LazyDrawer>
+                    {/* Formatter config bar — shown inline for formatter tools */}
+                    {(() => {
+                      const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
+                      const fmtToolId =
+                        ws?.type === 'tool' &&
+                        ws.tool &&
+                        ['js_fmt', 'ts_fmt', 'css_fmt', 'html_fmt'].includes(ws.tool.id)
+                          ? ws.tool.id
+                          : null;
+                      return fmtToolId ? (
+                        <FmtConfigBar
+                          toolId={fmtToolId}
+                          fmtCfg={formatter.fmtCfg}
+                          setFmtCfg={(updater) => formatter.setFmtCfg(updater(formatter.fmtCfg))}
+                        />
+                      ) : null;
+                    })()}
+                    {/* Select tool options bar (Format, Tone, Translate, Translit) */}
+                    {(() => {
+                      const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
+                      if (ws?.type !== 'tool' || ws.tool?.type !== 'select') return null;
+                      const tool = ws.tool as ToolDefinition;
+                      const currentVal =
+                        (tool.selectKey
+                          ? (ai as Record<string, unknown>)[tool.selectKey]
+                          : undefined) || tool.options?.[0]?.[0];
+                      return (
+                        <div className="tu-fmtbar">
+                          <span className="tu-fmtbar-lang">{tool.label}</span>
+                          {tool.id === 'translate' && (
+                            <>
                               <button
-                                key={val}
-                                className={`tu-fmtbar-opt${
-                                  currentVal === val ? ' tu-fmtbar-opt--on' : ''
+                                className={`tu-fmtbar-detect${
+                                  ai.autoDetectLang ? ' tu-fmtbar-detect--on' : ''
                                 }`}
                                 onClick={() => {
-                                  const setter = tool.setterKey ? (ai as Record<string, unknown>)[tool.setterKey] : null;
-                                  if (typeof setter === 'function') setter(val);
-                                  selectValueRef.current = val;
-                                  executeToolAction(tool);
+                                  const next = !ai.autoDetectLang;
+                                  ai.setAutoDetectLang(next);
+                                  if (next && text) ai.handleDetectLanguage();
+                                  else ai.setDetectedLang(null);
                                 }}
+                                title="Auto-detect input language"
                               >
-                                {label}
+                                <svg
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <circle cx="11" cy="11" r="8" />
+                                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                </svg>
+                                Auto-detect
                               </button>
+                              {ai.autoDetectLang && ai.detectedLang && (
+                                <span className="tu-fmtbar-detected">{ai.detectedLang}</span>
+                              )}
+                            </>
+                          )}
+                          <span className="tu-fmtbar-sep" />
+                          {(tool.options || []).map(([val, label]) => (
+                            <button
+                              key={val}
+                              className={`tu-fmtbar-opt${
+                                currentVal === val ? ' tu-fmtbar-opt--on' : ''
+                              }`}
+                              onClick={() => {
+                                const setter = tool.setterKey
+                                  ? (ai as Record<string, unknown>)[tool.setterKey]
+                                  : null;
+                                if (typeof setter === 'function') setter(val);
+                                selectValueRef.current = val;
+                                executeToolAction(tool);
+                              }}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                    <div className="tu-editor-body">
+                      {(() => {
+                        const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
+                        const isProse =
+                          ws?.type === 'tool' &&
+                          !!ws.tool?.group &&
+                          PROSE_GROUPS.has(ws.tool.group);
+                        if (isProse) {
+                          return (
+                            <ParagraphGutter
+                              textareaRef={textareaRef}
+                              text={text}
+                              scrollTop={inputScrollTop}
+                            />
+                          );
+                        }
+                        return (
+                          <div
+                            className="tu-line-numbers"
+                            ref={gutterRef as unknown as Ref<HTMLDivElement>}
+                          >
+                            {(text || '\n').split('\n').map((_, i) => (
+                              <span key={i}>{i + 1}</span>
                             ))}
                           </div>
                         );
                       })()}
-                      <div className="tu-editor-body">
-                        {(() => {
-                          const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-                          const isProse =
-                            ws?.type === 'tool' && !!ws.tool?.group && PROSE_GROUPS.has(ws.tool.group);
-                          if (isProse) {
-                            return (
-                              <ParagraphGutter
-                                textareaRef={textareaRef}
-                                text={text}
-                                scrollTop={inputScrollTop}
-                              />
-                            );
+                      <textarea
+                        ref={textareaRef}
+                        className="tu-textarea"
+                        id="text"
+                        value={text}
+                        onChange={(e) => {
+                          setText(e.target.value);
+                          if (previewMode === 'result') {
+                            ai.handleAiDismiss();
+                            setPreviewMode(null);
                           }
-                          return (
-                            <div className="tu-line-numbers" ref={gutterRef as unknown as Ref<HTMLDivElement>}>
-                              {(text || '\n').split('\n').map((_, i) => (
-                                <span key={i}>{i + 1}</span>
-                              ))}
-                            </div>
-                          );
-                        })()}
-                        <textarea
-                          ref={textareaRef}
-                          className="tu-textarea"
-                          id="text"
-                          value={text}
-                          onChange={(e) => {
-                            setText(e.target.value);
-                            if (previewMode === 'result') {
-                              ai.handleAiDismiss();
-                              setPreviewMode(null);
-                            }
-                          }}
-                          onPaste={() => {
-                            // After paste, auto-run the active tool with minimal delay
-                            const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-                            if (ws?.type === 'tool' && ws.tool) {
-                              setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
-                            }
-                          }}
-                          onScroll={(e) => {
-                            const ta = e.target as HTMLTextAreaElement;
-                            setInputScrollTop(ta.scrollTop);
-                            if (gutterRef.current) gutterRef.current.scrollTop = ta.scrollTop;
-                          }}
-                          placeholder="// Start typing or paste your text here..."
-                          style={{
-                            tabSize: formatter.fmtCfg.tabWidth,
-                            MozTabSize: formatter.fmtCfg.tabWidth,
-                          }}
-                        />
+                        }}
+                        onPaste={() => {
+                          // After paste, auto-run the active tool with minimal delay
+                          const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
+                          if (ws?.type === 'tool' && ws.tool) {
+                            setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
+                          }
+                        }}
+                        onScroll={(e) => {
+                          const ta = e.target as HTMLTextAreaElement;
+                          setInputScrollTop(ta.scrollTop);
+                          if (gutterRef.current) gutterRef.current.scrollTop = ta.scrollTop;
+                        }}
+                        placeholder="// Start typing or paste your text here..."
+                        style={{
+                          tabSize: formatter.fmtCfg.tabWidth,
+                          MozTabSize: formatter.fmtCfg.tabWidth,
+                        }}
+                      />
+                    </div>
+                    {loading && (
+                      <div className="tu-loading">
+                        <div className="tu-spinner" />
+                        <span>Processing...</span>
                       </div>
-                      {loading && (
-                        <div className="tu-loading">
-                          <div className="tu-spinner" />
-                          <span>Processing...</span>
-                        </div>
-                      )}
-                      {/* Compare With input (shown below main input when compare tool is active) */}
-                      {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
-                        'compare' && (
-                        <LazyDrawer>
-                          <CompareInput
-                            compareText={compare.compareText}
-                            setCompareText={compare.setCompareText}
-                            setDiffResult={compare.setDiffResult}
-                          />
-                        </LazyDrawer>
-                      )}
-                    </>
+                    )}
+                    {/* Compare With input (shown below main input when compare tool is active) */}
+                    {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId ===
+                      'compare' && (
+                      <LazyDrawer>
+                        <CompareInput
+                          compareText={compare.compareText}
+                          setCompareText={compare.setCompareText}
+                          setDiffResult={compare.setDiffResult}
+                        />
+                      </LazyDrawer>
+                    )}
+                  </>
                 </div>
 
                 {/* Split resize handle */}
@@ -3271,7 +3429,9 @@ export default function TextForm(props: TextFormProps) {
                       ) {
                         // fall through to OutputPanel below
                       } else {
-                        const drawerDef = ws.panelId ? DRAWERS[ws.panelId as keyof typeof DRAWERS] : undefined;
+                        const drawerDef = ws.panelId
+                          ? DRAWERS[ws.panelId as keyof typeof DRAWERS]
+                          : undefined;
                         return ws.panelId && drawerDef ? (
                           <DrawerPanel
                             title={drawerDef.title}
@@ -3291,8 +3451,15 @@ export default function TextForm(props: TextFormProps) {
                       'samplejson',
                     ].includes(ws?.panelId ?? '');
                     // Each tab's result is stored independently by tab ID
-                    const tabResult = (activeWorkspaceId ? toolResults[activeWorkspaceId] : null) as AiResult | null;
-                    const displayResult = (tabResult || (isNoInputDrawer ? ai.aiResult : text ? ai.aiResult : null)) as AiResult | null;
+                    const tabResult = (
+                      activeWorkspaceId ? toolResults[activeWorkspaceId] : null
+                    ) as AiResult | null;
+                    const displayResult = (tabResult ||
+                      (isNoInputDrawer
+                        ? ai.aiResult
+                        : text
+                          ? ai.aiResult
+                          : null)) as AiResult | null;
                     return (
                       <OutputPanel
                         aiResult={displayResult || null}
@@ -3339,14 +3506,19 @@ export default function TextForm(props: TextFormProps) {
                           (ws?.type === 'tool'
                             ? ws.tool
                             : ws?.type === 'drawer'
-                            ? TOOLS.find((t) => t.panelId === ws.panelId) || null
-                            : null) as ToolDefinition | null
+                              ? TOOLS.find((t) => t.panelId === ws.panelId) || null
+                              : null) as ToolDefinition | null
                         }
                         loading={loading}
                         exportTools={exportTools}
                         onOutputEdit={(newText) => {
-                          const updated = { label: displayResult?.label ?? '', ...displayResult, result: newText };
-                          if (activeWorkspaceId) setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: updated }));
+                          const updated = {
+                            label: displayResult?.label ?? '',
+                            ...displayResult,
+                            result: newText,
+                          };
+                          if (activeWorkspaceId)
+                            setToolResults((prev) => ({ ...prev, [activeWorkspaceId]: updated }));
                           ai.setAiResult(updated);
                         }}
                       />

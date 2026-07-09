@@ -94,7 +94,7 @@ describe('userDataApi endpoint execution', () => {
   }
 
   function lastRequest(): Request {
-    return mockFetch.mock.calls[mockFetch.mock.calls.length - 1][0] as Request;
+    return mockFetch.mock.calls[mockFetch.mock.calls.length - 1]![0] as Request;
   }
 
   beforeEach(() => {
@@ -125,7 +125,12 @@ describe('userDataApi endpoint execution', () => {
   ] as const)('%s issues a GET to %s', async (endpointName, path) => {
     const store = makeStore();
 
-    await store.dispatch(userDataApi.endpoints[endpointName].initiate());
+    // Collapse the endpoint union to one representative void-arg query so
+    // dispatch overload resolution succeeds; the result is never read here.
+    const endpoint = userDataApi.endpoints[
+      endpointName
+    ] as typeof userDataApi.endpoints.getPreferences;
+    await store.dispatch(endpoint.initiate());
 
     const request = lastRequest();
     expect(request.url).toContain(path);

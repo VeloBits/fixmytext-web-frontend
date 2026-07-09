@@ -16,7 +16,10 @@
   border: 1px solid var(--border);
   background: var(--bg);
   cursor: pointer;
-  transition: border-color var(--t), background var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t),
+    box-shadow var(--t);
 }
 .tu-pass-option:hover {
   border-color: var(--accent);
@@ -109,7 +112,10 @@
   font-size: 12px;
   color: var(--text-2);
   margin-bottom: 14px;
-  transition: border-color var(--t), background var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t),
+    box-shadow var(--t);
 }
 .tu-pass-pro-upsell:hover {
   border-color: var(--accent);

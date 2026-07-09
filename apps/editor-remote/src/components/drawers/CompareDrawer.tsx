@@ -106,7 +106,8 @@ export function CompareInput({ compareText, setCompareText, setDiffResult }: Com
             setDiffResult(null);
           }}
           onScroll={(e) => {
-            if (gutterRef.current) gutterRef.current.scrollTop = (e.target as HTMLTextAreaElement).scrollTop;
+            if (gutterRef.current)
+              gutterRef.current.scrollTop = (e.target as HTMLTextAreaElement).scrollTop;
           }}
           placeholder="// Paste or type the text to compare with..."
           spellCheck={false}
@@ -156,8 +157,15 @@ export default function CompareOutput({ diffResult, compareText }: CompareOutput
   const buildSideLines = () => {
     if (!diffResult) return [];
     type SideCellType = 'same' | 'added' | 'removed' | 'empty';
-    interface SideCell { num: number | null; text: string; type: SideCellType; }
-    interface SideRow { left: SideCell; right: SideCell; }
+    interface SideCell {
+      num: number | null;
+      text: string;
+      type: SideCellType;
+    }
+    interface SideRow {
+      left: SideCell;
+      right: SideCell;
+    }
     const lines: SideRow[] = [];
     let leftNum = 0,
       rightNum = 0;

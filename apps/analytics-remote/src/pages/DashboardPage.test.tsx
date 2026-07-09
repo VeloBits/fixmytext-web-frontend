@@ -1,7 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { GamificationContextValue, SubscriptionContextValue, User } from '@velobits/app-core/types/context';
+import type {
+  GamificationContextValue,
+  SubscriptionContextValue,
+  User,
+} from '@velobits/app-core/types/context';
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -35,7 +39,15 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/dashboard', search: '' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
+  Link: ({
+    children,
+    to,
+    ...p
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...p }, children),
 }));
 
 // ── react-redux mock ──

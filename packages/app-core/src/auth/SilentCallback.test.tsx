@@ -15,9 +15,7 @@ describe('SilentCallback', () => {
 
   it('handles signinSilentCallback errors gracefully', async () => {
     const { userManager } = await import('../auth/userManager');
-    vi.mocked(userManager.signinSilentCallback).mockRejectedValueOnce(
-      new Error('iframe error')
-    );
+    vi.mocked(userManager.signinSilentCallback).mockRejectedValueOnce(new Error('iframe error'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // Should not throw

@@ -52,7 +52,9 @@ describe('openRazorpayCheckout', () => {
 
   it('injects the SDK on demand and opens checkout once loaded', async () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
+    const RazorpayMock = vi.fn(function () {
+      return { open: openMock };
+    });
 
     const promise = openRazorpayCheckout({ orderId: 'o', onSuccess, onFailure });
     const script = getInjectedScript();
@@ -68,7 +70,9 @@ describe('openRazorpayCheckout', () => {
 
   it('creates Razorpay instance and calls open', async () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
+    const RazorpayMock = vi.fn(function () {
+      return { open: openMock };
+    });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     await openRazorpayCheckout({
@@ -97,7 +101,9 @@ describe('openRazorpayCheckout', () => {
 
   it('calls onSuccess via handler', async () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
+    const RazorpayMock = vi.fn(function () {
+      return { open: openMock };
+    });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     await openRazorpayCheckout({
@@ -117,7 +123,9 @@ describe('openRazorpayCheckout', () => {
 
   it('calls onFailure on modal dismiss', async () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
+    const RazorpayMock = vi.fn(function () {
+      return { open: openMock };
+    });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     await openRazorpayCheckout({
@@ -136,7 +144,9 @@ describe('openRazorpayCheckout', () => {
 
   it('uses default description when not provided', async () => {
     const openMock = vi.fn();
-    const RazorpayMock = vi.fn(function () { return { open: openMock }; });
+    const RazorpayMock = vi.fn(function () {
+      return { open: openMock };
+    });
     window.Razorpay = RazorpayMock as unknown as RazorpayConstructor;
 
     await openRazorpayCheckout({

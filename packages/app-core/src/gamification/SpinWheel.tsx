@@ -141,7 +141,12 @@ function rewardToSegmentIndex(res: SpinResult | null): number {
     return (res.amount ?? 0) >= 3 ? 1 : 0; // 3 Credits or 1 Credit
   }
   if (res.reward_type === 'pass') {
-    const passMap: Record<string, number> = { quick_fix: 2, tinkerer: 3, day_single: 4, day_triple: 5 };
+    const passMap: Record<string, number> = {
+      quick_fix: 2,
+      tinkerer: 3,
+      day_single: 4,
+      day_triple: 5,
+    };
     return (res.pass_id != null ? passMap[res.pass_id] : undefined) ?? 2;
   }
   return 0;

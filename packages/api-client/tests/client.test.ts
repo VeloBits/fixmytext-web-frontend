@@ -83,9 +83,9 @@ describe('apiFetch', () => {
   it('throws ApiError on non-2xx response', async () => {
     mockFetch.mockResolvedValue(makeResponse({ detail: 'Not found' }, 404));
 
-    await expect(
-      apiFetch('/missing', { baseUrl: 'http://localhost:8000' })
-    ).rejects.toMatchObject({ status: 404 });
+    await expect(apiFetch('/missing', { baseUrl: 'http://localhost:8000' })).rejects.toMatchObject({
+      status: 404,
+    });
   });
 
   it('returns parsed JSON on success', async () => {
@@ -126,9 +126,7 @@ describe('clearSession', () => {
     mockFetch.mockRejectedValue(new Error('network down'));
 
     // Should not throw
-    await expect(
-      clearSession({ baseUrl: 'http://localhost:8000' })
-    ).resolves.toBeUndefined();
+    await expect(clearSession({ baseUrl: 'http://localhost:8000' })).resolves.toBeUndefined();
   });
 
   it('uses default base URL when not provided', async () => {
@@ -143,8 +141,7 @@ describe('clearSession', () => {
 });
 
 describe('default base URL resolution', () => {
-  const viteEnvUrl = (import.meta as unknown as { env?: Record<string, string> }).env
-    ?.VITE_API_URL;
+  const viteEnvUrl = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_API_URL;
 
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -241,9 +238,7 @@ describe('apiFetch — defaults and edge cases', () => {
       json: () => Promise.reject(new Error('not json')),
     } as unknown as Response);
 
-    await expect(
-      apiFetch('/broken', { baseUrl: 'http://localhost:8000' })
-    ).rejects.toMatchObject({
+    await expect(apiFetch('/broken', { baseUrl: 'http://localhost:8000' })).rejects.toMatchObject({
       status: 500,
       message: 'Internal Server Error',
       detail: undefined,

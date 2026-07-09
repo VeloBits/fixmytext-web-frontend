@@ -1,11 +1,16 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import Home from './Home';
-import type { GamificationContextValue, SubscriptionContextValue } from '@velobits/app-core/types/context';
+import type {
+  GamificationContextValue,
+  SubscriptionContextValue,
+} from '@velobits/app-core/types/context';
 
 // Mock TextForm since it's a complex component
 vi.mock('@/components/editor/TextForm', () => ({
-  default: (props: Record<string, unknown>) => <div data-testid="text-form">{JSON.stringify(Object.keys(props))}</div>,
+  default: (props: Record<string, unknown>) => (
+    <div data-testid="text-form">{JSON.stringify(Object.keys(props))}</div>
+  ),
 }));
 
 describe('Home', () => {

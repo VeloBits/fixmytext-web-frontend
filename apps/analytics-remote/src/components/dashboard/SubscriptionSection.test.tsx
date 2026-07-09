@@ -94,7 +94,9 @@ function renderSub(props: Record<string, unknown> = {}) {
       subscription={subscription}
       showAlert={showAlert}
       navigate={navigate}
-      isAuthenticated={props.isAuthenticated !== undefined ? (props.isAuthenticated as boolean) : true}
+      isAuthenticated={
+        props.isAuthenticated !== undefined ? (props.isAuthenticated as boolean) : true
+      }
     />
   );
   return { subscription, navigate, showAlert };

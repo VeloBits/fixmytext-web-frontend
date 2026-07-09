@@ -33,7 +33,8 @@ vi.mock('framer-motion', () => {
 
 // Mock ToolIcon
 vi.mock('./ToolIcon', () => ({
-  default: ({ toolId }: { toolId?: string }) => React.createElement('span', { 'data-testid': `tool-icon-${toolId}` }),
+  default: ({ toolId }: { toolId?: string }) =>
+    React.createElement('span', { 'data-testid': `tool-icon-${toolId}` }),
 }));
 
 // Sample tools for testing

@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   description: `Browse all ${TOOLS.length}+ free online text tools — case converters, encoders, ciphers, AI writing tools, developer utilities, and more. No install, no signup.`,
   openGraph: {
     title: `All ${TOOLS.length}+ Free Text Tools — FixMyText`,
-    description: 'Case converters, encoders, ciphers, AI writing tools, developer utilities, and more.',
+    description:
+      'Case converters, encoders, ciphers, AI writing tools, developer utilities, and more.',
     type: 'website',
   },
 };
@@ -49,9 +50,7 @@ export default function ToolsPage() {
                   href={`/tools/${tool.id}`}
                   className="flex items-center gap-2.5 p-3 rounded-[var(--r-lg)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] hover:bg-[var(--bg2)] transition-all"
                 >
-                  <span
-                    className="text-[0.65rem] font-bold px-1.5 py-0.5 rounded-sm bg-[var(--surface-2)] shrink-0 text-[var(--accent)]"
-                  >
+                  <span className="text-[0.65rem] font-bold px-1.5 py-0.5 rounded-sm bg-[var(--surface-2)] shrink-0 text-[var(--accent)]">
                     {tool.icon}
                   </span>
                   <span className="text-sm text-[var(--text-2)] font-medium truncate hover:text-[var(--text)]">
@@ -66,14 +65,21 @@ export default function ToolsPage() {
 
       {/* Bottom CTA */}
       <div className="border-t border-[var(--border)] bg-[var(--surface)] py-10 px-4 text-center">
-        <p className="text-[var(--text-2)] mb-4">
-          Want to try a tool right now?
-        </p>
+        <p className="text-[var(--text-2)] mb-4">Want to try a tool right now?</p>
         <a
           href={WEB_APP_BASE_URL}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-[var(--r-lg)] font-semibold text-sm bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] transition-colors"
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
           </svg>
           Open the Editor

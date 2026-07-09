@@ -896,7 +896,9 @@ export default memo(function OutputPanel({
               {/* Sanitized to prevent XSS from AI-generated content */}
               <div
                 className="tu-preview-markdown"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(text) as string) }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(marked.parse(text) as string),
+                }}
               />
             </>
           ) : null}

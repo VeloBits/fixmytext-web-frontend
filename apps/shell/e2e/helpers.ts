@@ -11,17 +11,14 @@ export function uniqueEmail(prefix = 'e2e'): string {
 }
 
 export function razorpaySignature(orderId: string, paymentId: string, secret: string): string {
-  return crypto
-    .createHmac('sha256', secret)
-    .update(`${orderId}|${paymentId}`)
-    .digest('hex');
+  return crypto.createHmac('sha256', secret).update(`${orderId}|${paymentId}`).digest('hex');
 }
 
 export async function apiPost(
   request: APIRequestContext,
   path: string,
   body: Record<string, unknown>,
-  token?: string,
+  token?: string
 ): Promise<APIResponse> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -37,7 +34,7 @@ export async function apiPost(
  */
 export async function registerVerifiedUser(
   request: APIRequestContext,
-  { password = 'TestPass123!' } = {},
+  { password = 'TestPass123!' } = {}
 ) {
   const email = uniqueEmail();
   const displayName = 'E2E Tester';
@@ -50,19 +47,14 @@ export async function registerVerifiedUser(
   if (!reg.ok()) throw new Error(`register failed: ${reg.status()} ${await reg.text()}`);
   const { access_token: accessToken } = await reg.json();
 
-  const resend = await apiPost(
-    request,
-    '/api/v1/auth/resend-verification',
-    {},
-    accessToken,
-  );
+  const resend = await apiPost(request, '/api/v1/auth/resend-verification', {}, accessToken);
   if (!resend.ok()) {
     throw new Error(`resend-verification failed: ${resend.status()} ${await resend.text()}`);
   }
   const { verification_token: token } = await resend.json();
   if (!token) {
     throw new Error(
-      'No verification_token echoed. Backend must run with EMAIL_BACKEND=console for E2E.',
+      'No verification_token echoed. Backend must run with EMAIL_BACKEND=console for E2E.'
     );
   }
 

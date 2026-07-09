@@ -2,10 +2,10 @@
 
 ## Supported Versions
 
-| Version | Supported |
-|---------|-----------|
-| latest `main` | ✅ |
-| Older releases | ❌ |
+| Version        | Supported |
+| -------------- | --------- |
+| latest `main`  | ✅        |
+| Older releases | ❌        |
 
 ## Reporting a Vulnerability
 
@@ -20,22 +20,24 @@ We acknowledge receipt within **48 hours** and provide a triage status within **
 ## CVE Response SLA
 
 | Severity | Patch / mitigation target |
-|----------|---------------------------|
-| Critical | 48 hours |
-| High     | 7 days   |
-| Medium   | 30 days  |
-| Low      | 90 days  |
+| -------- | ------------------------- |
+| Critical | 48 hours                  |
+| High     | 7 days                    |
+| Medium   | 30 days                   |
+| Low      | 90 days                   |
 
 Targets are from the date of confirmed triage. Issues outside the project's scope are closed with a rationale.
 
 ## Scope
 
 In scope:
+
 - Application code in this repository
 - Dependency vulnerabilities surfaced by automated scanning
 - Infrastructure-as-code (Dockerfile, GitHub workflows) in this repository
 
 Out of scope:
+
 - Vulnerabilities in third-party services (Razorpay, Groq, etc.) — report to the vendor
 - Self-DoS via known-heavy operations (e.g. extremely large text input)
 - Best-practice findings without a concrete impact path
@@ -43,6 +45,7 @@ Out of scope:
 ## Automated Scanning
 
 This repository runs:
+
 - **CodeQL** — static analysis (`security-extended` query suite, weekly)
 - **Renovate** — automated dependency PRs (weekly, with security alerts off-schedule)
 - **`npm audit`** — dependency vulnerability checks on every PR

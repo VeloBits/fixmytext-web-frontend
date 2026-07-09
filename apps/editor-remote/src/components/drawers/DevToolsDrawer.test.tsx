@@ -16,9 +16,7 @@ describe('JsonPathDrawer', () => {
 
   it('renders the input and query button', () => {
     render(<JsonPathDrawer {...props} />);
-    expect(
-      screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title')
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('JSONPath, e.g. $.store.book[0].title')).toBeInTheDocument();
     expect(screen.getByText('Query')).toBeInTheDocument();
   });
 

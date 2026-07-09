@@ -127,9 +127,7 @@ export function resetLoadUser(): void {
 // The listener lives at module scope so signinSilent/removeUser is called exactly
 // once per event regardless of how many useOidcAuth hook instances are mounted.
 
-export type AuthMessage =
-  | { type: 'user_loaded' }
-  | { type: 'user_signed_out' };
+export type AuthMessage = { type: 'user_loaded' } | { type: 'user_signed_out' };
 
 const AUTH_CHANNEL = 'fixmytext_auth';
 
@@ -148,7 +146,11 @@ if (typeof BroadcastChannel !== 'undefined') {
       // Another tab completed login — silently acquire tokens here so this tab
       // picks up the SSO session without a page refresh.
       resetLoadUser();
-      try { await userManager.signinSilent(); } catch { /* SSO cookie absent */ }
+      try {
+        await userManager.signinSilent();
+      } catch {
+        /* SSO cookie absent */
+      }
     } else if (data?.type === 'user_signed_out') {
       // Another tab logged out — drop the in-memory user immediately.
       resetLoadUser();

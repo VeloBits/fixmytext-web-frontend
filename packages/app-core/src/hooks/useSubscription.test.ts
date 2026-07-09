@@ -121,12 +121,22 @@ describe('useSubscription', () => {
 
   it('checkToolAccess returns true for always-free tool', () => {
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'find_replace', type: 'api' } as unknown as ToolDefinition)).toBe(true);
+    expect(
+      result.current.checkToolAccess({
+        id: 'find_replace',
+        type: 'api',
+      } as unknown as ToolDefinition)
+    ).toBe(true);
   });
 
   it('checkToolAccess returns true for drawer tool', () => {
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'some_drawer', type: 'drawer' } as unknown as ToolDefinition)).toBe(true);
+    expect(
+      result.current.checkToolAccess({
+        id: 'some_drawer',
+        type: 'drawer',
+      } as unknown as ToolDefinition)
+    ).toBe(true);
   });
 
   it('checkToolAccess returns true when not authenticated', () => {
@@ -141,7 +151,9 @@ describe('useSubscription', () => {
       logout: vi.fn(),
     });
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
+    expect(
+      result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)
+    ).toBe(true);
   });
 
   it('checkToolAccess returns true for pro users', () => {
@@ -156,13 +168,17 @@ describe('useSubscription', () => {
       refetch: mockRefetchStatus,
     });
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
+    expect(
+      result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)
+    ).toBe(true);
   });
 
   it('checkToolAccess returns true when under free limit', () => {
     const { result } = renderHook(() => useSubscription({ showAlert }));
     // uppercase has 2 uses, limit is 3
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
+    expect(
+      result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)
+    ).toBe(true);
   });
 
   it('checkToolAccess shows upgrade modal when over limit', () => {
@@ -199,7 +215,9 @@ describe('useSubscription', () => {
       refetch: mockRefetchStatus,
     });
     const { result } = renderHook(() => useSubscription({ showAlert }));
-    expect(result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)).toBe(true);
+    expect(
+      result.current.checkToolAccess({ id: 'uppercase', type: 'api' } as unknown as ToolDefinition)
+    ).toBe(true);
   });
 
   it('checkToolAccess returns true for null tool', () => {

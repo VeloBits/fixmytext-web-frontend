@@ -182,8 +182,9 @@ export default function DashboardPage({
     sectionProps.refetchToolStats = refetchToolStats;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ActiveSection = (SECTIONS_MAP[activeSection] ?? OverviewSection) as React.ComponentType<any>;
+  const ActiveSection = (SECTIONS_MAP[activeSection] ??
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    OverviewSection) as React.ComponentType<any>;
 
   return (
     <div className="tu-dash">

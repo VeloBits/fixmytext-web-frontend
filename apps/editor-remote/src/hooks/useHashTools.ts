@@ -29,38 +29,38 @@ const useHashTools = ({
 }: HashToolsDeps) => {
   return useMemo(() => {
     // Factory for all hash handlers
-    const createHashHandler = (
-      toolId: string,
-      label: string,
-      hashFn: (t: string) => Promise<string>
-    ) => async (): Promise<void> => {
-      const t = textRef.current;
-      if (!t) return;
-      const original = t;
-      setLocalLoading(true);
-      try {
-        const hash = t.includes('\n')
-          ? (await Promise.all(t.split('\n').map((line) => hashFn(line)))).join('\n')
-          : await hashFn(t);
-        setAiResult({ label, result: hash });
-        setPreviewMode('result');
-        pushHistory(label, original, hash, { toolId, toolType: 'local' });
-        showAlert(`${label} generated`, 'success');
-      } catch {
-        showAlert(`${label} failed`, 'danger');
-      } finally {
-        setLocalLoading(false);
-      }
-    };
+    const createHashHandler =
+      (toolId: string, label: string, hashFn: (t: string) => Promise<string>) =>
+      async (): Promise<void> => {
+        const t = textRef.current;
+        if (!t) return;
+        const original = t;
+        setLocalLoading(true);
+        try {
+          const hash = t.includes('\n')
+            ? (await Promise.all(t.split('\n').map((line) => hashFn(line)))).join('\n')
+            : await hashFn(t);
+          setAiResult({ label, result: hash });
+          setPreviewMode('result');
+          pushHistory(label, original, hash, { toolId, toolType: 'local' });
+          showAlert(`${label} generated`, 'success');
+        } catch {
+          showAlert(`${label} failed`, 'danger');
+        } finally {
+          setLocalLoading(false);
+        }
+      };
 
     // Helper: Web Crypto API digest
-    const webCryptoHash = (algo: string) => async (text: string): Promise<string> => {
-      const data = new TextEncoder().encode(text);
-      const buf = await crypto.subtle.digest(algo, data);
-      return Array.from(new Uint8Array(buf))
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('');
-    };
+    const webCryptoHash =
+      (algo: string) =>
+      async (text: string): Promise<string> => {
+        const data = new TextEncoder().encode(text);
+        const buf = await crypto.subtle.digest(algo, data);
+        return Array.from(new Uint8Array(buf))
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('');
+      };
 
     // Helper: CRC32 (pure JS)
     const crc32Fn = (text: string): string => {

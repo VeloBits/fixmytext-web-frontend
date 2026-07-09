@@ -35,7 +35,15 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/pricing', search: '' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
+  Link: ({
+    children,
+    to,
+    ...p
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...p }, children),
 }));
 
 // ── react-redux mock ──
@@ -224,7 +232,15 @@ describe('PricingPage', () => {
 
   it('navigates to login if not authenticated when upgrading', () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
-    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, wasAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [samplePass], credit_packs: [] },
       isLoading: false,
@@ -275,7 +291,15 @@ describe('PricingPage', () => {
 
   it('navigates to login if not authenticated when buying pass', async () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
-    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, wasAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [samplePass], credit_packs: [] },
       isLoading: false,
@@ -408,7 +432,15 @@ describe('PricingPage', () => {
 
   it('calls handleBuyCredits via unauthenticated user shows alert', async () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
-    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, wasAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [], credit_packs: [sampleCredit] },
       isLoading: false,

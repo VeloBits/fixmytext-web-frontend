@@ -22,7 +22,7 @@ name: Deploy (Cloudflare)
 # workflow_dispatch.
 on:
   workflow_run:
-    workflows: ["Frontend CI"]
+    workflows: ['Frontend CI']
     types: [completed]
     branches: [main]
   workflow_dispatch:

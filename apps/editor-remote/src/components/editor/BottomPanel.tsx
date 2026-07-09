@@ -59,7 +59,13 @@ const TABS = [
   { id: 'pipeline', label: 'Pipeline', icon: '▶' },
 ];
 
-export default memo(function BottomPanel({ pipeline, history, text, gamification, style }: BottomPanelProps) {
+export default memo(function BottomPanel({
+  pipeline,
+  history,
+  text,
+  gamification,
+  style,
+}: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState('stats');
   const [collapsed, setCollapsed] = useState(false);
 

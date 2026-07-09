@@ -3,7 +3,10 @@
  * Syncs to DB when authenticated, falls back to localStorage.
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useGetPreferencesQuery, useUpdatePreferencesMutation } from '@velobits/app-core/store/api/userDataApi';
+import {
+  useGetPreferencesQuery,
+  useUpdatePreferencesMutation,
+} from '@velobits/app-core/store/api/userDataApi';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 
 /** Light or dark theme mode — mirrors ThemeContext.ThemeMode */

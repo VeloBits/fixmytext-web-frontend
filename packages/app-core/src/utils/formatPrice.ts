@@ -11,7 +11,7 @@ export function formatPrice(
   price: number,
   currency: SupportedCurrency,
   symbol: string,
-  decimals?: number,
+  decimals?: number
 ): string {
   const val = price / 100;
   if (currency === 'inr') {

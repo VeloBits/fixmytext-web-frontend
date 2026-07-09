@@ -160,8 +160,7 @@ export async function executeCheckoutFlow({
           navigate(failPath);
         }
       },
-      onFailure: (msg: string): void =>
-        showAlert?.(msg || 'Payment cancelled', 'info'),
+      onFailure: (msg: string): void => showAlert?.(msg || 'Payment cancelled', 'info'),
     });
   } catch (err) {
     const apiErr = err as { data?: { detail?: string } } | null;

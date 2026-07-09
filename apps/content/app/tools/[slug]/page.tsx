@@ -1,11 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import {
-  getAllSlugs,
-  getToolBySlug,
-  getToolsByGroup,
-  TOOL_GROUPS,
-} from '@velobits/tools-registry';
+import { getAllSlugs, getToolBySlug, getToolsByGroup, TOOL_GROUPS } from '@velobits/tools-registry';
 import { WEB_APP_BASE_URL } from '@velobits/api-client';
 
 interface Props {
@@ -102,10 +97,18 @@ export default async function ToolPage({ params }: Props) {
         <section className="border-b border-[var(--border)] bg-[var(--surface)]">
           <div className="max-w-3xl mx-auto px-4 py-12">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-1.5 text-xs text-[var(--text-3)] mb-6" aria-label="Breadcrumb">
-              <a href="/tools" className="hover:text-[var(--text)] transition-colors">All Tools</a>
+            <nav
+              className="flex items-center gap-1.5 text-xs text-[var(--text-3)] mb-6"
+              aria-label="Breadcrumb"
+            >
+              <a href="/tools" className="hover:text-[var(--text)] transition-colors">
+                All Tools
+              </a>
               <span>/</span>
-              <a href={`/tools?group=${tool.group}`} className="hover:text-[var(--text)] transition-colors">
+              <a
+                href={`/tools?group=${tool.group}`}
+                className="hover:text-[var(--text)] transition-colors"
+              >
                 {group?.label ?? tool.group}
               </a>
               <span>/</span>
@@ -138,7 +141,16 @@ export default async function ToolPage({ params }: Props) {
               href={editorUrl}
               className="inline-flex items-center gap-2.5 px-6 py-3 rounded-[var(--r-lg)] font-semibold text-sm bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] transition-colors shadow-sm"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
               Try {tool.label} Free

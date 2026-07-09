@@ -9,7 +9,11 @@ interface SmartSuggestionsProps {
   onDismiss: (id: string) => void;
 }
 
-export default memo(function SmartSuggestions({ suggestions, onToolClick, onDismiss }: SmartSuggestionsProps) {
+export default memo(function SmartSuggestions({
+  suggestions,
+  onToolClick,
+  onDismiss,
+}: SmartSuggestionsProps) {
   if (!suggestions || suggestions.length === 0) return null;
 
   return (

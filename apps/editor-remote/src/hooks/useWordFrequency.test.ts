@@ -4,12 +4,12 @@ import useWordFrequency from './useWordFrequency';
 describe('useWordFrequency', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let showAlert: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setAiResult: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setPreviewMode: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      pushHistory: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setAiResult: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setPreviewMode: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    pushHistory: any;
 
   beforeEach(() => {
     showAlert = vi.fn();

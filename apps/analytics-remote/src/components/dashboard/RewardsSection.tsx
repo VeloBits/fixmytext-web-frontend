@@ -1,6 +1,9 @@
 import SpinWheel from '@velobits/app-core/gamification/SpinWheel';
 import type { SubscriptionContextValue } from '@velobits/app-core/types/context';
-import type { SpinWheelSubscription, SpinHistoryItem } from '@velobits/app-core/gamification/SpinWheel';
+import type {
+  SpinWheelSubscription,
+  SpinHistoryItem,
+} from '@velobits/app-core/gamification/SpinWheel';
 
 interface RewardsSectionProps {
   subscription: SubscriptionContextValue;

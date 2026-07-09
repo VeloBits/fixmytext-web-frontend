@@ -18,12 +18,12 @@ The repo currently has two apps (`apps/web` and `apps/content`) and four shared 
 
 ### Four Deployment Units
 
-| Unit | Framework | Cloudflare Target | Serves |
-|------|-----------|-------------------|--------|
-| `apps/shell` | Vite + React 19 | Cloudflare Pages | `/app/*` routes |
-| `apps/editor-remote` | Vite + React 19 | Cloudflare Pages | Editor surface (loaded via MFE) |
-| `apps/analytics-remote` | Vite + React 19 | Cloudflare Pages | Analytics surface (loaded via MFE) |
-| `apps/content` | Next.js 15 | Cloudflare Pages + Workers | `/`, `/tools/*`, `/share/*`, `/about`, `/pricing` |
+| Unit                    | Framework       | Cloudflare Target          | Serves                                            |
+| ----------------------- | --------------- | -------------------------- | ------------------------------------------------- |
+| `apps/shell`            | Vite + React 19 | Cloudflare Pages           | `/app/*` routes                                   |
+| `apps/editor-remote`    | Vite + React 19 | Cloudflare Pages           | Editor surface (loaded via MFE)                   |
+| `apps/analytics-remote` | Vite + React 19 | Cloudflare Pages           | Analytics surface (loaded via MFE)                |
+| `apps/content`          | Next.js 15      | Cloudflare Pages + Workers | `/`, `/tools/*`, `/share/*`, `/about`, `/pricing` |
 
 ### Routing Layer
 
@@ -128,7 +128,7 @@ federation({
     'react-redux': { singleton: true },
     '@sentry/react': { singleton: true },
   },
-})
+});
 ```
 
 `VITE_USE_REMOTES` is removed from the shell config — when `apps/shell` is its own build, remotes are always enabled. The `App.tsx` lazy import logic in `apps/shell` simplifies to always using `import('editor-remote/EditorPage')` (the conditional `if (USE_REMOTES)` branch is deleted). The original `apps/web/vite.config.ts` monolithic config is preserved during migration as a fallback but ultimately deprecated.
@@ -148,19 +148,19 @@ federation({
     'react-dom': { singleton: true },
     // etc.
   },
-})
+});
 ```
 
 Analytics remote follows the same pattern, exposing `./AnalyticsPage`.
 
 ### Remote entry URL strategy
 
-| Environment | `VITE_EDITOR_REMOTE_ENTRY` |
-|-------------|---------------------------|
-| Local bare (no Docker) | `http://localhost:3101/remoteEntry.js` |
-| Docker dev | `http://localhost:3000/remotes/editor/remoteEntry.js` |
-| Docker prod | `http://localhost:3000/remotes/editor/remoteEntry.js` |
-| Cloudflare production | `https://fixmytext.com/remotes/editor/remoteEntry.js` |
+| Environment            | `VITE_EDITOR_REMOTE_ENTRY`                            |
+| ---------------------- | ----------------------------------------------------- |
+| Local bare (no Docker) | `http://localhost:3101/remoteEntry.js`                |
+| Docker dev             | `http://localhost:3000/remotes/editor/remoteEntry.js` |
+| Docker prod            | `http://localhost:3000/remotes/editor/remoteEntry.js` |
+| Cloudflare production  | `https://fixmytext.com/remotes/editor/remoteEntry.js` |
 
 The URL path pattern (`/remotes/editor/remoteEntry.js`) is identical across Docker and Cloudflare — only the base URL changes. This means the nginx router and CF Worker have isomorphic routing rules.
 
@@ -222,6 +222,7 @@ Both profiles use the **same service names** (`editor-remote`, `analytics-remote
 ### Environment files
 
 `.env.docker.dev`:
+
 ```
 VITE_API_URL=http://api-dev.velobits.dev
 VITE_KEYCLOAK_URL=http://auth-dev.velobits.dev
@@ -240,12 +241,12 @@ VITE_ANALYTICS_REMOTE_ENTRY=http://localhost:3000/remotes/analytics/remoteEntry.
 
 ### Four Cloudflare Pages projects
 
-| CF Pages project | Build command | Output dir |
-|---|---|---|
-| `fixmytext-shell` | `npm run build -w @velobits/shell` | `apps/shell/dist` |
-| `fixmytext-editor-remote` | `npm run build -w @velobits/editor-remote` | `apps/editor-remote/dist` |
-| `fixmytext-analytics-remote` | `npm run build -w @velobits/analytics-remote` | `apps/analytics-remote/dist` |
-| `fixmytext-content` | `npm run build -w @velobits/content-app && npx @cloudflare/next-on-pages` | `apps/content/.vercel/output/static` |
+| CF Pages project             | Build command                                                             | Output dir                           |
+| ---------------------------- | ------------------------------------------------------------------------- | ------------------------------------ |
+| `fixmytext-shell`            | `npm run build -w @velobits/shell`                                        | `apps/shell/dist`                    |
+| `fixmytext-editor-remote`    | `npm run build -w @velobits/editor-remote`                                | `apps/editor-remote/dist`            |
+| `fixmytext-analytics-remote` | `npm run build -w @velobits/analytics-remote`                             | `apps/analytics-remote/dist`         |
+| `fixmytext-content`          | `npm run build -w @velobits/content-app && npx @cloudflare/next-on-pages` | `apps/content/.vercel/output/static` |
 
 Each project is independent. A PR touching only `apps/editor-remote` only rebuilds and deploys that Pages project.
 
@@ -292,6 +293,7 @@ Each Pages project has its env vars set in the Cloudflare dashboard (or via `wra
 ### apps/content + @cloudflare/next-on-pages
 
 `apps/content/wrangler.toml`:
+
 ```toml
 name = "fixmytext-content"
 compatibility_date = "2024-09-23"
@@ -300,6 +302,7 @@ pages_build_output_dir = ".vercel/output/static"
 ```
 
 `apps/content/package.json` additions:
+
 ```json
 {
   "devDependencies": {
