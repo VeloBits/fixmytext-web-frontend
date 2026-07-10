@@ -1,0 +1,20 @@
+<!doctype html>
+<!--
+  Silent-renew relay for oidc-client-ts. The hidden iframe lands here after
+  Keycloak's prompt=none authorize redirect; all this page must do is hand the
+  response URL back to the parent window, which completes the code exchange
+  itself. Message shape is IFrameWindow's contract in oidc-client-ts 3.x
+  ({ source: "oidc-client", url, keepOpen } — see IFrameWindow._notifyParent);
+  re-verify it on major-version bumps. Keeping this page free of the SPA
+  bundle is the point: silent renew must stay fast and resilient inside
+  throttled background tabs, where booting the full app can blow past the
+  silent-request timeout.
+-->
+<meta charset="utf-8" />
+<title>Signing in…</title>
+<script>
+  window.parent.postMessage(
+    { source: 'oidc-client', url: window.location.href, keepOpen: false },
+    window.location.origin
+  );
+</script>

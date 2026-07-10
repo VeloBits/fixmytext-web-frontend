@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
+import { ErrorResponse } from 'oidc-client-ts';
 import { broadcastAuthMessage, hasAuthHint, userManager } from './userManager';
 
 // React 19 StrictMode fires useEffect 3+ times per mount via multiple
@@ -53,6 +54,15 @@ export function AuthCallback() {
         if (hasAuthHint()) {
           console.warn('OIDC callback replay detected — recovering via existing session', err);
           window.location.replace(window.location.pathname.replace(/auth\/callback.*/, ''));
+          return;
+        }
+        // Keycloak redirects here with error=access_denied when the user
+        // backs out of the login/registration screen. A change of mind, not
+        // a failure — land on the guest home instead of an error card. A
+        // guest has no session to restore (the hint case returned above), so
+        // a client-side navigate is enough.
+        if (err instanceof ErrorResponse && err.error === 'access_denied') {
+          navigate('/', { replace: true });
           return;
         }
         Sentry.captureException(err);

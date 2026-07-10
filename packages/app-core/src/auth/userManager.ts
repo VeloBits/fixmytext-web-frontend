@@ -13,11 +13,20 @@ const baseSettings: UserManagerSettings = {
   authority: REALM_BASE,
   client_id: KEYCLOAK_CLIENT_ID,
   redirect_uri: `${window.location.origin}/app/auth/callback`,
-  silent_redirect_uri: `${window.location.origin}/app/auth/silent-callback`,
+  // Static relay page (apps/shell/public/auth/silent-callback.html), NOT the
+  // SPA route: the hidden silent-renew iframe only needs to postMessage the
+  // response URL back to the parent. Booting the full SPA in the iframe took
+  // long enough in throttled background tabs to blow the silent-request
+  // timeout, so cross-tab login pickup silently failed there.
+  silent_redirect_uri: `${window.location.origin}/app/auth/silent-callback.html`,
   post_logout_redirect_uri: `${window.location.origin}/app/login`,
   response_type: 'code',
   scope: 'openid email profile',
   automaticSilentRenew: true,
+  // Default is 10s; give throttled background tabs extra slack — a slow
+  // success beats a swallowed timeout (the foreground reconciler is the
+  // backstop, not the primary path).
+  silentRequestTimeoutInSeconds: 30,
   // H-8: tokens (incl. the refresh_token) live ONLY in memory — never in
   // session/local storage, so an XSS can't read a long-lived refresh token.
   // On a reload the user is re-hydrated from Keycloak's SSO cookie via silent
@@ -149,7 +158,9 @@ if (typeof BroadcastChannel !== 'undefined') {
       try {
         await userManager.signinSilent();
       } catch {
-        /* SSO cookie absent */
+        /* SSO cookie absent, or this tab is backgrounded and the browser
+           throttled the silent iframe past its timeout — the foreground
+           reconciler below retries when the tab is next looked at. */
       }
     } else if (data?.type === 'user_signed_out') {
       // Another tab logged out — drop the in-memory user immediately.
@@ -157,4 +168,55 @@ if (typeof BroadcastChannel !== 'undefined') {
       await userManager.removeUser();
     }
   };
+}
+
+// ── Foreground reconciliation ───────────────────────────────────────────────
+// The broadcast pickup above is best-effort: signinSilent() runs in a hidden
+// iframe, and in a backgrounded tab the browser can throttle/freeze that flow
+// past its timeout — the failure is swallowed and the tab silently keeps the
+// wrong identity until a manual reload. The auth hint is shared localStorage
+// ("a session exists in this browser"), so whenever a tab returns to the
+// foreground, reconcile the in-memory user against it: acquire the session
+// this tab missed, or drop one it should no longer have. No-op (one getUser
+// on the in-memory store) when tab and hint already agree.
+let _reconciling = false;
+
+async function reconcileSessionWithHint(): Promise<void> {
+  if (_reconciling) return;
+  // Callback routes are driven by signinRedirectCallback/signinSilentCallback;
+  // a concurrent signinSilent here would race them (same guard as loadUser).
+  const path = window.location.pathname;
+  if (path.includes('/auth/callback') || path.includes('/auth/silent-callback')) return;
+  _reconciling = true;
+  try {
+    const user = await userManager.getUser();
+    let hint = false;
+    let hintReadable = true;
+    try {
+      hint = localStorage.getItem(AUTH_HINT_KEY) === '1';
+    } catch {
+      hintReadable = false; // storage unavailable — hint says nothing either way
+    }
+    if (hint && (!user || user.expired)) {
+      resetLoadUser();
+      try {
+        await userManager.signinSilent(); // success fires userLoaded → UI updates
+      } catch {
+        setAuthHint(false); // stale hint — the SSO session is gone
+      }
+    } else if (hintReadable && !hint && user) {
+      // Hint cleared by a signout this tab never received (e.g. frozen tab).
+      resetLoadUser();
+      await userManager.removeUser();
+    }
+  } finally {
+    _reconciling = false;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('focus', () => void reconcileSessionWithHint());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') void reconcileSessionWithHint();
+  });
 }
