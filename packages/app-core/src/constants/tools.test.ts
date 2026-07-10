@@ -21,7 +21,7 @@ describe('PERSONAS', () => {
     expect(PERSONAS).toHaveProperty('explorer');
   });
 
-  it('each persona has label, icon, and defaultTab', () => {
+  it('each persona has label, icon, defaultTab, and suggestedTools', () => {
     for (const persona of Object.values(PERSONAS)) {
       expect(persona).toHaveProperty('label');
       expect(persona).toHaveProperty('icon');
@@ -29,6 +29,16 @@ describe('PERSONAS', () => {
       expect(typeof persona.label).toBe('string');
       expect(typeof persona.icon).toBe('string');
       expect(typeof persona.defaultTab).toBe('string');
+      expect(Array.isArray(persona.suggestedTools)).toBe(true);
+    }
+  });
+
+  it('every suggested tool id references a known tool', () => {
+    const toolIds = new Set(TOOLS.map((t) => t.id));
+    for (const persona of Object.values(PERSONAS)) {
+      for (const id of persona.suggestedTools) {
+        expect(toolIds.has(id)).toBe(true);
+      }
     }
   });
 });

@@ -1,12 +1,15 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { components } from '../../types/openapi';
-import { createAuthBaseQuery } from './baseQuery';
+import { baseQueryWithRetry } from './baseQuery';
 
 type UserResponse = components['schemas']['UserResponse'];
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: createAuthBaseQuery(),
+  // Reauth + transient retry: a rate-limited (429) or flaky /auth/me must not
+  // read as "signed out" — see AppContext's userResolving/guest handling.
+  // resendVerification is a mutation, so the retry wrapper skips it.
+  baseQuery: baseQueryWithRetry,
   tagTypes: ['Me'],
   endpoints: (builder) => ({
     getMe: builder.query<UserResponse, void>({

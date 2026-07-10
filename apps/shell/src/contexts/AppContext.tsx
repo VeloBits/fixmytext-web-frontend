@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 import type React from 'react';
 import { useSelector } from 'react-redux';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
@@ -35,11 +35,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, accessToken } = useOidcAuth();
   const user = useSelector((s: RootState) => s.auth.user) as User | null;
   // Trigger /auth/me fetch when authenticated so Redux user state is populated.
-  const { isError: meFailed } = useGetMeQuery(undefined, { skip: !accessToken });
+  const {
+    isError: meFailed,
+    error: meError,
+    refetch: refetchMe,
+  } = useGetMeQuery(undefined, { skip: !accessToken });
   // Signed in but the profile hasn't landed in Redux yet (and the fetch hasn't
   // failed) — identity UI should show loading, not guest. The !meFailed guard
   // keeps a broken /auth/me from wedging consumers in a permanent loading state.
   const userResolving = isAuthenticated && !user && !meFailed;
+  // A transiently failing /auth/me (rate-limited 429, 5xx, network drop) is not
+  // a sign-out: only a definitive 401/403 settles the identity. Keep refetching
+  // in the background so a burst of 429s can't strand a signed-in user in
+  // guest-looking chrome — the profile pops in as soon as a poll succeeds.
+  const meStatus = (meError as { status?: number | string } | undefined)?.status;
+  const meAuthRejected = meStatus === 401 || meStatus === 403;
+  useEffect(() => {
+    if (!isAuthenticated || user || !meFailed || meAuthRejected) return undefined;
+    const id = window.setInterval(() => refetchMe(), 15_000);
+    return () => window.clearInterval(id);
+  }, [isAuthenticated, user, meFailed, meAuthRejected, refetchMe]);
   const gamification = useGamification() as unknown as GamificationContextValue;
   const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 

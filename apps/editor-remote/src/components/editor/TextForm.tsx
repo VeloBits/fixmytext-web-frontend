@@ -29,7 +29,7 @@ import {
   USE_CASE_TABS,
   ACHIEVEMENTS,
 } from '@velobits/app-core/constants/tools';
-import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
+import type { ToolDefinition, ToolTab, PersonaId } from '@velobits/app-core/types/tools';
 import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 import { ROUTES } from '@velobits/app-core/constants';
 
@@ -326,7 +326,13 @@ export default function TextForm(props: TextFormProps) {
   const [markdownMode, setMarkdownMode] = useState(false);
   const { activePanel, setActivePanel, togglePanel } = useDrawerState();
   const [previewMode, setPreviewMode] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  // Returning visitors have a persona synchronously (sessionStorage / cached
+  // state), so seed their default tab here — no 'all' flash before the switch.
+  const [activeTab, setActiveTab] = useState<string | null>(() => {
+    const personaId = props.gamification?.persona as PersonaId | undefined;
+    return personaId ? (PERSONAS[personaId]?.defaultTab ?? 'all') : null;
+  });
+  const personaTabApplied = useRef(activeTab !== null);
   // Must match the mobile breakpoint in editor.css — inline resize sizes would
   // otherwise override the media query and collapse the layout on small screens
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -433,6 +439,12 @@ export default function TextForm(props: TextFormProps) {
   const gamification = props.gamification;
   const pipeline = usePipeline();
   const suggestions = useSmartSuggestions(text);
+  // Persona picks surface as a pinned "For You" group — visible on an empty
+  // editor, unlike smart suggestions which need typed text to trigger.
+  const personaSuggestedIds = useMemo(() => {
+    const personaId = gamification?.persona as PersonaId | undefined;
+    return personaId ? (PERSONAS[personaId]?.suggestedTools ?? []) : [];
+  }, [gamification?.persona]);
   const search = useToolSearch();
   const trial = useTrialLimit(props.isAuthenticated);
   const subscription = props.subscription;
@@ -551,16 +563,21 @@ export default function TextForm(props: TextFormProps) {
     });
   }, [isAuthenticated, syncPanelSizes, sidebarResize.size, splitResize.size, bottomResize.size]);
 
-  // Set default tab from persona
+  // Default tab: persona wins once (it can arrive after mount — onboarding
+  // completes over the editor, or the DB copy hydrates on login), otherwise
+  // fall back to 'all'. Single effect: as two effects both ran against the
+  // same null-activeTab render and the 'all' write landed last every time.
   useEffect(() => {
-    if (gamification?.persona && !activeTab) {
-      setActiveTab(PERSONAS[gamification?.persona as string]?.defaultTab || 'all');
+    const personaId = gamification?.persona as PersonaId | undefined;
+    const personaTab = personaId ? PERSONAS[personaId]?.defaultTab : undefined;
+    if (personaTab && !personaTabApplied.current) {
+      personaTabApplied.current = true;
+      // take over only from the fallback; never stomp a tab the user picked
+      setActiveTab((prev) => (prev === null || prev === 'all' ? personaTab : prev));
+    } else if (!activeTab) {
+      setActiveTab('all');
     }
   }, [gamification?.persona, activeTab]);
-
-  useEffect(() => {
-    if (!activeTab) setActiveTab('all');
-  }, [activeTab]);
 
   // Capture AI results per-tab for persistence
   // Keyed by tab ID so each tab is fully independent
@@ -1819,7 +1836,10 @@ export default function TextForm(props: TextFormProps) {
               })()}
               hideTabs={!isMobile}
               viewMode={toolViewMode}
-              suggestedToolIds={suggestions.suggestions.map((t) => t.id)}
+              suggestedToolIds={[
+                ...new Set([...suggestions.suggestions.map((t) => t.id), ...personaSuggestedIds]),
+              ]}
+              personaToolIds={personaSuggestedIds}
             />
           )}
 

@@ -91,19 +91,25 @@ export function createBaseQueryWithReauth(extraHeaders: ExtraHeadersFn): RtkBase
   return createReauthQuery(createAuthBaseQuery(extraHeaders));
 }
 
+/** Transient failures worth retrying: rate limits (429), server errors (5xx),
+ * and network/timeout errors (non-numeric status). Other 4xx are terminal. */
+export function isTransientError(error: { status?: number | string } | undefined): boolean {
+  const status = error?.status;
+  if (typeof status !== 'number') return true;
+  return status === 429 || status >= 500;
+}
+
 /**
- * Reauth base query with automatic retry for transient server errors (5xx).
- * Use this for read-heavy APIs (queries). Mutations should NOT use this.
+ * Reauth base query with automatic retry for transient errors (429/5xx/network).
+ * Retries are limited to idempotent requests — a retried mutation can
+ * double-submit, so mutations surface the error to the caller instead.
  */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function retryCondition(_error: any, _args: any, { attempt }: { attempt: number }): boolean {
-  if (
-    (_error as FetchBaseQueryError & { status?: number })?.status &&
-    (_error as FetchBaseQueryError & { status?: number }).status! < 500
-  )
-    return false;
-  return attempt <= 2;
+function retryCondition(_error: any, args: any, { attempt }: { attempt: number }): boolean {
+  if (attempt > 2) return false;
+  if (!isIdempotent(args)) return false;
+  return isTransientError(_error as FetchBaseQueryError & { status?: number });
 }
 
 export const baseQueryWithRetry = retry(baseQueryWithReauth, {

@@ -12,7 +12,7 @@ import {
 } from '../store/api/userDataApi';
 import { TOOLS, ACHIEVEMENTS, QUEST_TEMPLATES, LEVELS } from '../constants/tools';
 import { useOidcAuth } from '../auth/useOidcAuth';
-import type { Achievement, LevelDefinition, QuestOp, QuestTemplate, Persona } from '../types/tools';
+import type { Achievement, LevelDefinition, QuestOp, QuestTemplate, PersonaId } from '../types/tools';
 import type {
   GamificationContextValue,
   GamificationStreak,
@@ -30,7 +30,7 @@ const AI_TOOL_IDS = TOOLS.filter((t) => t.tabs?.includes('ai')).map((t) => t.id)
 const DEV_TOOL_IDS = TOOLS.filter((t) => t.tabs?.includes('code')).map((t) => t.id);
 
 interface GamificationState {
-  persona: Persona | null;
+  persona: PersonaId | null;
   toolsUsed: Record<string, number>;
   discoveredTools: string[];
   totalOps: number;
@@ -55,9 +55,9 @@ function loadState(): Partial<GamificationState> | null {
   return null;
 }
 
-function loadGuestPersona(): Persona | null {
+function loadGuestPersona(): PersonaId | null {
   try {
-    return sessionStorage.getItem(GUEST_PERSONA_KEY) as unknown as Persona | null;
+    return sessionStorage.getItem(GUEST_PERSONA_KEY) as PersonaId | null;
   } catch {
     return null;
   }
@@ -176,7 +176,7 @@ export default function useGamification(): GamificationContextValue {
       setState((prev) => {
         const merged = { ...prev, ...dbState, sessionOps: prev.sessionOps };
         if (dbPrefs) {
-          const prefs = dbPrefs as { persona?: Persona };
+          const prefs = dbPrefs as { persona?: PersonaId };
           merged.persona = prefs.persona || prev.persona;
         }
         return merged;
@@ -184,10 +184,10 @@ export default function useGamification(): GamificationContextValue {
       // Mirror the DB persona into the guest sessionStorage copy: after logout
       // this tab falls back to guest state, and without the copy the welcome
       // picker would reappear for a user who onboarded long ago elsewhere.
-      const personaFromDb = (dbPrefs as { persona?: Persona } | undefined)?.persona;
+      const personaFromDb = (dbPrefs as { persona?: PersonaId } | undefined)?.persona;
       if (personaFromDb) {
         try {
-          sessionStorage.setItem(GUEST_PERSONA_KEY, personaFromDb as unknown as string);
+          sessionStorage.setItem(GUEST_PERSONA_KEY, personaFromDb);
         } catch {
           /* ignore */
         }
@@ -389,18 +389,18 @@ export default function useGamification(): GamificationContextValue {
   );
 
   const setPersona = useCallback(
-    (persona: Persona): void => {
+    (persona: PersonaId): void => {
       setState((prev) => ({ ...prev, persona }));
       // Always keep the guest copy too, even when authenticated: after logout
       // the hook falls back to guest state, and without it the welcome picker
       // would reappear on the logged-out home right after signing out.
       try {
-        sessionStorage.setItem(GUEST_PERSONA_KEY, persona as unknown as string);
+        sessionStorage.setItem(GUEST_PERSONA_KEY, persona);
       } catch {
         /* ignore */
       }
       if (isAuthenticated) {
-        syncPrefs({ persona: persona as unknown as string })
+        syncPrefs({ persona })
           .unwrap()
           .catch(() => {});
       }

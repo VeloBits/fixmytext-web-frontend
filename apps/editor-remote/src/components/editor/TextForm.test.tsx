@@ -321,11 +321,20 @@ vi.mock('@/hooks/useKeyboardShortcuts', () => ({
 
 // ── Child component mocks ──
 vi.mock('./ToolPanel', () => ({
-  default: ({ onToolClick, tools }: { onToolClick?: (t: unknown) => void; tools?: unknown[] }) =>
+  default: ({
+    onToolClick,
+    tools,
+    personaToolIds,
+  }: {
+    onToolClick?: (t: unknown) => void;
+    tools?: unknown[];
+    personaToolIds?: string[];
+  }) =>
     React.createElement(
       'div',
       {
         'data-testid': 'tool-panel',
+        'data-persona-tools': (personaToolIds ?? []).join(','),
         onClick: () => onToolClick && onToolClick(tools?.[0]),
       },
       'ToolPanel'
@@ -544,6 +553,41 @@ describe('TextForm', () => {
     const gamification = { ...defaultGamification, xp: 150 };
     render(<TextForm {...defaultProps} gamification={gamification} />);
     expect(screen.getByText('150 XP')).toBeInTheDocument();
+  });
+
+  it('opens the persona default tab on mount (developer → Code & Data)', () => {
+    const gamification = { ...defaultGamification, persona: 'developer' };
+    render(<TextForm {...defaultProps} gamification={gamification} />);
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain(
+      'Code & Data'
+    );
+  });
+
+  it('falls back to All Tools when no persona is set', () => {
+    render(<TextForm {...defaultProps} />);
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
+  });
+
+  it('switches to the persona tab when persona arrives after mount (onboarding completes)', () => {
+    const { rerender } = render(<TextForm {...defaultProps} />);
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
+    rerender(
+      <TextForm {...defaultProps} gamification={{ ...defaultGamification, persona: 'writer' }} />
+    );
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('Writing');
+  });
+
+  it('passes the persona suggestedTools to ToolPanel as personaToolIds', () => {
+    const gamification = { ...defaultGamification, persona: 'writer' };
+    render(<TextForm {...defaultProps} gamification={gamification} />);
+    expect(screen.getByTestId('tool-panel').getAttribute('data-persona-tools')).toBe(
+      'fix_grammar,paraphrase,change_tone,proofread'
+    );
+  });
+
+  it('passes no personaToolIds to ToolPanel without a persona', () => {
+    render(<TextForm {...defaultProps} />);
+    expect(screen.getByTestId('tool-panel').getAttribute('data-persona-tools')).toBe('');
   });
 
   it('toggles sidebar when activity bar button is clicked', () => {

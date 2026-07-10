@@ -47,6 +47,7 @@ interface ToolPanelProps {
   hideTabs?: boolean;
   viewMode?: string;
   suggestedToolIds?: string[];
+  personaToolIds?: string[];
 }
 
 function ToolPanelItem({
@@ -224,6 +225,7 @@ export default memo(function ToolPanel({
   hideTabs,
   viewMode = 'list',
   suggestedToolIds = [],
+  personaToolIds = [],
 }: ToolPanelProps) {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
@@ -287,6 +289,17 @@ export default memo(function ToolPanel({
       groups.push({ id: '_pinned', label: 'Pinned', tools: pinnedTools });
     }
 
+    // Persona "For You" picks — from the full catalog, not filteredTools, so
+    // they stay visible whatever tab is active (a persona's suggested tool may
+    // not belong to its own default tab); curated order, favorites already
+    // pinned above so skip them here
+    const forYouTools = personaToolIds
+      .map((id) => tools.find((t) => t.id === id))
+      .filter((t): t is ToolDefinition => !!t && !favorites.includes(t.id));
+    if (forYouTools.length > 0) {
+      groups.push({ id: '_foryou', label: 'For You', tools: forYouTools });
+    }
+
     for (const tool of filteredTools) {
       const gid = tool.group || 'other';
       if (!groupMap[gid]) {
@@ -315,7 +328,7 @@ export default memo(function ToolPanel({
     }
 
     return groups;
-  }, [filteredTools, favorites]);
+  }, [filteredTools, favorites, personaToolIds, tools]);
 
   return (
     <div className="tu-tpanel">
@@ -352,7 +365,7 @@ export default memo(function ToolPanel({
                   count={group.tools.length}
                   collapsed={!!collapsedGroups[group.id]}
                   onToggle={() => toggleGroup(group.id)}
-                  pinned={group.id === '_pinned'}
+                  pinned={group.id === '_pinned' || group.id === '_foryou'}
                 />
                 {!collapsedGroups[group.id] &&
                   (viewMode === 'grid' ? (

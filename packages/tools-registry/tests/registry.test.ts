@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TOOLS, TOOL_GROUPS, USE_CASE_TABS } from '../src/tools';
+import { TOOLS, TOOL_GROUPS, USE_CASE_TABS, PERSONAS } from '../src/tools';
 import { getToolBySlug, getAllSlugs, getToolsByGroup, getAllGroups } from '../src/slugs';
 
 describe('TOOLS registry', () => {
@@ -48,6 +48,45 @@ describe('TOOL_GROUPS', () => {
 describe('USE_CASE_TABS', () => {
   it('has 7 tabs', () => {
     expect(USE_CASE_TABS).toHaveLength(7);
+  });
+});
+
+describe('PERSONAS', () => {
+  it('every suggestedTools id references a known tool', () => {
+    const toolIds = new Set(TOOLS.map((t) => t.id));
+    for (const [key, persona] of Object.entries(PERSONAS)) {
+      for (const id of persona.suggestedTools) {
+        expect(toolIds.has(id), `${key}: unknown suggested tool '${id}'`).toBe(true);
+      }
+    }
+  });
+
+  it('every defaultTab is a valid use-case tab', () => {
+    const tabIds = new Set<string>(USE_CASE_TABS.map((t) => t.id));
+    for (const [key, persona] of Object.entries(PERSONAS)) {
+      expect(tabIds.has(persona.defaultTab), `${key}: unknown tab '${persona.defaultTab}'`).toBe(
+        true
+      );
+    }
+  });
+
+  it('every persona except explorer suggests at least one tool', () => {
+    for (const [key, persona] of Object.entries(PERSONAS)) {
+      if (key === 'explorer') {
+        // "Just Exploring" promises the whole catalog — no For You group
+        expect(persona.suggestedTools).toEqual([]);
+      } else {
+        expect(persona.suggestedTools.length, `${key} has no suggested tools`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('suggested tool ids are unique within each persona', () => {
+    for (const [key, persona] of Object.entries(PERSONAS)) {
+      expect(new Set(persona.suggestedTools).size, `${key} has duplicate ids`).toBe(
+        persona.suggestedTools.length
+      );
+    }
   });
 });
 

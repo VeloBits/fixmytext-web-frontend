@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { PERSONAS } from '@velobits/app-core/constants/tools';
-import type { Persona } from '@velobits/app-core/types/tools';
+import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
 
 interface PersonaMeta {
   gradient: string;
@@ -9,12 +9,14 @@ interface PersonaMeta {
   tagline: string;
 }
 
-type PersonaMetaMap = Record<string, PersonaMeta>;
+type PersonaMetaMap = Record<PersonaId, PersonaMeta>;
 
 interface PersonaItem extends Persona, PersonaMeta {
-  id: string;
+  id: PersonaId;
 }
 
+// `tools` are display shorthand for the real PERSONAS[*].suggestedTools ids
+// (the editor's "For You" group) — keep the two lists telling the same story.
 const PERSONA_META: PersonaMetaMap = {
   writer: {
     gradient: 'linear-gradient(135deg, #C586C0 0%, #569CD6 100%)',
@@ -48,7 +50,9 @@ const PERSONA_META: PersonaMetaMap = {
   },
 };
 
-const PERSONA_LIST: PersonaItem[] = Object.entries(PERSONAS).map(([id, data]) => ({
+const PERSONA_LIST: PersonaItem[] = (
+  Object.entries(PERSONAS) as [PersonaId, Persona][]
+).map(([id, data]) => ({
   id,
   ...data,
   ...(PERSONA_META[id] ?? { gradient: '', accent: '', tools: [], tagline: '' }),
@@ -81,7 +85,7 @@ const TypingText = ({ text }: TypingTextProps) => (
 );
 
 export interface OnboardingModalProps {
-  onComplete: (personaId: string) => void;
+  onComplete: (personaId: PersonaId) => void;
 }
 
 export default function OnboardingModal({ onComplete }: OnboardingModalProps) {

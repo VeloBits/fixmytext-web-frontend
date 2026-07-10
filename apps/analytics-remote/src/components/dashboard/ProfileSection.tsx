@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { PERSONAS } from '@velobits/app-core/constants/tools';
 import type { GamificationContextValue, User } from '@velobits/app-core/types/context';
 import type { AlertLevel } from '@velobits/app-core/types/alert';
-import type { Persona } from '@velobits/app-core/types/tools';
+import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
 
 interface ProfileSectionProps {
   user: User | null;
@@ -221,23 +221,20 @@ export default function ProfileSection({
         <h3 className="tu-dash-card-title">Persona</h3>
         <p className="tu-dash-card-desc">Choose your persona to get tailored tool suggestions</p>
         <div className="tu-dash-persona-grid">
-          {Object.entries(PERSONAS).map(([key, p]) => (
+          {(Object.entries(PERSONAS) as [PersonaId, Persona][]).map(([key, p]) => (
             <button
               key={key}
               className={`tu-dash-persona-card${
-                // persona is stored as a string key in practice
-                (g?.persona as unknown as string) === key ? ' tu-dash-persona-card--active' : ''
+                g?.persona === key ? ' tu-dash-persona-card--active' : ''
               }`}
               onClick={() => {
-                g.setPersona(key as unknown as Persona);
+                g.setPersona(key);
                 showAlert(`Persona changed to ${p.label}`, 'success');
               }}
             >
               <span className="tu-dash-persona-icon">{p.icon}</span>
               <span className="tu-dash-persona-label">{p.label}</span>
-              {(g?.persona as unknown as string) === key && (
-                <span className="tu-dash-persona-check">✓</span>
-              )}
+              {g?.persona === key && <span className="tu-dash-persona-check">✓</span>}
             </button>
           ))}
         </div>

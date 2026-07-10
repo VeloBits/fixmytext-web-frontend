@@ -14,6 +14,7 @@ import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
 import { AppProvider, useAppContext } from './contexts/AppContext';
+import type { PersonaId } from '@velobits/app-core/types/tools';
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 import PassPurchaseModal from './components/subscription/PassPurchaseModal';
 import { ROUTES } from '@velobits/app-core/constants';
@@ -69,8 +70,8 @@ function AppInner() {
     return () => window.removeEventListener('rtk-api-error', handler as EventListener);
   }, [showAlert]);
 
-  const handleOnboardingComplete = (personaId: string) => {
-    gamification.setPersona(personaId as unknown as Parameters<typeof gamification.setPersona>[0]);
+  const handleOnboardingComplete = (personaId: PersonaId) => {
+    gamification.setPersona(personaId);
   };
 
   // A share link is often someone's first visit; the persona picker has no

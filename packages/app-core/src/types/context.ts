@@ -6,7 +6,7 @@
 // depend on a single shared definition rather than on each other's source.
 
 import type { components } from './openapi';
-import type { Persona, Achievement, LevelDefinition, QuestOp, ToolDefinition } from './tools';
+import type { PersonaId, Achievement, LevelDefinition, QuestOp, ToolDefinition } from './tools';
 
 // ── User ─────────────────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ export interface GamificationDailyQuest {
 
 export interface GamificationContextValue {
   // state fields spread from the hook's internal state
-  persona: Persona | null;
+  persona: PersonaId | null;
   toolsUsed: Record<string, number>;
   discoveredTools: string[];
   totalOps: number;
@@ -51,7 +51,7 @@ export interface GamificationContextValue {
   // actions
   recordToolUse: (toolId: string, charCount?: number) => void;
   toggleFavorite: (toolId: string) => void;
-  setPersona: (persona: Persona) => void;
+  setPersona: (persona: PersonaId) => void;
 }
 
 // ── Subscription ──────────────────────────────────────────────────────────────

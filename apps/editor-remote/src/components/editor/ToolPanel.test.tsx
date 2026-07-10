@@ -221,6 +221,65 @@ describe('ToolPanel', () => {
     expect(screen.getByText('suggested')).toBeInTheDocument();
   });
 
+  it('renders For You group from personaToolIds in curated order', () => {
+    render(<ToolPanel {...defaultProps} personaToolIds={['fix_grammar', 'base64']} />);
+    const forYouGroup = screen.getByText('For You').closest('.tu-group')!;
+    const labels = Array.from(forYouGroup.querySelectorAll('.tu-titem-name')).map(
+      (el) => el.textContent
+    );
+    // Curated order preserved: fix_grammar first even though 'Base64 Encode' sorts before it
+    expect(labels).toEqual(['Fix Grammar', 'Base64 Encode']);
+  });
+
+  it('renders For You tools even when their tabs exclude the active tab', () => {
+    // base64 only has tabs ['all','encode'] — must still show on 'writing'
+    render(<ToolPanel {...defaultProps} activeTab="writing" personaToolIds={['base64']} />);
+    expect(screen.getByText('For You')).toBeInTheDocument();
+    expect(screen.getByText('Base64 Encode')).toBeInTheDocument();
+  });
+
+  it('does not render For You group when personaToolIds is empty or omitted', () => {
+    const { rerender } = render(<ToolPanel {...defaultProps} personaToolIds={[]} />);
+    expect(screen.queryByText('For You')).not.toBeInTheDocument();
+    rerender(<ToolPanel {...defaultProps} />);
+    expect(screen.queryByText('For You')).not.toBeInTheDocument();
+  });
+
+  it('ignores unknown ids in personaToolIds', () => {
+    render(<ToolPanel {...defaultProps} personaToolIds={['does_not_exist']} />);
+    expect(screen.queryByText('For You')).not.toBeInTheDocument();
+  });
+
+  it('clicking a For You tool calls onToolClick', () => {
+    const onToolClick = vi.fn();
+    render(
+      <ToolPanel
+        {...defaultProps}
+        activeTab="writing"
+        personaToolIds={['base64']}
+        onToolClick={onToolClick}
+      />
+    );
+    fireEvent.click(screen.getByText('Base64 Encode'));
+    expect(onToolClick).toHaveBeenCalledWith(sampleTools[3]);
+  });
+
+  it('excludes favorited tools from For You (already pinned above)', () => {
+    const gamification = { favorites: ['fix_grammar'], toggleFavorite: vi.fn() };
+    render(
+      <ToolPanel
+        {...defaultProps}
+        gamification={gamification}
+        personaToolIds={['fix_grammar', 'base64']}
+      />
+    );
+    expect(screen.getByText('Pinned')).toBeInTheDocument();
+    const forYouGroup = screen.getByText('For You').closest('.tu-group')!;
+    expect(forYouGroup.textContent).toContain('Base64 Encode');
+    // fix_grammar sits in Pinned already — not duplicated into For You
+    expect(forYouGroup.textContent).not.toContain('Fix Grammar');
+  });
+
   it('collapses group when group header is clicked', () => {
     render(<ToolPanel {...defaultProps} activeTab="all" />);
     // Click on Case Transform header to collapse

@@ -19,6 +19,7 @@ export type {
   SelectOption,
   UseCaseTab,
   Persona,
+  PersonaId,
   Achievement,
   AchievementStats,
   QuestTemplate,

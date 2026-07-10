@@ -143,9 +143,7 @@ describe('useGamification', () => {
   it('setPersona updates persona state', () => {
     const { result } = renderHook(() => useGamification());
     act(() => {
-      result.current.setPersona(
-        'developer' as unknown as Parameters<typeof result.current.setPersona>[0]
-      );
+      result.current.setPersona('developer');
     });
     expect(result.current.persona).toBe('developer');
     expect(result.current.onboarded).toBe(true);
@@ -154,9 +152,7 @@ describe('useGamification', () => {
   it('setPersona syncs to API when authenticated', () => {
     const { result } = renderHook(() => useGamification());
     act(() => {
-      result.current.setPersona(
-        'writer' as unknown as Parameters<typeof result.current.setPersona>[0]
-      );
+      result.current.setPersona('writer');
     });
     expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'writer' });
   });
@@ -166,9 +162,7 @@ describe('useGamification', () => {
     // then, and without it the welcome picker reappears right after sign-out.
     const { result } = renderHook(() => useGamification());
     act(() => {
-      result.current.setPersona(
-        'writer' as unknown as Parameters<typeof result.current.setPersona>[0]
-      );
+      result.current.setPersona('writer');
     });
     expect(sessionStorage.getItem('fmx_guest_persona')).toBe('writer');
   });
@@ -177,9 +171,7 @@ describe('useGamification', () => {
     mockAuth(false);
     const { result } = renderHook(() => useGamification());
     act(() => {
-      result.current.setPersona(
-        'developer' as unknown as Parameters<typeof result.current.setPersona>[0]
-      );
+      result.current.setPersona('developer');
     });
     expect(result.current.persona).toBe('developer');
     expect(sessionStorage.getItem('fmx_guest_persona')).toBe('developer');

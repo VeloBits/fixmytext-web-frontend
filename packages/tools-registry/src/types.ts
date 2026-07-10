@@ -144,11 +144,16 @@ export interface UseCaseTab {
   color: string;
 }
 
+/** Valid persona keys — literal union (not keyof typeof PERSONAS) to avoid a types→tools import cycle. */
+export type PersonaId = 'writer' | 'student' | 'developer' | 'social' | 'explorer';
+
 /** A persona entry from PERSONAS. */
 export interface Persona {
   label: string;
   icon: string;
   defaultTab: string;
+  /** Tool ids from TOOLS surfaced as the "For You" group for this persona. */
+  suggestedTools: string[];
 }
 
 /** A smart-suggestion rule that maps a text-detection function to tool IDs. */

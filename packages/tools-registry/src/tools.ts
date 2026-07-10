@@ -2,6 +2,7 @@ import { ENDPOINTS } from '@velobits/api-client';
 import type {
   ToolDefinition,
   Persona,
+  PersonaId,
   UseCaseTab,
   SmartSuggestionRule,
   Achievement,
@@ -13,12 +14,38 @@ import type {
    Tool & Category Configuration — Data-driven tool system
    ═══════════════════════════════════════════════════════ */
 
-export const PERSONAS: Record<string, Persona> = {
-  writer: { label: 'Writer / Blogger', icon: 'Wr', defaultTab: 'writing' },
-  student: { label: 'Student', icon: 'St', defaultTab: 'writing' },
-  developer: { label: 'Developer', icon: '</>', defaultTab: 'code' },
-  social: { label: 'Social Media', icon: '@s', defaultTab: 'ai' },
-  explorer: { label: 'Just Exploring', icon: '?>', defaultTab: 'all' },
+export const PERSONAS: Record<PersonaId, Persona> = {
+  writer: {
+    label: 'Writer / Blogger',
+    icon: 'Wr',
+    defaultTab: 'writing',
+    suggestedTools: ['fix_grammar', 'paraphrase', 'change_tone', 'proofread'],
+  },
+  student: {
+    label: 'Student',
+    icon: 'St',
+    defaultTab: 'writing',
+    suggestedTools: ['summarize', 'eli5', 'translate'],
+  },
+  developer: {
+    label: 'Developer',
+    icon: '</>',
+    defaultTab: 'code',
+    suggestedTools: ['json_fmt', 'regex_test', 'base64_enc', 'jwt_decode'],
+  },
+  social: {
+    label: 'Social Media',
+    icon: '@s',
+    defaultTab: 'ai',
+    suggestedTools: ['hashtags', 'seo_titles', 'tweet_shorten', 'meta_desc'],
+  },
+  explorer: {
+    // "Just Exploring" promises the full catalog — no For You group on purpose
+    label: 'Just Exploring',
+    icon: '?>',
+    defaultTab: 'all',
+    suggestedTools: [],
+  },
 };
 
 export const USE_CASE_TABS: UseCaseTab[] = [
