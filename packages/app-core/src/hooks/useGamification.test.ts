@@ -35,17 +35,20 @@ vi.mock('../store/api/userDataApi', () => ({
 
 import { useSelector } from 'react-redux';
 import { useOidcAuth } from '../auth/useOidcAuth';
+import { useGetGamificationQuery, useGetPreferencesQuery } from '../store/api/userDataApi';
 import useGamification from './useGamification';
 
 const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
 const mockUseOidcAuth = useOidcAuth as unknown as ReturnType<typeof vi.fn>;
+const mockGetGamification = useGetGamificationQuery as unknown as ReturnType<typeof vi.fn>;
+const mockGetPreferences = useGetPreferencesQuery as unknown as ReturnType<typeof vi.fn>;
 
-function mockAuth(isAuthenticated: boolean) {
+function mockAuth(isAuthenticated: boolean, sub?: string) {
   mockUseOidcAuth.mockReturnValue({
     isAuthenticated,
     isLoading: false,
     accessToken: isAuthenticated ? 'fake-token' : null,
-    oidcUser: null,
+    oidcUser: isAuthenticated && sub ? { profile: { sub } } : null,
     login: vi.fn(),
     logout: vi.fn(),
   });
@@ -58,6 +61,9 @@ describe('useGamification', () => {
     localStorage.clear();
     sessionStorage.clear();
     mockAuth(true);
+    // Re-pin the query defaults: clearAllMocks doesn't undo per-test mockReturnValue
+    mockGetGamification.mockReturnValue({ data: undefined });
+    mockGetPreferences.mockReturnValue({ data: undefined });
     mockUseSelector.mockReturnValue('fake-token');
     mockSyncToDb.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSyncPrefs.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -268,6 +274,72 @@ describe('useGamification', () => {
     const { unmount } = renderHook(() => useGamification());
     unmount();
     expect(mockSyncToDb).not.toHaveBeenCalled();
+  });
+
+  // The flat gamification response carries no persona; persona hydrates from
+  // /user/preferences in its own effect. These pin the ordering race where the
+  // gamification response landing first wiped the persona and re-showed the
+  // blocking welcome picker for already-onboarded users.
+  describe('persona hydration', () => {
+    const DB_GAMIFICATION = { total_ops: 3, xp: 30 };
+
+    it('keeps the tab persona when gamification hydrates before preferences', () => {
+      sessionStorage.setItem('fmx_guest_persona', 'writer');
+      mockAuth(true, 'user-a');
+      mockGetGamification.mockReturnValue({ data: DB_GAMIFICATION });
+      mockGetPreferences.mockReturnValue({ data: undefined }); // prefs still in flight
+      const { result } = renderHook(() => useGamification());
+      expect(result.current.totalOps).toBe(3); // gamification did hydrate
+      expect(result.current.persona).toBe('writer'); // …without wiping persona
+      expect(result.current.onboarded).toBe(true);
+    });
+
+    it('applies the DB persona when preferences land after gamification', () => {
+      mockAuth(true, 'user-a');
+      mockGetGamification.mockReturnValue({ data: DB_GAMIFICATION });
+      mockGetPreferences.mockReturnValue({ data: undefined });
+      const { result, rerender } = renderHook(() => useGamification());
+      expect(result.current.persona).toBeNull();
+      mockGetPreferences.mockReturnValue({ data: { persona: 'student' } });
+      rerender();
+      expect(result.current.persona).toBe('student');
+      // Mirrored for the post-logout guest fallback, tagged with the owner
+      expect(sessionStorage.getItem('fmx_guest_persona')).toBe('student');
+      expect(sessionStorage.getItem('fmx_guest_persona_owner')).toBe('user-a');
+    });
+
+    it('adopts a guest pick into the account when the DB has no persona', () => {
+      sessionStorage.setItem('fmx_guest_persona', 'developer');
+      sessionStorage.setItem('fmx_guest_persona_owner', 'guest');
+      mockAuth(true, 'user-a');
+      mockGetPreferences.mockReturnValue({ data: { persona: null } });
+      const { result } = renderHook(() => useGamification());
+      expect(result.current.persona).toBe('developer');
+      expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'developer' });
+      expect(sessionStorage.getItem('fmx_guest_persona_owner')).toBe('user-a');
+    });
+
+    it("drops another account's persona so the new user gets onboarding", () => {
+      sessionStorage.setItem('fmx_guest_persona', 'writer');
+      sessionStorage.setItem('fmx_guest_persona_owner', 'user-a');
+      mockAuth(true, 'user-b');
+      mockGetPreferences.mockReturnValue({ data: { persona: null } });
+      const { result } = renderHook(() => useGamification());
+      expect(result.current.persona).toBeNull();
+      expect(result.current.onboarded).toBe(false);
+      expect(sessionStorage.getItem('fmx_guest_persona')).toBeNull();
+      expect(mockSyncPrefs).not.toHaveBeenCalled();
+    });
+
+    it('setPersona tags the tab copy with the signed-in owner', () => {
+      mockAuth(true, 'user-a');
+      const { result } = renderHook(() => useGamification());
+      act(() => {
+        result.current.setPersona('social');
+      });
+      expect(sessionStorage.getItem('fmx_guest_persona')).toBe('social');
+      expect(sessionStorage.getItem('fmx_guest_persona_owner')).toBe('user-a');
+    });
   });
 
   it('silently swallows DB sync errors', async () => {

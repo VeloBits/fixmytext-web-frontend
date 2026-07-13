@@ -1,6 +1,11 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PERSONAS } from '@velobits/app-core/constants/tools';
 import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
+
+// Dismissing (X / Esc) counts as picking the catch-all persona: the picker
+// must never trap the user, and "no answer" behaves like "show me everything".
+const DISMISS_PERSONA: PersonaId = 'explorer';
 
 interface PersonaMeta {
   gradient: string;
@@ -89,6 +94,14 @@ export interface OnboardingModalProps {
 }
 
 export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onComplete(DISMISS_PERSONA);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onComplete]);
+
   return (
     <motion.div className="tu-onboard-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       {/* Floating particles */}
@@ -123,6 +136,16 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 22, delay: 0.1 }}
       >
+        <button
+          type="button"
+          className="tu-onboard-close"
+          aria-label="Skip — explore all tools"
+          title="Skip — explore all tools"
+          onClick={() => onComplete(DISMISS_PERSONA)}
+        >
+          ✕
+        </button>
+
         {/* Header */}
         <div className="tu-onboard-header">
           <motion.div

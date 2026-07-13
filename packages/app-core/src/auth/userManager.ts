@@ -5,6 +5,7 @@ import {
   type UserManagerSettings,
   type User,
 } from 'oidc-client-ts';
+import { clearSession } from '@velobits/api-client';
 import { KEYCLOAK_CLIENT_ID, KEYCLOAK_REALM, KEYCLOAK_URL } from './keycloakConfig';
 
 const REALM_BASE = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
@@ -91,6 +92,20 @@ userManager.events.addUserLoaded(() => setAuthHint(true));
 userManager.events.addUserUnloaded(() => setAuthHint(false));
 userManager.events.addUserSignedOut(() => setAuthHint(false));
 
+// PKCE staging entries (`oidc.<state>` in localStorage) are abandoned whenever
+// a redirect doesn't complete (Back from the Keycloak form, bounced logins);
+// prune the stale ones on boot so they don't accumulate forever.
+void userManager.clearStaleState();
+
+// The fixmytext_session cookie outlives the Keycloak SSO session (7-day TTL
+// vs 2h SSO idle / browser-session identity cookie). When the app concludes
+// "logged out" because the SSO session is gone, the cookie must be revoked
+// too — otherwise the browser silently keeps a live API credential while the
+// UI shows Sign In. Best-effort: clearSession never throws.
+function clearServerSession(): void {
+  void clearSession();
+}
+
 // One-time auth bootstrap, deduped across all hook instances. Reads the
 // in-memory user; if it's absent (e.g. after a hard reload) it attempts a
 // silent renew using the Keycloak SSO cookie, so the session is restored
@@ -110,14 +125,19 @@ export function loadUser(): Promise<User | null> {
     _loadUserPromise = (async () => {
       const existing = await userManager.getUser();
       if (existing && !existing.expired) return existing;
+      // Only a previously-signed-in browser holds a session cookie worth
+      // revoking — a plain guest failing signinSilent has nothing to clear.
+      const hadHint = hasAuthHint();
       try {
         // Success also fires userLoaded (→ hint set); the explicit set covers
         // signinSilent resolving null without throwing.
         const restored = await userManager.signinSilent();
         setAuthHint(!!restored);
+        if (!restored && hadHint) clearServerSession();
         return restored;
       } catch {
         setAuthHint(false); // stale hint — the SSO session is gone
+        if (hadHint) clearServerSession(); // …and so must the session cookie
         return null; // no live SSO session — caller treats as logged out
       }
     })();
@@ -203,6 +223,7 @@ async function reconcileSessionWithHint(): Promise<void> {
         await userManager.signinSilent(); // success fires userLoaded → UI updates
       } catch {
         setAuthHint(false); // stale hint — the SSO session is gone
+        clearServerSession(); // …and so must the session cookie
       }
     } else if (hintReadable && !hint && user) {
       // Hint cleared by a signout this tab never received (e.g. frozen tab).

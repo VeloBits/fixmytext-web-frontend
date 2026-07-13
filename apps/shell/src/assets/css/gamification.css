@@ -605,6 +605,31 @@
   opacity: 0.6;
 }
 
+/* Dismiss (X) — skip the picker, defaults to the explorer persona */
+.tu-onboard-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 2;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tu-onboard-close:hover {
+  background: var(--surface-2);
+  color: var(--text-1);
+}
+
 /* Narrow screens: tool tags don't shrink, so drop them under the text
    instead of crushing the label/tagline column to zero width */
 @media (max-width: 520px) {
