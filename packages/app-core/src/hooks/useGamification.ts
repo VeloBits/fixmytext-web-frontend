@@ -2,40 +2,36 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   useGetGamificationQuery,
   useUpdateGamificationMutation,
-  useUpdatePreferencesMutation,
-  useGetPreferencesQuery,
-  useGetFavoritesQuery,
-  useAddFavoriteMutation,
-  useRemoveFavoriteMutation,
   useGetDiscoveredToolsQuery,
   useGetPipelinesQuery,
 } from '../store/api/userDataApi';
 import { TOOLS, ACHIEVEMENTS, QUEST_TEMPLATES, LEVELS } from '../constants/tools';
 import { useOidcAuth } from '../auth/useOidcAuth';
-import type { Achievement, LevelDefinition, QuestOp, QuestTemplate, PersonaId } from '../types/tools';
+import { isGamificationEnabled } from '../config/features';
+import type { Achievement, LevelDefinition, QuestOp, QuestTemplate } from '../types/tools';
 import type {
   GamificationContextValue,
   GamificationStreak,
   GamificationDailyQuest,
 } from '../types/context';
 
+// Persona and favorites were extracted into usePersona / useFavorites (Phase A
+// of the gamification removal) — they are product features that survive
+// gamification and are NOT gated by the kill switch below.
+//
+// Kill switch: when VITE_GAMIFICATION_ENABLED === 'false' this hook goes inert
+// — every /user/gamification (+ discovered-tools/pipelines) query is skipped,
+// hydration and the debounced PUT never run, and recordToolUse is a no-op. A
+// flag-off bundle must issue ZERO requests to /user/gamification.
+
 // localStorage is a read-cache for pre-auth display speed only — never the source of truth.
 const STORAGE_KEY = 'fmx_gamification';
-// Guest persona lives in sessionStorage so the onboarding picker shows at most once
-// per tab session for unauthenticated users; signed-in users persist via /user/preferences.
-const GUEST_PERSONA_KEY = 'fmx_guest_persona';
-// Who the tab-local persona belongs to: 'guest' (picked while signed out) or a
-// Keycloak sub. Without this, user B logging in after user A in the same tab
-// inherits A's persona — B's onboarding is suppressed and their DB persona
-// never gets written.
-const GUEST_PERSONA_OWNER_KEY = 'fmx_guest_persona_owner';
 
 // Pre-compute static tool ID sets (TOOLS never changes)
 const AI_TOOL_IDS = TOOLS.filter((t) => t.tabs?.includes('ai')).map((t) => t.id);
 const DEV_TOOL_IDS = TOOLS.filter((t) => t.tabs?.includes('code')).map((t) => t.id);
 
 interface GamificationState {
-  persona: PersonaId | null;
   toolsUsed: Record<string, number>;
   discoveredTools: string[];
   totalOps: number;
@@ -43,7 +39,6 @@ interface GamificationState {
   xp: number;
   streak: GamificationStreak;
   achievements: string[];
-  favorites: string[];
   dailyQuest: GamificationDailyQuest;
   savedPipelines: unknown[];
   completedQuests: string[];
@@ -58,42 +53,6 @@ function loadState(): Partial<GamificationState> | null {
     /* ignore */
   }
   return null;
-}
-
-function loadGuestPersona(): PersonaId | null {
-  try {
-    return sessionStorage.getItem(GUEST_PERSONA_KEY) as PersonaId | null;
-  } catch {
-    return null;
-  }
-}
-
-/** null = legacy entry written before owner tagging — treated as adoptable,
- *  same as 'guest'. */
-function loadGuestPersonaOwner(): string | null {
-  try {
-    return sessionStorage.getItem(GUEST_PERSONA_OWNER_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function saveGuestPersona(persona: PersonaId, owner: string): void {
-  try {
-    sessionStorage.setItem(GUEST_PERSONA_KEY, persona);
-    sessionStorage.setItem(GUEST_PERSONA_OWNER_KEY, owner);
-  } catch {
-    /* ignore */
-  }
-}
-
-function clearGuestPersona(): void {
-  try {
-    sessionStorage.removeItem(GUEST_PERSONA_KEY);
-    sessionStorage.removeItem(GUEST_PERSONA_OWNER_KEY);
-  } catch {
-    /* ignore */
-  }
 }
 
 function today(): string {
@@ -119,11 +78,11 @@ function getLevel(xp: number): LevelDefinition {
 }
 
 /** Convert API response (flat) to hook state shape (nested).
- *  Note: favorites are NOT included here — they load from GET /user/favorites.
- *  persona is NOT included either — it lives in /user/preferences and hydrates
- *  in its own effect. Emitting `persona: null` here once wiped a persona the
- *  tab already knew whenever this response beat the preferences response
- *  (blocking welcome modal re-shown for onboarded users). */
+ *  Note: favorites are NOT included here — they load from GET /user/favorites
+ *  (useFavorites). persona is NOT included either — it lives in
+ *  /user/preferences and hydrates in usePersona. Emitting `persona: null` here
+ *  once wiped a persona the tab already knew whenever this response beat the
+ *  preferences response (blocking welcome modal re-shown for onboarded users). */
 function apiToState(api: Record<string, unknown>): Partial<GamificationState> {
   // Cast unknown fields with defaults; numeric/boolean/string fields are explicitly typed
   return {
@@ -162,7 +121,6 @@ function stateToApi(s: GamificationState): Record<string, unknown> {
 }
 
 const DEFAULT_STATE: GamificationState = {
-  persona: null,
   toolsUsed: {},
   discoveredTools: [],
   totalOps: 0,
@@ -170,18 +128,29 @@ const DEFAULT_STATE: GamificationState = {
   xp: 0,
   streak: { current: 0, lastDate: null },
   achievements: [],
-  favorites: [], // populated from GET /user/favorites when authenticated
   dailyQuest: { id: null, date: null, completed: false },
   savedPipelines: [],
   completedQuests: [],
   sessionOps: [],
 };
 
-export default function useGamification(): GamificationContextValue {
+export interface UseGamificationOptions {
+  /** Current favorites count (from useFavorites) — the achievement evaluator
+   * inside recordToolUse reads it (favorite_fan). Threaded in as an argument
+   * so this hook no longer owns favorites state; recordToolUse's public
+   * signature stays (toolId, charCount?) for the remotes. */
+  favoritesCount?: number;
+}
+
+export default function useGamification(
+  options: UseGamificationOptions = {}
+): GamificationContextValue {
+  const { favoritesCount = 0 } = options;
+  const enabled = isGamificationEnabled();
+
   const [state, setState] = useState<GamificationState>(() => {
     const saved = loadState();
-    const base = saved ? { ...DEFAULT_STATE, ...saved, sessionOps: [] } : { ...DEFAULT_STATE };
-    return base.persona ? base : { ...base, persona: loadGuestPersona() };
+    return saved ? { ...DEFAULT_STATE, ...saved, sessionOps: [] } : { ...DEFAULT_STATE };
   });
 
   const speedTimestamps = useRef<number[]>([]);
@@ -189,23 +158,30 @@ export default function useGamification(): GamificationContextValue {
   const [xpGain, setXpGain] = useState<number | null>(null);
   const hydrated = useRef(false);
 
-  // Auth state from OIDC
-  const { isAuthenticated, oidcUser } = useOidcAuth();
-  const userSub = oidcUser?.profile.sub;
+  // Latest favorites count for the achievement evaluator: recordToolUse keeps
+  // its stable []-deps identity, so it reads through a ref.
+  const favoritesCountRef = useRef(favoritesCount);
+  favoritesCountRef.current = favoritesCount;
 
-  // RTK Query — fetch gamification + preferences + favorites from DB when authenticated
-  const { data: dbGamification } = useGetGamificationQuery(undefined, { skip: !isAuthenticated });
-  const { data: dbPrefs } = useGetPreferencesQuery(undefined, { skip: !isAuthenticated });
-  const { data: dbFavorites } = useGetFavoritesQuery(undefined, { skip: !isAuthenticated });
-  const { data: dbDiscovered } = useGetDiscoveredToolsQuery(undefined, { skip: !isAuthenticated });
-  const { data: dbPipelines } = useGetPipelinesQuery(undefined, { skip: !isAuthenticated });
+  // Auth state from OIDC
+  const { isAuthenticated } = useOidcAuth();
+
+  // RTK Query — fetch gamification data from DB when enabled + authenticated.
+  // The skip on the flag is the kill switch's network guarantee.
+  const { data: dbGamification } = useGetGamificationQuery(undefined, {
+    skip: !enabled || !isAuthenticated,
+  });
+  const { data: dbDiscovered } = useGetDiscoveredToolsQuery(undefined, {
+    skip: !enabled || !isAuthenticated,
+  });
+  const { data: dbPipelines } = useGetPipelinesQuery(undefined, {
+    skip: !enabled || !isAuthenticated,
+  });
   const [syncToDb] = useUpdateGamificationMutation();
-  const [syncPrefs] = useUpdatePreferencesMutation();
-  const [apiAddFavorite] = useAddFavoriteMutation();
-  const [apiRemoveFavorite] = useRemoveFavoriteMutation();
 
   // Hydrate from DB on first fetch (DB is authoritative; localStorage was read-only pre-auth cache)
   useEffect(() => {
+    if (!enabled) return;
     if (dbGamification && !hydrated.current) {
       hydrated.current = true;
       // Cast: RTK Query returns unknown; shape is the flat gamification API object.
@@ -213,54 +189,7 @@ export default function useGamification(): GamificationContextValue {
       const dbState = apiToState(dbGamification as Record<string, unknown>);
       setState((prev) => ({ ...prev, ...dbState, sessionOps: prev.sessionOps }));
     }
-  }, [dbGamification]);
-
-  // Persona hydration is deliberately its own effect: the preferences response
-  // can land before OR after the gamification one, so it must not sit behind
-  // the one-shot `hydrated` guard above (that ordering race re-showed the
-  // blocking welcome modal for already-onboarded users).
-  useEffect(() => {
-    if (!isAuthenticated || !dbPrefs) return;
-    const personaFromDb = (dbPrefs as { persona?: PersonaId }).persona;
-    if (personaFromDb) {
-      setState((prev) =>
-        prev.persona === personaFromDb ? prev : { ...prev, persona: personaFromDb }
-      );
-      // Mirror into the tab-local copy: after logout this tab falls back to
-      // guest state, and without it the welcome picker would reappear for a
-      // user who onboarded long ago elsewhere.
-      saveGuestPersona(personaFromDb, userSub ?? 'guest');
-      return;
-    }
-    // DB has no persona. A tab-local pick made as a guest (or by this same
-    // account) is adopted and synced up — the user just answered the picker,
-    // don't ask again. One left behind by a DIFFERENT account is not ours:
-    // drop it so this user gets their own onboarding.
-    const stored = loadGuestPersona();
-    if (!stored) return;
-    const owner = loadGuestPersonaOwner();
-    if (owner === null || owner === 'guest' || owner === userSub) {
-      setState((prev) => (prev.persona === stored ? prev : { ...prev, persona: stored }));
-      saveGuestPersona(stored, userSub ?? 'guest');
-      syncPrefs({ persona: stored })
-        .unwrap()
-        .catch(() => {});
-    } else {
-      clearGuestPersona();
-      // Only null out a persona that came from the foreign mirror — never one
-      // the user just actively picked (setPersona may have run in between).
-      setState((prev) => (prev.persona === stored ? { ...prev, persona: null } : prev));
-    }
-  }, [isAuthenticated, dbPrefs, userSub, syncPrefs]);
-
-  // Hydrate favorites from dedicated endpoint
-  useEffect(() => {
-    if (dbFavorites) {
-      const favs = dbFavorites as { favorites: Array<{ tool_id: string }> };
-      const ids = favs.favorites.map((f) => f.tool_id);
-      setState((prev) => ({ ...prev, favorites: ids }));
-    }
-  }, [dbFavorites]);
+  }, [dbGamification, enabled]);
 
   // Hydrate discovered tools from dedicated endpoint
   useEffect(() => {
@@ -295,17 +224,18 @@ export default function useGamification(): GamificationContextValue {
 
   // Sync to DB on state change (debounced). localStorage is NOT written — DB is source of truth.
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!enabled || !isAuthenticated) return;
     const timer = setTimeout(() => {
       syncToDb(stateToApi(state))
         .unwrap()
         .catch(() => {});
     }, 500);
     return () => clearTimeout(timer);
-  }, [state, isAuthenticated, syncToDb]);
+  }, [state, isAuthenticated, syncToDb, enabled]);
 
   // Check streak on mount
   useEffect(() => {
+    if (!isGamificationEnabled()) return;
     setState((prev) => {
       const d = today();
       const streak = { ...prev.streak };
@@ -335,6 +265,10 @@ export default function useGamification(): GamificationContextValue {
   }, []);
 
   const recordToolUse = useCallback((toolId: string, charCount = 0): void => {
+    // Kill switch: no XP, no achievements, and — critically — no state change
+    // that would wake the debounced PUT.
+    if (!isGamificationEnabled()) return;
+
     const now = Date.now();
     speedTimestamps.current.push(now);
     speedTimestamps.current = speedTimestamps.current.filter((t) => now - t < 60000);
@@ -383,7 +317,7 @@ export default function useGamification(): GamificationContextValue {
         languagesUsed: langCount,
         streak: streak.current,
         totalChars,
-        favoritesCount: prev.favorites.length,
+        favoritesCount: favoritesCountRef.current,
         savedPipelines: prev.savedPipelines.length,
         nightOwl: hour >= 0 && hour < 5,
         earlyBird: hour >= 5 && hour < 7,
@@ -423,45 +357,6 @@ export default function useGamification(): GamificationContextValue {
     });
   }, []);
 
-  const toggleFavorite = useCallback(
-    (toolId: string): void => {
-      setState((prev) => {
-        const isFav = prev.favorites.includes(toolId);
-        if (isAuthenticated) {
-          if (isFav)
-            apiRemoveFavorite(toolId)
-              .unwrap()
-              .catch(() => {});
-          else
-            apiAddFavorite(toolId)
-              .unwrap()
-              .catch(() => {});
-        }
-        const favorites = isFav
-          ? prev.favorites.filter((id) => id !== toolId)
-          : [...prev.favorites, toolId];
-        return { ...prev, favorites };
-      });
-    },
-    [isAuthenticated, apiAddFavorite, apiRemoveFavorite]
-  );
-
-  const setPersona = useCallback(
-    (persona: PersonaId): void => {
-      setState((prev) => ({ ...prev, persona }));
-      // Always keep the guest copy too, even when authenticated: after logout
-      // the hook falls back to guest state, and without it the welcome picker
-      // would reappear on the logged-out home right after signing out.
-      saveGuestPersona(persona, isAuthenticated && userSub ? userSub : 'guest');
-      if (isAuthenticated) {
-        syncPrefs({ persona })
-          .unwrap()
-          .catch(() => {});
-      }
-    },
-    [isAuthenticated, userSub, syncPrefs]
-  );
-
   const level = getLevel(state.xp);
   const nextLevel = LEVELS.find((l) => l.xp > state.xp) || level;
   const xpProgress =
@@ -475,9 +370,6 @@ export default function useGamification(): GamificationContextValue {
     newAchievement,
     dismissAchievement: () => setNewAchievement(null),
     xpGain,
-    onboarded: !!state.persona,
     recordToolUse,
-    toggleFavorite,
-    setPersona,
   };
 }

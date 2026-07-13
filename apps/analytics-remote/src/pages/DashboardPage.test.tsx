@@ -1,8 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
+  FavoritesContextValue,
   GamificationContextValue,
+  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -64,6 +66,9 @@ vi.mock('@velobits/app-core/store/api/passesApi', () => ({
 vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetToolStatsQuery: () => ({ data: null, isLoading: false }),
 }));
+vi.mock('@velobits/app-core/store/api/historyApi', () => ({
+  useGetHistoryQuery: () => ({ data: null, isLoading: false }),
+}));
 vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [vi.fn(), { isLoading: false }],
 }));
@@ -89,16 +94,22 @@ const defaultGamification = {
   totalOps: 25,
   totalChars: 5000,
   achievements: ['first_use'],
-  favorites: [],
   toolsUsed: {},
   discoveredTools: ['trim_extra'],
   sessionOps: [],
   dailyQuest: null,
-  onboarded: true,
+} as unknown as GamificationContextValue;
+
+const defaultPersona = {
   persona: 'writer',
   setPersona: vi.fn(),
+  onboarded: true,
+} as unknown as PersonaContextValue;
+
+const defaultFavorites = {
+  favorites: [],
   toggleFavorite: vi.fn(),
-} as unknown as GamificationContextValue;
+} as unknown as FavoritesContextValue;
 
 const defaultSubscription = {
   isPro: false,
@@ -123,6 +134,8 @@ const defaultUser = {
 function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
+      persona={defaultPersona}
+      favorites={defaultFavorites}
       gamification={defaultGamification}
       user={defaultUser}
       isAuthenticated={true}
@@ -424,14 +437,14 @@ describe('DashboardPage', () => {
     // Click a persona button
     const writerBtn = screen.getAllByText(/Writer/i)[0]!;
     fireEvent.click(writerBtn);
-    expect(defaultGamification.setPersona).toHaveBeenCalled();
+    expect(defaultPersona.setPersona).toHaveBeenCalled();
   });
 
   // ── Favorites with items ──
   it('shows favorited tools and calls toggleFavorite', () => {
     const toggleFavorite = vi.fn();
-    const gamification = { ...defaultGamification, favorites: ['trim_extra'], toggleFavorite };
-    renderDash({ gamification });
+    const favorites = { favorites: ['trim_extra'], toggleFavorite } as FavoritesContextValue;
+    renderDash({ favorites });
     const favButtons = screen.getAllByText('Favorites');
     const navBtn = favButtons.find((el) => el.closest('nav'));
     fireEvent.click(navBtn || favButtons[0]!);
@@ -486,5 +499,77 @@ describe('DashboardPage', () => {
     renderDash({ gamification });
     fireEvent.click(screen.getByText('Usage History'));
     expect(screen.getByText(/1 operations/i)).toBeInTheDocument();
+  });
+});
+
+// ── Gamification kill switch off: shell passes gamification=null ──
+describe('DashboardPage — gamification disabled (null)', () => {
+  beforeEach(() => {
+    mockNavigate.mockReset();
+  });
+
+  it('renders without crashing when gamification is null', () => {
+    renderDash({ gamification: null });
+    expect(screen.getAllByText('Alice').length).toBeGreaterThan(0);
+  });
+
+  it('hides the Achievements nav entry', () => {
+    renderDash({ gamification: null });
+    const nav = document.querySelector('nav.tu-dash-nav') as HTMLElement;
+    expect(within(nav).queryByText('Achievements')).not.toBeInTheDocument();
+    // Other nav entries remain
+    expect(within(nav).getByText('Overview')).toBeInTheDocument();
+    expect(within(nav).getByText('Favorites')).toBeInTheDocument();
+    expect(within(nav).getByText('Usage History')).toBeInTheDocument();
+  });
+
+  it('hides the sidebar XP bar, level line and streak', () => {
+    renderDash({ gamification: null });
+    expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Lvl/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/day streak/i)).not.toBeInTheDocument();
+    // Ops count still shown, sourced from server stats (0 with null mock data)
+    expect(screen.getByText(/0 operations/i)).toBeInTheDocument();
+  });
+
+  it('shows the slimmed usage overview without gamification widgets', () => {
+    renderDash({ gamification: null });
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
+    expect(screen.queryByText('Your FixMyText journey at a glance')).not.toBeInTheDocument();
+    // Usage stats grid ('Favorites' also matches the nav entry, so scope it)
+    expect(screen.getByText('Operations')).toBeInTheDocument();
+    expect(screen.getByText('Tools Used')).toBeInTheDocument();
+    expect(
+      screen.getAllByText('Favorites').some((el) => el.closest('.tu-dash-stat-card'))
+    ).toBe(true);
+    expect(screen.getByText('Most Used Tools')).toBeInTheDocument();
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    // No XP/level/streak/quest/achievement widgets
+    expect(screen.queryByText('Day Streak')).not.toBeInTheDocument();
+    expect(screen.queryByText('Daily Quest')).not.toBeInTheDocument();
+    expect(screen.queryByText('Recent Achievements')).not.toBeInTheDocument();
+    expect(screen.queryByText(/XP to/)).not.toBeInTheDocument();
+  });
+
+  it('persona picker still functions on the profile tab', () => {
+    const setPersona = vi.fn();
+    const persona = { persona: 'writer', setPersona, onboarded: true } as PersonaContextValue;
+    renderDash({ gamification: null, persona });
+    fireEvent.click(screen.getByText('Profile'));
+    const writerBtn = screen.getAllByText(/Writer/i)[0]!;
+    fireEvent.click(writerBtn);
+    expect(setPersona).toHaveBeenCalled();
+  });
+
+  it('favorites section still lists tools and toggles favorites', () => {
+    const toggleFavorite = vi.fn();
+    const favorites = { favorites: ['trim_extra'], toggleFavorite } as FavoritesContextValue;
+    renderDash({ gamification: null, favorites });
+    const favButtons = screen.getAllByText('Favorites');
+    const navBtn = favButtons.find((el) => el.closest('nav'));
+    fireEvent.click(navBtn || favButtons[0]!);
+    expect(screen.getByText('1 tools favorited')).toBeInTheDocument();
+    fireEvent.click(screen.getByTitle('Remove from favorites'));
+    expect(toggleFavorite).toHaveBeenCalledWith('trim_extra');
   });
 });

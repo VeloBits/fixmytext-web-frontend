@@ -2,7 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
+  FavoritesContextValue,
   GamificationContextValue,
+  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -75,6 +77,15 @@ vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetToolStatsQuery: () => toolStatsState,
 }));
 
+interface HistoryQueryState {
+  data: unknown;
+  isLoading: boolean;
+}
+let historyState: HistoryQueryState = { data: null, isLoading: false };
+vi.mock('@velobits/app-core/store/api/historyApi', () => ({
+  useGetHistoryQuery: () => historyState,
+}));
+
 vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [vi.fn(), { isLoading: false }],
 }));
@@ -100,16 +111,22 @@ const defaultGamification = {
   totalOps: 25,
   totalChars: 5000,
   achievements: ['first_step'],
-  favorites: [],
   toolsUsed: {},
   discoveredTools: ['trim_extra'],
   sessionOps: [],
   dailyQuest: null,
-  onboarded: true,
+} as unknown as GamificationContextValue;
+
+const defaultPersona = {
   persona: 'writer',
   setPersona: vi.fn(),
+  onboarded: true,
+} as unknown as PersonaContextValue;
+
+const defaultFavorites = {
+  favorites: [],
   toggleFavorite: vi.fn(),
-} as unknown as GamificationContextValue;
+} as unknown as FavoritesContextValue;
 
 const defaultSubscription = {
   isPro: false,
@@ -134,6 +151,8 @@ const defaultUser = {
 function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
+      persona={defaultPersona}
+      favorites={defaultFavorites}
       gamification={defaultGamification}
       user={defaultUser}
       isAuthenticated={true}
@@ -151,6 +170,7 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     vi.clearAllMocks();
     searchParamsValue = new URLSearchParams();
     toolStatsState = { data: null, isLoading: false };
+    historyState = { data: null, isLoading: false };
   });
 
   // ── Initial tab from URL ──
@@ -278,13 +298,109 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     expect(screen.queryByText('Failed to load tool statistics')).not.toBeInTheDocument();
   });
 
-  // ── Missing gamification fallbacks ──
-  it('renders defaults when gamification is missing', () => {
-    renderDash({ gamification: null as unknown as GamificationContextValue });
-    expect(screen.getByText(/Beginner — Lvl 1/)).toBeInTheDocument();
-    expect(screen.getByText('0 XP')).toBeInTheDocument();
-    expect(screen.getByText(/0 day streak/)).toBeInTheDocument();
+  // ── Null gamification (kill switch off): sidebar hides XP widgets ──
+  it('hides level, XP bar and streak when gamification is null', () => {
+    renderDash({ gamification: null });
+    expect(screen.queryByText(/Beginner — Lvl 1/)).not.toBeInTheDocument();
+    expect(screen.queryByText('0 XP')).not.toBeInTheDocument();
+    expect(screen.queryByText(/day streak/)).not.toBeInTheDocument();
+    // Ops count survives, sourced from server tool stats (null data → 0)
     expect(screen.getByText(/0 operations/)).toBeInTheDocument();
+  });
+
+  it('sources sidebar ops count from server tool stats when gamification is null', () => {
+    toolStatsState = {
+      data: {
+        stats: [
+          { tool_id: 'trim_extra', total_uses: 5 },
+          { tool_id: 'camel_case', total_uses: 2 },
+        ],
+      },
+      isLoading: false,
+    };
+    renderDash({ gamification: null });
+    expect(screen.getByText(/7 operations/)).toBeInTheDocument();
+  });
+
+  // ── Slimmed overview (gamification null) with server data ──
+  it('slimmed overview shows usage stats from server data', () => {
+    toolStatsState = {
+      data: {
+        stats: [
+          { tool_id: 'trim_extra', total_uses: 5 },
+          { tool_id: 'camel_case', total_uses: 2 },
+        ],
+      },
+      isLoading: false,
+    };
+    historyState = {
+      data: {
+        items: [
+          {
+            id: 'h1',
+            tool_id: 'trim_extra',
+            tool_label: 'Trim Extra Spaces',
+            created_at: '2026-07-12T10:00:00Z',
+          },
+          {
+            id: 'h2',
+            tool_id: 'unknown_tool',
+            tool_label: 'Mystery Tool',
+            created_at: '2026-07-12T09:00:00Z',
+          },
+        ],
+        total: 7,
+        page: 1,
+        page_size: 5,
+        has_more: true,
+      },
+      isLoading: false,
+    };
+    const favorites = { favorites: ['trim_extra'], toggleFavorite: vi.fn() };
+    renderDash({ gamification: null, favorites });
+
+    // Stats grid: total ops, tools used, favorites count
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
+    const opsCard = screen.getByText('Operations').closest('.tu-dash-stat-card') as HTMLElement;
+    expect(within(opsCard).getByText('7')).toBeInTheDocument();
+    const toolsCard = screen.getByText('Tools Used').closest('.tu-dash-stat-card') as HTMLElement;
+    expect(toolsCard.querySelector('.tu-dash-stat-value')?.textContent).toMatch(/^2\//);
+    // 'Favorites' also matches the sidebar nav entry, so pick the stat card one
+    const favCard = screen
+      .getAllByText('Favorites')
+      .find((el) => el.closest('.tu-dash-stat-card'))!
+      .closest('.tu-dash-stat-card') as HTMLElement;
+    expect(within(favCard).getByText('1')).toBeInTheDocument();
+
+    // Per-tool data from the stats endpoint (label also appears in Recent Activity)
+    expect(screen.getByText('Most Used Tools')).toBeInTheDocument();
+    expect(screen.getAllByText('Trim Extra Spaces').length).toBeGreaterThan(0);
+    expect(screen.getByText('5x')).toBeInTheDocument();
+
+    // Recent activity from the history endpoint (unknown ids fall back to label)
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('Mystery Tool')).toBeInTheDocument();
+
+    // No gamification widgets
+    expect(screen.queryByText('Day Streak')).not.toBeInTheDocument();
+    expect(screen.queryByText('Daily Quest')).not.toBeInTheDocument();
+    expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
+  });
+
+  it('slimmed overview shows empty recent activity when history is empty', () => {
+    renderDash({ gamification: null });
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('No recent activity yet')).toBeInTheDocument();
+  });
+
+  // ── Stale achievements tab with gamification null must not crash ──
+  it('renders nothing (no crash) for a stale achievements tab when gamification is null', () => {
+    searchParamsValue = new URLSearchParams('tab=achievements');
+    renderDash({ gamification: null });
+    // The nav entry is gone and the section renders nothing
+    expect(screen.queryByText(/of .* unlocked/i)).not.toBeInTheDocument();
+    const nav = document.querySelector('nav.tu-dash-nav') as HTMLElement;
+    expect(within(nav).queryByText('Achievements')).not.toBeInTheDocument();
   });
 
   // ── Achievements section unlocked branch ──

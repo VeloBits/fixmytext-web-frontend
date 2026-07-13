@@ -2,14 +2,18 @@ import { ACHIEVEMENTS } from '@velobits/app-core/constants/tools';
 import type { GamificationContextValue } from '@velobits/app-core/types/context';
 
 interface AchievementsSectionProps {
-  g: GamificationContextValue;
+  g: GamificationContextValue | null;
 }
 
 /**
  * Dashboard achievements section.
  * Displays all achievements with unlock progress and status.
+ * Only reachable when gamification is enabled (the nav entry is hidden
+ * otherwise), but guard against null anyway so a stale route/tab can't crash.
  */
 export default function AchievementsSection({ g }: AchievementsSectionProps) {
+  if (!g) return null;
+
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Achievements</h2>

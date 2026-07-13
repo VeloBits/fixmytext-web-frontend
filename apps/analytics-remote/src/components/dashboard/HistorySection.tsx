@@ -3,7 +3,7 @@ import type { GamificationContextValue } from '@velobits/app-core/types/context'
 import type { QuestOp } from '@velobits/app-core/types/tools';
 
 interface HistorySectionProps {
-  g: GamificationContextValue;
+  g: GamificationContextValue | null;
   recentOps: QuestOp[];
 }
 
@@ -66,7 +66,7 @@ export default function HistorySection({ g, recentOps }: HistorySectionProps) {
               <div
                 key={tool.id}
                 className={`tu-dash-discovered${discovered ? '' : ' tu-dash-discovered--locked'}`}
-                title={discovered ? `${tool.label} — ${g.toolsUsed?.[tool.id] || 0}x used` : '???'}
+                title={discovered ? `${tool.label} — ${g?.toolsUsed?.[tool.id] || 0}x used` : '???'}
               >
                 <span>{discovered ? tool.icon : '?'}</span>
               </div>

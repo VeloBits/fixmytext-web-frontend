@@ -11,9 +11,9 @@ interface TooltipState {
   left: number;
 }
 
-interface GamificationState {
-  favorites?: string[];
-  toggleFavorite?: (id: string) => void;
+interface FavoritesState {
+  favorites: string[];
+  toggleFavorite: (id: string) => void;
 }
 
 interface ToolItemProps {
@@ -42,7 +42,7 @@ interface ToolPanelProps {
   onTabChange: (tabId: string) => void;
   onToolClick: (tool: ToolDefinition) => void;
   disabled: boolean;
-  gamification?: GamificationState | null;
+  favorites: FavoritesState;
   activeToolId?: string | null;
   hideTabs?: boolean;
   viewMode?: string;
@@ -220,7 +220,7 @@ export default memo(function ToolPanel({
   onTabChange,
   onToolClick,
   disabled,
-  gamification,
+  favorites,
   activeToolId,
   hideTabs,
   viewMode = 'list',
@@ -272,16 +272,16 @@ export default memo(function ToolPanel({
 
   // Group tools — each group contains tools sorted alphabetically
   // Favorites are pinned at the top as their own group
-  const favorites = useMemo(() => gamification?.favorites || [], [gamification]);
+  const favoriteIds = useMemo(() => favorites.favorites || [], [favorites]);
   const groupedTools = useMemo(() => {
     const groups: { id: string; label: string; tools: ToolDefinition[] }[] = [];
     const groupMap: Record<string, ToolDefinition[]> = {};
 
     // Collect pinned favorites from the filtered set
     const pinnedTools =
-      favorites.length > 0
+      favoriteIds.length > 0
         ? filteredTools
-            .filter((t) => favorites.includes(t.id))
+            .filter((t) => favoriteIds.includes(t.id))
             .sort((a, b) => a.label.localeCompare(b.label))
         : [];
 
@@ -295,7 +295,7 @@ export default memo(function ToolPanel({
     // pinned above so skip them here
     const forYouTools = personaToolIds
       .map((id) => tools.find((t) => t.id === id))
-      .filter((t): t is ToolDefinition => !!t && !favorites.includes(t.id));
+      .filter((t): t is ToolDefinition => !!t && !favoriteIds.includes(t.id));
     if (forYouTools.length > 0) {
       groups.push({ id: '_foryou', label: 'For You', tools: forYouTools });
     }
@@ -328,7 +328,7 @@ export default memo(function ToolPanel({
     }
 
     return groups;
-  }, [filteredTools, favorites, personaToolIds, tools]);
+  }, [filteredTools, favoriteIds, personaToolIds, tools]);
 
   return (
     <div className="tu-tpanel">
@@ -376,8 +376,8 @@ export default memo(function ToolPanel({
                           tool={tool}
                           disabled={disabled}
                           onClick={() => onToolClick(tool)}
-                          isFavorite={gamification?.favorites?.includes(tool.id)}
-                          onToggleFavorite={gamification?.toggleFavorite}
+                          isFavorite={favoriteIds.includes(tool.id)}
+                          onToggleFavorite={favorites.toggleFavorite}
                           isActive={activeToolId === tool.id}
                           isSuggested={suggestedToolIds.includes(tool.id)}
                           onHover={handleHover}
@@ -393,8 +393,8 @@ export default memo(function ToolPanel({
                           tool={tool}
                           disabled={disabled}
                           onClick={() => onToolClick(tool)}
-                          isFavorite={gamification?.favorites?.includes(tool.id)}
-                          onToggleFavorite={gamification?.toggleFavorite}
+                          isFavorite={favoriteIds.includes(tool.id)}
+                          onToggleFavorite={favorites.toggleFavorite}
                           isActive={activeToolId === tool.id}
                           isSuggested={suggestedToolIds.includes(tool.id)}
                           onHover={handleHover}

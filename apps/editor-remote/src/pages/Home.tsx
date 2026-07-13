@@ -1,6 +1,8 @@
 import TextForm from '@/components/editor/TextForm';
 import type {
+  FavoritesContextValue,
   GamificationContextValue,
+  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -9,7 +11,9 @@ interface HomeProps {
   mode: string;
   setMode: (mode: string) => void;
   showAlert: (message: string, type: string) => void;
-  gamification: GamificationContextValue;
+  persona: PersonaContextValue;
+  favorites: FavoritesContextValue;
+  gamification?: GamificationContextValue | null;
   user: User | null;
   isAuthenticated: boolean;
   subscription: SubscriptionContextValue;
@@ -19,6 +23,8 @@ export default function Home({
   mode,
   setMode,
   showAlert,
+  persona,
+  favorites,
   gamification,
   user,
   isAuthenticated,
@@ -29,7 +35,9 @@ export default function Home({
       mode={mode}
       setMode={setMode}
       showAlert={showAlert}
-      gamification={gamification}
+      persona={persona}
+      favorites={favorites}
+      gamification={gamification ?? null}
       user={user}
       isAuthenticated={isAuthenticated}
       subscription={subscription}

@@ -1,5 +1,8 @@
 import { TOOLS, ACHIEVEMENTS, LEVELS, QUEST_TEMPLATES } from '@velobits/app-core/constants/tools';
-import type { GamificationContextValue } from '@velobits/app-core/types/context';
+import type {
+  FavoritesContextValue,
+  GamificationContextValue,
+} from '@velobits/app-core/types/context';
 import type { LevelDefinition } from '@velobits/app-core/types/tools';
 
 export interface TopTool {
@@ -16,8 +19,17 @@ export interface CategoryUsage {
   count: number;
 }
 
+/** Server-side history entry (subset of HistoryResponse used by the slim overview). */
+export interface RecentHistoryEntry {
+  id: string;
+  tool_id: string;
+  tool_label: string;
+  created_at: string;
+}
+
 interface OverviewSectionProps {
-  g: GamificationContextValue;
+  g: GamificationContextValue | null;
+  favorites: FavoritesContextValue;
   level: LevelDefinition;
   nextLevel: LevelDefinition;
   xpProgress: number;
@@ -26,15 +38,67 @@ interface OverviewSectionProps {
   setActiveSection: (section: string) => void;
   toolStatsError?: unknown;
   refetchToolStats?: () => void;
+  /** Total operations from the server tool-stats endpoint (slim mode). */
+  statsTotalOps?: number;
+  /** Distinct tools used, from the server tool-stats endpoint (slim mode). */
+  statsToolCount?: number;
+  /** Latest server history entries (slim mode). */
+  recentHistory?: RecentHistoryEntry[];
+}
+
+/** Shared error banner for the tool-stats query. */
+function ToolStatsError({
+  toolStatsError,
+  refetchToolStats,
+}: Pick<OverviewSectionProps, 'toolStatsError' | 'refetchToolStats'>) {
+  if (!toolStatsError) return null;
+  return (
+    <div className="error-state" style={{ padding: '12px 16px', marginBottom: 16 }}>
+      <p>Failed to load tool statistics</p>
+      <button onClick={refetchToolStats}>Retry</button>
+    </div>
+  );
+}
+
+/** Shared "Most Used Tools" card (identical markup in both modes). */
+function MostUsedToolsCard({ topTools }: { topTools: TopTool[] }) {
+  return (
+    <div className="tu-dash-card">
+      <h3 className="tu-dash-card-title">Most Used Tools</h3>
+      {topTools.length === 0 ? (
+        <div className="tu-dash-empty">No tools used yet — start exploring!</div>
+      ) : (
+        <div className="tu-dash-tool-list">
+          {topTools.map((tool, i) => (
+            <div key={tool.id} className="tu-dash-tool-row">
+              <span className="tu-dash-tool-rank">#{i + 1}</span>
+              <span className="tu-dash-tool-icon">{tool.icon}</span>
+              <span className="tu-dash-tool-name">{tool.label}</span>
+              <div className="tu-dash-tool-bar-wrap">
+                <div
+                  className="tu-dash-tool-bar"
+                  style={{ width: `${(tool.count / topTools[0]!.count) * 100}%` }}
+                />
+              </div>
+              <span className="tu-dash-tool-count">{tool.count}x</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /**
- * Dashboard overview section.
- * Shows user XP/level, stats grid, daily quest, top tools, category breakdown,
- * and recent achievements at a glance.
+ * Dashboard overview section. Two render modes:
+ * - gamification on (g non-null): full version — XP/level hero, stats grid,
+ *   daily quest, top tools, category breakdown, recent achievements.
+ * - gamification off (g === null): slimmed usage overview — real usage stats
+ *   only (server tool stats + recent history + favorites count).
  */
 export default function OverviewSection({
   g,
+  favorites,
   level,
   nextLevel,
   xpProgress,
@@ -43,19 +107,83 @@ export default function OverviewSection({
   setActiveSection,
   toolStatsError,
   refetchToolStats,
+  statsTotalOps = 0,
+  statsToolCount = 0,
+  recentHistory,
 }: OverviewSectionProps) {
+  const favoritesCount = favorites?.favorites?.length || 0;
+
+  // ── Slimmed usage overview (gamification kill switch off) ──
+  if (!g) {
+    return (
+      <div className="tu-dash-content">
+        <h2 className="tu-dash-title">Overview</h2>
+        <p className="tu-dash-subtitle">Your FixMyText usage at a glance</p>
+
+        <ToolStatsError toolStatsError={toolStatsError} refetchToolStats={refetchToolStats} />
+
+        {/* Usage stats grid */}
+        <div className="tu-dash-stats-grid">
+          <div className="tu-dash-stat-card">
+            <span className="tu-dash-stat-icon">🔧</span>
+            <span className="tu-dash-stat-value">{statsTotalOps}</span>
+            <span className="tu-dash-stat-label">Operations</span>
+          </div>
+          <div className="tu-dash-stat-card">
+            <span className="tu-dash-stat-icon">🧰</span>
+            <span className="tu-dash-stat-value">
+              {statsToolCount}
+              <small>/{TOOLS.length}</small>
+            </span>
+            <span className="tu-dash-stat-label">Tools Used</span>
+          </div>
+          <div className="tu-dash-stat-card">
+            <span className="tu-dash-stat-icon">❤️</span>
+            <span className="tu-dash-stat-value">{favoritesCount}</span>
+            <span className="tu-dash-stat-label">Favorites</span>
+          </div>
+        </div>
+
+        {/* Top tools + Recent activity */}
+        <div className="tu-dash-row">
+          <MostUsedToolsCard topTools={topTools} />
+          <div className="tu-dash-card">
+            <h3 className="tu-dash-card-title">Recent Activity</h3>
+            {!recentHistory || recentHistory.length === 0 ? (
+              <div className="tu-dash-empty">No recent activity yet</div>
+            ) : (
+              <div className="tu-dash-history-list">
+                {recentHistory.map((entry) => {
+                  const tool = TOOLS.find((t) => t.id === entry.tool_id);
+                  return (
+                    <div key={entry.id} className="tu-dash-history-item">
+                      <span className="tu-dash-history-dot" />
+                      <span className="tu-dash-history-icon">{tool?.icon || '🔧'}</span>
+                      <span className="tu-dash-history-name">
+                        {tool?.label || entry.tool_label}
+                      </span>
+                      <span className="tu-dash-history-time">
+                        {new Date(entry.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Full gamified overview (unchanged) ──
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Overview</h2>
       <p className="tu-dash-subtitle">Your FixMyText journey at a glance</p>
 
       {/* Error state for tool stats */}
-      {Boolean(toolStatsError) && (
-        <div className="error-state" style={{ padding: '12px 16px', marginBottom: 16 }}>
-          <p>Failed to load tool statistics</p>
-          <button onClick={refetchToolStats}>Retry</button>
-        </div>
-      )}
+      <ToolStatsError toolStatsError={toolStatsError} refetchToolStats={refetchToolStats} />
 
       {/* XP + Level card */}
       <div className="tu-dash-card tu-dash-card--hero">
@@ -132,7 +260,7 @@ export default function OverviewSection({
         </div>
         <div className="tu-dash-stat-card">
           <span className="tu-dash-stat-icon">❤️</span>
-          <span className="tu-dash-stat-value">{g?.favorites?.length || 0}</span>
+          <span className="tu-dash-stat-value">{favoritesCount}</span>
           <span className="tu-dash-stat-label">Favorites</span>
         </div>
       </div>
@@ -156,29 +284,7 @@ export default function OverviewSection({
 
       {/* Top tools + Category usage */}
       <div className="tu-dash-row">
-        <div className="tu-dash-card">
-          <h3 className="tu-dash-card-title">Most Used Tools</h3>
-          {topTools.length === 0 ? (
-            <div className="tu-dash-empty">No tools used yet — start exploring!</div>
-          ) : (
-            <div className="tu-dash-tool-list">
-              {topTools.map((tool, i) => (
-                <div key={tool.id} className="tu-dash-tool-row">
-                  <span className="tu-dash-tool-rank">#{i + 1}</span>
-                  <span className="tu-dash-tool-icon">{tool.icon}</span>
-                  <span className="tu-dash-tool-name">{tool.label}</span>
-                  <div className="tu-dash-tool-bar-wrap">
-                    <div
-                      className="tu-dash-tool-bar"
-                      style={{ width: `${(tool.count / topTools[0]!.count) * 100}%` }}
-                    />
-                  </div>
-                  <span className="tu-dash-tool-count">{tool.count}x</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <MostUsedToolsCard topTools={topTools} />
         <div className="tu-dash-card">
           <h3 className="tu-dash-card-title">Category Breakdown</h3>
           {categoryUsage.length === 0 ? (

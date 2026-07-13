@@ -99,10 +99,24 @@ vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
     logout: vi.fn(),
   }),
 }));
+// Persona/favorites were extracted out of useGamification (Phase A of the
+// gamification removal); AppContext now composes three hooks and the shell
+// reads onboarding state from the persona context value.
+vi.mock('@velobits/app-core/hooks/usePersona', () => ({
+  default: () => ({
+    persona: mockState.onboarded ? 'writer' : null,
+    setPersona: vi.fn(),
+    onboarded: mockState.onboarded,
+  }),
+}));
+vi.mock('@velobits/app-core/hooks/useFavorites', () => ({
+  default: () => ({
+    favorites: [],
+    toggleFavorite: vi.fn(),
+  }),
+}));
 vi.mock('@velobits/app-core/hooks/useGamification', () => ({
   default: () => ({
-    onboarded: mockState.onboarded,
-    setPersona: vi.fn(),
     xp: 0,
     level: 1,
     streak: { current: 0 },

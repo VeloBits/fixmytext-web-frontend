@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { PERSONAS } from '@velobits/app-core/constants/tools';
-import type { GamificationContextValue, User } from '@velobits/app-core/types/context';
+import type { PersonaContextValue, User } from '@velobits/app-core/types/context';
 import type { AlertLevel } from '@velobits/app-core/types/alert';
 import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
 
 interface ProfileSectionProps {
   user: User | null;
   isAuthenticated: boolean;
-  g: GamificationContextValue;
+  persona: PersonaContextValue;
   mode: string;
   setMode: (mode: string) => void;
   showAlert: (msg: string, type?: AlertLevel) => void;
@@ -20,7 +20,7 @@ interface ProfileSectionProps {
 export default function ProfileSection({
   user,
   isAuthenticated,
-  g,
+  persona,
   mode,
   setMode,
   showAlert,
@@ -225,16 +225,16 @@ export default function ProfileSection({
             <button
               key={key}
               className={`tu-dash-persona-card${
-                g?.persona === key ? ' tu-dash-persona-card--active' : ''
+                persona?.persona === key ? ' tu-dash-persona-card--active' : ''
               }`}
               onClick={() => {
-                g.setPersona(key);
+                persona.setPersona(key);
                 showAlert(`Persona changed to ${p.label}`, 'success');
               }}
             >
               <span className="tu-dash-persona-icon">{p.icon}</span>
               <span className="tu-dash-persona-label">{p.label}</span>
-              {g?.persona === key && <span className="tu-dash-persona-check">✓</span>}
+              {persona?.persona === key && <span className="tu-dash-persona-check">✓</span>}
             </button>
           ))}
         </div>

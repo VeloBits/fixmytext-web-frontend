@@ -31,8 +31,8 @@ export default defineConfig(({ mode }) => ({
         '@sentry/react': { singleton: true },
         // Singleton: the host provides the one store/api instance at runtime.
         // Pinned (not '*') so a breaking app-core change forces a coordinated
-        // rebuild instead of silent version skew (M-2).
-        '@velobits/app-core': { singleton: true, requiredVersion: '^0.1.0' },
+        // rebuild instead of silent version skew.
+        '@velobits/app-core': { singleton: true, requiredVersion: '^0.2.0' },
       },
     }),
     react(),

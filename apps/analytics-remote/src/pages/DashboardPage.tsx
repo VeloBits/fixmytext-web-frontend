@@ -2,12 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TOOLS, ACHIEVEMENTS, LEVELS, USE_CASE_TABS } from '@velobits/app-core/constants/tools';
 import { useGetToolStatsQuery } from '@velobits/app-core/store/api/userDataApi';
-import type { AlertLevel } from '@velobits/app-core/types/alert';
-import type {
-  GamificationContextValue,
-  SubscriptionContextValue,
-  User,
-} from '@velobits/app-core/types/context';
+import { useGetHistoryQuery } from '@velobits/app-core/store/api/historyApi';
+import type { AnalyticsPageProps } from '@velobits/app-core/contract';
 
 // Extracted dashboard section components
 import OverviewSection from '@/components/dashboard/OverviewSection';
@@ -18,15 +14,10 @@ import AchievementsSection from '@/components/dashboard/AchievementsSection';
 import FavoritesSection from '@/components/dashboard/FavoritesSection';
 import HistorySection from '@/components/dashboard/HistorySection';
 
-interface DashboardPageProps {
-  gamification: GamificationContextValue;
-  user: User | null;
-  isAuthenticated: boolean;
-  showAlert: (message: string, type: AlertLevel) => void;
-  mode: string;
-  setMode: (mode: string) => void;
-  subscription: SubscriptionContextValue;
-}
+// Props come straight from the host<->remote contract: `persona` and
+// `favorites` are required, `gamification` is optional/nullable (null while
+// the VITE_GAMIFICATION_ENABLED kill switch is off).
+type DashboardPageProps = AnalyticsPageProps;
 
 /** Section component lookup map. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,6 +38,8 @@ const SECTIONS_MAP: Record<string, React.ComponentType<any>> = {
  * and section-level state while delegating rendering to extracted section components.
  */
 export default function DashboardPage({
+  persona,
+  favorites,
   gamification,
   user,
   isAuthenticated,
@@ -61,9 +54,9 @@ export default function DashboardPage({
     return searchParams.get('tab') || 'overview';
   });
 
-  const g = gamification;
-  const level = g?.level || LEVELS[0];
-  const nextLevel = g?.nextLevel || LEVELS[1];
+  const g = gamification ?? null;
+  const level = g?.level || LEVELS[0]!;
+  const nextLevel = g?.nextLevel || LEVELS[1]!;
   const xpProgress = g?.xpProgress || 0;
 
   // Handle payment redirect -- auto-open subscription tab and show result
@@ -104,6 +97,22 @@ export default function DashboardPage({
     error: toolStatsError,
     refetch: refetchToolStats,
   } = useGetToolStatsQuery(undefined, { skip: !isAuthenticated });
+
+  // Recent server-side history: only needed for the slimmed (gamification-off)
+  // overview; skipped entirely while gamification is on so flag-ON behavior
+  // and network traffic are identical to today.
+  const { data: historyData } = useGetHistoryQuery(
+    { page: 1, pageSize: 5 },
+    { skip: !isAuthenticated || Boolean(g) }
+  );
+
+  // Server-derived usage aggregates (history stats endpoint). Used for the ops
+  // count when gamification is null.
+  const statsTotalOps = useMemo(
+    () => toolStatsData?.stats?.reduce((sum, s) => sum + s.total_uses, 0) ?? 0,
+    [toolStatsData]
+  );
+  const statsToolCount = toolStatsData?.stats?.length ?? 0;
 
   // Top used tools
   const topTools = useMemo(() => {
@@ -151,7 +160,9 @@ export default function DashboardPage({
     { id: 'subscription', label: 'Subscription', icon: '⚡' },
     { id: 'rewards', label: 'Rewards', icon: '🎰' },
     { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'achievements', label: 'Achievements', icon: '🏆' },
+    // Achievements are gamification-only: hide the nav entry when the
+    // gamification kill switch is off (g === null).
+    ...(g ? [{ id: 'achievements', label: 'Achievements', icon: '🏆' }] : []),
     { id: 'favorites', label: 'Favorites', icon: '❤️' },
     { id: 'history', label: 'Usage History', icon: '📈' },
   ];
@@ -160,12 +171,17 @@ export default function DashboardPage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sectionProps: Record<string, any> = {
     g,
+    persona,
+    favorites,
     level,
     nextLevel,
     xpProgress,
     topTools,
     categoryUsage,
     recentOps,
+    statsTotalOps,
+    statsToolCount,
+    recentHistory: historyData?.items,
     user,
     isAuthenticated,
     showAlert,
@@ -196,19 +212,23 @@ export default function DashboardPage({
           </div>
           <div className="tu-dash-profile-info">
             <span className="tu-dash-profile-name">{user?.display_name || 'Guest'}</span>
-            <span className="tu-dash-profile-level">
-              {level.title} — Lvl {level.level}
-            </span>
+            {g && (
+              <span className="tu-dash-profile-level">
+                {level.title} — Lvl {level.level}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Mini XP bar in sidebar */}
-        <div className="tu-dash-sidebar-xp">
-          <div className="tu-dash-sidebar-xp-track">
-            <div className="tu-dash-sidebar-xp-fill" style={{ width: `${xpProgress}%` }} />
+        {/* Mini XP bar in sidebar (gamification only) */}
+        {g && (
+          <div className="tu-dash-sidebar-xp">
+            <div className="tu-dash-sidebar-xp-track">
+              <div className="tu-dash-sidebar-xp-fill" style={{ width: `${xpProgress}%` }} />
+            </div>
+            <span className="tu-dash-sidebar-xp-text">{g.xp || 0} XP</span>
           </div>
-          <span className="tu-dash-sidebar-xp-text">{g?.xp || 0} XP</span>
-        </div>
+        )}
 
         <nav className="tu-dash-nav">
           {sections.map((s) => (
@@ -221,24 +241,27 @@ export default function DashboardPage({
             >
               <span className="tu-dash-nav-icon">{s.icon}</span>
               <span>{s.label}</span>
-              {s.id === 'achievements' && (
+              {s.id === 'achievements' && g && (
                 <span className="tu-dash-nav-badge">
-                  {g?.achievements?.length || 0}/{ACHIEVEMENTS.length}
+                  {g.achievements?.length || 0}/{ACHIEVEMENTS.length}
                 </span>
               )}
             </button>
           ))}
         </nav>
 
-        {/* Quick stats in sidebar */}
+        {/* Quick stats in sidebar. Streak is gamification-only; the ops count
+            falls back to the server-side tool stats when gamification is off. */}
         <div className="tu-dash-sidebar-stats">
-          <div className="tu-dash-sidebar-stat">
-            <span>🔥</span>
-            <span>{g?.streak?.current || 0} day streak</span>
-          </div>
+          {g && (
+            <div className="tu-dash-sidebar-stat">
+              <span>🔥</span>
+              <span>{g.streak?.current || 0} day streak</span>
+            </div>
+          )}
           <div className="tu-dash-sidebar-stat">
             <span>🔧</span>
-            <span>{g?.totalOps || 0} operations</span>
+            <span>{g ? g.totalOps || 0 : statsTotalOps} operations</span>
           </div>
         </div>
 

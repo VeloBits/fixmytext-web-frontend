@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProfileSection from './ProfileSection';
-import type { GamificationContextValue, User } from '@velobits/app-core/types/context';
+import type { PersonaContextValue, User } from '@velobits/app-core/types/context';
 
 const mockResendVerification = vi.fn();
 
@@ -21,12 +21,16 @@ interface RenderProfileOptions {
 }
 
 function renderProfile({ user, isAuthenticated = true }: RenderProfileOptions = {}) {
-  const g = { persona: 'writer', setPersona: vi.fn() } as unknown as GamificationContextValue;
+  const persona = {
+    persona: 'writer',
+    setPersona: vi.fn(),
+    onboarded: true,
+  } as unknown as PersonaContextValue;
   return render(
     <ProfileSection
       user={(user ?? null) as User | null}
       isAuthenticated={isAuthenticated}
-      g={g}
+      persona={persona}
       mode="dark"
       setMode={vi.fn()}
       showAlert={vi.fn()}
@@ -80,7 +84,9 @@ describe('ProfileSection — email verification', () => {
       <ProfileSection
         user={user}
         isAuthenticated
-        g={{ persona: 'writer', setPersona: vi.fn() } as unknown as GamificationContextValue}
+        persona={
+          { persona: 'writer', setPersona: vi.fn(), onboarded: true } as unknown as PersonaContextValue
+        }
         mode="dark"
         setMode={vi.fn()}
         showAlert={showAlertLocal}
@@ -111,7 +117,9 @@ describe('ProfileSection — email verification', () => {
           } as User
         }
         isAuthenticated
-        g={{ persona: 'writer', setPersona: vi.fn() } as unknown as GamificationContextValue}
+        persona={
+          { persona: 'writer', setPersona: vi.fn(), onboarded: true } as unknown as PersonaContextValue
+        }
         mode="dark"
         setMode={vi.fn()}
         showAlert={showAlertLocal}
@@ -128,5 +136,25 @@ describe('ProfileSection — email verification', () => {
     });
     // No countdown/cooldown in new Keycloak-based flow
     expect(screen.queryByRole('button', { name: /resend in \d+s/i })).not.toBeInTheDocument();
+  });
+});
+
+describe('ProfileSection — persona picker (persona prop)', () => {
+  it('marks the active persona and calls setPersona from the persona prop', () => {
+    const setPersona = vi.fn();
+    const showAlert = vi.fn();
+    render(
+      <ProfileSection
+        user={null}
+        isAuthenticated={false}
+        persona={{ persona: null, setPersona, onboarded: false } as unknown as PersonaContextValue}
+        mode="dark"
+        setMode={vi.fn()}
+        showAlert={showAlert}
+      />
+    );
+    fireEvent.click(screen.getByText('Writer'));
+    expect(setPersona).toHaveBeenCalledWith('writer');
+    expect(showAlert).toHaveBeenCalledWith('Persona changed to Writer', 'success');
   });
 });

@@ -58,7 +58,8 @@ function AppInner() {
   const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
   const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
-  const { user, isAuthenticated, userResolving, gamification, subscription } = useAppContext();
+  const { user, isAuthenticated, userResolving, persona, favorites, gamification, subscription } =
+    useAppContext();
   const { isLoading: authLoading, wasAuthenticated } = useOidcAuth();
   const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
 
@@ -71,7 +72,7 @@ function AppInner() {
   }, [showAlert]);
 
   const handleOnboardingComplete = (personaId: PersonaId) => {
-    gamification.setPersona(personaId);
+    persona.setPersona(personaId);
   };
 
   // A share link is often someone's first visit; the persona picker has no
@@ -103,7 +104,7 @@ function AppInner() {
 
   return (
     <>
-      {!gamification.onboarded && !isShareView && !isAuthScreen && (
+      {!persona.onboarded && !isShareView && !isAuthScreen && (
         <OnboardingModal onComplete={handleOnboardingComplete} />
       )}
 
@@ -128,6 +129,8 @@ function AppInner() {
                   mode={mode}
                   setMode={setMode as (mode: string) => void}
                   showAlert={showAlert as (message: string, type: string) => void}
+                  persona={persona}
+                  favorites={favorites}
                   gamification={gamification}
                   user={user}
                   isAuthenticated={isAuthenticated}
@@ -153,6 +156,8 @@ function AppInner() {
               <ProtectedRoute>
                 <RemoteBoundary name="Dashboard">
                   <DashboardPage
+                    persona={persona}
+                    favorites={favorites}
                     gamification={gamification}
                     user={user}
                     isAuthenticated={isAuthenticated}

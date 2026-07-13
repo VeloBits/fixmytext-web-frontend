@@ -1,9 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 
 const mockSyncToDb = vi.fn();
-const mockSyncPrefs = vi.fn();
-const mockApiAddFavorite = vi.fn();
-const mockApiRemoveFavorite = vi.fn();
 
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
@@ -24,24 +21,25 @@ vi.mock('../auth/useOidcAuth', () => ({
 vi.mock('../store/api/userDataApi', () => ({
   useGetGamificationQuery: vi.fn(() => ({ data: undefined })),
   useUpdateGamificationMutation: () => [mockSyncToDb],
-  useUpdatePreferencesMutation: () => [mockSyncPrefs],
-  useGetPreferencesQuery: vi.fn(() => ({ data: undefined })),
-  useGetFavoritesQuery: vi.fn(() => ({ data: undefined })),
-  useAddFavoriteMutation: () => [mockApiAddFavorite],
-  useRemoveFavoriteMutation: () => [mockApiRemoveFavorite],
   useGetDiscoveredToolsQuery: vi.fn(() => ({ data: undefined })),
   useGetPipelinesQuery: vi.fn(() => ({ data: undefined })),
 }));
 
 import { useSelector } from 'react-redux';
 import { useOidcAuth } from '../auth/useOidcAuth';
-import { useGetGamificationQuery, useGetPreferencesQuery } from '../store/api/userDataApi';
+import {
+  useGetGamificationQuery,
+  useGetDiscoveredToolsQuery,
+  useGetPipelinesQuery,
+} from '../store/api/userDataApi';
+import { isGamificationEnabled } from '../config/features';
 import useGamification from './useGamification';
 
 const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
 const mockUseOidcAuth = useOidcAuth as unknown as ReturnType<typeof vi.fn>;
 const mockGetGamification = useGetGamificationQuery as unknown as ReturnType<typeof vi.fn>;
-const mockGetPreferences = useGetPreferencesQuery as unknown as ReturnType<typeof vi.fn>;
+const mockGetDiscovered = useGetDiscoveredToolsQuery as unknown as ReturnType<typeof vi.fn>;
+const mockGetPipelines = useGetPipelinesQuery as unknown as ReturnType<typeof vi.fn>;
 
 function mockAuth(isAuthenticated: boolean, sub?: string) {
   mockUseOidcAuth.mockReturnValue({
@@ -63,12 +61,10 @@ describe('useGamification', () => {
     mockAuth(true);
     // Re-pin the query defaults: clearAllMocks doesn't undo per-test mockReturnValue
     mockGetGamification.mockReturnValue({ data: undefined });
-    mockGetPreferences.mockReturnValue({ data: undefined });
+    mockGetDiscovered.mockReturnValue({ data: undefined });
+    mockGetPipelines.mockReturnValue({ data: undefined });
     mockUseSelector.mockReturnValue('fake-token');
     mockSyncToDb.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    mockSyncPrefs.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    mockApiAddFavorite.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    mockApiRemoveFavorite.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   afterEach(() => {
@@ -80,8 +76,6 @@ describe('useGamification', () => {
     expect(result.current.totalOps).toBe(0);
     expect(result.current.xp).toBeGreaterThanOrEqual(0);
     expect(result.current.achievements).toEqual([]);
-    expect(result.current.favorites).toEqual([]);
-    expect(result.current.onboarded).toBe(false);
     expect(result.current.level).toBeDefined();
     expect(result.current.level.level).toBe(1);
   });
@@ -120,76 +114,6 @@ describe('useGamification', () => {
       result.current.recordToolUse('lowercase', 0);
     });
     expect(result.current.discoveredTools).toContain('lowercase');
-  });
-
-  it('toggleFavorite adds and removes favorites', () => {
-    const { result } = renderHook(() => useGamification());
-    act(() => {
-      result.current.toggleFavorite('uppercase');
-    });
-    expect(result.current.favorites).toContain('uppercase');
-    act(() => {
-      result.current.toggleFavorite('uppercase');
-    });
-    expect(result.current.favorites).not.toContain('uppercase');
-  });
-
-  it('toggleFavorite calls API when authenticated', () => {
-    const { result } = renderHook(() => useGamification());
-    act(() => {
-      result.current.toggleFavorite('uppercase');
-    });
-    expect(mockApiAddFavorite).toHaveBeenCalledWith('uppercase');
-    act(() => {
-      result.current.toggleFavorite('uppercase');
-    });
-    expect(mockApiRemoveFavorite).toHaveBeenCalledWith('uppercase');
-  });
-
-  it('setPersona updates persona state', () => {
-    const { result } = renderHook(() => useGamification());
-    act(() => {
-      result.current.setPersona('developer');
-    });
-    expect(result.current.persona).toBe('developer');
-    expect(result.current.onboarded).toBe(true);
-  });
-
-  it('setPersona syncs to API when authenticated', () => {
-    const { result } = renderHook(() => useGamification());
-    act(() => {
-      result.current.setPersona('writer');
-    });
-    expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'writer' });
-  });
-
-  it('setPersona also writes guest sessionStorage when authenticated', () => {
-    // The guest copy must survive logout: the hook falls back to guest state
-    // then, and without it the welcome picker reappears right after sign-out.
-    const { result } = renderHook(() => useGamification());
-    act(() => {
-      result.current.setPersona('writer');
-    });
-    expect(sessionStorage.getItem('fmx_guest_persona')).toBe('writer');
-  });
-
-  it('setPersona persists to sessionStorage for guests instead of the API', () => {
-    mockAuth(false);
-    const { result } = renderHook(() => useGamification());
-    act(() => {
-      result.current.setPersona('developer');
-    });
-    expect(result.current.persona).toBe('developer');
-    expect(sessionStorage.getItem('fmx_guest_persona')).toBe('developer');
-    expect(mockSyncPrefs).not.toHaveBeenCalled();
-  });
-
-  it('restores guest persona from sessionStorage on init', () => {
-    mockAuth(false);
-    sessionStorage.setItem('fmx_guest_persona', 'writer');
-    const { result } = renderHook(() => useGamification());
-    expect(result.current.persona).toBe('writer');
-    expect(result.current.onboarded).toBe(true);
   });
 
   it('dismissAchievement clears the newAchievement', () => {
@@ -276,70 +200,13 @@ describe('useGamification', () => {
     expect(mockSyncToDb).not.toHaveBeenCalled();
   });
 
-  // The flat gamification response carries no persona; persona hydrates from
-  // /user/preferences in its own effect. These pin the ordering race where the
-  // gamification response landing first wiped the persona and re-showed the
-  // blocking welcome picker for already-onboarded users.
-  describe('persona hydration', () => {
-    const DB_GAMIFICATION = { total_ops: 3, xp: 30 };
-
-    it('keeps the tab persona when gamification hydrates before preferences', () => {
-      sessionStorage.setItem('fmx_guest_persona', 'writer');
-      mockAuth(true, 'user-a');
-      mockGetGamification.mockReturnValue({ data: DB_GAMIFICATION });
-      mockGetPreferences.mockReturnValue({ data: undefined }); // prefs still in flight
-      const { result } = renderHook(() => useGamification());
-      expect(result.current.totalOps).toBe(3); // gamification did hydrate
-      expect(result.current.persona).toBe('writer'); // …without wiping persona
-      expect(result.current.onboarded).toBe(true);
+  it('achievement evaluator reads the threaded-in favoritesCount (favorite_fan)', () => {
+    // favorites moved to useFavorites; AppContext threads the count in.
+    const { result } = renderHook(() => useGamification({ favoritesCount: 5 }));
+    act(() => {
+      result.current.recordToolUse('uppercase', 0);
     });
-
-    it('applies the DB persona when preferences land after gamification', () => {
-      mockAuth(true, 'user-a');
-      mockGetGamification.mockReturnValue({ data: DB_GAMIFICATION });
-      mockGetPreferences.mockReturnValue({ data: undefined });
-      const { result, rerender } = renderHook(() => useGamification());
-      expect(result.current.persona).toBeNull();
-      mockGetPreferences.mockReturnValue({ data: { persona: 'student' } });
-      rerender();
-      expect(result.current.persona).toBe('student');
-      // Mirrored for the post-logout guest fallback, tagged with the owner
-      expect(sessionStorage.getItem('fmx_guest_persona')).toBe('student');
-      expect(sessionStorage.getItem('fmx_guest_persona_owner')).toBe('user-a');
-    });
-
-    it('adopts a guest pick into the account when the DB has no persona', () => {
-      sessionStorage.setItem('fmx_guest_persona', 'developer');
-      sessionStorage.setItem('fmx_guest_persona_owner', 'guest');
-      mockAuth(true, 'user-a');
-      mockGetPreferences.mockReturnValue({ data: { persona: null } });
-      const { result } = renderHook(() => useGamification());
-      expect(result.current.persona).toBe('developer');
-      expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'developer' });
-      expect(sessionStorage.getItem('fmx_guest_persona_owner')).toBe('user-a');
-    });
-
-    it("drops another account's persona so the new user gets onboarding", () => {
-      sessionStorage.setItem('fmx_guest_persona', 'writer');
-      sessionStorage.setItem('fmx_guest_persona_owner', 'user-a');
-      mockAuth(true, 'user-b');
-      mockGetPreferences.mockReturnValue({ data: { persona: null } });
-      const { result } = renderHook(() => useGamification());
-      expect(result.current.persona).toBeNull();
-      expect(result.current.onboarded).toBe(false);
-      expect(sessionStorage.getItem('fmx_guest_persona')).toBeNull();
-      expect(mockSyncPrefs).not.toHaveBeenCalled();
-    });
-
-    it('setPersona tags the tab copy with the signed-in owner', () => {
-      mockAuth(true, 'user-a');
-      const { result } = renderHook(() => useGamification());
-      act(() => {
-        result.current.setPersona('social');
-      });
-      expect(sessionStorage.getItem('fmx_guest_persona')).toBe('social');
-      expect(sessionStorage.getItem('fmx_guest_persona_owner')).toBe('user-a');
-    });
+    expect(result.current.achievements).toContain('favorite_fan');
   });
 
   it('silently swallows DB sync errors', async () => {
@@ -355,5 +222,69 @@ describe('useGamification', () => {
       await Promise.resolve();
     });
     expect(mockSyncToDb).toHaveBeenCalled();
+  });
+
+  // ── Kill switch (VITE_GAMIFICATION_ENABLED=false) ──
+  // A flag-off bundle must issue ZERO requests to /user/gamification (and the
+  // companion discovered-tools/pipelines endpoints): every query is skipped,
+  // recordToolUse goes inert, and the debounced PUT never fires.
+  describe('kill switch (flag off)', () => {
+    beforeEach(() => {
+      vi.stubEnv('VITE_GAMIFICATION_ENABLED', 'false');
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('skips all gamification queries even when authenticated', () => {
+      renderHook(() => useGamification());
+      expect(mockGetGamification).toHaveBeenCalledWith(undefined, { skip: true });
+      expect(mockGetDiscovered).toHaveBeenCalledWith(undefined, { skip: true });
+      expect(mockGetPipelines).toHaveBeenCalledWith(undefined, { skip: true });
+    });
+
+    it('recordToolUse is a no-op', () => {
+      const { result } = renderHook(() => useGamification());
+      act(() => {
+        result.current.recordToolUse('uppercase', 10);
+      });
+      expect(result.current.totalOps).toBe(0);
+      expect(result.current.totalChars).toBe(0);
+      expect(result.current.xp).toBe(0);
+      expect(result.current.achievements).toEqual([]);
+    });
+
+    it('never schedules the debounced PUT — not even for mount-time state changes', () => {
+      const { result } = renderHook(() => useGamification());
+      act(() => {
+        result.current.recordToolUse('uppercase', 10);
+      });
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+      expect(mockSyncToDb).not.toHaveBeenCalled();
+    });
+
+    it('AppContext-style consumers resolve to null', () => {
+      // Mirrors AppProvider's wiring: the hook is still called (rules of
+      // hooks) but the exposed context value is null while disabled.
+      const { result } = renderHook(() => {
+        const value = useGamification();
+        return isGamificationEnabled() ? value : null;
+      });
+      expect(result.current).toBeNull();
+    });
+
+    it('re-enabling the flag restores live behavior (call-time evaluation)', () => {
+      vi.unstubAllEnvs();
+      vi.stubEnv('VITE_GAMIFICATION_ENABLED', 'true');
+      const { result } = renderHook(() => useGamification());
+      act(() => {
+        result.current.recordToolUse('uppercase', 10);
+      });
+      expect(result.current.totalOps).toBe(1);
+      expect(isGamificationEnabled()).toBe(true);
+    });
   });
 });

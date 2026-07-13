@@ -52,7 +52,18 @@ test.describe('Module Federation smoke (hermetic)', () => {
       }
     });
 
-    await page.goto('/app/');
+    // Deep-link a tool so the editor view (not the guest landing) renders, and
+    // dismiss the first-visit persona onboarding dialog that overlays it.
+    await page.goto('/app/?tool=md5');
+    const overlay = page.locator('.tu-onboard-overlay');
+    const onboarding = await overlay
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (onboarding) {
+      await page.keyboard.press('Escape');
+      await overlay.waitFor({ state: 'hidden', timeout: 5_000 });
+    }
 
     // The editor surface (TextForm) is owned by editor-remote. Its textarea rendering
     // proves the remote loaded, mounted, and the app-core store singleton initialised.

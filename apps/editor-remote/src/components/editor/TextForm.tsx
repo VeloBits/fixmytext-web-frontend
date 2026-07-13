@@ -29,7 +29,8 @@ import {
   USE_CASE_TABS,
   ACHIEVEMENTS,
 } from '@velobits/app-core/constants/tools';
-import type { ToolDefinition, ToolTab, PersonaId } from '@velobits/app-core/types/tools';
+import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
+import type { FavoritesContextValue, PersonaContextValue } from '@velobits/app-core/types/context';
 import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 import { ROUTES } from '@velobits/app-core/constants';
 
@@ -298,7 +299,11 @@ type AnyRecord = Record<string, any>;
 
 interface TextFormProps {
   showAlert: (msg: string, type: string) => void;
-  gamification: AnyRecord | null;
+  persona: PersonaContextValue;
+  favorites: FavoritesContextValue;
+  /** null when the VITE_GAMIFICATION_ENABLED kill switch is off — all
+   * gamification UI (XP, streak, quests, achievements) must vanish cleanly. */
+  gamification?: AnyRecord | null;
   user: AnyRecord | null;
   isAuthenticated: boolean;
   mode: string;
@@ -314,7 +319,9 @@ interface TextFormProps {
  *
  * @param {object} props
  * @param {function} props.showAlert - Alert notification callback.
- * @param {object} props.gamification - Gamification hook state.
+ * @param {object} props.persona - Persona (onboarding) state.
+ * @param {object} props.favorites - Favorites state.
+ * @param {object|null} props.gamification - Gamification hook state (null when disabled).
  * @param {object|null} props.user - Current user object.
  * @param {boolean} props.isAuthenticated - Whether user is authenticated.
  * @param {string} props.mode - Current theme mode.
@@ -330,7 +337,7 @@ export default function TextForm(props: TextFormProps) {
   // Returning visitors have a persona synchronously (sessionStorage / cached
   // state), so seed their default tab here — no 'all' flash before the switch.
   const [activeTab, setActiveTab] = useState<string | null>(() => {
-    const personaId = props.gamification?.persona as PersonaId | undefined;
+    const personaId = props.persona.persona ?? undefined;
     return personaId ? (PERSONAS[personaId]?.defaultTab ?? 'all') : null;
   });
   const personaTabApplied = useRef(activeTab !== null);
@@ -437,15 +444,17 @@ export default function TextForm(props: TextFormProps) {
     setPreviewMode,
     history.pushHistory
   );
-  const gamification = props.gamification;
+  const gamification = props.gamification ?? null;
+  const persona = props.persona;
+  const favorites = props.favorites;
   const pipeline = usePipeline();
   const suggestions = useSmartSuggestions(text);
   // Persona picks surface as a pinned "For You" group — visible on an empty
   // editor, unlike smart suggestions which need typed text to trigger.
   const personaSuggestedIds = useMemo(() => {
-    const personaId = gamification?.persona as PersonaId | undefined;
+    const personaId = persona.persona ?? undefined;
     return personaId ? (PERSONAS[personaId]?.suggestedTools ?? []) : [];
-  }, [gamification?.persona]);
+  }, [persona.persona]);
   const search = useToolSearch();
   const trial = useTrialLimit(props.isAuthenticated);
   const subscription = props.subscription;
@@ -569,7 +578,7 @@ export default function TextForm(props: TextFormProps) {
   // fall back to 'all'. Single effect: as two effects both ran against the
   // same null-activeTab render and the 'all' write landed last every time.
   useEffect(() => {
-    const personaId = gamification?.persona as PersonaId | undefined;
+    const personaId = persona.persona ?? undefined;
     const personaTab = personaId ? PERSONAS[personaId]?.defaultTab : undefined;
     if (personaTab && !personaTabApplied.current) {
       personaTabApplied.current = true;
@@ -578,7 +587,7 @@ export default function TextForm(props: TextFormProps) {
     } else if (!activeTab) {
       setActiveTab('all');
     }
-  }, [gamification?.persona, activeTab]);
+  }, [persona.persona, activeTab]);
 
   // Capture AI results per-tab for persistence
   // Keyed by tab ID so each tab is fully independent
@@ -1828,7 +1837,7 @@ export default function TextForm(props: TextFormProps) {
               onTabChange={(tabId) => setActiveTab(tabId)}
               onToolClick={handleToolClick}
               disabled={loading}
-              gamification={gamification}
+              favorites={favorites}
               activeToolId={(() => {
                 const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                 if (ws?.type === 'tool') return ws.tool?.id ?? null;
@@ -1850,7 +1859,7 @@ export default function TextForm(props: TextFormProps) {
           {/* Favourites panel */}
           {activeTab === '_favourites' &&
             (() => {
-              const favTools = ((gamification?.favorites as string[]) || [])
+              const favTools = favorites.favorites
                 .map((id: string) => TOOLS.find((t) => t.id === id))
                 .filter(Boolean) as ToolDefinition[];
               return (
@@ -1878,7 +1887,7 @@ export default function TextForm(props: TextFormProps) {
                               className="tu-titem-fav tu-tgrid-card-fav tu-titem-fav--active"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                gamification?.toggleFavorite(tool.id);
+                                favorites.toggleFavorite(tool.id);
                               }}
                               title="Remove from favourites"
                             >
@@ -1899,7 +1908,7 @@ export default function TextForm(props: TextFormProps) {
                               className="tu-titem-fav tu-titem-fav--active"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                gamification?.toggleFavorite(tool.id);
+                                favorites.toggleFavorite(tool.id);
                               }}
                               title="Remove from favourites"
                             >
@@ -2203,66 +2212,85 @@ export default function TextForm(props: TextFormProps) {
             </div>
           )}
 
-          {/* ─── Sidebar Footer: Gamification ─── */}
-          <div className="tu-sidebar-footer">
-            {/* Level + XP */}
-            <div className="tu-sf-row tu-sf-level">
-              <span className="tu-sf-level-icon">⚡</span>
-              <span className="tu-sf-label">Lv.{gamification?.level?.level || 1}</span>
-              <span className="tu-sf-sublabel">{gamification?.level?.title || 'Beginner'}</span>
-              <span className="tu-sf-value">{gamification?.xp || 0} XP</span>
-            </div>
-            <div className="tu-sf-xp-track">
-              <div
-                className="tu-sf-xp-fill"
-                style={{ width: `${gamification?.xpProgress || 0}%` }}
-              />
-            </div>
-
-            {/* Subscription Status */}
-            {subscription?.isPro && (
-              <div className="tu-sf-row tu-sf-ai-usage">
-                <span className="tu-sf-label tu-sf-label--pro">PRO</span>
-                <span className="tu-sf-value">Unlimited</span>
-              </div>
-            )}
-            {subscription &&
+          {/* ─── Sidebar Footer: Gamification + Subscription ─── */}
+          {(() => {
+            const showPro = subscription?.isPro;
+            const showCredits =
+              subscription &&
               props.isAuthenticated &&
               !subscription.isPro &&
-              subscription.totalCredits > 0 && (
-                <div className="tu-sf-row tu-sf-ai-usage">
-                  <span className="tu-sf-label">Credits</span>
-                  <span className="tu-sf-value">{subscription.totalCredits}</span>
-                </div>
-              )}
+              subscription.totalCredits > 0;
+            // Nothing to show (gamification disabled, no subscription badges):
+            // skip the footer entirely so its border/padding don't render as an
+            // empty strip.
+            if (!gamification && !showPro && !showCredits) return null;
+            return (
+              <div className="tu-sidebar-footer">
+                {/* Level + XP */}
+                {gamification && (
+                  <>
+                    <div className="tu-sf-row tu-sf-level">
+                      <span className="tu-sf-level-icon">⚡</span>
+                      <span className="tu-sf-label">Lv.{gamification.level?.level || 1}</span>
+                      <span className="tu-sf-sublabel">
+                        {gamification.level?.title || 'Beginner'}
+                      </span>
+                      <span className="tu-sf-value">{gamification.xp || 0} XP</span>
+                    </div>
+                    <div className="tu-sf-xp-track">
+                      <div
+                        className="tu-sf-xp-fill"
+                        style={{ width: `${gamification.xpProgress || 0}%` }}
+                      />
+                    </div>
+                  </>
+                )}
 
-            {/* Streak + Discovery */}
-            <div className="tu-sf-stats">
-              <div className="tu-sf-stat" title="Daily streak">
-                🔥 <b>{gamification?.streak?.current || 0}</b> streak
-              </div>
-              <div className="tu-sf-stat" title="Tools discovered">
-                🧭 <b>{gamification?.discoveredTools?.length || 0}</b>/{TOOLS.length}
-              </div>
-            </div>
+                {/* Subscription Status */}
+                {showPro && (
+                  <div className="tu-sf-row tu-sf-ai-usage">
+                    <span className="tu-sf-label tu-sf-label--pro">PRO</span>
+                    <span className="tu-sf-value">Unlimited</span>
+                  </div>
+                )}
+                {showCredits && (
+                  <div className="tu-sf-row tu-sf-ai-usage">
+                    <span className="tu-sf-label">Credits</span>
+                    <span className="tu-sf-value">{subscription.totalCredits}</span>
+                  </div>
+                )}
 
-            {/* Daily Quest */}
-            {gamification?.dailyQuest?.id && (
-              <div
-                className={`tu-sf-quest${
-                  gamification?.dailyQuest.completed ? ' tu-sf-quest--done' : ''
-                }`}
-              >
-                <span className="tu-sf-quest-icon">
-                  {gamification?.dailyQuest.completed ? '✅' : '📋'}
-                </span>
-                <span className="tu-sf-quest-text">
-                  {QUEST_TEMPLATES.find((q) => q.id === gamification?.dailyQuest.id)?.text ||
-                    'Daily Quest'}
-                </span>
+                {/* Streak + Discovery */}
+                {gamification && (
+                  <div className="tu-sf-stats">
+                    <div className="tu-sf-stat" title="Daily streak">
+                      🔥 <b>{gamification.streak?.current || 0}</b> streak
+                    </div>
+                    <div className="tu-sf-stat" title="Tools discovered">
+                      🧭 <b>{gamification.discoveredTools?.length || 0}</b>/{TOOLS.length}
+                    </div>
+                  </div>
+                )}
+
+                {/* Daily Quest */}
+                {gamification?.dailyQuest?.id && (
+                  <div
+                    className={`tu-sf-quest${
+                      gamification.dailyQuest.completed ? ' tu-sf-quest--done' : ''
+                    }`}
+                  >
+                    <span className="tu-sf-quest-icon">
+                      {gamification.dailyQuest.completed ? '✅' : '📋'}
+                    </span>
+                    <span className="tu-sf-quest-text">
+                      {QUEST_TEMPLATES.find((q) => q.id === gamification.dailyQuest.id)?.text ||
+                        'Daily Quest'}
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            );
+          })()}
           {/* Sidebar resize handle */}
           {sidebarOpen && (
             <div
@@ -2302,11 +2330,13 @@ export default function TextForm(props: TextFormProps) {
                       <h1 className="tu-landing-title">
                         Welcome back, {props.user?.display_name?.split(' ')[0] || 'there'}
                       </h1>
-                      <p className="tu-landing-subtitle">
-                        Level {gamification?.level?.level || 1}{' '}
-                        {gamification?.level?.title || 'Beginner'} &middot; {gamification?.xp || 0}{' '}
-                        XP
-                      </p>
+                      {gamification && (
+                        <p className="tu-landing-subtitle">
+                          Level {gamification.level?.level || 1}{' '}
+                          {gamification.level?.title || 'Beginner'} &middot; {gamification.xp || 0}{' '}
+                          XP
+                        </p>
+                      )}
                     </div>
                     <button className="tu-landing-search-btn" onClick={() => search.open()}>
                       <svg
@@ -2341,105 +2371,108 @@ export default function TextForm(props: TextFormProps) {
                     </div>
                   )}
 
-                  {/* Dashboard grid */}
-                  <div className="tu-landing-dash-grid">
-                    {/* Daily quest card */}
-                    <div className="tu-landing-card tu-landing-card--quest">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x2728;</span>
-                        Daily Quest
-                      </h2>
-                      {gamification?.dailyQuest?.id ? (
-                        (() => {
-                          const quest = QUEST_TEMPLATES.find(
-                            (q) => q.id === gamification?.dailyQuest.id
-                          );
-                          return quest ? (
-                            <div className="tu-landing-quest-body">
-                              <p className="tu-landing-quest-text">{quest.text}</p>
-                              <div className="tu-landing-quest-footer">
-                                <span className="tu-landing-quest-xp">+{quest.xp} XP</span>
-                                {gamification?.dailyQuest.completed ? (
-                                  <span className="tu-landing-quest-done">Completed!</span>
-                                ) : (
-                                  <span className="tu-landing-quest-pending">In progress</span>
-                                )}
+                  {/* Dashboard grid — gamification-only cards, hidden entirely
+                      when the kill switch nulls gamification */}
+                  {gamification && (
+                    <div className="tu-landing-dash-grid">
+                      {/* Daily quest card */}
+                      <div className="tu-landing-card tu-landing-card--quest">
+                        <h2 className="tu-landing-card-title">
+                          <span className="tu-landing-card-icon">&#x2728;</span>
+                          Daily Quest
+                        </h2>
+                        {gamification.dailyQuest?.id ? (
+                          (() => {
+                            const quest = QUEST_TEMPLATES.find(
+                              (q) => q.id === gamification.dailyQuest.id
+                            );
+                            return quest ? (
+                              <div className="tu-landing-quest-body">
+                                <p className="tu-landing-quest-text">{quest.text}</p>
+                                <div className="tu-landing-quest-footer">
+                                  <span className="tu-landing-quest-xp">+{quest.xp} XP</span>
+                                  {gamification.dailyQuest.completed ? (
+                                    <span className="tu-landing-quest-done">Completed!</span>
+                                  ) : (
+                                    <span className="tu-landing-quest-pending">In progress</span>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ) : null;
-                        })()
-                      ) : (
-                        <p className="tu-landing-quest-text" style={{ color: 'var(--text-3)' }}>
-                          No quest today
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Stats card */}
-                    <div className="tu-landing-card tu-landing-card--stats">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x1F4CA;</span>
-                        Your Stats
-                      </h2>
-                      <div className="tu-landing-mini-stats">
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.streak?.current || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Day Streak</span>
-                        </div>
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.totalOps || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Operations</span>
-                        </div>
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.discoveredTools?.length || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Tools Found</span>
-                        </div>
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.achievements?.length || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Badges</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Achievements card */}
-                    <div className="tu-landing-card tu-landing-card--achievements">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x1F3C6;</span>
-                        Recent Badges
-                      </h2>
-                      <div className="tu-landing-badge-row">
-                        {gamification?.achievements?.length > 0 ? (
-                          (gamification?.achievements as string[])
-                            .slice(-6)
-                            .reverse()
-                            .map((aid: string) => {
-                              const ach = ACHIEVEMENTS.find((a) => a.id === aid);
-                              return ach ? (
-                                <span
-                                  key={aid}
-                                  className="tu-landing-badge"
-                                  title={`${ach.label}: ${ach.description}`}
-                                >
-                                  {ach.icon}
-                                </span>
-                              ) : null;
-                            })
+                            ) : null;
+                          })()
                         ) : (
-                          <span className="tu-landing-badge-empty">
-                            Complete quests to earn badges
-                          </span>
+                          <p className="tu-landing-quest-text" style={{ color: 'var(--text-3)' }}>
+                            No quest today
+                          </p>
                         )}
                       </div>
+
+                      {/* Stats card */}
+                      <div className="tu-landing-card tu-landing-card--stats">
+                        <h2 className="tu-landing-card-title">
+                          <span className="tu-landing-card-icon">&#x1F4CA;</span>
+                          Your Stats
+                        </h2>
+                        <div className="tu-landing-mini-stats">
+                          <div className="tu-landing-mini-stat">
+                            <span className="tu-landing-mini-stat-val">
+                              {gamification.streak?.current || 0}
+                            </span>
+                            <span className="tu-landing-mini-stat-label">Day Streak</span>
+                          </div>
+                          <div className="tu-landing-mini-stat">
+                            <span className="tu-landing-mini-stat-val">
+                              {gamification.totalOps || 0}
+                            </span>
+                            <span className="tu-landing-mini-stat-label">Operations</span>
+                          </div>
+                          <div className="tu-landing-mini-stat">
+                            <span className="tu-landing-mini-stat-val">
+                              {gamification.discoveredTools?.length || 0}
+                            </span>
+                            <span className="tu-landing-mini-stat-label">Tools Found</span>
+                          </div>
+                          <div className="tu-landing-mini-stat">
+                            <span className="tu-landing-mini-stat-val">
+                              {gamification.achievements?.length || 0}
+                            </span>
+                            <span className="tu-landing-mini-stat-label">Badges</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Achievements card */}
+                      <div className="tu-landing-card tu-landing-card--achievements">
+                        <h2 className="tu-landing-card-title">
+                          <span className="tu-landing-card-icon">&#x1F3C6;</span>
+                          Recent Badges
+                        </h2>
+                        <div className="tu-landing-badge-row">
+                          {gamification.achievements?.length > 0 ? (
+                            (gamification.achievements as string[])
+                              .slice(-6)
+                              .reverse()
+                              .map((aid: string) => {
+                                const ach = ACHIEVEMENTS.find((a) => a.id === aid);
+                                return ach ? (
+                                  <span
+                                    key={aid}
+                                    className="tu-landing-badge"
+                                    title={`${ach.label}: ${ach.description}`}
+                                  >
+                                    {ach.icon}
+                                  </span>
+                                ) : null;
+                              })
+                          ) : (
+                            <span className="tu-landing-badge-empty">
+                              Complete quests to earn badges
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Favorites + Recent tools */}
                   <div className="tu-landing-tools-row">
@@ -2447,11 +2480,11 @@ export default function TextForm(props: TextFormProps) {
                     <div className="tu-landing-card tu-landing-card--wide">
                       <h2 className="tu-landing-card-title">
                         <span className="tu-landing-card-icon">&#x2764;</span>
-                        {gamification?.favorites?.length > 0 ? 'Your Favourites' : 'Popular Tools'}
+                        {favorites.favorites.length > 0 ? 'Your Favourites' : 'Popular Tools'}
                       </h2>
                       <div className="tu-landing-tool-grid">
-                        {((gamification?.favorites?.length ?? 0) > 0
-                          ? ((gamification?.favorites ?? []) as string[])
+                        {(favorites.favorites.length > 0
+                          ? favorites.favorites
                               .slice(0, 8)
                               .map((id: string) => TOOLS.find((t) => t.id === id))
                               .filter((t): t is ToolDefinition => Boolean(t))
@@ -2482,45 +2515,48 @@ export default function TextForm(props: TextFormProps) {
                       </div>
                     </div>
 
-                    {/* Most used */}
-                    <div className="tu-landing-card tu-landing-card--wide">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x1F525;</span>
-                        Most Used
-                      </h2>
-                      <div className="tu-landing-tool-grid">
-                        {(() => {
-                          const used = (gamification?.toolsUsed || {}) as Record<string, number>;
-                          const sorted = Object.entries(used)
-                            .sort((a, b) => b[1] - a[1])
-                            .slice(0, 8);
-                          if (sorted.length === 0)
-                            return (
-                              <span className="tu-landing-badge-empty">
-                                Start using tools to track your favorites
-                              </span>
-                            );
-                          return sorted.map(([id, count]) => {
-                            const tool = TOOLS.find((t) => t.id === id);
-                            return tool ? (
-                              <button
-                                key={id}
-                                className="tu-landing-tool-btn"
-                                onClick={() => handleToolClick(tool)}
-                              >
-                                <span
-                                  className={`tu-landing-tool-icon tu-titem-icon--${tool.color}`}
-                                >
-                                  {tool.icon}
+                    {/* Most used — usage counts come from gamification, so the
+                        card disappears with it */}
+                    {gamification && (
+                      <div className="tu-landing-card tu-landing-card--wide">
+                        <h2 className="tu-landing-card-title">
+                          <span className="tu-landing-card-icon">&#x1F525;</span>
+                          Most Used
+                        </h2>
+                        <div className="tu-landing-tool-grid">
+                          {(() => {
+                            const used = (gamification.toolsUsed || {}) as Record<string, number>;
+                            const sorted = Object.entries(used)
+                              .sort((a, b) => b[1] - a[1])
+                              .slice(0, 8);
+                            if (sorted.length === 0)
+                              return (
+                                <span className="tu-landing-badge-empty">
+                                  Start using tools to track your favorites
                                 </span>
-                                <span className="tu-landing-tool-name">{tool.label}</span>
-                                <span className="tu-landing-tool-count">{count}x</span>
-                              </button>
-                            ) : null;
-                          });
-                        })()}
+                              );
+                            return sorted.map(([id, count]) => {
+                              const tool = TOOLS.find((t) => t.id === id);
+                              return tool ? (
+                                <button
+                                  key={id}
+                                  className="tu-landing-tool-btn"
+                                  onClick={() => handleToolClick(tool)}
+                                >
+                                  <span
+                                    className={`tu-landing-tool-icon tu-titem-icon--${tool.color}`}
+                                  >
+                                    {tool.icon}
+                                  </span>
+                                  <span className="tu-landing-tool-name">{tool.label}</span>
+                                  <span className="tu-landing-tool-count">{count}x</span>
+                                </button>
+                              ) : null;
+                            });
+                          })()}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Category grid + Shortcuts */}
@@ -3838,10 +3874,12 @@ export default function TextForm(props: TextFormProps) {
           return <SaveModal />;
         })()}
 
-      <AchievementToast
-        achievement={gamification?.newAchievement}
-        onDismiss={gamification?.dismissAchievement}
-      />
+      {gamification && (
+        <AchievementToast
+          achievement={gamification.newAchievement}
+          onDismiss={gamification.dismissAchievement}
+        />
+      )}
       <CommandPalette search={search} onToolClick={handleToolClick} />
       <KeyboardShortcuts
         isOpen={shortcutsOpen}

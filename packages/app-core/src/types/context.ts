@@ -12,6 +12,25 @@ import type { PersonaId, Achievement, LevelDefinition, QuestOp, ToolDefinition }
 
 export type User = components['schemas']['UserResponse'];
 
+// ── Persona (onboarding) ──────────────────────────────────────────────────────
+// Extracted from gamification (Phase A of the gamification removal): persona
+// drives onboarding + "For You" personalization and survives gamification.
+
+export interface PersonaContextValue {
+  persona: PersonaId | null;
+  setPersona: (persona: PersonaId) => void;
+  onboarded: boolean;
+}
+
+// ── Favorites ─────────────────────────────────────────────────────────────────
+// Extracted from gamification (Phase A): favorites are a product feature and
+// survive gamification.
+
+export interface FavoritesContextValue {
+  favorites: string[];
+  toggleFavorite: (toolId: string) => void;
+}
+
 // ── Gamification ──────────────────────────────────────────────────────────────
 
 export interface GamificationStreak {
@@ -27,7 +46,6 @@ export interface GamificationDailyQuest {
 
 export interface GamificationContextValue {
   // state fields spread from the hook's internal state
-  persona: PersonaId | null;
   toolsUsed: Record<string, number>;
   discoveredTools: string[];
   totalOps: number;
@@ -35,7 +53,6 @@ export interface GamificationContextValue {
   xp: number;
   streak: GamificationStreak;
   achievements: string[];
-  favorites: string[];
   dailyQuest: GamificationDailyQuest;
   savedPipelines: unknown[];
   completedQuests: string[];
@@ -47,11 +64,8 @@ export interface GamificationContextValue {
   newAchievement: Achievement | null;
   dismissAchievement: () => void;
   xpGain: number | null;
-  onboarded: boolean;
   // actions
   recordToolUse: (toolId: string, charCount?: number) => void;
-  toggleFavorite: (toolId: string) => void;
-  setPersona: (persona: PersonaId) => void;
 }
 
 // ── Subscription ──────────────────────────────────────────────────────────────
@@ -103,6 +117,10 @@ export interface AppContextValue {
    * still null). Identity UI (avatar, name) should treat this as loading, not
    * as a guest. Optional so existing mock/context builders stay valid. */
   userResolving?: boolean;
-  gamification: GamificationContextValue;
+  persona: PersonaContextValue;
+  favorites: FavoritesContextValue;
+  /** null when gamification is disabled via the VITE_GAMIFICATION_ENABLED
+   * kill switch (see config/features.ts). Consumers must null-check. */
+  gamification: GamificationContextValue | null;
   subscription: SubscriptionContextValue;
 }
