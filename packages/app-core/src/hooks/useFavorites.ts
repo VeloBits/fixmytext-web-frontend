@@ -8,9 +8,7 @@ import { useOidcAuth } from '../auth/useOidcAuth';
 import type { FavoritesContextValue } from '../types/context';
 
 /**
- * Favorite tools. Extracted from useGamification (Phase A of the gamification
- * removal) — favorites are a product concern, not a gamification one, so this
- * is NOT gated by the gamification feature flag.
+ * Favorite tools.
  *
  * Signed-in users persist via the dedicated /user/favorites endpoints; guest
  * favorites stay in-memory for the session only.

@@ -28,16 +28,10 @@ interface HistoryProps {
   handleClearHistory: () => void;
 }
 
-interface GamificationProps {
-  xp?: number;
-  discoveredTools?: string[];
-}
-
 interface BottomPanelProps {
   pipeline: PipelineProps;
   history: HistoryProps;
   text: string;
-  gamification?: GamificationProps | null;
   style?: CSSProperties;
 }
 
@@ -59,13 +53,7 @@ const TABS = [
   { id: 'pipeline', label: 'Pipeline', icon: '▶' },
 ];
 
-export default memo(function BottomPanel({
-  pipeline,
-  history,
-  text,
-  gamification,
-  style,
-}: BottomPanelProps) {
+export default memo(function BottomPanel({ pipeline, history, text, style }: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState('stats');
   const [collapsed, setCollapsed] = useState(false);
 
@@ -279,20 +267,6 @@ export default memo(function BottomPanel({
                       <span className="tu-stat-value tu-stat-value--word">{stats.longest}</span>
                       <span className="tu-stat-label">Longest Word</span>
                     </div>
-                    {gamification && (
-                      <>
-                        <div className="tu-stat-card tu-stat-card--accent">
-                          <span className="tu-stat-value">{gamification.xp || 0}</span>
-                          <span className="tu-stat-label">Total XP</span>
-                        </div>
-                        <div className="tu-stat-card tu-stat-card--accent">
-                          <span className="tu-stat-value">
-                            {gamification.discoveredTools?.length || 0}
-                          </span>
-                          <span className="tu-stat-label">Tools Used</span>
-                        </div>
-                      </>
-                    )}
                   </div>
                 )
               )}

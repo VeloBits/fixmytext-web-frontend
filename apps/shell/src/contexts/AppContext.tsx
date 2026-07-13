@@ -9,11 +9,9 @@ import { passesApi } from '@velobits/app-core/store/api/passesApi';
 import { historyApi } from '@velobits/app-core/store/api/historyApi';
 import { logout as clearAuthUser } from '@velobits/app-core/store/slices/authSlice';
 import type { AppDispatch, RootState } from '@velobits/app-core/store/store';
-import useGamification from '@velobits/app-core/hooks/useGamification';
 import usePersona from '@velobits/app-core/hooks/usePersona';
 import useFavorites from '@velobits/app-core/hooks/useFavorites';
 import useSubscription from '@velobits/app-core/hooks/useSubscription';
-import { isGamificationEnabled } from '@velobits/app-core/config/features';
 import { useAlertContext } from './AlertContext';
 import type {
   User,
@@ -29,9 +27,6 @@ export type {
   User,
   PersonaContextValue,
   FavoritesContextValue,
-  GamificationStreak,
-  GamificationDailyQuest,
-  GamificationContextValue,
   ToolUsage,
   SubscriptionContextValue,
   AppContextValue,
@@ -84,15 +79,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated, user, meFailed, meAuthRejected, refetchMe]);
   const persona = usePersona();
   const favorites = useFavorites();
-  // Always called (rules of hooks) — when the kill switch is off the hook is
-  // internally inert (all queries skipped, no PUTs) and consumers get null.
-  const gamificationValue = useGamification({ favoritesCount: favorites.favorites.length });
-  const gamification = isGamificationEnabled() ? gamificationValue : null;
   const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 
   const value = useMemo(
-    () => ({ user, isAuthenticated, userResolving, persona, favorites, gamification, subscription }),
-    [user, isAuthenticated, userResolving, persona, favorites, gamification, subscription]
+    () => ({ user, isAuthenticated, userResolving, persona, favorites, subscription }),
+    [user, isAuthenticated, userResolving, persona, favorites, subscription]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

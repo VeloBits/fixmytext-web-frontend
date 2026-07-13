@@ -1,20 +1,19 @@
 // Shared application context value types.
 //
-// These describe the gamification / subscription / user state that the shell
-// produces (via AppProvider) and injects as props into the federated remote
-// surfaces. They live in app-core so both the shell provider and the remotes
-// depend on a single shared definition rather than on each other's source.
+// These describe the persona / favorites / subscription / user state that the
+// shell produces (via AppProvider) and injects as props into the federated
+// remote surfaces. They live in app-core so both the shell provider and the
+// remotes depend on a single shared definition rather than on each other's source.
 
 import type { components } from './openapi';
-import type { PersonaId, Achievement, LevelDefinition, QuestOp, ToolDefinition } from './tools';
+import type { PersonaId, ToolDefinition } from './tools';
 
 // ── User ─────────────────────────────────────────────────────────────────────
 
 export type User = components['schemas']['UserResponse'];
 
 // ── Persona (onboarding) ──────────────────────────────────────────────────────
-// Extracted from gamification (Phase A of the gamification removal): persona
-// drives onboarding + "For You" personalization and survives gamification.
+// Persona drives onboarding + "For You" personalization.
 
 export interface PersonaContextValue {
   persona: PersonaId | null;
@@ -23,49 +22,10 @@ export interface PersonaContextValue {
 }
 
 // ── Favorites ─────────────────────────────────────────────────────────────────
-// Extracted from gamification (Phase A): favorites are a product feature and
-// survive gamification.
 
 export interface FavoritesContextValue {
   favorites: string[];
   toggleFavorite: (toolId: string) => void;
-}
-
-// ── Gamification ──────────────────────────────────────────────────────────────
-
-export interface GamificationStreak {
-  current: number;
-  lastDate: string | null;
-}
-
-export interface GamificationDailyQuest {
-  id: string | null;
-  date: string | null;
-  completed: boolean;
-}
-
-export interface GamificationContextValue {
-  // state fields spread from the hook's internal state
-  toolsUsed: Record<string, number>;
-  discoveredTools: string[];
-  totalOps: number;
-  totalChars: number;
-  xp: number;
-  streak: GamificationStreak;
-  achievements: string[];
-  dailyQuest: GamificationDailyQuest;
-  savedPipelines: unknown[];
-  completedQuests: string[];
-  sessionOps: QuestOp[];
-  // computed / extra fields
-  level: LevelDefinition;
-  nextLevel: LevelDefinition;
-  xpProgress: number;
-  newAchievement: Achievement | null;
-  dismissAchievement: () => void;
-  xpGain: number | null;
-  // actions
-  recordToolUse: (toolId: string, charCount?: number) => void;
 }
 
 // ── Subscription ──────────────────────────────────────────────────────────────
@@ -119,8 +79,5 @@ export interface AppContextValue {
   userResolving?: boolean;
   persona: PersonaContextValue;
   favorites: FavoritesContextValue;
-  /** null when gamification is disabled via the VITE_GAMIFICATION_ENABLED
-   * kill switch (see config/features.ts). Consumers must null-check. */
-  gamification: GamificationContextValue | null;
   subscription: SubscriptionContextValue;
 }

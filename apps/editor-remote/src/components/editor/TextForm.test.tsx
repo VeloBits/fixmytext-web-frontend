@@ -426,10 +426,6 @@ vi.mock('@/components/layout/CommandPalette', () => ({
 vi.mock('@/components/layout/KeyboardShortcuts', () => ({
   default: () => React.createElement('div', { 'data-testid': 'keyboard-shortcuts' }),
 }));
-vi.mock('@velobits/app-core/gamification/AchievementToast', () => ({
-  default: () => React.createElement('div', { 'data-testid': 'achievement-toast' }),
-}));
-
 // ── Top-level mock references for per-test overrides ──
 import useTrialLimitHook from '@velobits/app-core/hooks/useTrialLimit';
 const mockUseTrialLimit = vi.mocked(useTrialLimitHook);
@@ -461,8 +457,8 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // ── Default props ──
-// Persona and favorites are separate contexts now (Phase A of the gamification
-// removal) — the gamification object no longer carries them.
+// Persona and favorites are standalone contexts (gamification was removed
+// entirely in Phase C).
 const defaultPersona: PersonaContextValue = {
   persona: null,
   setPersona: vi.fn(),
@@ -474,30 +470,12 @@ const defaultFavorites: FavoritesContextValue = {
   toggleFavorite: vi.fn(),
 };
 
-const defaultGamification = {
-  level: { level: 1, title: 'Beginner' },
-  xp: 0,
-  xpProgress: 0,
-  nextLevel: null,
-  streak: { current: 0 },
-  discoveredTools: [],
-  achievements: [],
-  dailyQuest: null,
-  totalOps: 0,
-  toolsUsed: {},
-  newAchievement: null,
-  xpGain: null,
-  recordToolUse: vi.fn(),
-  dismissAchievement: vi.fn(),
-};
-
 const defaultProps = {
   showAlert: vi.fn(),
   isAuthenticated: false,
   user: null,
   persona: defaultPersona,
   favorites: defaultFavorites,
-  gamification: defaultGamification,
   subscription: null,
   mode: 'dark',
   setMode: vi.fn(),
@@ -560,15 +538,11 @@ describe('TextForm', () => {
     expect(screen.getByText(/Welcome back/)).toBeInTheDocument();
   });
 
-  it('renders gamification sidebar footer with level info', () => {
+  it('renders no sidebar footer without subscription badges', () => {
     render(<TextForm {...defaultProps} />);
-    expect(screen.getByText(/Lv\.1/)).toBeInTheDocument();
-  });
-
-  it('shows XP in sidebar footer', () => {
-    const gamification = { ...defaultGamification, xp: 150 };
-    render(<TextForm {...defaultProps} gamification={gamification} />);
-    expect(screen.getByText('150 XP')).toBeInTheDocument();
+    // The footer only exists for PRO/credits badges now — with none, it is
+    // skipped entirely so its border/padding don't render as an empty strip.
+    expect(document.querySelector('.tu-sidebar-footer')).not.toBeInTheDocument();
   });
 
   it('opens the persona default tab on mount (developer → Code & Data)', () => {
@@ -689,11 +663,6 @@ describe('TextForm', () => {
     expect(screen.getByTestId('keyboard-shortcuts')).toBeInTheDocument();
   });
 
-  it('renders achievement toast', () => {
-    render(<TextForm {...defaultProps} />);
-    expect(screen.getByTestId('achievement-toast')).toBeInTheDocument();
-  });
-
   it('shows "Get Started Free" CTA for unauthenticated users', () => {
     render(<TextForm {...defaultProps} />);
     expect(screen.getByText('Get Started Free')).toBeInTheDocument();
@@ -800,33 +769,6 @@ describe('TextForm', () => {
     expect(document.querySelector('.tu-forge')).toBeInTheDocument();
   });
 
-  it('displays streak info in sidebar footer', () => {
-    const gamification = { ...defaultGamification, streak: { current: 5 } };
-    render(<TextForm {...defaultProps} gamification={gamification} />);
-    // Streak element contains "5" and "streak"
-    expect(document.querySelector('.tu-sf-stat')).toBeInTheDocument();
-    const footerText = document.querySelector('.tu-sidebar-footer')?.textContent;
-    expect(footerText).toMatch(/5/);
-  });
-
-  it('shows "Discover all tools" count in sidebar', () => {
-    const gamification = { ...defaultGamification, discoveredTools: ['uppercase', 'lowercase'] };
-    render(<TextForm {...defaultProps} gamification={gamification} />);
-    // The discovery stat shows "2/N" in sidebar footer
-    const footerText = document.querySelector('.tu-sidebar-footer')?.textContent;
-    expect(footerText).toMatch(/2/);
-  });
-
-  it('shows daily quest in sidebar footer when present', () => {
-    const gamification = {
-      ...defaultGamification,
-      dailyQuest: { id: 'use_5_tools', completed: false },
-    };
-    render(<TextForm {...defaultProps} gamification={gamification} />);
-    // Quest renders if QUEST_TEMPLATES has matching id
-    expect(document.querySelector('.tu-sidebar-footer')).toBeInTheDocument();
-  });
-
   it('shows PRO badge when subscription.isPro is true', () => {
     const props = {
       ...defaultProps,
@@ -875,15 +817,6 @@ describe('TextForm', () => {
     const avatarBtn = document.querySelector('.tu-activity-avatar');
     fireEvent.click(avatarBtn!);
     expect(screen.getByText('Upgrade to Pro')).toBeInTheDocument();
-  });
-
-  it('switches to whats-new panel when whats-new button is clicked', () => {
-    const gamification = { ...defaultGamification, discoveredTools: [] };
-    render(<TextForm {...defaultProps} gamification={gamification} />);
-    const newBtn = document.querySelector('.tu-activity-btn[data-tooltip="What\'s New"]');
-    fireEvent.click(newBtn!);
-    // Should render the what's new panel (may show tools or "discovered all" message)
-    expect(document.querySelector('.tu-tpanel')).toBeInTheDocument();
   });
 
   // axe over the full TextForm tree needs more than the default 5s
@@ -1169,7 +1102,7 @@ describe('TextForm', () => {
   });
 });
 
-describe('TextForm with gamification disabled (null)', () => {
+describe('TextForm persona and favorites (post-gamification-removal)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
@@ -1182,43 +1115,9 @@ describe('TextForm with gamification disabled (null)', () => {
     }
   });
 
-  const nullGamProps = { ...defaultProps, gamification: null };
-
-  it('renders without crashing', () => {
-    render(<TextForm {...nullGamProps} />);
-    expect(document.querySelector('.tu-forge')).toBeInTheDocument();
-  });
-
-  it('hides the XP/level sidebar footer entirely (no empty shell)', () => {
-    render(<TextForm {...nullGamProps} />);
-    expect(document.querySelector('.tu-sf-level')).not.toBeInTheDocument();
-    expect(document.querySelector('.tu-sf-xp-track')).not.toBeInTheDocument();
-    expect(document.querySelector('.tu-sf-stats')).not.toBeInTheDocument();
-    // no gamification and no subscription badges → footer skipped completely
-    expect(document.querySelector('.tu-sidebar-footer')).not.toBeInTheDocument();
-  });
-
-  it('keeps the sidebar footer for subscription badges when gamification is null', () => {
+  it('signed-in landing shows only product cards (no gamification remnants)', () => {
     const props = {
-      ...nullGamProps,
-      isAuthenticated: true,
-      user: { display_name: 'Pro User', email: 'pro@example.com' },
-      subscription: {
-        isPro: true,
-        checkToolAccess: vi.fn(() => true),
-        refetchStatus: vi.fn(),
-        totalCredits: 0,
-      },
-    };
-    render(<TextForm {...props} />);
-    expect(document.querySelector('.tu-sidebar-footer')).toBeInTheDocument();
-    expect(screen.getByText('PRO')).toBeInTheDocument();
-    expect(document.querySelector('.tu-sf-level')).not.toBeInTheDocument();
-  });
-
-  it('hides XP bar, quest, stats and badge cards on the signed-in landing', () => {
-    const props = {
-      ...nullGamProps,
+      ...defaultProps,
       isAuthenticated: true,
       user: { display_name: 'Alice', email: 'alice@example.com' },
     };
@@ -1235,7 +1134,7 @@ describe('TextForm with gamification disabled (null)', () => {
 
   it('shows "Your Favourites" on the landing from the favorites prop', () => {
     const props = {
-      ...nullGamProps,
+      ...defaultProps,
       isAuthenticated: true,
       user: { display_name: 'Alice', email: 'alice@example.com' },
       favorites: { favorites: ['fix_grammar'], toggleFavorite: vi.fn() },
@@ -1245,15 +1144,10 @@ describe('TextForm with gamification disabled (null)', () => {
     expect(screen.getByText('Fix Grammar')).toBeInTheDocument();
   });
 
-  it('does not render the achievement toast', () => {
-    render(<TextForm {...nullGamProps} />);
-    expect(screen.queryByTestId('achievement-toast')).not.toBeInTheDocument();
-  });
-
   it('favourites sidebar panel works from the favorites prop', () => {
     const toggleFavorite = vi.fn();
     const props = {
-      ...nullGamProps,
+      ...defaultProps,
       favorites: { favorites: ['fix_grammar'], toggleFavorite },
     };
     render(<TextForm {...props} />);
@@ -1265,9 +1159,9 @@ describe('TextForm with gamification disabled (null)', () => {
     expect(toggleFavorite).toHaveBeenCalledWith('fix_grammar');
   });
 
-  it('passes favorites and personaToolIds to ToolPanel with gamification null', () => {
+  it('passes favorites and personaToolIds to ToolPanel', () => {
     const props = {
-      ...nullGamProps,
+      ...defaultProps,
       persona: { ...defaultPersona, persona: 'writer' as const },
       favorites: { favorites: ['fix_grammar'], toggleFavorite: vi.fn() },
     };
@@ -1279,15 +1173,14 @@ describe('TextForm with gamification disabled (null)', () => {
     );
   });
 
-  it('still executes tools — recordToolUse is safely skipped', async () => {
-    render(<TextForm {...nullGamProps} />);
+  it('executes tools on paste (debounced auto-run)', async () => {
+    render(<TextForm {...defaultProps} />);
     // Open a workspace tab via the mocked ToolPanel (first real tool)
     fireEvent.click(screen.getByTestId('tool-panel'));
     const textarea = document.querySelector('.tu-textarea') as HTMLTextAreaElement;
     expect(textarea).toBeInTheDocument();
     fireEvent.change(textarea, { target: { value: 'hello world' } });
-    // Paste schedules executeToolAction (150ms) which used to call
-    // gamification.recordToolUse — must not throw when gamification is null
+    // Paste schedules executeToolAction (150ms)
     fireEvent.paste(textarea);
     await act(async () => {
       await new Promise((r) => setTimeout(r, 250));
@@ -1362,7 +1255,7 @@ describe('TextForm mobile (max-width: 768px)', () => {
     render(<TextForm {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
     const tabs = document.querySelectorAll('.tu-sheet-tab');
-    expect(tabs.length).toBe(4);
+    expect(tabs.length).toBe(3);
     const historyTab = Array.from(tabs).find((t) => t.textContent?.includes('History'));
     fireEvent.click(historyTab as HTMLElement);
     // sidebar header title switches to the History panel

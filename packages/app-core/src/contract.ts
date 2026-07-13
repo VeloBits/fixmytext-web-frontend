@@ -8,17 +8,11 @@
 
 import type {
   FavoritesContextValue,
-  GamificationContextValue,
   PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from './types/context';
 import type { AlertLevel } from './types/alert';
-
-// `gamification` is deliberately optional AND nullable: the shell passes null
-// while the VITE_GAMIFICATION_ENABLED kill switch is off (Phase A of the
-// gamification removal), and the hard-delete phase can then drop the key
-// entirely without another breaking contract change.
 
 export interface EditorPageProps {
   mode: string;
@@ -26,7 +20,6 @@ export interface EditorPageProps {
   showAlert: (message: string, type: string) => void;
   persona: PersonaContextValue;
   favorites: FavoritesContextValue;
-  gamification?: GamificationContextValue | null;
   user: User | null;
   isAuthenticated: boolean;
   subscription: SubscriptionContextValue;
@@ -35,7 +28,6 @@ export interface EditorPageProps {
 export interface AnalyticsPageProps {
   persona: PersonaContextValue;
   favorites: FavoritesContextValue;
-  gamification?: GamificationContextValue | null;
   user: User | null;
   isAuthenticated: boolean;
   showAlert: (message: string, type: AlertLevel) => void;

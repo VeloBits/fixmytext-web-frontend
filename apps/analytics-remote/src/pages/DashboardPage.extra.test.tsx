@@ -3,7 +3,6 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
   FavoritesContextValue,
-  GamificationContextValue,
   PersonaContextValue,
   SubscriptionContextValue,
   User,
@@ -102,21 +101,6 @@ vi.mock('@velobits/app-core/utils/formatPrice', () => ({
 
 import DashboardPage from './DashboardPage';
 
-const defaultGamification = {
-  xp: 120,
-  level: { level: 2, title: 'Novice', xp: 100 },
-  nextLevel: { level: 3, title: 'Apprentice', xp: 250 },
-  xpProgress: 10,
-  streak: { current: 2, best: 7 },
-  totalOps: 25,
-  totalChars: 5000,
-  achievements: ['first_step'],
-  toolsUsed: {},
-  discoveredTools: ['trim_extra'],
-  sessionOps: [],
-  dailyQuest: null,
-} as unknown as GamificationContextValue;
-
 const defaultPersona = {
   persona: 'writer',
   setPersona: vi.fn(),
@@ -153,7 +137,6 @@ function renderDash(props: Record<string, unknown> = {}) {
     <DashboardPage
       persona={defaultPersona}
       favorites={defaultFavorites}
-      gamification={defaultGamification}
       user={defaultUser}
       isAuthenticated={true}
       showAlert={vi.fn()}
@@ -183,7 +166,15 @@ describe('DashboardPage — payment redirects and tool stats', () => {
   it('falls back to Overview for an unknown tab param', () => {
     searchParamsValue = new URLSearchParams('tab=bogus');
     renderDash();
-    expect(screen.getByText('Your FixMyText journey at a glance')).toBeInTheDocument();
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
+  });
+
+  it('falls back to Overview for the removed achievements tab', () => {
+    searchParamsValue = new URLSearchParams('tab=achievements');
+    renderDash();
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
+    const nav = document.querySelector('nav.tu-dash-nav') as HTMLElement;
+    expect(within(nav).queryByText('Achievements')).not.toBeInTheDocument();
   });
 
   // ── upgrade=… redirects ──
@@ -262,24 +253,18 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     expect(screen.queryByText(/No tools used yet/i)).not.toBeInTheDocument();
   });
 
-  it('falls back to local toolsUsed for top tools and builds category breakdown', () => {
-    const gamification = {
-      ...defaultGamification,
-      toolsUsed: { trim_extra: 7, camel_case: 3, not_a_real_tool: 1 },
+  it('sources the sidebar ops count from server tool stats', () => {
+    toolStatsState = {
+      data: {
+        stats: [
+          { tool_id: 'trim_extra', total_uses: 5 },
+          { tool_id: 'camel_case', total_uses: 2 },
+        ],
+      },
+      isLoading: false,
     };
-    renderDash({ gamification });
-    // Top tools (sorted desc, unknown ids filtered)
-    expect(screen.getByText('Trim Extra Spaces')).toBeInTheDocument();
-    expect(screen.getByText('camelCase')).toBeInTheDocument();
-    expect(screen.getByText('7x')).toBeInTheDocument();
-    expect(screen.getByText('3x')).toBeInTheDocument();
-    // Category breakdown: transform = 7 + 3, code = 3
-    const card = screen.getByText('Category Breakdown').closest('.tu-dash-card') as HTMLElement;
-    expect(within(card).getByText('Transform')).toBeInTheDocument();
-    expect(within(card).getByText('Code & Data')).toBeInTheDocument();
-    expect(within(card).getByText('10')).toBeInTheDocument();
-    expect(within(card).getByText('3')).toBeInTheDocument();
-    expect(screen.queryByText(/No usage data yet/i)).not.toBeInTheDocument();
+    renderDash();
+    expect(screen.getByText(/7 operations/)).toBeInTheDocument();
   });
 
   it('shows tool stats error state on overview and retries', () => {
@@ -298,32 +283,8 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     expect(screen.queryByText('Failed to load tool statistics')).not.toBeInTheDocument();
   });
 
-  // ── Null gamification (kill switch off): sidebar hides XP widgets ──
-  it('hides level, XP bar and streak when gamification is null', () => {
-    renderDash({ gamification: null });
-    expect(screen.queryByText(/Beginner — Lvl 1/)).not.toBeInTheDocument();
-    expect(screen.queryByText('0 XP')).not.toBeInTheDocument();
-    expect(screen.queryByText(/day streak/)).not.toBeInTheDocument();
-    // Ops count survives, sourced from server tool stats (null data → 0)
-    expect(screen.getByText(/0 operations/)).toBeInTheDocument();
-  });
-
-  it('sources sidebar ops count from server tool stats when gamification is null', () => {
-    toolStatsState = {
-      data: {
-        stats: [
-          { tool_id: 'trim_extra', total_uses: 5 },
-          { tool_id: 'camel_case', total_uses: 2 },
-        ],
-      },
-      isLoading: false,
-    };
-    renderDash({ gamification: null });
-    expect(screen.getByText(/7 operations/)).toBeInTheDocument();
-  });
-
-  // ── Slimmed overview (gamification null) with server data ──
-  it('slimmed overview shows usage stats from server data', () => {
+  // ── Overview with server data ──
+  it('overview shows usage stats from server data', () => {
     toolStatsState = {
       data: {
         stats: [
@@ -357,7 +318,7 @@ describe('DashboardPage — payment redirects and tool stats', () => {
       isLoading: false,
     };
     const favorites = { favorites: ['trim_extra'], toggleFavorite: vi.fn() };
-    renderDash({ gamification: null, favorites });
+    renderDash({ favorites });
 
     // Stats grid: total ops, tools used, favorites count
     expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
@@ -380,53 +341,11 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     // Recent activity from the history endpoint (unknown ids fall back to label)
     expect(screen.getByText('Recent Activity')).toBeInTheDocument();
     expect(screen.getByText('Mystery Tool')).toBeInTheDocument();
-
-    // No gamification widgets
-    expect(screen.queryByText('Day Streak')).not.toBeInTheDocument();
-    expect(screen.queryByText('Daily Quest')).not.toBeInTheDocument();
-    expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
   });
 
-  it('slimmed overview shows empty recent activity when history is empty', () => {
-    renderDash({ gamification: null });
+  it('overview shows empty recent activity when history is empty', () => {
+    renderDash();
     expect(screen.getByText('Recent Activity')).toBeInTheDocument();
     expect(screen.getByText('No recent activity yet')).toBeInTheDocument();
-  });
-
-  // ── Stale achievements tab with gamification null must not crash ──
-  it('renders nothing (no crash) for a stale achievements tab when gamification is null', () => {
-    searchParamsValue = new URLSearchParams('tab=achievements');
-    renderDash({ gamification: null });
-    // The nav entry is gone and the section renders nothing
-    expect(screen.queryByText(/of .* unlocked/i)).not.toBeInTheDocument();
-    const nav = document.querySelector('nav.tu-dash-nav') as HTMLElement;
-    expect(within(nav).queryByText('Achievements')).not.toBeInTheDocument();
-  });
-
-  // ── Achievements section unlocked branch ──
-  it('shows an unlocked achievement in the achievements section', () => {
-    searchParamsValue = new URLSearchParams('tab=achievements');
-    renderDash();
-    expect(screen.getByText(/of .* unlocked/i)).toBeInTheDocument();
-    expect(screen.getByText('Unlocked')).toBeInTheDocument();
-    expect(screen.getByText('First Step')).toBeInTheDocument();
-  });
-
-  // ── History section branches ──
-  it('renders history ops with NEW badge, known tool label and empty time', () => {
-    const gamification = {
-      ...defaultGamification,
-      sessionOps: [
-        { id: 'trim_extra', tab: 'transform', time: null, isNew: true },
-        { id: 'mystery_tool', isNew: false },
-      ],
-    };
-    searchParamsValue = new URLSearchParams('tab=history');
-    renderDash({ gamification });
-    expect(screen.getByText(/2 operations/)).toBeInTheDocument();
-    expect(screen.getByText('NEW')).toBeInTheDocument();
-    expect(screen.getByText('Trim Extra Spaces')).toBeInTheDocument();
-    // Unknown tool id falls back to raw id and default icon
-    expect(screen.getByText('mystery_tool')).toBeInTheDocument();
   });
 });

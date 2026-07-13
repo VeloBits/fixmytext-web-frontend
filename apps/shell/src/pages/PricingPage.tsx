@@ -508,8 +508,8 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
           <p>
             Every tool gets <strong>3 free uses per day</strong> — no sign-up needed.
             <br />
-            Log in for a <strong>+1 daily bonus</strong>. Earn free passes through streaks, quests,
-            and the weekly spin!
+            Log in for a <strong>+1 daily bonus</strong>. Earn free passes with the weekly reward
+            spin!
           </p>
         </div>
       </div>

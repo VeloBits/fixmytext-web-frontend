@@ -12,10 +12,6 @@ export type {
   UseCaseTab,
   Persona,
   PersonaId,
-  Achievement,
-  AchievementStats,
-  QuestTemplate,
   QuestOp,
-  LevelDefinition,
   SmartSuggestionRule,
 } from '@velobits/tools-registry';

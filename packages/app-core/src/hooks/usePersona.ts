@@ -69,9 +69,9 @@ function clearGuestPersona(): void {
 }
 
 /**
- * Persona / onboarding state. Extracted from useGamification (Phase A of the
- * gamification removal) — persona is a product concern, not a gamification
- * one, so it is NOT gated by the gamification feature flag.
+ * Persona / onboarding state. Persona drives onboarding and "For You"
+ * personalization — a product concern that outlived the removed rewards system
+ * it was originally bundled with.
  */
 export default function usePersona(): PersonaContextValue {
   const [persona, setPersonaState] = useState<PersonaId | null>(
@@ -86,7 +86,7 @@ export default function usePersona(): PersonaContextValue {
   const [syncPrefs] = useUpdatePreferencesMutation();
 
   // Persona hydration is deliberately its own effect: the preferences response
-  // can land before OR after the gamification one, so it must not sit behind
+  // can land before OR after other per-user queries, so it must not sit behind
   // a one-shot hydration guard shared with other state (that ordering race
   // re-showed the blocking welcome modal for already-onboarded users).
   useEffect(() => {

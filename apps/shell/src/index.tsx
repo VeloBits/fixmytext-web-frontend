@@ -35,3 +35,17 @@ root.render(
     </ErrorBoundary>
   </React.StrictMode>
 );
+
+// One-time cleanup of the removed gamification feature's localStorage blob.
+// ORDERING: usePersona's state initializer still reads this key as a legacy
+// persona fallback during the FIRST render, so the removal is deferred until
+// after React has mounted (setTimeout 0 runs after the synchronous render
+// pass above). Once the legacy read in usePersona is dropped, this cleanup
+// can be dropped with it in a future release.
+setTimeout(() => {
+  try {
+    localStorage.removeItem('fmx_gamification');
+  } catch {
+    /* storage unavailable (e.g. blocked third-party context) — ignore */
+  }
+}, 0);

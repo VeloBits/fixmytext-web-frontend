@@ -1,7 +1,6 @@
 import TextForm from '@/components/editor/TextForm';
 import type {
   FavoritesContextValue,
-  GamificationContextValue,
   PersonaContextValue,
   SubscriptionContextValue,
   User,
@@ -13,7 +12,6 @@ interface HomeProps {
   showAlert: (message: string, type: string) => void;
   persona: PersonaContextValue;
   favorites: FavoritesContextValue;
-  gamification?: GamificationContextValue | null;
   user: User | null;
   isAuthenticated: boolean;
   subscription: SubscriptionContextValue;
@@ -25,7 +23,6 @@ export default function Home({
   showAlert,
   persona,
   favorites,
-  gamification,
   user,
   isAuthenticated,
   subscription,
@@ -37,7 +34,6 @@ export default function Home({
       showAlert={showAlert}
       persona={persona}
       favorites={favorites}
-      gamification={gamification ?? null}
       user={user}
       isAuthenticated={isAuthenticated}
       subscription={subscription}

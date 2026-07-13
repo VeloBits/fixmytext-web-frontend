@@ -1,6 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
 
-const mockSyncToDb = vi.fn();
 const mockSyncPrefs = vi.fn();
 
 vi.mock('react-redux', () => ({
@@ -20,23 +19,17 @@ vi.mock('../auth/useOidcAuth', () => ({
 }));
 
 vi.mock('../store/api/userDataApi', () => ({
-  useGetGamificationQuery: vi.fn(() => ({ data: undefined })),
-  useUpdateGamificationMutation: () => [mockSyncToDb],
   useUpdatePreferencesMutation: () => [mockSyncPrefs],
   useGetPreferencesQuery: vi.fn(() => ({ data: undefined })),
-  useGetDiscoveredToolsQuery: vi.fn(() => ({ data: undefined })),
-  useGetPipelinesQuery: vi.fn(() => ({ data: undefined })),
 }));
 
 import { useSelector } from 'react-redux';
 import { useOidcAuth } from '../auth/useOidcAuth';
-import { useGetGamificationQuery, useGetPreferencesQuery } from '../store/api/userDataApi';
+import { useGetPreferencesQuery } from '../store/api/userDataApi';
 import usePersona from './usePersona';
-import useGamification from './useGamification';
 
 const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
 const mockUseOidcAuth = useOidcAuth as unknown as ReturnType<typeof vi.fn>;
-const mockGetGamification = useGetGamificationQuery as unknown as ReturnType<typeof vi.fn>;
 const mockGetPreferences = useGetPreferencesQuery as unknown as ReturnType<typeof vi.fn>;
 
 function mockAuth(isAuthenticated: boolean, sub?: string) {
@@ -50,19 +43,6 @@ function mockAuth(isAuthenticated: boolean, sub?: string) {
   });
 }
 
-// The persona/gamification ordering race (P2-TC-22) is cross-hook since the
-// Phase A split: gamification hydration lives in useGamification while persona
-// hydration lives here. Render both hooks together — exactly like AppContext
-// does — so the original race assertions keep their meaning. usePersona's keys
-// are spread last; the hooks share no key names.
-function renderPersonaWithGamification() {
-  return renderHook(() => {
-    const gamification = useGamification();
-    const persona = usePersona();
-    return { ...gamification, ...persona };
-  });
-}
-
 describe('usePersona', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -71,10 +51,8 @@ describe('usePersona', () => {
     sessionStorage.clear();
     mockAuth(true);
     // Re-pin the query defaults: clearAllMocks doesn't undo per-test mockReturnValue
-    mockGetGamification.mockReturnValue({ data: undefined });
     mockGetPreferences.mockReturnValue({ data: undefined });
     mockUseSelector.mockReturnValue('fake-token');
-    mockSyncToDb.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSyncPrefs.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
@@ -128,29 +106,23 @@ describe('usePersona', () => {
     expect(result.current.onboarded).toBe(true);
   });
 
-  // The flat gamification response carries no persona; persona hydrates from
-  // /user/preferences in its own effect. These pin the ordering race where the
-  // gamification response landing first wiped the persona and re-showed the
-  // blocking welcome picker for already-onboarded users.
+  // Persona hydrates from /user/preferences in its own effect, independent of
+  // any other per-user query landing first or last (the P2-TC-22 ordering race
+  // was fixed by making this hydration self-contained).
   describe('persona hydration', () => {
-    const DB_GAMIFICATION = { total_ops: 3, xp: 30 };
-
-    it('keeps the tab persona when gamification hydrates before preferences', () => {
+    it('keeps the tab persona while preferences are still in flight', () => {
       sessionStorage.setItem('fmx_guest_persona', 'writer');
       mockAuth(true, 'user-a');
-      mockGetGamification.mockReturnValue({ data: DB_GAMIFICATION });
       mockGetPreferences.mockReturnValue({ data: undefined }); // prefs still in flight
-      const { result } = renderPersonaWithGamification();
-      expect(result.current.totalOps).toBe(3); // gamification did hydrate
-      expect(result.current.persona).toBe('writer'); // …without wiping persona
+      const { result } = renderHook(() => usePersona());
+      expect(result.current.persona).toBe('writer');
       expect(result.current.onboarded).toBe(true);
     });
 
-    it('applies the DB persona when preferences land after gamification', () => {
+    it('applies the DB persona when preferences land', () => {
       mockAuth(true, 'user-a');
-      mockGetGamification.mockReturnValue({ data: DB_GAMIFICATION });
       mockGetPreferences.mockReturnValue({ data: undefined });
-      const { result, rerender } = renderPersonaWithGamification();
+      const { result, rerender } = renderHook(() => usePersona());
       expect(result.current.persona).toBeNull();
       mockGetPreferences.mockReturnValue({ data: { persona: 'student' } });
       rerender();
@@ -165,7 +137,7 @@ describe('usePersona', () => {
       sessionStorage.setItem('fmx_guest_persona_owner', 'guest');
       mockAuth(true, 'user-a');
       mockGetPreferences.mockReturnValue({ data: { persona: null } });
-      const { result } = renderPersonaWithGamification();
+      const { result } = renderHook(() => usePersona());
       expect(result.current.persona).toBe('developer');
       expect(mockSyncPrefs).toHaveBeenCalledWith({ persona: 'developer' });
       expect(sessionStorage.getItem('fmx_guest_persona_owner')).toBe('user-a');
@@ -176,7 +148,7 @@ describe('usePersona', () => {
       sessionStorage.setItem('fmx_guest_persona_owner', 'user-a');
       mockAuth(true, 'user-b');
       mockGetPreferences.mockReturnValue({ data: { persona: null } });
-      const { result } = renderPersonaWithGamification();
+      const { result } = renderHook(() => usePersona());
       expect(result.current.persona).toBeNull();
       expect(result.current.onboarded).toBe(false);
       expect(sessionStorage.getItem('fmx_guest_persona')).toBeNull();
@@ -185,7 +157,7 @@ describe('usePersona', () => {
 
     it('setPersona tags the tab copy with the signed-in owner', () => {
       mockAuth(true, 'user-a');
-      const { result } = renderPersonaWithGamification();
+      const { result } = renderHook(() => usePersona());
       act(() => {
         result.current.setPersona('social');
       });

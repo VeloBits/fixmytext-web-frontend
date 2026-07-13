@@ -77,8 +77,6 @@ services:
         # override via host env / a root `.env` for a real deployment.
         VITE_EDITOR_REMOTE_ENTRY: ${VITE_EDITOR_REMOTE_ENTRY:-http://localhost:3000/remotes/editor/remoteEntry.js}
         VITE_ANALYTICS_REMOTE_ENTRY: ${VITE_ANALYTICS_REMOTE_ENTRY:-http://localhost:3000/remotes/analytics/remoteEntry.js}
-        # Gamification kill switch: absent/true ⇒ enabled; 'false' ⇒ dark.
-        VITE_GAMIFICATION_ENABLED: ${VITE_GAMIFICATION_ENABLED:-true}
     container_name: fixmytext-shell-prod
     env_file: .env.docker.prod
     restart: unless-stopped
@@ -114,8 +112,6 @@ services:
       args:
         APP_WORKSPACE: '@velobits/editor-remote'
         APP_PATH: 'apps/editor-remote'
-        # Gamification kill switch (build-time bake, see shell-prod comment).
-        VITE_GAMIFICATION_ENABLED: ${VITE_GAMIFICATION_ENABLED:-true}
     container_name: fixmytext-editor-prod
     env_file: .env.docker.prod
     restart: unless-stopped
@@ -146,8 +142,6 @@ services:
       args:
         APP_WORKSPACE: '@velobits/analytics-remote'
         APP_PATH: 'apps/analytics-remote'
-        # Gamification kill switch (build-time bake, see shell-prod comment).
-        VITE_GAMIFICATION_ENABLED: ${VITE_GAMIFICATION_ENABLED:-true}
     container_name: fixmytext-analytics-prod
     env_file: .env.docker.prod
     restart: unless-stopped

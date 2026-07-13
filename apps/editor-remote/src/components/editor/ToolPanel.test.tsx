@@ -87,8 +87,7 @@ const defaultProps = {
   onTabChange: vi.fn(),
   onToolClick: vi.fn(),
   disabled: false,
-  // Favorites are their own context now (Phase A of the gamification removal) —
-  // ToolPanel no longer receives a gamification prop at all.
+  // Favorites are their own standalone context.
   favorites: { favorites: [] as string[], toggleFavorite: vi.fn() },
   activeToolId: null,
   hideTabs: false,
@@ -282,10 +281,9 @@ describe('ToolPanel', () => {
     expect(forYouGroup.textContent).not.toContain('Fix Grammar');
   });
 
-  it('pinned favorites and For You work with gamification disabled (kill switch)', () => {
-    // ToolPanel takes no gamification prop anymore — favorites + persona picks
-    // are independent contexts and must keep working when gamification is null
-    // upstream (nothing gamification-shaped is passed here at all).
+  it('pinned favorites and For You work together', () => {
+    // Favorites + persona picks are independent contexts driving the pinned
+    // and For You groups.
     const toggleFavorite = vi.fn();
     const favorites = { favorites: ['uppercase'], toggleFavorite };
     render(<ToolPanel {...defaultProps} favorites={favorites} personaToolIds={['fix_grammar']} />);

@@ -58,7 +58,7 @@ function AppInner() {
   const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
   const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
-  const { user, isAuthenticated, userResolving, persona, favorites, gamification, subscription } =
+  const { user, isAuthenticated, userResolving, persona, favorites, subscription } =
     useAppContext();
   const { isLoading: authLoading, wasAuthenticated } = useOidcAuth();
   const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
@@ -131,7 +131,6 @@ function AppInner() {
                   showAlert={showAlert as (message: string, type: string) => void}
                   persona={persona}
                   favorites={favorites}
-                  gamification={gamification}
                   user={user}
                   isAuthenticated={isAuthenticated}
                   subscription={subscription}
@@ -158,7 +157,6 @@ function AppInner() {
                   <DashboardPage
                     persona={persona}
                     favorites={favorites}
-                    gamification={gamification}
                     user={user}
                     isAuthenticated={isAuthenticated}
                     showAlert={showAlert}
