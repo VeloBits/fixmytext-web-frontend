@@ -308,7 +308,7 @@ export default function PassPurchaseModal({
           {/* Hints */}
           <div className="tu-pass-hints">
             <p>
-              <SparkleIcon /> Complete today&apos;s quest for a chance to earn a free pass!
+              <SparkleIcon /> Try the weekly reward spin for a chance to earn a free pass!
             </p>
             <button
               className="tu-upgrade-footer-link"

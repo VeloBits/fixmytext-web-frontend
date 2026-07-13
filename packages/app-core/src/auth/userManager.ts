@@ -5,6 +5,7 @@ import {
   type UserManagerSettings,
   type User,
 } from 'oidc-client-ts';
+import { clearSession } from '@velobits/api-client';
 import { KEYCLOAK_CLIENT_ID, KEYCLOAK_REALM, KEYCLOAK_URL } from './keycloakConfig';
 
 const REALM_BASE = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
@@ -13,11 +14,20 @@ const baseSettings: UserManagerSettings = {
   authority: REALM_BASE,
   client_id: KEYCLOAK_CLIENT_ID,
   redirect_uri: `${window.location.origin}/app/auth/callback`,
-  silent_redirect_uri: `${window.location.origin}/app/auth/silent-callback`,
+  // Static relay page (apps/shell/public/auth/silent-callback.html), NOT the
+  // SPA route: the hidden silent-renew iframe only needs to postMessage the
+  // response URL back to the parent. Booting the full SPA in the iframe took
+  // long enough in throttled background tabs to blow the silent-request
+  // timeout, so cross-tab login pickup silently failed there.
+  silent_redirect_uri: `${window.location.origin}/app/auth/silent-callback.html`,
   post_logout_redirect_uri: `${window.location.origin}/app/login`,
   response_type: 'code',
   scope: 'openid email profile',
   automaticSilentRenew: true,
+  // Default is 10s; give throttled background tabs extra slack — a slow
+  // success beats a swallowed timeout (the foreground reconciler is the
+  // backstop, not the primary path).
+  silentRequestTimeoutInSeconds: 30,
   // H-8: tokens (incl. the refresh_token) live ONLY in memory — never in
   // session/local storage, so an XSS can't read a long-lived refresh token.
   // On a reload the user is re-hydrated from Keycloak's SSO cookie via silent
@@ -82,6 +92,20 @@ userManager.events.addUserLoaded(() => setAuthHint(true));
 userManager.events.addUserUnloaded(() => setAuthHint(false));
 userManager.events.addUserSignedOut(() => setAuthHint(false));
 
+// PKCE staging entries (`oidc.<state>` in localStorage) are abandoned whenever
+// a redirect doesn't complete (Back from the Keycloak form, bounced logins);
+// prune the stale ones on boot so they don't accumulate forever.
+void userManager.clearStaleState();
+
+// The fixmytext_session cookie outlives the Keycloak SSO session (7-day TTL
+// vs 2h SSO idle / browser-session identity cookie). When the app concludes
+// "logged out" because the SSO session is gone, the cookie must be revoked
+// too — otherwise the browser silently keeps a live API credential while the
+// UI shows Sign In. Best-effort: clearSession never throws.
+function clearServerSession(): void {
+  void clearSession();
+}
+
 // One-time auth bootstrap, deduped across all hook instances. Reads the
 // in-memory user; if it's absent (e.g. after a hard reload) it attempts a
 // silent renew using the Keycloak SSO cookie, so the session is restored
@@ -101,14 +125,19 @@ export function loadUser(): Promise<User | null> {
     _loadUserPromise = (async () => {
       const existing = await userManager.getUser();
       if (existing && !existing.expired) return existing;
+      // Only a previously-signed-in browser holds a session cookie worth
+      // revoking — a plain guest failing signinSilent has nothing to clear.
+      const hadHint = hasAuthHint();
       try {
         // Success also fires userLoaded (→ hint set); the explicit set covers
         // signinSilent resolving null without throwing.
         const restored = await userManager.signinSilent();
         setAuthHint(!!restored);
+        if (!restored && hadHint) clearServerSession();
         return restored;
       } catch {
         setAuthHint(false); // stale hint — the SSO session is gone
+        if (hadHint) clearServerSession(); // …and so must the session cookie
         return null; // no live SSO session — caller treats as logged out
       }
     })();
@@ -149,7 +178,9 @@ if (typeof BroadcastChannel !== 'undefined') {
       try {
         await userManager.signinSilent();
       } catch {
-        /* SSO cookie absent */
+        /* SSO cookie absent, or this tab is backgrounded and the browser
+           throttled the silent iframe past its timeout — the foreground
+           reconciler below retries when the tab is next looked at. */
       }
     } else if (data?.type === 'user_signed_out') {
       // Another tab logged out — drop the in-memory user immediately.
@@ -157,4 +188,56 @@ if (typeof BroadcastChannel !== 'undefined') {
       await userManager.removeUser();
     }
   };
+}
+
+// ── Foreground reconciliation ───────────────────────────────────────────────
+// The broadcast pickup above is best-effort: signinSilent() runs in a hidden
+// iframe, and in a backgrounded tab the browser can throttle/freeze that flow
+// past its timeout — the failure is swallowed and the tab silently keeps the
+// wrong identity until a manual reload. The auth hint is shared localStorage
+// ("a session exists in this browser"), so whenever a tab returns to the
+// foreground, reconcile the in-memory user against it: acquire the session
+// this tab missed, or drop one it should no longer have. No-op (one getUser
+// on the in-memory store) when tab and hint already agree.
+let _reconciling = false;
+
+async function reconcileSessionWithHint(): Promise<void> {
+  if (_reconciling) return;
+  // Callback routes are driven by signinRedirectCallback/signinSilentCallback;
+  // a concurrent signinSilent here would race them (same guard as loadUser).
+  const path = window.location.pathname;
+  if (path.includes('/auth/callback') || path.includes('/auth/silent-callback')) return;
+  _reconciling = true;
+  try {
+    const user = await userManager.getUser();
+    let hint = false;
+    let hintReadable = true;
+    try {
+      hint = localStorage.getItem(AUTH_HINT_KEY) === '1';
+    } catch {
+      hintReadable = false; // storage unavailable — hint says nothing either way
+    }
+    if (hint && (!user || user.expired)) {
+      resetLoadUser();
+      try {
+        await userManager.signinSilent(); // success fires userLoaded → UI updates
+      } catch {
+        setAuthHint(false); // stale hint — the SSO session is gone
+        clearServerSession(); // …and so must the session cookie
+      }
+    } else if (hintReadable && !hint && user) {
+      // Hint cleared by a signout this tab never received (e.g. frozen tab).
+      resetLoadUser();
+      await userManager.removeUser();
+    }
+  } finally {
+    _reconciling = false;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('focus', () => void reconcileSessionWithHint());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') void reconcileSessionWithHint();
+  });
 }

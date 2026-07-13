@@ -22,14 +22,9 @@ import {
   useGetUiSettingsQuery,
   useUpdateUiSettingsMutation,
 } from '@velobits/app-core/store/api/userDataApi';
-import {
-  TOOLS,
-  PERSONAS,
-  QUEST_TEMPLATES,
-  USE_CASE_TABS,
-  ACHIEVEMENTS,
-} from '@velobits/app-core/constants/tools';
-import type { ToolDefinition, ToolTab, PersonaId } from '@velobits/app-core/types/tools';
+import { TOOLS, PERSONAS, USE_CASE_TABS } from '@velobits/app-core/constants/tools';
+import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
+import type { FavoritesContextValue, PersonaContextValue } from '@velobits/app-core/types/context';
 import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 import { ROUTES } from '@velobits/app-core/constants';
 
@@ -125,11 +120,9 @@ function LazyDrawer({ children }: { children: ReactNode }) {
 }
 import SmartSuggestions from './SmartSuggestions';
 import BottomPanel from './BottomPanel';
+import { noopNotice } from './noopNotice';
 import CommandPalette from '@/components/layout/CommandPalette';
 import KeyboardShortcuts from '@/components/layout/KeyboardShortcuts';
-import AchievementToast from '@velobits/app-core/gamification/AchievementToast';
-
-import { motion, AnimatePresence } from 'framer-motion';
 
 // SVG icons for activity bar (module-level constant — avoids recreation on every render)
 const ACTIVITY_ICONS = {
@@ -297,7 +290,8 @@ type AnyRecord = Record<string, any>;
 
 interface TextFormProps {
   showAlert: (msg: string, type: string) => void;
-  gamification: AnyRecord | null;
+  persona: PersonaContextValue;
+  favorites: FavoritesContextValue;
   user: AnyRecord | null;
   isAuthenticated: boolean;
   mode: string;
@@ -313,7 +307,8 @@ interface TextFormProps {
  *
  * @param {object} props
  * @param {function} props.showAlert - Alert notification callback.
- * @param {object} props.gamification - Gamification hook state.
+ * @param {object} props.persona - Persona (onboarding) state.
+ * @param {object} props.favorites - Favorites state.
  * @param {object|null} props.user - Current user object.
  * @param {boolean} props.isAuthenticated - Whether user is authenticated.
  * @param {string} props.mode - Current theme mode.
@@ -329,7 +324,7 @@ export default function TextForm(props: TextFormProps) {
   // Returning visitors have a persona synchronously (sessionStorage / cached
   // state), so seed their default tab here — no 'all' flash before the switch.
   const [activeTab, setActiveTab] = useState<string | null>(() => {
-    const personaId = props.gamification?.persona as PersonaId | undefined;
+    const personaId = props.persona.persona ?? undefined;
     return personaId ? (PERSONAS[personaId]?.defaultTab ?? 'all') : null;
   });
   const personaTabApplied = useRef(activeTab !== null);
@@ -436,15 +431,16 @@ export default function TextForm(props: TextFormProps) {
     setPreviewMode,
     history.pushHistory
   );
-  const gamification = props.gamification;
+  const persona = props.persona;
+  const favorites = props.favorites;
   const pipeline = usePipeline();
   const suggestions = useSmartSuggestions(text);
   // Persona picks surface as a pinned "For You" group — visible on an empty
   // editor, unlike smart suggestions which need typed text to trigger.
   const personaSuggestedIds = useMemo(() => {
-    const personaId = gamification?.persona as PersonaId | undefined;
+    const personaId = persona.persona ?? undefined;
     return personaId ? (PERSONAS[personaId]?.suggestedTools ?? []) : [];
-  }, [gamification?.persona]);
+  }, [persona.persona]);
   const search = useToolSearch();
   const trial = useTrialLimit(props.isAuthenticated);
   const subscription = props.subscription;
@@ -568,7 +564,7 @@ export default function TextForm(props: TextFormProps) {
   // fall back to 'all'. Single effect: as two effects both ran against the
   // same null-activeTab render and the 'all' write landed last every time.
   useEffect(() => {
-    const personaId = gamification?.persona as PersonaId | undefined;
+    const personaId = persona.persona ?? undefined;
     const personaTab = personaId ? PERSONAS[personaId]?.defaultTab : undefined;
     if (personaTab && !personaTabApplied.current) {
       personaTabApplied.current = true;
@@ -577,7 +573,7 @@ export default function TextForm(props: TextFormProps) {
     } else if (!activeTab) {
       setActiveTab('all');
     }
-  }, [gamification?.persona, activeTab]);
+  }, [persona.persona, activeTab]);
 
   // Capture AI results per-tab for persistence
   // Keyed by tab ID so each tab is fully independent
@@ -652,7 +648,8 @@ export default function TextForm(props: TextFormProps) {
         ai.setAiResult({ label: successMsg, result: data.result });
         setPreviewMode('result');
         history.pushHistory(successMsg, original, data.result, toolMeta);
-        showAlert(successMsg, 'success');
+        const notice = noopNotice(original, data.result, toolMeta?.toolGroup as string | undefined);
+        showAlert(notice ?? successMsg, notice ? 'info' : 'success');
         return { success: true, result: data.result };
       } catch (err) {
         const detail = (err as { data?: { detail?: unknown } }).data?.detail;
@@ -687,7 +684,8 @@ export default function TextForm(props: TextFormProps) {
       ai.setAiResult({ label: successMsg, result: data.result });
       setPreviewMode('result');
       history.pushHistory(successMsg, original, data.result, toolMeta);
-      showAlert(successMsg, 'success');
+      const notice = noopNotice(original, data.result, toolMeta?.toolGroup as string | undefined);
+      showAlert(notice ?? successMsg, notice ? 'info' : 'success');
       return { success: true, result: data.result };
     } catch (err) {
       const detail = (err as { data?: { detail?: unknown } }).data?.detail;
@@ -1199,8 +1197,6 @@ export default function TextForm(props: TextFormProps) {
       // Unified tool access check (all tool types: ai, api, local, action, select)
       if (subscription?.checkToolAccess && !subscription.checkToolAccess(tool)) return;
 
-      gamification?.recordToolUse(tool.id, (textRef.current || '').length);
-
       // Stamp the source so the persistence effect knows which tool produced the result
       aiResultSourceRef.current = tool.id;
 
@@ -1208,6 +1204,7 @@ export default function TextForm(props: TextFormProps) {
         callApi(tool.endpoint!, tool.successMsg ?? '', {
           toolId: tool.id,
           toolType: tool.type,
+          toolGroup: tool.group,
         }).then((res) => {
           if (res?.success) pipeline.addStep(tool.id, tool.label, res.result ?? '');
           if (subscription?.refetchStatus) subscription.refetchStatus();
@@ -1238,7 +1235,7 @@ export default function TextForm(props: TextFormProps) {
         togglePanel(tool.panelId!);
       }
     },
-    [trial, subscription, gamification, callApi, pipeline, handlerMap, togglePanel]
+    [trial, subscription, callApi, pipeline, handlerMap, togglePanel]
   );
 
   // ── Unified tool click handler ──────────────────────────
@@ -1282,7 +1279,6 @@ export default function TextForm(props: TextFormProps) {
         }
         setActiveWorkspaceId(tabId);
         setActivePanel(panelId);
-        gamification?.recordToolUse(tool.id, text.length);
       } else {
         // api, ai, local, select → open as workspace tab; action is handled via executeToolAction
         if (
@@ -1297,7 +1293,7 @@ export default function TextForm(props: TextFormProps) {
         }
       }
     },
-    [openToolTab, executeToolAction, text, gamification, compare, setActivePanel]
+    [openToolTab, executeToolAction, compare, setActivePanel]
   );
 
   // ── Auto-run tool on first open (when text was seeded) ──
@@ -1583,31 +1579,6 @@ export default function TextForm(props: TextFormProps) {
               {ACTIVITY_ICONS[tab.id] || <span>{tab.icon}</span>}
             </button>
           ))}
-          {/* What's New */}
-          <button
-            className={`tu-activity-btn${
-              activeTab === '_new' && sidebarOpen ? ' tu-activity-btn--active' : ''
-            }`}
-            onClick={() => handleActivityClick('_new')}
-            data-tooltip="What's New"
-            aria-label="What's New"
-            aria-pressed={activeTab === '_new' && sidebarOpen}
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-          </button>
           {/* Favourites */}
           <button
             className={`tu-activity-btn${
@@ -1698,15 +1669,13 @@ export default function TextForm(props: TextFormProps) {
         <div className="tu-forge-sidebar">
           <div className="tu-sidebar-header">
             <span title="~/FixMyText/workspace/tools">
-              {activeTab === '_new'
-                ? "What's New"
-                : activeTab === '_templates'
-                  ? 'Templates'
-                  : activeTab === '_history'
-                    ? 'History'
-                    : activeTab === '_favourites'
-                      ? 'Favourites'
-                      : USE_CASE_TABS.find((t) => t.id === activeTab)?.label || 'Explorer'}
+              {activeTab === '_templates'
+                ? 'Templates'
+                : activeTab === '_history'
+                  ? 'History'
+                  : activeTab === '_favourites'
+                    ? 'Favourites'
+                    : USE_CASE_TABS.find((t) => t.id === activeTab)?.label || 'Explorer'}
               {activeTab && !activeTab.startsWith('_') && (
                 <span className="tu-sidebar-header-count">
                   {activeTab === 'all'
@@ -1716,9 +1685,7 @@ export default function TextForm(props: TextFormProps) {
               )}
             </span>
             <div className="tu-sidebar-header-actions">
-              {((activeTab && !activeTab.startsWith('_')) ||
-                activeTab === '_favourites' ||
-                activeTab === '_new') && (
+              {((activeTab && !activeTab.startsWith('_')) || activeTab === '_favourites') && (
                 <>
                   <button
                     className={`tu-sidebar-header-btn${
@@ -1799,7 +1766,6 @@ export default function TextForm(props: TextFormProps) {
           {isMobile && (
             <div className="tu-sheet-tabs">
               {[
-                { id: '_new', label: "What's New", icon: '✨' },
                 { id: '_favourites', label: 'Favourites', icon: '♥' },
                 { id: '_templates', label: 'Templates', icon: '▤' },
                 { id: '_history', label: 'History', icon: '↺' },
@@ -1824,7 +1790,7 @@ export default function TextForm(props: TextFormProps) {
               onTabChange={(tabId) => setActiveTab(tabId)}
               onToolClick={handleToolClick}
               disabled={loading}
-              gamification={gamification}
+              favorites={favorites}
               activeToolId={(() => {
                 const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                 if (ws?.type === 'tool') return ws.tool?.id ?? null;
@@ -1846,7 +1812,7 @@ export default function TextForm(props: TextFormProps) {
           {/* Favourites panel */}
           {activeTab === '_favourites' &&
             (() => {
-              const favTools = ((gamification?.favorites as string[]) || [])
+              const favTools = favorites.favorites
                 .map((id: string) => TOOLS.find((t) => t.id === id))
                 .filter(Boolean) as ToolDefinition[];
               return (
@@ -1874,7 +1840,7 @@ export default function TextForm(props: TextFormProps) {
                               className="tu-titem-fav tu-tgrid-card-fav tu-titem-fav--active"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                gamification?.toggleFavorite(tool.id);
+                                favorites.toggleFavorite(tool.id);
                               }}
                               title="Remove from favourites"
                             >
@@ -1895,57 +1861,12 @@ export default function TextForm(props: TextFormProps) {
                               className="tu-titem-fav tu-titem-fav--active"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                gamification?.toggleFavorite(tool.id);
+                                favorites.toggleFavorite(tool.id);
                               }}
                               title="Remove from favourites"
                             >
                               ♥
                             </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-
-          {/* What's New panel */}
-          {activeTab === '_new' &&
-            (() => {
-              const discovered = gamification?.discoveredTools || [];
-              const newTools = TOOLS.filter(
-                (t) =>
-                  !discovered.includes(t.id) && (t.tabs?.includes('ai') || t.tabs?.includes('code'))
-              );
-              return (
-                <div className="tu-tpanel">
-                  {newTools.length === 0 ? (
-                    <div className="tu-sidebar-panel-empty">You&apos;ve discovered all tools!</div>
-                  ) : toolViewMode === 'grid' ? (
-                    <div className="tu-tpanel-list">
-                      <div className="tu-group-grid">
-                        {newTools.map((tool) => (
-                          <div
-                            key={tool.id}
-                            className="tu-tgrid-card"
-                            onClick={() => handleToolClick(tool)}
-                          >
-                            <div className="tu-tgrid-card-icon">
-                              <ToolIcon icon={tool.icon} color={tool.color} toolId={tool.id} />
-                            </div>
-                            <span className="tu-tgrid-card-name">{tool.label}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="tu-tpanel-list">
-                      {newTools.map((tool) => (
-                        <div key={tool.id} className="tu-titem-wrap">
-                          <div className="tu-titem" onClick={() => handleToolClick(tool)}>
-                            <ToolIcon icon={tool.icon} color={tool.color} toolId={tool.id} />
-                            <span className="tu-titem-name">{tool.label}</span>
                           </div>
                         </div>
                       ))}
@@ -2199,66 +2120,35 @@ export default function TextForm(props: TextFormProps) {
             </div>
           )}
 
-          {/* ─── Sidebar Footer: Gamification ─── */}
-          <div className="tu-sidebar-footer">
-            {/* Level + XP */}
-            <div className="tu-sf-row tu-sf-level">
-              <span className="tu-sf-level-icon">⚡</span>
-              <span className="tu-sf-label">Lv.{gamification?.level?.level || 1}</span>
-              <span className="tu-sf-sublabel">{gamification?.level?.title || 'Beginner'}</span>
-              <span className="tu-sf-value">{gamification?.xp || 0} XP</span>
-            </div>
-            <div className="tu-sf-xp-track">
-              <div
-                className="tu-sf-xp-fill"
-                style={{ width: `${gamification?.xpProgress || 0}%` }}
-              />
-            </div>
-
-            {/* Subscription Status */}
-            {subscription?.isPro && (
-              <div className="tu-sf-row tu-sf-ai-usage">
-                <span className="tu-sf-label tu-sf-label--pro">PRO</span>
-                <span className="tu-sf-value">Unlimited</span>
-              </div>
-            )}
-            {subscription &&
+          {/* ─── Sidebar Footer: Subscription ─── */}
+          {(() => {
+            const showPro = subscription?.isPro;
+            const showCredits =
+              subscription &&
               props.isAuthenticated &&
               !subscription.isPro &&
-              subscription.totalCredits > 0 && (
-                <div className="tu-sf-row tu-sf-ai-usage">
-                  <span className="tu-sf-label">Credits</span>
-                  <span className="tu-sf-value">{subscription.totalCredits}</span>
-                </div>
-              )}
-
-            {/* Streak + Discovery */}
-            <div className="tu-sf-stats">
-              <div className="tu-sf-stat" title="Daily streak">
-                🔥 <b>{gamification?.streak?.current || 0}</b> streak
+              subscription.totalCredits > 0;
+            // Nothing to show (no subscription badges): skip the footer
+            // entirely so its border/padding don't render as an empty strip.
+            if (!showPro && !showCredits) return null;
+            return (
+              <div className="tu-sidebar-footer">
+                {/* Subscription Status */}
+                {showPro && (
+                  <div className="tu-sf-row tu-sf-ai-usage">
+                    <span className="tu-sf-label tu-sf-label--pro">PRO</span>
+                    <span className="tu-sf-value">Unlimited</span>
+                  </div>
+                )}
+                {showCredits && (
+                  <div className="tu-sf-row tu-sf-ai-usage">
+                    <span className="tu-sf-label">Credits</span>
+                    <span className="tu-sf-value">{subscription.totalCredits}</span>
+                  </div>
+                )}
               </div>
-              <div className="tu-sf-stat" title="Tools discovered">
-                🧭 <b>{gamification?.discoveredTools?.length || 0}</b>/{TOOLS.length}
-              </div>
-            </div>
-
-            {/* Daily Quest */}
-            {gamification?.dailyQuest?.id && (
-              <div
-                className={`tu-sf-quest${
-                  gamification?.dailyQuest.completed ? ' tu-sf-quest--done' : ''
-                }`}
-              >
-                <span className="tu-sf-quest-icon">
-                  {gamification?.dailyQuest.completed ? '✅' : '📋'}
-                </span>
-                <span className="tu-sf-quest-text">
-                  {QUEST_TEMPLATES.find((q) => q.id === gamification?.dailyQuest.id)?.text ||
-                    'Daily Quest'}
-                </span>
-              </div>
-            )}
-          </div>
+            );
+          })()}
           {/* Sidebar resize handle */}
           {sidebarOpen && (
             <div
@@ -2298,11 +2188,6 @@ export default function TextForm(props: TextFormProps) {
                       <h1 className="tu-landing-title">
                         Welcome back, {props.user?.display_name?.split(' ')[0] || 'there'}
                       </h1>
-                      <p className="tu-landing-subtitle">
-                        Level {gamification?.level?.level || 1}{' '}
-                        {gamification?.level?.title || 'Beginner'} &middot; {gamification?.xp || 0}{' '}
-                        XP
-                      </p>
                     </div>
                     <button className="tu-landing-search-btn" onClick={() => search.open()}>
                       <svg
@@ -2321,133 +2206,17 @@ export default function TextForm(props: TextFormProps) {
                     </button>
                   </div>
 
-                  {/* XP progress bar */}
-                  {gamification?.nextLevel && (
-                    <div className="tu-landing-xp-bar">
-                      <div className="tu-landing-xp-track">
-                        <div
-                          className="tu-landing-xp-fill"
-                          style={{ width: `${Math.min(gamification?.xpProgress || 0, 100)}%` }}
-                        />
-                      </div>
-                      <span className="tu-landing-xp-label">
-                        {gamification?.xp || 0} / {gamification?.nextLevel.xp} XP to{' '}
-                        {gamification?.nextLevel.title}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Dashboard grid */}
-                  <div className="tu-landing-dash-grid">
-                    {/* Daily quest card */}
-                    <div className="tu-landing-card tu-landing-card--quest">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x2728;</span>
-                        Daily Quest
-                      </h2>
-                      {gamification?.dailyQuest?.id ? (
-                        (() => {
-                          const quest = QUEST_TEMPLATES.find(
-                            (q) => q.id === gamification?.dailyQuest.id
-                          );
-                          return quest ? (
-                            <div className="tu-landing-quest-body">
-                              <p className="tu-landing-quest-text">{quest.text}</p>
-                              <div className="tu-landing-quest-footer">
-                                <span className="tu-landing-quest-xp">+{quest.xp} XP</span>
-                                {gamification?.dailyQuest.completed ? (
-                                  <span className="tu-landing-quest-done">Completed!</span>
-                                ) : (
-                                  <span className="tu-landing-quest-pending">In progress</span>
-                                )}
-                              </div>
-                            </div>
-                          ) : null;
-                        })()
-                      ) : (
-                        <p className="tu-landing-quest-text" style={{ color: 'var(--text-3)' }}>
-                          No quest today
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Stats card */}
-                    <div className="tu-landing-card tu-landing-card--stats">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x1F4CA;</span>
-                        Your Stats
-                      </h2>
-                      <div className="tu-landing-mini-stats">
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.streak?.current || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Day Streak</span>
-                        </div>
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.totalOps || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Operations</span>
-                        </div>
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.discoveredTools?.length || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Tools Found</span>
-                        </div>
-                        <div className="tu-landing-mini-stat">
-                          <span className="tu-landing-mini-stat-val">
-                            {gamification?.achievements?.length || 0}
-                          </span>
-                          <span className="tu-landing-mini-stat-label">Badges</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Achievements card */}
-                    <div className="tu-landing-card tu-landing-card--achievements">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x1F3C6;</span>
-                        Recent Badges
-                      </h2>
-                      <div className="tu-landing-badge-row">
-                        {gamification?.achievements?.length > 0 ? (
-                          (gamification?.achievements as string[])
-                            .slice(-6)
-                            .reverse()
-                            .map((aid: string) => {
-                              const ach = ACHIEVEMENTS.find((a) => a.id === aid);
-                              return ach ? (
-                                <span
-                                  key={aid}
-                                  className="tu-landing-badge"
-                                  title={`${ach.label}: ${ach.description}`}
-                                >
-                                  {ach.icon}
-                                </span>
-                              ) : null;
-                            })
-                        ) : (
-                          <span className="tu-landing-badge-empty">
-                            Complete quests to earn badges
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Favorites + Recent tools */}
                   <div className="tu-landing-tools-row">
                     {/* Favourites */}
                     <div className="tu-landing-card tu-landing-card--wide">
                       <h2 className="tu-landing-card-title">
                         <span className="tu-landing-card-icon">&#x2764;</span>
-                        {gamification?.favorites?.length > 0 ? 'Your Favourites' : 'Popular Tools'}
+                        {favorites.favorites.length > 0 ? 'Your Favourites' : 'Popular Tools'}
                       </h2>
                       <div className="tu-landing-tool-grid">
-                        {((gamification?.favorites?.length ?? 0) > 0
-                          ? ((gamification?.favorites ?? []) as string[])
+                        {(favorites.favorites.length > 0
+                          ? favorites.favorites
                               .slice(0, 8)
                               .map((id: string) => TOOLS.find((t) => t.id === id))
                               .filter((t): t is ToolDefinition => Boolean(t))
@@ -2478,45 +2247,6 @@ export default function TextForm(props: TextFormProps) {
                       </div>
                     </div>
 
-                    {/* Most used */}
-                    <div className="tu-landing-card tu-landing-card--wide">
-                      <h2 className="tu-landing-card-title">
-                        <span className="tu-landing-card-icon">&#x1F525;</span>
-                        Most Used
-                      </h2>
-                      <div className="tu-landing-tool-grid">
-                        {(() => {
-                          const used = (gamification?.toolsUsed || {}) as Record<string, number>;
-                          const sorted = Object.entries(used)
-                            .sort((a, b) => b[1] - a[1])
-                            .slice(0, 8);
-                          if (sorted.length === 0)
-                            return (
-                              <span className="tu-landing-badge-empty">
-                                Start using tools to track your favorites
-                              </span>
-                            );
-                          return sorted.map(([id, count]) => {
-                            const tool = TOOLS.find((t) => t.id === id);
-                            return tool ? (
-                              <button
-                                key={id}
-                                className="tu-landing-tool-btn"
-                                onClick={() => handleToolClick(tool)}
-                              >
-                                <span
-                                  className={`tu-landing-tool-icon tu-titem-icon--${tool.color}`}
-                                >
-                                  {tool.icon}
-                                </span>
-                                <span className="tu-landing-tool-name">{tool.label}</span>
-                                <span className="tu-landing-tool-count">{count}x</span>
-                              </button>
-                            ) : null;
-                          });
-                        })()}
-                      </div>
-                    </div>
                   </div>
 
                   {/* Category grid + Shortcuts */}
@@ -2804,8 +2534,10 @@ export default function TextForm(props: TextFormProps) {
                       <span className="tu-landing-highlight-label">Categories</span>
                     </div>
                     <div className="tu-landing-highlight">
-                      <span className="tu-landing-highlight-val">{ACHIEVEMENTS.length}</span>
-                      <span className="tu-landing-highlight-label">Achievements</span>
+                      <span className="tu-landing-highlight-val">
+                        {TOOLS.filter((t) => t.type === 'ai').length}+
+                      </span>
+                      <span className="tu-landing-highlight-label">AI-powered tools</span>
                     </div>
                     <div className="tu-landing-highlight">
                       <span className="tu-landing-highlight-val">Free</span>
@@ -2817,7 +2549,8 @@ export default function TextForm(props: TextFormProps) {
                   <div className="tu-landing-bottom-cta">
                     <h2 className="tu-landing-section-title">Ready to fix your text?</h2>
                     <p className="tu-landing-subtitle">
-                      Create a free account to sync your progress, earn XP, and unlock achievements.
+                      Create a free account to sync your work across devices, keep your full
+                      history, and pin your favourite tools.
                     </p>
                     <div className="tu-landing-hero-actions">
                       <button className="tu-landing-cta" onClick={() => navigate('/login')}>
@@ -3558,7 +3291,6 @@ export default function TextForm(props: TextFormProps) {
                 pipeline={pipeline}
                 history={history}
                 text={text}
-                gamification={gamification}
                 style={isMobile ? undefined : { height: bottomResize.size }}
               />
 
@@ -3739,20 +3471,6 @@ export default function TextForm(props: TextFormProps) {
         </>
       )}
 
-      {/* Floating overlays */}
-      <AnimatePresence>
-        {gamification?.xpGain && (
-          <motion.div
-            className="tu-xp-float"
-            initial={{ opacity: 1, y: 0 }}
-            animate={{ opacity: 0, y: -40 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
-          >
-            +{gamification?.xpGain} XP
-          </motion.div>
-        )}
-      </AnimatePresence>
       {/* Save to Template modal */}
       {saveModal &&
         (() => {
@@ -3834,10 +3552,6 @@ export default function TextForm(props: TextFormProps) {
           return <SaveModal />;
         })()}
 
-      <AchievementToast
-        achievement={gamification?.newAchievement}
-        onDismiss={gamification?.dismissAchievement}
-      />
       <CommandPalette search={search} onToolClick={handleToolClick} />
       <KeyboardShortcuts
         isOpen={shortcutsOpen}

@@ -1,7 +1,7 @@
 // @velobits/app-core — shared runtime foundation for the FixMyText micro-frontends.
 //
 // Holds the Redux/RTK-Query store, OIDC auth runtime, domain constants, shared
-// data hooks, gamification UI, utilities, and the host<->remote contract types.
+// data hooks, utilities, and the host<->remote contract types.
 // The shell (host) and the editor/analytics remotes all consume this package;
 // in production it is shared as a Module Federation singleton so there is exactly
 // one store instance at runtime (see each app's vite.config federation `shared`).
@@ -17,6 +17,6 @@ export * from './store';
 export * from './utils';
 export * from './constants';
 
-// Auth runtime, gamification UI, shared hooks, and shared UI components are consumed
+// Auth runtime, shared hooks, and shared UI components are consumed
 // via subpaths (e.g. '@velobits/app-core/auth/useOidcAuth',
 // '@velobits/app-core/components/editor/ToolIcon').

@@ -1,57 +1,31 @@
 // Shared application context value types.
 //
-// These describe the gamification / subscription / user state that the shell
-// produces (via AppProvider) and injects as props into the federated remote
-// surfaces. They live in app-core so both the shell provider and the remotes
-// depend on a single shared definition rather than on each other's source.
+// These describe the persona / favorites / subscription / user state that the
+// shell produces (via AppProvider) and injects as props into the federated
+// remote surfaces. They live in app-core so both the shell provider and the
+// remotes depend on a single shared definition rather than on each other's source.
 
 import type { components } from './openapi';
-import type { PersonaId, Achievement, LevelDefinition, QuestOp, ToolDefinition } from './tools';
+import type { PersonaId, ToolDefinition } from './tools';
 
 // ── User ─────────────────────────────────────────────────────────────────────
 
 export type User = components['schemas']['UserResponse'];
 
-// ── Gamification ──────────────────────────────────────────────────────────────
+// ── Persona (onboarding) ──────────────────────────────────────────────────────
+// Persona drives onboarding + "For You" personalization.
 
-export interface GamificationStreak {
-  current: number;
-  lastDate: string | null;
-}
-
-export interface GamificationDailyQuest {
-  id: string | null;
-  date: string | null;
-  completed: boolean;
-}
-
-export interface GamificationContextValue {
-  // state fields spread from the hook's internal state
+export interface PersonaContextValue {
   persona: PersonaId | null;
-  toolsUsed: Record<string, number>;
-  discoveredTools: string[];
-  totalOps: number;
-  totalChars: number;
-  xp: number;
-  streak: GamificationStreak;
-  achievements: string[];
-  favorites: string[];
-  dailyQuest: GamificationDailyQuest;
-  savedPipelines: unknown[];
-  completedQuests: string[];
-  sessionOps: QuestOp[];
-  // computed / extra fields
-  level: LevelDefinition;
-  nextLevel: LevelDefinition;
-  xpProgress: number;
-  newAchievement: Achievement | null;
-  dismissAchievement: () => void;
-  xpGain: number | null;
-  onboarded: boolean;
-  // actions
-  recordToolUse: (toolId: string, charCount?: number) => void;
-  toggleFavorite: (toolId: string) => void;
   setPersona: (persona: PersonaId) => void;
+  onboarded: boolean;
+}
+
+// ── Favorites ─────────────────────────────────────────────────────────────────
+
+export interface FavoritesContextValue {
+  favorites: string[];
+  toggleFavorite: (toolId: string) => void;
 }
 
 // ── Subscription ──────────────────────────────────────────────────────────────
@@ -103,6 +77,7 @@ export interface AppContextValue {
    * still null). Identity UI (avatar, name) should treat this as loading, not
    * as a guest. Optional so existing mock/context builders stay valid. */
   userResolving?: boolean;
-  gamification: GamificationContextValue;
+  persona: PersonaContextValue;
+  favorites: FavoritesContextValue;
   subscription: SubscriptionContextValue;
 }

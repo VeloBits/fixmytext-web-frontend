@@ -38,7 +38,6 @@ describe('BottomPanel', () => {
       handleClearHistory: vi.fn(),
     },
     text: 'Hello world. This is a test.',
-    gamification: null,
     style: {},
   };
 
@@ -128,16 +127,6 @@ describe('BottomPanel', () => {
     );
     // Badge "2" appears on the Pipeline tab button; may also appear in stats
     expect(screen.getAllByText('2').length).toBeGreaterThan(0);
-  });
-
-  it('shows gamification stats when provided', () => {
-    render(
-      <BottomPanel {...baseProps} gamification={{ xp: 250, discoveredTools: ['a', 'b', 'c'] }} />
-    );
-    expect(screen.getByText('250')).toBeInTheDocument();
-    expect(screen.getByText('Total XP')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('Tools Used')).toBeInTheDocument();
   });
 
   it('calls handleRestoreOriginal when restore input button clicked', () => {

@@ -11,9 +11,5 @@ export type {
   UseCaseTab,
   Persona,
   SmartSuggestionRule,
-  AchievementStats,
-  Achievement,
   QuestOp,
-  QuestTemplate,
-  LevelDefinition,
 } from './tools';

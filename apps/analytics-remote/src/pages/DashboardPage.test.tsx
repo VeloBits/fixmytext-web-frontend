@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
-  GamificationContextValue,
+  FavoritesContextValue,
+  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -64,6 +65,9 @@ vi.mock('@velobits/app-core/store/api/passesApi', () => ({
 vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetToolStatsQuery: () => ({ data: null, isLoading: false }),
 }));
+vi.mock('@velobits/app-core/store/api/historyApi', () => ({
+  useGetHistoryQuery: () => ({ data: null, isLoading: false }),
+}));
 vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [vi.fn(), { isLoading: false }],
 }));
@@ -80,25 +84,16 @@ vi.mock('@velobits/app-core/utils/formatPrice', () => ({
 
 import DashboardPage from './DashboardPage';
 
-const defaultGamification = {
-  xp: 120,
-  level: { level: 2, title: 'Apprentice', xp: 100 },
-  nextLevel: { level: 3, title: 'Journeyman', xp: 300 },
-  xpProgress: 10,
-  streak: { current: 3, best: 7 },
-  totalOps: 25,
-  totalChars: 5000,
-  achievements: ['first_use'],
-  favorites: [],
-  toolsUsed: {},
-  discoveredTools: ['trim_extra'],
-  sessionOps: [],
-  dailyQuest: null,
-  onboarded: true,
+const defaultPersona = {
   persona: 'writer',
   setPersona: vi.fn(),
+  onboarded: true,
+} as unknown as PersonaContextValue;
+
+const defaultFavorites = {
+  favorites: [],
   toggleFavorite: vi.fn(),
-} as unknown as GamificationContextValue;
+} as unknown as FavoritesContextValue;
 
 const defaultSubscription = {
   isPro: false,
@@ -123,7 +118,8 @@ const defaultUser = {
 function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
-      gamification={defaultGamification}
+      persona={defaultPersona}
+      favorites={defaultFavorites}
       user={defaultUser}
       isAuthenticated={true}
       showAlert={vi.fn()}
@@ -155,41 +151,35 @@ describe('DashboardPage', () => {
     expect(screen.getAllByText('Guest').length).toBeGreaterThan(0);
   });
 
-  it('shows level title and number in sidebar', () => {
+  it('shows operations stat in sidebar, sourced from server stats', () => {
     renderDash();
-    expect(screen.getAllByText(/Apprentice/i).length).toBeGreaterThan(0);
+    // Mock tool stats data is null → 0 operations
+    expect(screen.getByText(/0 operations/i)).toBeInTheDocument();
   });
 
-  it('shows XP value in sidebar', () => {
+  it('renders no gamification widgets in the sidebar', () => {
     renderDash();
-    expect(screen.getAllByText(/120 XP/).length).toBeGreaterThan(0);
-  });
-
-  it('shows streak stat in sidebar', () => {
-    renderDash();
-    expect(screen.getByText(/3 day streak/i)).toBeInTheDocument();
-  });
-
-  it('shows operations stat in sidebar', () => {
-    renderDash();
-    expect(screen.getByText(/25 operations/i)).toBeInTheDocument();
+    expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Lvl/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/day streak/i)).not.toBeInTheDocument();
   });
 
   // ── Navigation tabs ──
   it('renders all sidebar nav items', () => {
     renderDash();
-    expect(screen.getAllByText('Overview').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Subscription').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Rewards').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Profile').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Achievements').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Favorites').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Usage History').length).toBeGreaterThan(0);
+    const nav = document.querySelector('nav.tu-dash-nav') as HTMLElement;
+    expect(within(nav).getByText('Overview')).toBeInTheDocument();
+    expect(within(nav).getByText('Subscription')).toBeInTheDocument();
+    expect(within(nav).getByText('Rewards')).toBeInTheDocument();
+    expect(within(nav).getByText('Profile')).toBeInTheDocument();
+    expect(within(nav).getByText('Favorites')).toBeInTheDocument();
+    expect(within(nav).getByText('Usage History')).toBeInTheDocument();
+    expect(within(nav).queryByText('Achievements')).not.toBeInTheDocument();
   });
 
   it('shows Overview section by default', () => {
     renderDash();
-    expect(screen.getByText('Your FixMyText journey at a glance')).toBeInTheDocument();
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
   });
 
   it('switches to Subscription tab', () => {
@@ -211,16 +201,6 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Manage your account and preferences')).toBeInTheDocument();
   });
 
-  it('switches to Achievements tab', () => {
-    renderDash();
-    // Click the nav button (which is a button containing the text "Achievements")
-    const achButtons = screen.getAllByText('Achievements');
-    // The nav button is the one inside <nav>
-    const navBtn = achButtons.find((el) => el.closest('nav'));
-    fireEvent.click(navBtn || achButtons[0]!);
-    expect(screen.getByText(/of .* unlocked/i)).toBeInTheDocument();
-  });
-
   it('switches to Favorites tab', () => {
     renderDash();
     const favButtons = screen.getAllByText('Favorites');
@@ -236,13 +216,14 @@ describe('DashboardPage', () => {
   });
 
   // ── Overview section ──
-  it('shows stat cards in overview', () => {
+  it('shows usage stat cards in overview', () => {
     renderDash();
     expect(screen.getByText('Operations')).toBeInTheDocument();
-    expect(screen.getByText('Characters')).toBeInTheDocument();
-    expect(screen.getByText('Day Streak')).toBeInTheDocument();
-    expect(screen.getByText('Discovered')).toBeInTheDocument();
-    expect(screen.getAllByText('Achievements').length).toBeGreaterThan(0);
+    expect(screen.getByText('Tools Used')).toBeInTheDocument();
+    // 'Favorites' also matches the nav entry, so scope it to a stat card
+    expect(
+      screen.getAllByText('Favorites').some((el) => el.closest('.tu-dash-stat-card'))
+    ).toBe(true);
   });
 
   it('shows empty tools message when no tools used', () => {
@@ -250,9 +231,10 @@ describe('DashboardPage', () => {
     expect(screen.getByText(/No tools used yet/i)).toBeInTheDocument();
   });
 
-  it('shows empty category message when no tools used', () => {
+  it('shows empty recent activity message when history is empty', () => {
     renderDash();
-    expect(screen.getByText(/No usage data yet/i)).toBeInTheDocument();
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('No recent activity yet')).toBeInTheDocument();
   });
 
   it('navigates back to editor', () => {
@@ -424,29 +406,22 @@ describe('DashboardPage', () => {
     // Click a persona button
     const writerBtn = screen.getAllByText(/Writer/i)[0]!;
     fireEvent.click(writerBtn);
-    expect(defaultGamification.setPersona).toHaveBeenCalled();
+    expect(defaultPersona.setPersona).toHaveBeenCalled();
   });
 
   // ── Favorites with items ──
   it('shows favorited tools and calls toggleFavorite', () => {
     const toggleFavorite = vi.fn();
-    const gamification = { ...defaultGamification, favorites: ['trim_extra'], toggleFavorite };
-    renderDash({ gamification });
+    const favorites = { favorites: ['trim_extra'], toggleFavorite } as FavoritesContextValue;
+    renderDash({ favorites });
     const favButtons = screen.getAllByText('Favorites');
     const navBtn = favButtons.find((el) => el.closest('nav'));
     fireEvent.click(navBtn || favButtons[0]!);
+    expect(screen.getByText('1 tools favorited')).toBeInTheDocument();
     // There should be a remove-from-favorites button (the heart)
     const heartBtn = screen.getByTitle('Remove from favorites');
     fireEvent.click(heartBtn);
     expect(toggleFavorite).toHaveBeenCalledWith('trim_extra');
-  });
-
-  // ── Overview: View all achievements link ──
-  it('clicking View all in achievements preview switches to achievements tab', () => {
-    renderDash();
-    const viewAllBtn = screen.getByText('View all');
-    fireEvent.click(viewAllBtn);
-    expect(screen.getByText(/of .* unlocked/i)).toBeInTheDocument();
   });
 
   // ── Subscription tab: handleUpgrade ──
@@ -475,16 +450,5 @@ describe('DashboardPage', () => {
     fireEvent.click(screen.getByText('Subscription'));
     fireEvent.click(screen.getByText('View all plans'));
     expect(mockNavigate).toHaveBeenCalledWith('/pricing');
-  });
-
-  // ── Usage history with data ──
-  it('shows history items when sessionOps exist', () => {
-    const gamification = {
-      ...defaultGamification,
-      sessionOps: [{ id: 'trim', tab: 'text', time: Date.now(), isNew: false }],
-    };
-    renderDash({ gamification });
-    fireEvent.click(screen.getByText('Usage History'));
-    expect(screen.getByText(/1 operations/i)).toBeInTheDocument();
   });
 });

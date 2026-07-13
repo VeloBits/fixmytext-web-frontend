@@ -1,17 +1,18 @@
 import { TOOLS } from '@velobits/app-core/constants/tools';
-import type { GamificationContextValue } from '@velobits/app-core/types/context';
 import type { QuestOp } from '@velobits/app-core/types/tools';
 
 interface HistorySectionProps {
-  g: GamificationContextValue;
-  recentOps: QuestOp[];
+  recentOps?: QuestOp[];
 }
 
 /**
  * Dashboard usage history section.
- * Shows session timeline, discovered tools progress grid, and usage stats.
+ * Shows the session timeline and the tool discovery grid. Session ops and
+ * discovery were tracked by the removed gamification state, so with no
+ * producer left the timeline shows its empty state and the discovery grid
+ * renders fully locked — identical to the previous kill-switch-off behavior.
  */
-export default function HistorySection({ g, recentOps }: HistorySectionProps) {
+export default function HistorySection({ recentOps = [] }: HistorySectionProps) {
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Usage History</h2>
@@ -48,30 +49,18 @@ export default function HistorySection({ g, recentOps }: HistorySectionProps) {
         </div>
       )}
 
-      {/* All-time tool discovery */}
+      {/* All-time tool discovery (no tracking source anymore: always locked) */}
       <div className="tu-dash-card">
-        <h3 className="tu-dash-card-title">
-          Discovered Tools ({g?.discoveredTools?.length || 0}/{TOOLS.length})
-        </h3>
+        <h3 className="tu-dash-card-title">Discovered Tools (0/{TOOLS.length})</h3>
         <div className="tu-dash-discovered-progress">
-          <div
-            className="tu-dash-discovered-progress-fill"
-            style={{ width: `${((g?.discoveredTools?.length || 0) / TOOLS.length) * 100}%` }}
-          />
+          <div className="tu-dash-discovered-progress-fill" style={{ width: '0%' }} />
         </div>
         <div className="tu-dash-discovered-grid">
-          {TOOLS.map((tool) => {
-            const discovered = g?.discoveredTools?.includes(tool.id);
-            return (
-              <div
-                key={tool.id}
-                className={`tu-dash-discovered${discovered ? '' : ' tu-dash-discovered--locked'}`}
-                title={discovered ? `${tool.label} — ${g.toolsUsed?.[tool.id] || 0}x used` : '???'}
-              >
-                <span>{discovered ? tool.icon : '?'}</span>
-              </div>
-            );
-          })}
+          {TOOLS.map((tool) => (
+            <div key={tool.id} className="tu-dash-discovered tu-dash-discovered--locked" title="???">
+              <span>?</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

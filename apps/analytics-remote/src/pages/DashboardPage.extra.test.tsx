@@ -2,7 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
-  GamificationContextValue,
+  FavoritesContextValue,
+  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -75,6 +76,15 @@ vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetToolStatsQuery: () => toolStatsState,
 }));
 
+interface HistoryQueryState {
+  data: unknown;
+  isLoading: boolean;
+}
+let historyState: HistoryQueryState = { data: null, isLoading: false };
+vi.mock('@velobits/app-core/store/api/historyApi', () => ({
+  useGetHistoryQuery: () => historyState,
+}));
+
 vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [vi.fn(), { isLoading: false }],
 }));
@@ -91,25 +101,16 @@ vi.mock('@velobits/app-core/utils/formatPrice', () => ({
 
 import DashboardPage from './DashboardPage';
 
-const defaultGamification = {
-  xp: 120,
-  level: { level: 2, title: 'Novice', xp: 100 },
-  nextLevel: { level: 3, title: 'Apprentice', xp: 250 },
-  xpProgress: 10,
-  streak: { current: 2, best: 7 },
-  totalOps: 25,
-  totalChars: 5000,
-  achievements: ['first_step'],
-  favorites: [],
-  toolsUsed: {},
-  discoveredTools: ['trim_extra'],
-  sessionOps: [],
-  dailyQuest: null,
-  onboarded: true,
+const defaultPersona = {
   persona: 'writer',
   setPersona: vi.fn(),
+  onboarded: true,
+} as unknown as PersonaContextValue;
+
+const defaultFavorites = {
+  favorites: [],
   toggleFavorite: vi.fn(),
-} as unknown as GamificationContextValue;
+} as unknown as FavoritesContextValue;
 
 const defaultSubscription = {
   isPro: false,
@@ -134,7 +135,8 @@ const defaultUser = {
 function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
-      gamification={defaultGamification}
+      persona={defaultPersona}
+      favorites={defaultFavorites}
       user={defaultUser}
       isAuthenticated={true}
       showAlert={vi.fn()}
@@ -151,6 +153,7 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     vi.clearAllMocks();
     searchParamsValue = new URLSearchParams();
     toolStatsState = { data: null, isLoading: false };
+    historyState = { data: null, isLoading: false };
   });
 
   // ── Initial tab from URL ──
@@ -163,7 +166,15 @@ describe('DashboardPage — payment redirects and tool stats', () => {
   it('falls back to Overview for an unknown tab param', () => {
     searchParamsValue = new URLSearchParams('tab=bogus');
     renderDash();
-    expect(screen.getByText('Your FixMyText journey at a glance')).toBeInTheDocument();
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
+  });
+
+  it('falls back to Overview for the removed achievements tab', () => {
+    searchParamsValue = new URLSearchParams('tab=achievements');
+    renderDash();
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
+    const nav = document.querySelector('nav.tu-dash-nav') as HTMLElement;
+    expect(within(nav).queryByText('Achievements')).not.toBeInTheDocument();
   });
 
   // ── upgrade=… redirects ──
@@ -242,24 +253,18 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     expect(screen.queryByText(/No tools used yet/i)).not.toBeInTheDocument();
   });
 
-  it('falls back to local toolsUsed for top tools and builds category breakdown', () => {
-    const gamification = {
-      ...defaultGamification,
-      toolsUsed: { trim_extra: 7, camel_case: 3, not_a_real_tool: 1 },
+  it('sources the sidebar ops count from server tool stats', () => {
+    toolStatsState = {
+      data: {
+        stats: [
+          { tool_id: 'trim_extra', total_uses: 5 },
+          { tool_id: 'camel_case', total_uses: 2 },
+        ],
+      },
+      isLoading: false,
     };
-    renderDash({ gamification });
-    // Top tools (sorted desc, unknown ids filtered)
-    expect(screen.getByText('Trim Extra Spaces')).toBeInTheDocument();
-    expect(screen.getByText('camelCase')).toBeInTheDocument();
-    expect(screen.getByText('7x')).toBeInTheDocument();
-    expect(screen.getByText('3x')).toBeInTheDocument();
-    // Category breakdown: transform = 7 + 3, code = 3
-    const card = screen.getByText('Category Breakdown').closest('.tu-dash-card') as HTMLElement;
-    expect(within(card).getByText('Transform')).toBeInTheDocument();
-    expect(within(card).getByText('Code & Data')).toBeInTheDocument();
-    expect(within(card).getByText('10')).toBeInTheDocument();
-    expect(within(card).getByText('3')).toBeInTheDocument();
-    expect(screen.queryByText(/No usage data yet/i)).not.toBeInTheDocument();
+    renderDash();
+    expect(screen.getByText(/7 operations/)).toBeInTheDocument();
   });
 
   it('shows tool stats error state on overview and retries', () => {
@@ -278,39 +283,69 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     expect(screen.queryByText('Failed to load tool statistics')).not.toBeInTheDocument();
   });
 
-  // ── Missing gamification fallbacks ──
-  it('renders defaults when gamification is missing', () => {
-    renderDash({ gamification: null as unknown as GamificationContextValue });
-    expect(screen.getByText(/Beginner — Lvl 1/)).toBeInTheDocument();
-    expect(screen.getByText('0 XP')).toBeInTheDocument();
-    expect(screen.getByText(/0 day streak/)).toBeInTheDocument();
-    expect(screen.getByText(/0 operations/)).toBeInTheDocument();
-  });
-
-  // ── Achievements section unlocked branch ──
-  it('shows an unlocked achievement in the achievements section', () => {
-    searchParamsValue = new URLSearchParams('tab=achievements');
-    renderDash();
-    expect(screen.getByText(/of .* unlocked/i)).toBeInTheDocument();
-    expect(screen.getByText('Unlocked')).toBeInTheDocument();
-    expect(screen.getByText('First Step')).toBeInTheDocument();
-  });
-
-  // ── History section branches ──
-  it('renders history ops with NEW badge, known tool label and empty time', () => {
-    const gamification = {
-      ...defaultGamification,
-      sessionOps: [
-        { id: 'trim_extra', tab: 'transform', time: null, isNew: true },
-        { id: 'mystery_tool', isNew: false },
-      ],
+  // ── Overview with server data ──
+  it('overview shows usage stats from server data', () => {
+    toolStatsState = {
+      data: {
+        stats: [
+          { tool_id: 'trim_extra', total_uses: 5 },
+          { tool_id: 'camel_case', total_uses: 2 },
+        ],
+      },
+      isLoading: false,
     };
-    searchParamsValue = new URLSearchParams('tab=history');
-    renderDash({ gamification });
-    expect(screen.getByText(/2 operations/)).toBeInTheDocument();
-    expect(screen.getByText('NEW')).toBeInTheDocument();
-    expect(screen.getByText('Trim Extra Spaces')).toBeInTheDocument();
-    // Unknown tool id falls back to raw id and default icon
-    expect(screen.getByText('mystery_tool')).toBeInTheDocument();
+    historyState = {
+      data: {
+        items: [
+          {
+            id: 'h1',
+            tool_id: 'trim_extra',
+            tool_label: 'Trim Extra Spaces',
+            created_at: '2026-07-12T10:00:00Z',
+          },
+          {
+            id: 'h2',
+            tool_id: 'unknown_tool',
+            tool_label: 'Mystery Tool',
+            created_at: '2026-07-12T09:00:00Z',
+          },
+        ],
+        total: 7,
+        page: 1,
+        page_size: 5,
+        has_more: true,
+      },
+      isLoading: false,
+    };
+    const favorites = { favorites: ['trim_extra'], toggleFavorite: vi.fn() };
+    renderDash({ favorites });
+
+    // Stats grid: total ops, tools used, favorites count
+    expect(screen.getByText('Your FixMyText usage at a glance')).toBeInTheDocument();
+    const opsCard = screen.getByText('Operations').closest('.tu-dash-stat-card') as HTMLElement;
+    expect(within(opsCard).getByText('7')).toBeInTheDocument();
+    const toolsCard = screen.getByText('Tools Used').closest('.tu-dash-stat-card') as HTMLElement;
+    expect(toolsCard.querySelector('.tu-dash-stat-value')?.textContent).toMatch(/^2\//);
+    // 'Favorites' also matches the sidebar nav entry, so pick the stat card one
+    const favCard = screen
+      .getAllByText('Favorites')
+      .find((el) => el.closest('.tu-dash-stat-card'))!
+      .closest('.tu-dash-stat-card') as HTMLElement;
+    expect(within(favCard).getByText('1')).toBeInTheDocument();
+
+    // Per-tool data from the stats endpoint (label also appears in Recent Activity)
+    expect(screen.getByText('Most Used Tools')).toBeInTheDocument();
+    expect(screen.getAllByText('Trim Extra Spaces').length).toBeGreaterThan(0);
+    expect(screen.getByText('5x')).toBeInTheDocument();
+
+    // Recent activity from the history endpoint (unknown ids fall back to label)
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('Mystery Tool')).toBeInTheDocument();
+  });
+
+  it('overview shows empty recent activity when history is empty', () => {
+    renderDash();
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('No recent activity yet')).toBeInTheDocument();
   });
 });

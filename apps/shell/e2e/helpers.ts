@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import type { APIRequestContext, APIResponse } from '@playwright/test';
+import type { APIRequestContext, APIResponse, Page } from '@playwright/test';
 
 // API base URL: api-dev.velobits.dev via /etc/hosts + Traefik + Kong.
 // CI can override via E2E_API_URL env var to point at any host (incl. localhost ports).
@@ -59,4 +59,21 @@ export async function registerVerifiedUser(
   }
 
   return { email, password, accessToken, verificationToken: token };
+}
+
+/**
+ * Fresh guest sessions get the blocking persona-onboarding overlay on first
+ * visit. Dismiss it via Escape (maps to the "explorer" persona and persists
+ * for the tab session) so specs can drive the editor underneath.
+ */
+export async function dismissOnboardingIfPresent(page: Page): Promise<void> {
+  const overlay = page.locator('.tu-onboard-overlay');
+  const appeared = await overlay
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (appeared) {
+    await page.keyboard.press('Escape');
+    await overlay.waitFor({ state: 'hidden', timeout: 5_000 });
+  }
 }

@@ -1,20 +1,21 @@
 import { TOOLS } from '@velobits/app-core/constants/tools';
-import type { GamificationContextValue } from '@velobits/app-core/types/context';
+import type { FavoritesContextValue } from '@velobits/app-core/types/context';
 
 interface FavoritesSectionProps {
-  g: GamificationContextValue;
+  favorites: FavoritesContextValue;
 }
 
 /**
  * Dashboard favorites section.
  * Lists all favorited tools with option to remove from favorites.
  */
-export default function FavoritesSection({ g }: FavoritesSectionProps) {
+export default function FavoritesSection({ favorites }: FavoritesSectionProps) {
+  const favoriteIds = favorites?.favorites || [];
   return (
     <div className="tu-dash-content">
       <h2 className="tu-dash-title">Favorites</h2>
-      <p className="tu-dash-subtitle">{g?.favorites?.length || 0} tools favorited</p>
-      {!g?.favorites || g.favorites.length === 0 ? (
+      <p className="tu-dash-subtitle">{favoriteIds.length} tools favorited</p>
+      {favoriteIds.length === 0 ? (
         <div className="tu-dash-empty-page">
           <span className="tu-dash-empty-icon">❤️</span>
           <span>No favorites yet</span>
@@ -22,7 +23,7 @@ export default function FavoritesSection({ g }: FavoritesSectionProps) {
         </div>
       ) : (
         <div className="tu-tpanel-list tu-dash-fav-panel">
-          {g.favorites.map((id) => {
+          {favoriteIds.map((id) => {
             const tool = TOOLS.find((t) => t.id === id);
             if (!tool) return null;
             return (
@@ -32,7 +33,7 @@ export default function FavoritesSection({ g }: FavoritesSectionProps) {
                   <span className="tu-titem-name">{tool.label}</span>
                   <button
                     className="tu-titem-fav tu-titem-fav--active"
-                    onClick={() => g.toggleFavorite(id)}
+                    onClick={() => favorites.toggleFavorite(id)}
                     title="Remove from favorites"
                   >
                     ♥

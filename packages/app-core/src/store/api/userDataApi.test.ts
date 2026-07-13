@@ -3,8 +3,6 @@ import {
   userDataApi,
   useGetPreferencesQuery,
   useUpdatePreferencesMutation,
-  useGetGamificationQuery,
-  useUpdateGamificationMutation,
   useGetTemplatesQuery,
   useCreateTemplateMutation,
   useUpdateTemplateMutation,
@@ -15,9 +13,7 @@ import {
   useAddFavoriteMutation,
   useRemoveFavoriteMutation,
   useGetToolStatsQuery,
-  useGetDiscoveredToolsQuery,
   useGetSpinHistoryQuery,
-  useGetPipelinesQuery,
 } from './userDataApi';
 
 describe('userDataApi', () => {
@@ -38,8 +34,6 @@ describe('userDataApi', () => {
     const expected = [
       'getPreferences',
       'updatePreferences',
-      'getGamification',
-      'updateGamification',
       'getTemplates',
       'createTemplate',
       'updateTemplate',
@@ -50,12 +44,7 @@ describe('userDataApi', () => {
       'addFavorite',
       'removeFavorite',
       'getToolStats',
-      'getDiscoveredTools',
       'getSpinHistory',
-      'getPipelines',
-      'createPipeline',
-      'updatePipeline',
-      'deletePipeline',
     ];
     for (const name of expected) {
       expect(names).toContain(name);
@@ -65,8 +54,6 @@ describe('userDataApi', () => {
   it('exports all hooks', () => {
     expect(typeof useGetPreferencesQuery).toBe('function');
     expect(typeof useUpdatePreferencesMutation).toBe('function');
-    expect(typeof useGetGamificationQuery).toBe('function');
-    expect(typeof useUpdateGamificationMutation).toBe('function');
     expect(typeof useGetTemplatesQuery).toBe('function');
     expect(typeof useCreateTemplateMutation).toBe('function');
     expect(typeof useUpdateTemplateMutation).toBe('function');
@@ -77,9 +64,7 @@ describe('userDataApi', () => {
     expect(typeof useAddFavoriteMutation).toBe('function');
     expect(typeof useRemoveFavoriteMutation).toBe('function');
     expect(typeof useGetToolStatsQuery).toBe('function');
-    expect(typeof useGetDiscoveredToolsQuery).toBe('function');
     expect(typeof useGetSpinHistoryQuery).toBe('function');
-    expect(typeof useGetPipelinesQuery).toBe('function');
   });
 });
 
@@ -114,14 +99,11 @@ describe('userDataApi endpoint execution', () => {
 
   it.each([
     ['getPreferences', '/api/v1/user/preferences'],
-    ['getGamification', '/api/v1/user/gamification'],
     ['getTemplates', '/api/v1/user/templates'],
     ['getUiSettings', '/api/v1/user/ui-settings'],
     ['getFavorites', '/api/v1/user/favorites'],
     ['getToolStats', '/api/v1/user/tool-stats'],
-    ['getDiscoveredTools', '/api/v1/user/discovered-tools'],
     ['getSpinHistory', '/api/v1/user/spin-history'],
-    ['getPipelines', '/api/v1/user/pipelines'],
   ] as const)('%s issues a GET to %s', async (endpointName, path) => {
     const store = makeStore();
 
@@ -144,16 +126,6 @@ describe('userDataApi endpoint execution', () => {
 
     const request = lastRequest();
     expect(request.url).toContain('/api/v1/user/preferences');
-    expect(request.method).toBe('PUT');
-  });
-
-  it('updateGamification issues a PUT to /api/v1/user/gamification', async () => {
-    const store = makeStore();
-
-    await store.dispatch(userDataApi.endpoints.updateGamification.initiate({ xp: 10 }));
-
-    const request = lastRequest();
-    expect(request.url).toContain('/api/v1/user/gamification');
     expect(request.method).toBe('PUT');
   });
 
@@ -218,40 +190,6 @@ describe('userDataApi endpoint execution', () => {
 
     const request = lastRequest();
     expect(request.url).toContain('/api/v1/user/favorites/uppercase');
-    expect(request.method).toBe('DELETE');
-  });
-
-  it('createPipeline issues a POST to /api/v1/user/pipelines', async () => {
-    const store = makeStore();
-
-    await store.dispatch(
-      userDataApi.endpoints.createPipeline.initiate({ name: 'My pipeline', steps: [] })
-    );
-
-    const request = lastRequest();
-    expect(request.url).toContain('/api/v1/user/pipelines');
-    expect(request.method).toBe('POST');
-  });
-
-  it('updatePipeline issues a PUT to /api/v1/user/pipelines/:id', async () => {
-    const store = makeStore();
-
-    await store.dispatch(
-      userDataApi.endpoints.updatePipeline.initiate({ id: 'pipe-1', name: 'Renamed' })
-    );
-
-    const request = lastRequest();
-    expect(request.url).toContain('/api/v1/user/pipelines/pipe-1');
-    expect(request.method).toBe('PUT');
-  });
-
-  it('deletePipeline issues a DELETE to /api/v1/user/pipelines/:id', async () => {
-    const store = makeStore();
-
-    await store.dispatch(userDataApi.endpoints.deletePipeline.initiate('pipe-1'));
-
-    const request = lastRequest();
-    expect(request.url).toContain('/api/v1/user/pipelines/pipe-1');
     expect(request.method).toBe('DELETE');
   });
 });

@@ -6,21 +6,28 @@
 // federation.d.ts ambient module declarations and each remote's exposed page
 // component are both typed against these.
 
-import type { GamificationContextValue, SubscriptionContextValue, User } from './types/context';
+import type {
+  FavoritesContextValue,
+  PersonaContextValue,
+  SubscriptionContextValue,
+  User,
+} from './types/context';
 import type { AlertLevel } from './types/alert';
 
 export interface EditorPageProps {
   mode: string;
   setMode: (mode: string) => void;
   showAlert: (message: string, type: string) => void;
-  gamification: GamificationContextValue;
+  persona: PersonaContextValue;
+  favorites: FavoritesContextValue;
   user: User | null;
   isAuthenticated: boolean;
   subscription: SubscriptionContextValue;
 }
 
 export interface AnalyticsPageProps {
-  gamification: GamificationContextValue;
+  persona: PersonaContextValue;
+  favorites: FavoritesContextValue;
   user: User | null;
   isAuthenticated: boolean;
   showAlert: (message: string, type: AlertLevel) => void;

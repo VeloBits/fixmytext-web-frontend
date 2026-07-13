@@ -1,16 +1,21 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import type React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
-import { useGetMeQuery } from '@velobits/app-core/store/api/authApi';
-import type { RootState } from '@velobits/app-core/store/store';
-import useGamification from '@velobits/app-core/hooks/useGamification';
+import { authApi, useGetMeQuery } from '@velobits/app-core/store/api/authApi';
+import { userDataApi } from '@velobits/app-core/store/api/userDataApi';
+import { subscriptionApi } from '@velobits/app-core/store/api/subscriptionApi';
+import { passesApi } from '@velobits/app-core/store/api/passesApi';
+import { historyApi } from '@velobits/app-core/store/api/historyApi';
+import { logout as clearAuthUser } from '@velobits/app-core/store/slices/authSlice';
+import type { AppDispatch, RootState } from '@velobits/app-core/store/store';
+import usePersona from '@velobits/app-core/hooks/usePersona';
+import useFavorites from '@velobits/app-core/hooks/useFavorites';
 import useSubscription from '@velobits/app-core/hooks/useSubscription';
 import { useAlertContext } from './AlertContext';
 import type {
   User,
   AppContextValue,
-  GamificationContextValue,
   SubscriptionContextValue,
 } from '@velobits/app-core/types/context';
 
@@ -20,9 +25,8 @@ import type {
 // on shell source.
 export type {
   User,
-  GamificationStreak,
-  GamificationDailyQuest,
-  GamificationContextValue,
+  PersonaContextValue,
+  FavoritesContextValue,
   ToolUsage,
   SubscriptionContextValue,
   AppContextValue,
@@ -33,7 +37,25 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const { showAlert } = useAlertContext();
   const { isAuthenticated, accessToken } = useOidcAuth();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((s: RootState) => s.auth.user) as User | null;
+  // A cross-tab logout (BroadcastChannel → removeUser) or Keycloak-side session
+  // end clears the OIDC user but not the Redux identity: signoutRedirect only
+  // navigates the tab that initiated it, so a background tab keeps s.auth.user
+  // and every user-scoped RTK Query cache — the chrome shows "Sign In" while
+  // the profile menu still names the signed-out user. When auth drops while a
+  // profile is loaded, purge it all so this tab renders as a true guest and
+  // nothing leaks into a later session. All user-scoped queries skip while
+  // unauthenticated, so the resets don't trigger unauthenticated refetches.
+  useEffect(() => {
+    if (isAuthenticated || !user) return;
+    dispatch(clearAuthUser());
+    dispatch(authApi.util.resetApiState());
+    dispatch(userDataApi.util.resetApiState());
+    dispatch(subscriptionApi.util.resetApiState());
+    dispatch(passesApi.util.resetApiState());
+    dispatch(historyApi.util.resetApiState());
+  }, [isAuthenticated, user, dispatch]);
   // Trigger /auth/me fetch when authenticated so Redux user state is populated.
   const {
     isError: meFailed,
@@ -55,12 +77,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const id = window.setInterval(() => refetchMe(), 15_000);
     return () => window.clearInterval(id);
   }, [isAuthenticated, user, meFailed, meAuthRejected, refetchMe]);
-  const gamification = useGamification() as unknown as GamificationContextValue;
+  const persona = usePersona();
+  const favorites = useFavorites();
   const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 
   const value = useMemo(
-    () => ({ user, isAuthenticated, userResolving, gamification, subscription }),
-    [user, isAuthenticated, userResolving, gamification, subscription]
+    () => ({ user, isAuthenticated, userResolving, persona, favorites, subscription }),
+    [user, isAuthenticated, userResolving, persona, favorites, subscription]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

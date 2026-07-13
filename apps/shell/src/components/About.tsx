@@ -51,10 +51,10 @@ const FEATURES = [
     color: 'var(--emerald)',
   },
   {
-    icon: '🎮',
-    title: 'Gamified Experience',
+    icon: '🎁',
+    title: 'Rewards Built In',
     description:
-      'Earn XP, level up, complete daily quests, unlock achievements, and build streaks as you work.',
+      'Claim a daily login bonus, take the weekly reward spin, and earn credits and free passes as you work.',
     color: 'var(--violet)',
   },
 ];

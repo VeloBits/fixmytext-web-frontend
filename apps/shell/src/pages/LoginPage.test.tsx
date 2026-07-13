@@ -2,11 +2,18 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import LoginPage from './LoginPage';
 
-const { mockSigninRedirect } = vi.hoisted(() => ({ mockSigninRedirect: vi.fn() }));
+const { mockSigninRedirect, mockNavigate } = vi.hoisted(() => ({
+  mockSigninRedirect: vi.fn(),
+  mockNavigate: vi.fn(),
+}));
 
 vi.mock('@velobits/app-core/auth/userManager', () => ({
   hasAuthHint: vi.fn(() => false), // no persisted session hint in tests
   userManager: { signinRedirect: mockSigninRedirect },
+}));
+
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
 }));
 
 vi.mock('@/components/layout/PageSkeleton', () => ({
@@ -43,5 +50,27 @@ describe('LoginPage', () => {
     fireEvent.click(retry);
     expect(mockSigninRedirect).toHaveBeenCalledTimes(2);
     await waitFor(() => expect(screen.getByTestId('page-skeleton')).toBeInTheDocument());
+  });
+
+  it('returns to the guest home when restored from the back/forward cache', () => {
+    render(<LoginPage />);
+    expect(mockNavigate).not.toHaveBeenCalled();
+
+    // Browser Back from Keycloak = bfcache restore = pageshow with persisted=true.
+    const restore = new Event('pageshow');
+    Object.defineProperty(restore, 'persisted', { value: true });
+    fireEvent(window, restore);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
+  });
+
+  it('does not navigate away on a normal (non-restored) pageshow', () => {
+    render(<LoginPage />);
+
+    const initialShow = new Event('pageshow');
+    Object.defineProperty(initialShow, 'persisted', { value: false });
+    fireEvent(window, initialShow);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });

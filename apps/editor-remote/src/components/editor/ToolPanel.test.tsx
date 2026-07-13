@@ -87,7 +87,8 @@ const defaultProps = {
   onTabChange: vi.fn(),
   onToolClick: vi.fn(),
   disabled: false,
-  gamification: { favorites: [], toggleFavorite: vi.fn() },
+  // Favorites are their own standalone context.
+  favorites: { favorites: [] as string[], toggleFavorite: vi.fn() },
   activeToolId: null,
   hideTabs: false,
   viewMode: 'list',
@@ -195,22 +196,22 @@ describe('ToolPanel', () => {
   });
 
   it('renders pinned favorites group when favorites are set', () => {
-    const gamification = { favorites: ['uppercase'], toggleFavorite: vi.fn() };
-    render(<ToolPanel {...defaultProps} gamification={gamification} />);
+    const favorites = { favorites: ['uppercase'], toggleFavorite: vi.fn() };
+    render(<ToolPanel {...defaultProps} favorites={favorites} />);
     expect(screen.getByText('Pinned')).toBeInTheDocument();
   });
 
   it('shows filled heart for favorite tools', () => {
-    const gamification = { favorites: ['uppercase'], toggleFavorite: vi.fn() };
-    render(<ToolPanel {...defaultProps} gamification={gamification} />);
+    const favorites = { favorites: ['uppercase'], toggleFavorite: vi.fn() };
+    render(<ToolPanel {...defaultProps} favorites={favorites} />);
     const activeFavBtns = document.querySelectorAll('.tu-titem-fav--active');
     expect(activeFavBtns.length).toBeGreaterThan(0);
   });
 
   it('calls toggleFavorite when heart is clicked', () => {
     const toggleFavorite = vi.fn();
-    const gamification = { favorites: [], toggleFavorite };
-    render(<ToolPanel {...defaultProps} gamification={gamification} />);
+    const favorites = { favorites: [] as string[], toggleFavorite };
+    render(<ToolPanel {...defaultProps} favorites={favorites} />);
     const favBtns = document.querySelectorAll('.tu-titem-fav');
     fireEvent.click(favBtns[0]!);
     expect(toggleFavorite).toHaveBeenCalled();
@@ -265,11 +266,11 @@ describe('ToolPanel', () => {
   });
 
   it('excludes favorited tools from For You (already pinned above)', () => {
-    const gamification = { favorites: ['fix_grammar'], toggleFavorite: vi.fn() };
+    const favorites = { favorites: ['fix_grammar'], toggleFavorite: vi.fn() };
     render(
       <ToolPanel
         {...defaultProps}
-        gamification={gamification}
+        favorites={favorites}
         personaToolIds={['fix_grammar', 'base64']}
       />
     );
@@ -278,6 +279,19 @@ describe('ToolPanel', () => {
     expect(forYouGroup.textContent).toContain('Base64 Encode');
     // fix_grammar sits in Pinned already — not duplicated into For You
     expect(forYouGroup.textContent).not.toContain('Fix Grammar');
+  });
+
+  it('pinned favorites and For You work together', () => {
+    // Favorites + persona picks are independent contexts driving the pinned
+    // and For You groups.
+    const toggleFavorite = vi.fn();
+    const favorites = { favorites: ['uppercase'], toggleFavorite };
+    render(<ToolPanel {...defaultProps} favorites={favorites} personaToolIds={['fix_grammar']} />);
+    expect(screen.getByText('Pinned')).toBeInTheDocument();
+    expect(screen.getByText('For You')).toBeInTheDocument();
+    const heart = document.querySelector('.tu-titem-fav--active');
+    fireEvent.click(heart!);
+    expect(toggleFavorite).toHaveBeenCalledWith('uppercase');
   });
 
   it('collapses group when group header is clicked', () => {

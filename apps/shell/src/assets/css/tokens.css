@@ -111,10 +111,6 @@ body {
   --suggestion-bg: #eaeaeb;
   --suggestion-border: #c8c8c8;
 
-  /* XP / Progress */
-  --xp-bar-bg: #c8c8c8;
-  --xp-bar-fill: linear-gradient(90deg, #007acc, #1c8cd9);
-
   /* Pipeline */
   --pipeline-bg: #f0f0f0;
   --pipeline-line: #c8c8c8;
@@ -196,7 +192,6 @@ body.dark {
   --list-active: #094771;
   --list-focus: #062f4a;
 
-  --xp-bar-bg: #3c3c3c;
   --pipeline-bg: #1e1e1e;
   --pipeline-line: #3c3c3c;
   --suggestion-bg: #252526;

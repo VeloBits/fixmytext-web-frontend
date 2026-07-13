@@ -110,14 +110,7 @@ describe('errorMiddleware with rejectedWithValue actions', () => {
   });
 
   it('skips silent query endpoints', () => {
-    const silentEndpoints = [
-      'refresh',
-      'getMe',
-      'getPreferences',
-      'getGamification',
-      'getTemplates',
-      'getHistory',
-    ];
+    const silentEndpoints = ['refresh', 'getMe', 'getPreferences', 'getTemplates', 'getHistory'];
     for (const ep of silentEndpoints) {
       dispatchEventSpy.mockClear();
       const action = makeRejectedWithValueAction({

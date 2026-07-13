@@ -1,5 +1,12 @@
 /* ═══════════════════════════════════════════════════════
-   Gamification — VSCode Style
+   Legacy stylesheet — VSCode Style
+   Despite the filename (kept to avoid churn), this file no
+   longer holds gamification rules. It now mainly contains the
+   persona onboarding modal styles plus shared editor chrome
+   (pipeline strip, smart suggestions, command palette,
+   keyboard-shortcuts modal). The gamification rules (XP float,
+   achievement celebration modal) were removed with the
+   gamification feature.
    ═══════════════════════════════════════════════════════ */
 
 /* ── Pipeline Strip ──────────────────────────────── */
@@ -123,135 +130,6 @@
 
 .tu-suggestion-dismiss:hover {
   opacity: 1;
-}
-
-/* ── XP Gain Float ───────────────────────────────── */
-.tu-xp-float {
-  position: fixed;
-  top: 50px;
-  right: 20px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--accent);
-  pointer-events: none;
-  z-index: 1000;
-}
-
-/* ── Achievement Celebration Modal ───────────────── */
-.tu-achieve-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  z-index: 2000;
-}
-
-.tu-achieve-modal {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 36px 40px 20px;
-  border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--amber);
-  box-shadow:
-    0 0 40px rgba(245, 158, 11, 0.15),
-    0 20px 60px rgba(0, 0, 0, 0.4);
-  min-width: 280px;
-  max-width: 360px;
-  overflow: hidden;
-}
-
-/* Confetti burst */
-.tu-achieve-confetti-wrap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.tu-achieve-confetti {
-  position: absolute;
-  top: 0;
-  pointer-events: none;
-}
-
-/* Glow ring behind icon */
-.tu-achieve-glow {
-  position: absolute;
-  top: 20px;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-/* Icon */
-.tu-achieve-icon {
-  font-size: 2.8rem;
-  line-height: 1;
-  margin-bottom: 12px;
-  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
-  z-index: 1;
-}
-
-/* Badge label */
-.tu-achieve-badge {
-  font-size: 0.58rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--amber);
-  background: rgba(245, 158, 11, 0.1);
-  padding: 3px 12px;
-  border-radius: var(--r-pill);
-  margin-bottom: 8px;
-}
-
-/* Achievement name */
-.tu-achieve-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0 0 4px;
-  text-align: center;
-}
-
-/* Description */
-.tu-achieve-desc {
-  font-size: 0.72rem;
-  color: var(--text-3);
-  margin: 0 0 12px;
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* Auto-close progress bar */
-.tu-achieve-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--amber);
-  transform-origin: left;
-  opacity: 0.6;
-}
-
-/* Dismiss hint */
-.tu-achieve-hint {
-  font-size: 0.55rem;
-  color: var(--text-3);
-  margin-top: 14px;
-  opacity: 0.5;
 }
 
 /* ── Command Palette (VSCode style) ───────────────── */
@@ -603,6 +481,31 @@
   font-size: 0.65rem;
   color: var(--text-3);
   opacity: 0.6;
+}
+
+/* Dismiss (X) — skip the picker, defaults to the explorer persona */
+.tu-onboard-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 2;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tu-onboard-close:hover {
+  background: var(--surface-2);
+  color: var(--text-1);
 }
 
 /* Narrow screens: tool tags don't shrink, so drop them under the text

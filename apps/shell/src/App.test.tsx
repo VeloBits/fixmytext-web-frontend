@@ -99,14 +99,19 @@ vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
     logout: vi.fn(),
   }),
 }));
-vi.mock('@velobits/app-core/hooks/useGamification', () => ({
+// AppContext composes the persona/favorites/subscription hooks and the shell
+// reads onboarding state from the persona context value.
+vi.mock('@velobits/app-core/hooks/usePersona', () => ({
   default: () => ({
-    onboarded: mockState.onboarded,
+    persona: mockState.onboarded ? 'writer' : null,
     setPersona: vi.fn(),
-    xp: 0,
-    level: 1,
-    streak: { current: 0 },
-    totalOps: 0,
+    onboarded: mockState.onboarded,
+  }),
+}));
+vi.mock('@velobits/app-core/hooks/useFavorites', () => ({
+  default: () => ({
+    favorites: [],
+    toggleFavorite: vi.fn(),
   }),
 }));
 vi.mock('@velobits/app-core/hooks/useSubscription', () => ({

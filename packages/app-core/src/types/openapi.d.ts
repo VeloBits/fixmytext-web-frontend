@@ -3665,30 +3665,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/user/gamification': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Gamification
-     * @description Return the authenticated user's gamification state (XP, streak, quests).
-     */
-    get: operations['get_gamification_api_v1_user_gamification_get'];
-    /**
-     * Update Gamification
-     * @description Update the authenticated user's gamification state (partial update).
-     */
-    put: operations['update_gamification_api_v1_user_gamification_put'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/v1/user/templates': {
     parameters: {
       query?: never;
@@ -4638,79 +4614,6 @@ export interface components {
         | 'table'
         | 'tldr'
         | 'headings';
-    };
-    /**
-     * GamificationResponse
-     * @description Current gamification state for a user.
-     */
-    GamificationResponse: {
-      /**
-       * Xp
-       * @default 0
-       */
-      xp: number;
-      /**
-       * Streak Current
-       * @default 0
-       */
-      streak_current: number;
-      /** Streak Last Date */
-      streak_last_date?: string | null;
-      /**
-       * Total Ops
-       * @default 0
-       */
-      total_ops: number;
-      /**
-       * Total Chars
-       * @default 0
-       */
-      total_chars: number;
-      /**
-       * Achievements
-       * @default []
-       */
-      achievements: string[];
-      /**
-       * Completed Quests
-       * @default []
-       */
-      completed_quests: string[];
-      /** Daily Quest Id */
-      daily_quest_id?: string | null;
-      /** Daily Quest Date */
-      daily_quest_date?: string | null;
-      /**
-       * Daily Quest Completed
-       * @default false
-       */
-      daily_quest_completed: boolean;
-    };
-    /**
-     * GamificationUpdate
-     * @description Partial update for gamification state. All fields optional.
-     */
-    GamificationUpdate: {
-      /** Xp */
-      xp?: number | null;
-      /** Streak Current */
-      streak_current?: number | null;
-      /** Streak Last Date */
-      streak_last_date?: string | null;
-      /** Total Ops */
-      total_ops?: number | null;
-      /** Total Chars */
-      total_chars?: number | null;
-      /** Achievements */
-      achievements?: string[] | null;
-      /** Completed Quests */
-      completed_quests?: string[] | null;
-      /** Daily Quest Id */
-      daily_quest_id?: string | null;
-      /** Daily Quest Date */
-      daily_quest_date?: string | null;
-      /** Daily Quest Completed */
-      daily_quest_completed?: boolean | null;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -11596,59 +11499,6 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['PreferencesResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_gamification_api_v1_user_gamification_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['GamificationResponse'];
-        };
-      };
-    };
-  };
-  update_gamification_api_v1_user_gamification_put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GamificationUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['GamificationResponse'];
         };
       };
       /** @description Validation Error */

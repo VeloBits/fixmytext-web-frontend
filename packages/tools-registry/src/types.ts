@@ -162,51 +162,10 @@ export interface SmartSuggestionRule {
   toolIds: string[];
 }
 
-/** Stats object passed to achievement condition functions. */
-export interface AchievementStats {
-  totalOps: number;
-  discoveredTools: string[];
-  sessionOps: number;
-  speedCount: number;
-  aiToolsUsed: number;
-  devToolsUsed: number;
-  languagesUsed: number;
-  streak: number;
-  totalChars: number;
-  favoritesCount: number;
-  savedPipelines: number;
-  nightOwl: boolean;
-  earlyBird: boolean;
-}
-
-/** A gamification achievement definition. */
-export interface Achievement {
-  id: string;
-  label: string;
-  description: string;
-  icon: string;
-  condition: (stats: AchievementStats) => boolean;
-}
-
-/** An operation record used in quest check functions. */
+/** A single tool-use operation record (e.g. the analytics recent-activity list). */
 export interface QuestOp {
   id?: string;
   tab?: string;
   isNew?: boolean;
   time?: number;
-}
-
-/** A daily quest template. */
-export interface QuestTemplate {
-  id: string;
-  text: string;
-  xp: number;
-  check: (ops: QuestOp[]) => boolean;
-}
-
-/** A player level definition. */
-export interface LevelDefinition {
-  level: number;
-  xp: number;
-  title: string;
 }

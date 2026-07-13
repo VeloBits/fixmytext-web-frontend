@@ -119,9 +119,9 @@ describe('PassPurchaseModal', () => {
     expect(baseProps.onDismiss).toHaveBeenCalled();
   });
 
-  it('shows quest hint', () => {
+  it('shows free-pass hint', () => {
     render(<PassPurchaseModal {...baseProps} />);
-    expect(screen.getByText(/Complete today/)).toBeInTheDocument();
+    expect(screen.getByText(/weekly reward spin/)).toBeInTheDocument();
   });
 
   it('shows browse all passes link', () => {
