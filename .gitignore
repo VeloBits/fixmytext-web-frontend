@@ -40,3 +40,6 @@ apps/content/.open-next/
 *.ai
 .claude
 fixmytext-output.pdf
+
+# ── TypeScript ───────────────────────────────────────────────────────────────
+*.tsbuildinfo

@@ -125,6 +125,7 @@ function LazyDrawer({ children }: { children: ReactNode }) {
 }
 import SmartSuggestions from './SmartSuggestions';
 import BottomPanel from './BottomPanel';
+import { noopNotice } from './noopNotice';
 import CommandPalette from '@/components/layout/CommandPalette';
 import KeyboardShortcuts from '@/components/layout/KeyboardShortcuts';
 import AchievementToast from '@velobits/app-core/gamification/AchievementToast';
@@ -652,7 +653,8 @@ export default function TextForm(props: TextFormProps) {
         ai.setAiResult({ label: successMsg, result: data.result });
         setPreviewMode('result');
         history.pushHistory(successMsg, original, data.result, toolMeta);
-        showAlert(successMsg, 'success');
+        const notice = noopNotice(original, data.result, toolMeta?.toolGroup as string | undefined);
+        showAlert(notice ?? successMsg, notice ? 'info' : 'success');
         return { success: true, result: data.result };
       } catch (err) {
         const detail = (err as { data?: { detail?: unknown } }).data?.detail;
@@ -687,7 +689,8 @@ export default function TextForm(props: TextFormProps) {
       ai.setAiResult({ label: successMsg, result: data.result });
       setPreviewMode('result');
       history.pushHistory(successMsg, original, data.result, toolMeta);
-      showAlert(successMsg, 'success');
+      const notice = noopNotice(original, data.result, toolMeta?.toolGroup as string | undefined);
+      showAlert(notice ?? successMsg, notice ? 'info' : 'success');
       return { success: true, result: data.result };
     } catch (err) {
       const detail = (err as { data?: { detail?: unknown } }).data?.detail;
@@ -1208,6 +1211,7 @@ export default function TextForm(props: TextFormProps) {
         callApi(tool.endpoint!, tool.successMsg ?? '', {
           toolId: tool.id,
           toolType: tool.type,
+          toolGroup: tool.group,
         }).then((res) => {
           if (res?.success) pipeline.addStep(tool.id, tool.label, res.result ?? '');
           if (subscription?.refetchStatus) subscription.refetchStatus();
