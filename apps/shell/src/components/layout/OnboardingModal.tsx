@@ -1,29 +1,23 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { PERSONAS } from '@velobits/app-core/constants/tools';
+import { STARTER_KITS } from '@velobits/app-core/constants/tools';
 import { XIcon } from '@velobits/design-system';
-import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
+import type { StarterKit, StarterKitId } from '@velobits/app-core/types/tools';
 
-// Dismissing (X / Esc) counts as picking the catch-all persona: the picker
-// must never trap the user, and "no answer" behaves like "show me everything".
-const DISMISS_PERSONA: PersonaId = 'explorer';
-
-interface PersonaMeta {
+interface KitMeta {
   gradient: string;
   accent: string;
   tools: string[];
   tagline: string;
 }
 
-type PersonaMetaMap = Record<PersonaId, PersonaMeta>;
+type KitMetaMap = Record<StarterKitId, KitMeta>;
 
-interface PersonaItem extends Persona, PersonaMeta {
-  id: PersonaId;
-}
+interface KitItem extends StarterKit, KitMeta {}
 
-// `tools` are display shorthand for the real PERSONAS[*].suggestedTools ids
-// (the editor's "For You" group) — keep the two lists telling the same story.
-const PERSONA_META: PersonaMetaMap = {
+// `tools` are display shorthand for the real STARTER_KITS[*].toolIds (the
+// tools seeded into the kit's group) — keep the two lists telling the same story.
+const KIT_META: KitMetaMap = {
   writer: {
     gradient: 'linear-gradient(135deg, #C586C0 0%, #569CD6 100%)',
     accent: '#C586C0',
@@ -52,17 +46,14 @@ const PERSONA_META: PersonaMetaMap = {
     gradient: 'linear-gradient(135deg, #007ACC 0%, #4EC9B0 100%)',
     accent: '#3399DD',
     tools: ['Everything!'],
-    tagline: 'Discover all 70+ tools',
+    tagline: 'Discover all 250+ tools',
   },
 };
 
-const PERSONA_LIST: PersonaItem[] = (Object.entries(PERSONAS) as [PersonaId, Persona][]).map(
-  ([id, data]) => ({
-    id,
-    ...data,
-    ...(PERSONA_META[id] ?? { gradient: '', accent: '', tools: [], tagline: '' }),
-  })
-);
+const KIT_LIST: KitItem[] = STARTER_KITS.map((kit) => ({
+  ...kit,
+  ...(KIT_META[kit.id] ?? { gradient: '', accent: '', tools: [], tagline: '' }),
+}));
 
 interface TypingTextProps {
   text: string;
@@ -91,13 +82,15 @@ const TypingText = ({ text }: TypingTextProps) => (
 );
 
 export interface OnboardingModalProps {
-  onComplete: (personaId: PersonaId) => void;
+  /** Called with the picked starter kit, or null when dismissed (X / Esc).
+   * The picker must never trap the user — "no answer" creates nothing. */
+  onComplete: (kit: StarterKit | null) => void;
 }
 
 export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onComplete(DISMISS_PERSONA);
+      if (e.key === 'Escape') onComplete(null);
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -142,7 +135,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
           className="tu-onboard-close"
           aria-label="Skip — explore all tools"
           title="Skip — explore all tools"
-          onClick={() => onComplete(DISMISS_PERSONA)}
+          onClick={() => onComplete(null)}
         >
           <XIcon size={16} />
         </button>
@@ -166,13 +159,13 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            Pick your path. We&apos;ll tailor the experience for you.
+            Pick a starter kit — we&apos;ll set up your first tool group.
           </motion.p>
         </div>
 
-        {/* Persona cards */}
+        {/* Starter-kit cards */}
         <div className="tu-onboard-personas">
-          {PERSONA_LIST.map((p, i) => (
+          {KIT_LIST.map((p, i) => (
             <motion.button
               key={p.id}
               className="tu-onboard-persona"
@@ -180,7 +173,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.8 + i * 0.08, type: 'spring', stiffness: 300, damping: 24 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => onComplete(p.id)}
+              onClick={() => onComplete(p)}
             >
               <span className="tu-onboard-persona-icon">{p.icon}</span>
               <div className="tu-onboard-persona-text">
@@ -222,7 +215,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4 }}
         >
-          <span>You can change this anytime in settings</span>
+          <span>Your kit becomes an editable group — rename or change it anytime</span>
         </motion.div>
       </motion.div>
     </motion.div>

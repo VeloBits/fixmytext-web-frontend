@@ -1,8 +1,8 @@
 import TextForm from '@/components/editor/TextForm';
 import type {
   FavoritesContextValue,
-  PersonaContextValue,
   SubscriptionContextValue,
+  ToolGroupsContextValue,
   User,
 } from '@velobits/app-core/types/context';
 
@@ -10,7 +10,7 @@ interface HomeProps {
   mode: string;
   setMode: (mode: string) => void;
   showAlert: (message: string, type: string) => void;
-  persona: PersonaContextValue;
+  toolGroups: ToolGroupsContextValue;
   favorites: FavoritesContextValue;
   user: User | null;
   isAuthenticated: boolean;
@@ -21,7 +21,7 @@ export default function Home({
   mode,
   setMode,
   showAlert,
-  persona,
+  toolGroups,
   favorites,
   user,
   isAuthenticated,
@@ -32,7 +32,7 @@ export default function Home({
       mode={mode}
       setMode={setMode}
       showAlert={showAlert}
-      persona={persona}
+      toolGroups={toolGroups}
       favorites={favorites}
       user={user}
       isAuthenticated={isAuthenticated}

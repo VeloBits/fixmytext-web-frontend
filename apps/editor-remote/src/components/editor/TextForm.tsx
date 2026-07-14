@@ -22,9 +22,12 @@ import {
   useGetUiSettingsQuery,
   useUpdateUiSettingsMutation,
 } from '@velobits/app-core/store/api/userDataApi';
-import { TOOLS, PERSONAS, USE_CASE_TABS } from '@velobits/app-core/constants/tools';
+import { TOOLS, USE_CASE_TABS } from '@velobits/app-core/constants/tools';
 import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
-import type { FavoritesContextValue, PersonaContextValue } from '@velobits/app-core/types/context';
+import type {
+  FavoritesContextValue,
+  ToolGroupsContextValue,
+} from '@velobits/app-core/types/context';
 import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 import { ROUTES } from '@velobits/app-core/constants';
 import {
@@ -307,7 +310,7 @@ type AnyRecord = Record<string, any>;
 
 interface TextFormProps {
   showAlert: (msg: string, type: string) => void;
-  persona: PersonaContextValue;
+  toolGroups: ToolGroupsContextValue;
   favorites: FavoritesContextValue;
   user: AnyRecord | null;
   isAuthenticated: boolean;
@@ -324,7 +327,7 @@ interface TextFormProps {
  *
  * @param {object} props
  * @param {function} props.showAlert - Alert notification callback.
- * @param {object} props.persona - Persona (onboarding) state.
+ * @param {object} props.toolGroups - Custom tool groups state.
  * @param {object} props.favorites - Favorites state.
  * @param {object|null} props.user - Current user object.
  * @param {boolean} props.isAuthenticated - Whether user is authenticated.
@@ -338,13 +341,7 @@ export default function TextForm(props: TextFormProps) {
   const [markdownMode, setMarkdownMode] = useState(false);
   const { activePanel, setActivePanel, togglePanel } = useDrawerState();
   const [previewMode, setPreviewMode] = useState<string | null>(null);
-  // Returning visitors have a persona synchronously (sessionStorage / cached
-  // state), so seed their default tab here — no 'all' flash before the switch.
-  const [activeTab, setActiveTab] = useState<string | null>(() => {
-    const personaId = props.persona.persona ?? undefined;
-    return personaId ? (PERSONAS[personaId]?.defaultTab ?? 'all') : null;
-  });
-  const personaTabApplied = useRef(activeTab !== null);
+  const [activeTab, setActiveTab] = useState<string | null>('all');
   // Must match the mobile breakpoint in editor.css — inline resize sizes would
   // otherwise override the media query and collapse the layout on small screens
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -448,16 +445,10 @@ export default function TextForm(props: TextFormProps) {
     setPreviewMode,
     history.pushHistory
   );
-  const persona = props.persona;
+  const toolGroups = props.toolGroups;
   const favorites = props.favorites;
   const pipeline = usePipeline();
   const suggestions = useSmartSuggestions(text);
-  // Persona picks surface as a pinned "For You" group — visible on an empty
-  // editor, unlike smart suggestions which need typed text to trigger.
-  const personaSuggestedIds = useMemo(() => {
-    const personaId = persona.persona ?? undefined;
-    return personaId ? (PERSONAS[personaId]?.suggestedTools ?? []) : [];
-  }, [persona.persona]);
   const search = useToolSearch();
   const trial = useTrialLimit(props.isAuthenticated);
   const subscription = props.subscription;
@@ -576,21 +567,17 @@ export default function TextForm(props: TextFormProps) {
     });
   }, [isAuthenticated, syncPanelSizes, sidebarResize.size, splitResize.size, bottomResize.size]);
 
-  // Default tab: persona wins once (it can arrive after mount — onboarding
-  // completes over the editor, or the DB copy hydrates on login), otherwise
-  // fall back to 'all'. Single effect: as two effects both ran against the
-  // same null-activeTab render and the 'all' write landed last every time.
+  // The shell dispatches this right after a starter-kit pick so the editor
+  // lands on the kit's tab. Transient by design — nothing is persisted, and
+  // it only ever fires from the onboarding modal.
   useEffect(() => {
-    const personaId = persona.persona ?? undefined;
-    const personaTab = personaId ? PERSONAS[personaId]?.defaultTab : undefined;
-    if (personaTab && !personaTabApplied.current) {
-      personaTabApplied.current = true;
-      // take over only from the fallback; never stomp a tab the user picked
-      setActiveTab((prev) => (prev === null || prev === 'all' ? personaTab : prev));
-    } else if (!activeTab) {
-      setActiveTab('all');
-    }
-  }, [persona.persona, activeTab]);
+    const onKitTab = (e: Event) => {
+      const tab = (e as CustomEvent<{ tab?: string }>).detail?.tab;
+      if (tab) setActiveTab(tab);
+    };
+    window.addEventListener('fmx:onboarding-tab', onKitTab);
+    return () => window.removeEventListener('fmx:onboarding-tab', onKitTab);
+  }, []);
 
   // Capture AI results per-tab for persistence
   // Keyed by tab ID so each tab is fully independent
@@ -1822,10 +1809,8 @@ export default function TextForm(props: TextFormProps) {
               })()}
               hideTabs={!isMobile}
               viewMode={toolViewMode}
-              suggestedToolIds={[
-                ...new Set([...suggestions.suggestions.map((t) => t.id), ...personaSuggestedIds]),
-              ]}
-              personaToolIds={personaSuggestedIds}
+              suggestedToolIds={suggestions.suggestions.map((t) => t.id)}
+              toolGroups={toolGroups}
             />
           )}
 

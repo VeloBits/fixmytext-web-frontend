@@ -3,7 +3,6 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
   FavoritesContextValue,
-  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -101,12 +100,6 @@ vi.mock('@velobits/app-core/utils/formatPrice', () => ({
 
 import DashboardPage from './DashboardPage';
 
-const defaultPersona = {
-  persona: 'writer',
-  setPersona: vi.fn(),
-  onboarded: true,
-} as unknown as PersonaContextValue;
-
 const defaultFavorites = {
   favorites: [],
   toggleFavorite: vi.fn(),
@@ -135,7 +128,6 @@ const defaultUser = {
 function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
-      persona={defaultPersona}
       favorites={defaultFavorites}
       user={defaultUser}
       isAuthenticated={true}

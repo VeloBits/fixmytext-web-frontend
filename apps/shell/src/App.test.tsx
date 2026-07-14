@@ -99,13 +99,24 @@ vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
     logout: vi.fn(),
   }),
 }));
-// AppContext composes the persona/favorites/subscription hooks and the shell
-// reads onboarding state from the persona context value.
-vi.mock('@velobits/app-core/hooks/usePersona', () => ({
+// AppContext composes the tool-groups/favorites/subscription hooks; the shell
+// gates onboarding via its local useOnboardingGate hook (mocked below).
+vi.mock('@velobits/app-core/hooks/useToolGroups', () => ({
   default: () => ({
-    persona: mockState.onboarded ? 'writer' : null,
-    setPersona: vi.fn(),
-    onboarded: mockState.onboarded,
+    groups: [],
+    ready: true,
+    createGroup: vi.fn(),
+    renameGroup: vi.fn(),
+    deleteGroup: vi.fn(),
+    addToolToGroup: vi.fn(),
+    removeToolFromGroup: vi.fn(),
+  }),
+}));
+vi.mock('./hooks/useOnboardingGate', () => ({
+  default: () => ({
+    seen: mockState.onboarded,
+    resolved: true,
+    markSeen: vi.fn(),
   }),
 }));
 vi.mock('@velobits/app-core/hooks/useFavorites', () => ({
@@ -220,8 +231,8 @@ describe('App', () => {
   });
 
   it('does not show OnboardingModal on the share viewer even when not onboarded', () => {
-    // A share recipient may be a first-time visitor; the persona picker must not
-    // block the read-only share page (its overlay swallows all pointer events).
+    // A share recipient may be a first-time visitor; the starter-kit picker must
+    // not block the read-only share page (its overlay swallows all pointer events).
     mockState.onboarded = false;
     mockState.shareRouteMatch = { pathname: '/share/some-id' };
     render(<App />);

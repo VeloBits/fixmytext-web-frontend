@@ -3,7 +3,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import TextForm from './TextForm';
 import { expectNoA11yViolations } from '@/test/axeHelper';
-import type { FavoritesContextValue, PersonaContextValue } from '@velobits/app-core/types/context';
+import type {
+  FavoritesContextValue,
+  ToolGroupsContextValue,
+} from '@velobits/app-core/types/context';
 
 // ── Framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -325,19 +328,19 @@ vi.mock('./ToolPanel', () => ({
   default: ({
     onToolClick,
     tools,
-    personaToolIds,
+    toolGroups,
     favorites,
   }: {
     onToolClick?: (t: unknown) => void;
     tools?: unknown[];
-    personaToolIds?: string[];
+    toolGroups?: { groups?: { name: string }[] };
     favorites?: { favorites?: string[] };
   }) =>
     React.createElement(
       'div',
       {
         'data-testid': 'tool-panel',
-        'data-persona-tools': (personaToolIds ?? []).join(','),
+        'data-group-names': (toolGroups?.groups ?? []).map((g) => g.name).join(','),
         'data-favorites': (favorites?.favorites ?? []).join(','),
         onClick: () => onToolClick && onToolClick(tools?.[0]),
       },
@@ -457,12 +460,16 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // ── Default props ──
-// Persona and favorites are standalone contexts (gamification was removed
-// entirely in Phase C).
-const defaultPersona: PersonaContextValue = {
-  persona: null,
-  setPersona: vi.fn(),
-  onboarded: false,
+// Tool groups and favorites are standalone contexts (personas were replaced
+// by custom tool groups).
+const defaultToolGroups: ToolGroupsContextValue = {
+  groups: [],
+  ready: true,
+  createGroup: vi.fn(),
+  renameGroup: vi.fn(),
+  deleteGroup: vi.fn(),
+  addToolToGroup: vi.fn(),
+  removeToolFromGroup: vi.fn(),
 };
 
 const defaultFavorites: FavoritesContextValue = {
@@ -474,7 +481,7 @@ const defaultProps = {
   showAlert: vi.fn(),
   isAuthenticated: false,
   user: null,
-  persona: defaultPersona,
+  toolGroups: defaultToolGroups,
   favorites: defaultFavorites,
   subscription: null,
   mode: 'dark',
@@ -545,35 +552,31 @@ describe('TextForm', () => {
     expect(document.querySelector('.tu-sidebar-footer')).not.toBeInTheDocument();
   });
 
-  it('opens the persona default tab on mount (developer → Code & Data)', () => {
-    const persona = { ...defaultPersona, persona: 'developer' as const };
-    render(<TextForm {...defaultProps} persona={persona} />);
+  it('starts on the All Tools tab', () => {
+    render(<TextForm {...defaultProps} />);
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
+  });
+
+  it('switches tab once when the onboarding starter-kit event fires', () => {
+    render(<TextForm {...defaultProps} />);
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent('fmx:onboarding-tab', { detail: { tab: 'code' } })
+      );
+    });
     expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('Code & Data');
   });
 
-  it('falls back to All Tools when no persona is set', () => {
-    render(<TextForm {...defaultProps} />);
-    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
-  });
-
-  it('switches to the persona tab when persona arrives after mount (onboarding completes)', () => {
-    const { rerender } = render(<TextForm {...defaultProps} />);
-    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
-    rerender(<TextForm {...defaultProps} persona={{ ...defaultPersona, persona: 'writer' }} />);
-    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('Writing');
-  });
-
-  it('passes the persona suggestedTools to ToolPanel as personaToolIds', () => {
-    const persona = { ...defaultPersona, persona: 'writer' as const };
-    render(<TextForm {...defaultProps} persona={persona} />);
-    expect(screen.getByTestId('tool-panel').getAttribute('data-persona-tools')).toBe(
-      'fix_grammar,paraphrase,change_tone,proofread'
+  it('passes the toolGroups context through to ToolPanel', () => {
+    const toolGroups = {
+      ...defaultToolGroups,
+      groups: [{ id: 'g1', name: 'Writing essentials', toolIds: ['fix_grammar'] }],
+    };
+    render(<TextForm {...defaultProps} toolGroups={toolGroups} />);
+    expect(screen.getByTestId('tool-panel').getAttribute('data-group-names')).toBe(
+      'Writing essentials'
     );
-  });
-
-  it('passes no personaToolIds to ToolPanel without a persona', () => {
-    render(<TextForm {...defaultProps} />);
-    expect(screen.getByTestId('tool-panel').getAttribute('data-persona-tools')).toBe('');
   });
 
   it('toggles sidebar when activity bar button is clicked', () => {
@@ -1102,7 +1105,7 @@ describe('TextForm', () => {
   });
 });
 
-describe('TextForm persona and favorites (post-gamification-removal)', () => {
+describe('TextForm tool groups and favorites (post-gamification-removal)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
@@ -1159,18 +1162,21 @@ describe('TextForm persona and favorites (post-gamification-removal)', () => {
     expect(toggleFavorite).toHaveBeenCalledWith('fix_grammar');
   });
 
-  it('passes favorites and personaToolIds to ToolPanel', () => {
+  it('passes favorites and toolGroups to ToolPanel', () => {
     const props = {
       ...defaultProps,
-      persona: { ...defaultPersona, persona: 'writer' as const },
+      toolGroups: {
+        ...defaultToolGroups,
+        groups: [
+          { id: 'g1', name: 'Writing essentials', toolIds: ['fix_grammar', 'paraphrase'] },
+        ],
+      },
       favorites: { favorites: ['fix_grammar'], toggleFavorite: vi.fn() },
     };
     render(<TextForm {...props} />);
     const panel = screen.getByTestId('tool-panel');
     expect(panel.getAttribute('data-favorites')).toBe('fix_grammar');
-    expect(panel.getAttribute('data-persona-tools')).toBe(
-      'fix_grammar,paraphrase,change_tone,proofread'
-    );
+    expect(panel.getAttribute('data-group-names')).toBe('Writing essentials');
   });
 
   it('executes tools on paste (debounced auto-run)', async () => {

@@ -22,8 +22,7 @@ import ProfileSection from '@/components/dashboard/ProfileSection';
 import FavoritesSection from '@/components/dashboard/FavoritesSection';
 import HistorySection from '@/components/dashboard/HistorySection';
 
-// Props come straight from the host<->remote contract: `persona` and
-// `favorites` are required.
+// Props come straight from the host<->remote contract: `favorites` is required.
 type DashboardPageProps = AnalyticsPageProps;
 
 /** Section component lookup map. */
@@ -44,7 +43,6 @@ const SECTIONS_MAP: Record<string, React.ComponentType<any>> = {
  * and section-level state while delegating rendering to extracted section components.
  */
 export default function DashboardPage({
-  persona,
   favorites,
   user,
   isAuthenticated,
@@ -135,7 +133,6 @@ export default function DashboardPage({
   // Build props for the active section component
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sectionProps: Record<string, any> = {
-    persona,
     favorites,
     topTools,
     statsTotalOps,

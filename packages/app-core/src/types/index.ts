@@ -9,7 +9,8 @@ export type {
   SelectOption,
   ToolDefinition,
   UseCaseTab,
-  Persona,
+  StarterKit,
+  StarterKitId,
   SmartSuggestionRule,
   QuestOp,
 } from './tools';

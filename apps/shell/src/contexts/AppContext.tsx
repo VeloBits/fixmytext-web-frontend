@@ -9,7 +9,7 @@ import { passesApi } from '@velobits/app-core/store/api/passesApi';
 import { historyApi } from '@velobits/app-core/store/api/historyApi';
 import { logout as clearAuthUser } from '@velobits/app-core/store/slices/authSlice';
 import type { AppDispatch, RootState } from '@velobits/app-core/store/store';
-import usePersona from '@velobits/app-core/hooks/usePersona';
+import useToolGroups from '@velobits/app-core/hooks/useToolGroups';
 import useFavorites from '@velobits/app-core/hooks/useFavorites';
 import useSubscription from '@velobits/app-core/hooks/useSubscription';
 import { useAlertContext } from './AlertContext';
@@ -25,7 +25,8 @@ import type {
 // on shell source.
 export type {
   User,
-  PersonaContextValue,
+  ToolGroupsContextValue,
+  ToolGroupView,
   FavoritesContextValue,
   ToolUsage,
   SubscriptionContextValue,
@@ -77,13 +78,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const id = window.setInterval(() => refetchMe(), 15_000);
     return () => window.clearInterval(id);
   }, [isAuthenticated, user, meFailed, meAuthRejected, refetchMe]);
-  const persona = usePersona();
+  const toolGroups = useToolGroups();
   const favorites = useFavorites();
   const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 
   const value = useMemo(
-    () => ({ user, isAuthenticated, userResolving, persona, favorites, subscription }),
-    [user, isAuthenticated, userResolving, persona, favorites, subscription]
+    () => ({ user, isAuthenticated, userResolving, toolGroups, favorites, subscription }),
+    [user, isAuthenticated, userResolving, toolGroups, favorites, subscription]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

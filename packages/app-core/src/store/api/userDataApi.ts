@@ -10,6 +10,9 @@ type TemplateUpdate = components['schemas']['TemplateUpdate'];
 type UiSettingsResponse = components['schemas']['UiSettingsResponse'];
 type UiSettingsUpdate = components['schemas']['UiSettingsUpdate'];
 type FavoritesResponse = components['schemas']['FavoritesResponse'];
+type ToolGroupsResponse = components['schemas']['ToolGroupsResponse'];
+type ToolGroupResponse = components['schemas']['ToolGroupResponse'];
+type ToolGroupCreate = components['schemas']['ToolGroupCreate'];
 type ToolStatsResponse = components['schemas']['ToolStatsResponse'];
 type SpinHistoryResponse = components['schemas']['SpinHistoryResponse'];
 
@@ -17,10 +20,28 @@ export interface UpdateTemplateArg extends TemplateUpdate {
   id: string;
 }
 
+export interface RenameToolGroupArg {
+  id: string;
+  name: string;
+}
+
+export interface ToolGroupItemArg {
+  groupId: string;
+  toolId: string;
+}
+
 export const userDataApi = createApi({
   reducerPath: 'userDataApi',
   baseQuery: baseQueryWithRetry,
-  tagTypes: ['Preferences', 'Templates', 'UiSettings', 'Favorites', 'ToolStats', 'SpinHistory'],
+  tagTypes: [
+    'Preferences',
+    'Templates',
+    'UiSettings',
+    'Favorites',
+    'ToolGroups',
+    'ToolStats',
+    'SpinHistory',
+  ],
   endpoints: (builder) => ({
     // Preferences
     getPreferences: builder.query<PreferencesResponse, void>({
@@ -74,6 +95,42 @@ export const userDataApi = createApi({
       invalidatesTags: ['Favorites'],
     }),
 
+    // Tool Groups (user-created named groups of tools)
+    getToolGroups: builder.query<ToolGroupsResponse, void>({
+      query: () => '/api/v1/user/tool-groups',
+      providesTags: ['ToolGroups'],
+    }),
+    createToolGroup: builder.mutation<ToolGroupResponse, ToolGroupCreate>({
+      query: (body) => ({ url: '/api/v1/user/tool-groups', method: 'POST', body }),
+      invalidatesTags: ['ToolGroups'],
+    }),
+    renameToolGroup: builder.mutation<ToolGroupResponse, RenameToolGroupArg>({
+      query: ({ id, name }) => ({
+        url: `/api/v1/user/tool-groups/${id}`,
+        method: 'PUT',
+        body: { name },
+      }),
+      invalidatesTags: ['ToolGroups'],
+    }),
+    deleteToolGroup: builder.mutation<void, string>({
+      query: (id) => ({ url: `/api/v1/user/tool-groups/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['ToolGroups'],
+    }),
+    addToolToGroup: builder.mutation<void, ToolGroupItemArg>({
+      query: ({ groupId, toolId }) => ({
+        url: `/api/v1/user/tool-groups/${groupId}/tools/${toolId}`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['ToolGroups'],
+    }),
+    removeToolFromGroup: builder.mutation<void, ToolGroupItemArg>({
+      query: ({ groupId, toolId }) => ({
+        url: `/api/v1/user/tool-groups/${groupId}/tools/${toolId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ToolGroups'],
+    }),
+
     // Tool Stats (lifetime per-tool usage)
     getToolStats: builder.query<ToolStatsResponse, void>({
       query: () => '/api/v1/user/tool-stats',
@@ -100,6 +157,12 @@ export const {
   useGetFavoritesQuery,
   useAddFavoriteMutation,
   useRemoveFavoriteMutation,
+  useGetToolGroupsQuery,
+  useCreateToolGroupMutation,
+  useRenameToolGroupMutation,
+  useDeleteToolGroupMutation,
+  useAddToolToGroupMutation,
+  useRemoveToolFromGroupMutation,
   useGetToolStatsQuery,
   useGetSpinHistoryQuery,
 } = userDataApi;

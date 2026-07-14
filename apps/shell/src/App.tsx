@@ -14,7 +14,8 @@ import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
 import { AppProvider, useAppContext } from './contexts/AppContext';
-import type { PersonaId } from '@velobits/app-core/types/tools';
+import type { StarterKit } from '@velobits/app-core/types/tools';
+import useOnboardingGate from './hooks/useOnboardingGate';
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 import PassPurchaseModal from './components/subscription/PassPurchaseModal';
 import { ROUTES } from '@velobits/app-core/constants';
@@ -58,8 +59,9 @@ function AppInner() {
   const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
   const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
-  const { user, isAuthenticated, userResolving, persona, favorites, subscription } =
+  const { user, isAuthenticated, userResolving, toolGroups, favorites, subscription } =
     useAppContext();
+  const onboarding = useOnboardingGate(toolGroups);
   const { isLoading: authLoading, wasAuthenticated } = useOidcAuth();
   const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
 
@@ -71,18 +73,28 @@ function AppInner() {
     return () => window.removeEventListener('rtk-api-error', handler as EventListener);
   }, [showAlert]);
 
-  const handleOnboardingComplete = (personaId: PersonaId) => {
-    persona.setPersona(personaId);
+  const handleOnboardingComplete = (kit: StarterKit | null) => {
+    if (kit && kit.toolIds.length > 0) {
+      toolGroups.createGroup(kit.groupName, kit.toolIds);
+    }
+    if (kit) {
+      // One-shot: the editor listens and lands on the kit's tab (transient,
+      // nothing persisted).
+      window.dispatchEvent(
+        new CustomEvent('fmx:onboarding-tab', { detail: { tab: kit.defaultTab } })
+      );
+    }
+    onboarding.markSeen();
   };
 
-  // A share link is often someone's first visit; the persona picker has no
-  // dismiss affordance and its overlay blocks the whole page, so a recipient
-  // couldn't even read/copy the share. Onboard them when they enter the editor.
+  // A share link is often someone's first visit; the starter-kit overlay
+  // blocks the whole page, so a recipient couldn't even read/copy the share.
+  // Onboard them when they enter the editor.
   const isShareView = useMatch(ROUTES.SHARE) !== null;
 
   // Same blocking problem on auth screens: they render their own status and
   // error cards ("Couldn't reach sign-in" with Retry, callback errors), and
-  // the persona overlay would sit on top and make those buttons unclickable
+  // the onboarding overlay would sit on top and make those buttons unclickable
   // for a first-time visitor. Onboarding waits until the user is on app content.
   const { pathname } = useLocation();
   const isAuthScreen =
@@ -104,7 +116,7 @@ function AppInner() {
 
   return (
     <>
-      {!persona.onboarded && !isShareView && !isAuthScreen && (
+      {onboarding.resolved && !onboarding.seen && !isShareView && !isAuthScreen && (
         <OnboardingModal onComplete={handleOnboardingComplete} />
       )}
 
@@ -129,7 +141,7 @@ function AppInner() {
                   mode={mode}
                   setMode={setMode as (mode: string) => void}
                   showAlert={showAlert as (message: string, type: string) => void}
-                  persona={persona}
+                  toolGroups={toolGroups}
                   favorites={favorites}
                   user={user}
                   isAuthenticated={isAuthenticated}
@@ -155,7 +167,6 @@ function AppInner() {
               <ProtectedRoute>
                 <RemoteBoundary name="Dashboard">
                   <DashboardPage
-                    persona={persona}
                     favorites={favorites}
                     user={user}
                     isAuthenticated={isAuthenticated}

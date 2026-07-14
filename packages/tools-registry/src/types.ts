@@ -144,16 +144,22 @@ export interface UseCaseTab {
   color: string;
 }
 
-/** Valid persona keys — literal union (not keyof typeof PERSONAS) to avoid a types→tools import cycle. */
-export type PersonaId = 'writer' | 'student' | 'developer' | 'social' | 'explorer';
+/** Valid starter-kit keys — literal union (not derived from STARTER_KITS) to avoid a types→tools import cycle. */
+export type StarterKitId = 'writer' | 'student' | 'developer' | 'social' | 'explorer';
 
-/** A persona entry from PERSONAS. */
-export interface Persona {
+/** A starter-kit entry from STARTER_KITS: an onboarding card whose pick seeds
+ * the user's first custom tool group (replaced personas, 2026-07-14). */
+export interface StarterKit {
+  id: StarterKitId;
   label: string;
   icon: string;
+  /** Name of the custom group the kit creates. Empty string = the kit creates
+   * nothing (explorer). Must stay in sync with backend migration 0004 seeds. */
+  groupName: string;
+  /** Tab activated once right after the pick; not persisted anywhere. */
   defaultTab: string;
-  /** Tool ids from TOOLS surfaced as the "For You" group for this persona. */
-  suggestedTools: string[];
+  /** Tool ids seeded into the created group. */
+  toolIds: string[];
 }
 
 /** A smart-suggestion rule that maps a text-detection function to tool IDs. */

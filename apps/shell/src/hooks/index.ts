@@ -7,7 +7,8 @@ export { useTheme } from './useTheme';
 // Shared data hooks live in @velobits/app-core/hooks/.
 
 export { initVisitorId, getVisitorId } from '@velobits/app-core/hooks/useFingerprint';
-export { default as usePersona } from '@velobits/app-core/hooks/usePersona';
+export { default as useToolGroups } from '@velobits/app-core/hooks/useToolGroups';
+export { default as useOnboardingGate } from './useOnboardingGate';
 export { default as useFavorites } from '@velobits/app-core/hooks/useFavorites';
 export { default as useHistory } from '@velobits/app-core/hooks/useHistory';
 export type { HistoryEntry, ToolMeta, HistoryValue } from '@velobits/app-core/hooks/useHistory';

@@ -1,7 +1,7 @@
 export {
   TOOLS,
   TOOL_GROUPS,
-  PERSONAS,
+  STARTER_KITS,
   USE_CASE_TABS,
   SMART_SUGGESTION_RULES,
   SEARCH_INTENTS,
@@ -15,8 +15,8 @@ export type {
   ToolColor,
   SelectOption,
   UseCaseTab,
-  Persona,
-  PersonaId,
+  StarterKit,
+  StarterKitId,
   QuestOp,
   SmartSuggestionRule,
 } from './types';
