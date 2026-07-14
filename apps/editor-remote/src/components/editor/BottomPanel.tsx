@@ -1,6 +1,15 @@
 import { useState, useMemo, memo } from 'react';
 import type { CSSProperties } from 'react';
 import PipelineStrip from './PipelineStrip';
+import {
+  BarChart3Icon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CornerUpLeftIcon,
+  CornerUpRightIcon,
+  HistoryIcon,
+  PlayIcon,
+} from '@velobits/design-system';
 
 interface PipelineStepItem {
   toolId?: string;
@@ -48,9 +57,9 @@ function truncate(str: string, len = 80): string {
 }
 
 const TABS = [
-  { id: 'stats', label: 'Stats Dashboard', icon: '☷' },
-  { id: 'history', label: 'History', icon: '⧖' },
-  { id: 'pipeline', label: 'Pipeline', icon: '▶' },
+  { id: 'stats', label: 'Stats Dashboard', icon: BarChart3Icon },
+  { id: 'history', label: 'History', icon: HistoryIcon },
+  { id: 'pipeline', label: 'Pipeline', icon: PlayIcon },
 ];
 
 export default memo(function BottomPanel({ pipeline, history, text, style }: BottomPanelProps) {
@@ -109,7 +118,9 @@ export default memo(function BottomPanel({ pipeline, history, text, style }: Bot
               }
             }}
           >
-            <span className="tu-bottom-tab-icon">{tab.icon}</span>
+            <span className="tu-bottom-tab-icon">
+              <tab.icon size={12} />
+            </span>
             {tab.label}
             {tab.id === 'pipeline' && pipeline.steps.length > 0 && (
               <span className="tu-bottom-tab-badge">{pipeline.steps.length}</span>
@@ -125,7 +136,7 @@ export default memo(function BottomPanel({ pipeline, history, text, style }: Bot
           onClick={() => setCollapsed((c) => !c)}
           title={collapsed ? 'Expand panel' : 'Collapse panel'}
         >
-          {collapsed ? '▲' : '▼'}
+          {collapsed ? <ChevronUpIcon size={13} /> : <ChevronDownIcon size={13} />}
         </button>
       </div>
 
@@ -136,7 +147,9 @@ export default memo(function BottomPanel({ pipeline, history, text, style }: Bot
             <div className="tu-bottom-content">
               {pipeline.steps.length === 0 ? (
                 <div className="tu-bottom-empty">
-                  <span className="tu-bottom-empty-icon">▶</span>
+                  <span className="tu-bottom-empty-icon">
+                    <PlayIcon size={22} />
+                  </span>
                   <span>No pipeline steps yet. Use tools to build a processing chain.</span>
                 </div>
               ) : (
@@ -149,7 +162,9 @@ export default memo(function BottomPanel({ pipeline, history, text, style }: Bot
             <div className="tu-bottom-content">
               {history.history.length === 0 ? (
                 <div className="tu-bottom-empty">
-                  <span className="tu-bottom-empty-icon">⧖</span>
+                  <span className="tu-bottom-empty-icon">
+                    <HistoryIcon size={22} />
+                  </span>
                   <span>No operations yet. Use any tool to start recording.</span>
                 </div>
               ) : (
@@ -196,14 +211,14 @@ export default memo(function BottomPanel({ pipeline, history, text, style }: Bot
                                   onClick={() => history.handleRestoreOriginal(i)}
                                   title="Restore input"
                                 >
-                                  ↩
+                                  <CornerUpLeftIcon size={13} />
                                 </button>
                                 <button
                                   className="tu-bottom-action"
                                   onClick={() => history.handleRestoreResult(i)}
                                   title="Restore output"
                                 >
-                                  ↪
+                                  <CornerUpRightIcon size={13} />
                                 </button>
                               </td>
                             </tr>
@@ -221,7 +236,9 @@ export default memo(function BottomPanel({ pipeline, history, text, style }: Bot
             <div className="tu-bottom-content">
               {!text ? (
                 <div className="tu-bottom-empty">
-                  <span className="tu-bottom-empty-icon">☷</span>
+                  <span className="tu-bottom-empty-icon">
+                    <BarChart3Icon size={22} />
+                  </span>
                   <span>Enter some text to see statistics.</span>
                 </div>
               ) : (

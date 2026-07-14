@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@velobits/api-client": "*",
+    "@velobits/design-system": "*",
     "@velobits/tools-registry": "*"
   },
   "peerDependencies": {

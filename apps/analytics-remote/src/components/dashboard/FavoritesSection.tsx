@@ -1,5 +1,6 @@
 import { TOOLS } from '@velobits/app-core/constants/tools';
 import type { FavoritesContextValue } from '@velobits/app-core/types/context';
+import { HeartIcon } from '@velobits/design-system';
 
 interface FavoritesSectionProps {
   favorites: FavoritesContextValue;
@@ -17,7 +18,9 @@ export default function FavoritesSection({ favorites }: FavoritesSectionProps) {
       <p className="tu-dash-subtitle">{favoriteIds.length} tools favorited</p>
       {favoriteIds.length === 0 ? (
         <div className="tu-dash-empty-page">
-          <span className="tu-dash-empty-icon">❤️</span>
+          <span className="tu-dash-empty-icon">
+            <HeartIcon size={32} />
+          </span>
           <span>No favorites yet</span>
           <span className="tu-dash-empty-hint">Heart tools from the sidebar to add them here</span>
         </div>
@@ -36,7 +39,7 @@ export default function FavoritesSection({ favorites }: FavoritesSectionProps) {
                     onClick={() => favorites.toggleFavorite(id)}
                     title="Remove from favorites"
                   >
-                    ♥
+                    <HeartIcon size={14} fill="currentColor" />
                   </button>
                 </div>
               </div>

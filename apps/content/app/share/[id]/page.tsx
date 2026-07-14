@@ -1,3 +1,4 @@
+import { AlertTriangleIcon, ClockIcon } from '@velobits/design-system';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getShareResult } from '@/lib/api';
@@ -67,7 +68,7 @@ export default async function SharePage({ params }: Props) {
   if (lookup.status === 'expired') {
     return (
       <ShareStatusView
-        emoji="⏱"
+        icon={ClockIcon}
         title="This share has expired"
         description="Shared results expire after 30 days."
       />
@@ -76,7 +77,7 @@ export default async function SharePage({ params }: Props) {
   if (lookup.status === 'error') {
     return (
       <ShareStatusView
-        emoji="⚠️"
+        icon={AlertTriangleIcon}
         title="Something went wrong"
         description="We couldn't load this shared result. Please try again in a moment."
       />

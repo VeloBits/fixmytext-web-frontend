@@ -18,8 +18,8 @@
   padding-top: 180px;
   text-align: center;
 }
-.sh-state-emoji {
-  font-size: 3rem;
+.sh-state-icon {
+  color: var(--text-3);
   line-height: 1;
 }
 .sh-state-title {

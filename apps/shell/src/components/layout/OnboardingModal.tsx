@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PERSONAS } from '@velobits/app-core/constants/tools';
+import { XIcon } from '@velobits/design-system';
 import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
 
 // Dismissing (X / Esc) counts as picking the catch-all persona: the picker
@@ -55,13 +56,13 @@ const PERSONA_META: PersonaMetaMap = {
   },
 };
 
-const PERSONA_LIST: PersonaItem[] = (
-  Object.entries(PERSONAS) as [PersonaId, Persona][]
-).map(([id, data]) => ({
-  id,
-  ...data,
-  ...(PERSONA_META[id] ?? { gradient: '', accent: '', tools: [], tagline: '' }),
-}));
+const PERSONA_LIST: PersonaItem[] = (Object.entries(PERSONAS) as [PersonaId, Persona][]).map(
+  ([id, data]) => ({
+    id,
+    ...data,
+    ...(PERSONA_META[id] ?? { gradient: '', accent: '', tools: [], tagline: '' }),
+  })
+);
 
 interface TypingTextProps {
   text: string;
@@ -143,7 +144,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
           title="Skip — explore all tools"
           onClick={() => onComplete(DISMISS_PERSONA)}
         >
-          ✕
+          <XIcon size={16} />
         </button>
 
         {/* Header */}

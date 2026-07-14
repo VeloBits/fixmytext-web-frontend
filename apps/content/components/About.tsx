@@ -4,6 +4,20 @@ import type { CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { USE_CASE_TABS, TOOLS } from '@velobits/tools-registry';
 import { WEB_APP_BASE_URL } from '@velobits/api-client';
+import {
+  BotIcon,
+  CodeIcon,
+  DownloadIcon,
+  FileTextIcon,
+  Gamepad2Icon,
+  GemIcon,
+  GraduationCapIcon,
+  LockIcon,
+  LockOpenIcon,
+  PenLineIcon,
+  ShieldIcon,
+  SmartphoneIcon,
+} from '@velobits/design-system';
 
 const EDITOR_URL = WEB_APP_BASE_URL;
 
@@ -19,42 +33,42 @@ const STATS = [
 
 const FEATURES = [
   {
-    icon: '✍️',
+    icon: PenLineIcon,
     title: 'Text Transformation',
     description:
       'Uppercase, lowercase, title case, camelCase, snake_case, reverse, sort, deduplicate, trim, and more.',
     color: 'var(--pink)',
   },
   {
-    icon: '🤖',
+    icon: BotIcon,
     title: 'AI-Powered Tools',
     description:
       'Grammar fix, paraphrase, summarize, tone, translate, SEO generation, and sentiment analysis.',
     color: 'var(--cyan)',
   },
   {
-    icon: '💻',
+    icon: CodeIcon,
     title: 'Developer Toolkit',
     description:
       'JSON/CSV/YAML formatting, HTML/CSS/JS/TS prettifiers, regex tester, JWT decoder, hash generators.',
     color: 'var(--indigo)',
   },
   {
-    icon: '🔒',
+    icon: LockIcon,
     title: 'Encoding & Decoding',
     description:
       'Base64, URL encoding, hex, Morse code, HTML/JSON escaping, ROT13 — encode and decode anything.',
     color: 'var(--amber)',
   },
   {
-    icon: '📤',
+    icon: DownloadIcon,
     title: 'Export Anywhere',
     description:
       'Download as TXT, PDF, DOCX, or JSON. Preview and render Markdown right in the editor.',
     color: 'var(--emerald)',
   },
   {
-    icon: '🎮',
+    icon: Gamepad2Icon,
     title: 'Gamified Experience',
     description:
       'Earn XP, level up, complete daily quests, unlock achievements, and build streaks as you work.',
@@ -82,19 +96,19 @@ const HOW_IT_WORKS = [
 
 const PRINCIPLES = [
   {
-    icon: '🛡',
+    icon: ShieldIcon,
     title: 'Privacy First',
     text: 'Your text stays in your browser for local tools. AI tools send data securely and never store it.',
     accent: 'var(--cyan)',
   },
   {
-    icon: '🔓',
+    icon: LockOpenIcon,
     title: 'No Sign-Up Required',
     text: 'All transformation tools work without an account. Sign up only unlocks AI features.',
     accent: 'var(--amber)',
   },
   {
-    icon: '💎',
+    icon: GemIcon,
     title: 'Always Free',
     text: 'Every core tool is free with no limits, no ads, and no paywalls.',
     accent: 'var(--emerald)',
@@ -102,10 +116,22 @@ const PRINCIPLES = [
 ];
 
 const AUDIENCES = [
-  { icon: '📝', label: 'Writers', desc: 'Clean up drafts, rewrite, and format in seconds' },
-  { icon: '🎓', label: 'Students', desc: 'Fix grammar, summarize notes, translate assignments' },
-  { icon: '👨‍💻', label: 'Developers', desc: 'Format JSON, decode JWTs, test regex, prettify code' },
-  { icon: '📱', label: 'Creators', desc: 'Generate hashtags, SEO titles, and social copy' },
+  { icon: FileTextIcon, label: 'Writers', desc: 'Clean up drafts, rewrite, and format in seconds' },
+  {
+    icon: GraduationCapIcon,
+    label: 'Students',
+    desc: 'Fix grammar, summarize notes, translate assignments',
+  },
+  {
+    icon: CodeIcon,
+    label: 'Developers',
+    desc: 'Format JSON, decode JWTs, test regex, prettify code',
+  },
+  {
+    icon: SmartphoneIcon,
+    label: 'Creators',
+    desc: 'Generate hashtags, SEO titles, and social copy',
+  },
 ];
 
 const TECH = ['React', 'Vite', 'Redux Toolkit', 'FastAPI', 'Framer Motion', 'Prettier'];
@@ -281,7 +307,7 @@ export default function About() {
                   className="about-feature-icon-wrap"
                   style={{ '--feature-color': f.color } as CSSVars}
                 >
-                  <span className="about-feature-icon">{f.icon}</span>
+                  <f.icon className="about-feature-icon" size={18} />
                 </div>
                 <h3 className="about-feature-title">{f.title}</h3>
                 <p className="about-feature-desc">{f.description}</p>
@@ -321,7 +347,7 @@ export default function About() {
             <div className="about-audiences">
               {AUDIENCES.map((a, i) => (
                 <motion.div key={a.label} className="about-audience" {...fade(i * 0.06)}>
-                  <span className="about-audience-icon">{a.icon}</span>
+                  <a.icon className="about-audience-icon" size={18} />
                   <div>
                     <h4 className="about-audience-label">{a.label}</h4>
                     <p className="about-audience-desc">{a.desc}</p>
@@ -364,7 +390,7 @@ export default function About() {
                 style={{ '--principle-accent': p.accent } as CSSVars}
                 {...scaleIn(i * 0.1)}
               >
-                <span className="about-principle-icon">{p.icon}</span>
+                <p.icon className="about-principle-icon" size={24} />
                 <h3 className="about-principle-title">{p.title}</h3>
                 <p className="about-principle-text">{p.text}</p>
                 <div className="about-principle-bar" />

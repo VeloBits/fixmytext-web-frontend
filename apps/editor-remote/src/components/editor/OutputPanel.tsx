@@ -6,6 +6,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useCreateShareMutation } from '@velobits/app-core/store/api/shareApi';
 import type { ToolDefinition } from '@velobits/app-core/types/tools';
+import { SmileIcon, ZapIcon } from '@velobits/design-system';
 
 interface AiResult {
   label: string;
@@ -352,7 +353,9 @@ export default memo(function OutputPanel({
             </>
           ) : (
             <>
-              <span className="tu-output-empty-icon">⚡</span>
+              <span className="tu-output-empty-icon">
+                <ZapIcon size={24} />
+              </span>
               <span>
                 {activeTool
                   ? 'Start typing — output updates automatically'
@@ -792,7 +795,7 @@ export default memo(function OutputPanel({
                 onClick={() => setEmojiPickerOpen((prev) => !prev)}
                 title="Emoji picker"
               >
-                😀
+                <SmileIcon size={15} />
               </button>
               {emojiPickerOpen && (
                 <div className="tu-fmt-emoji-picker">

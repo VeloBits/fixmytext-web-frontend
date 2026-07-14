@@ -27,6 +27,23 @@ import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
 import type { FavoritesContextValue, PersonaContextValue } from '@velobits/app-core/types/context';
 import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 import { ROUTES } from '@velobits/app-core/constants';
+import {
+  BarChart3Icon,
+  CornerUpLeftIcon,
+  CornerUpRightIcon,
+  FileTextIcon,
+  HeartIcon,
+  HistoryIcon,
+  CommandIcon,
+  KeyboardIcon,
+  LayoutTemplateIcon,
+  LogInIcon,
+  LogOutIcon,
+  MoonIcon,
+  SunIcon,
+  XIcon,
+  ZapIcon,
+} from '@velobits/design-system';
 
 // Hooks
 import useFindReplace from '@/hooks/useFindReplace';
@@ -1756,7 +1773,7 @@ export default function TextForm(props: TextFormProps) {
                 onClick={() => setSidebarOpen(false)}
                 title="Close sidebar"
               >
-                ✕
+                <XIcon size={14} />
               </button>
             </div>
           </div>
@@ -1766,9 +1783,9 @@ export default function TextForm(props: TextFormProps) {
           {isMobile && (
             <div className="tu-sheet-tabs">
               {[
-                { id: '_favourites', label: 'Favourites', icon: '♥' },
-                { id: '_templates', label: 'Templates', icon: '▤' },
-                { id: '_history', label: 'History', icon: '↺' },
+                { id: '_favourites', label: 'Favourites', icon: HeartIcon },
+                { id: '_templates', label: 'Templates', icon: LayoutTemplateIcon },
+                { id: '_history', label: 'History', icon: HistoryIcon },
               ].map((t) => (
                 <button
                   key={t.id}
@@ -1776,7 +1793,10 @@ export default function TextForm(props: TextFormProps) {
                   onClick={() => setActiveTab(activeTab === t.id ? 'all' : t.id)}
                   aria-pressed={activeTab === t.id}
                 >
-                  <span aria-hidden="true">{t.icon}</span> {t.label}
+                  <span aria-hidden="true">
+                    <t.icon size={13} />
+                  </span>{' '}
+                  {t.label}
                 </button>
               ))}
             </div>
@@ -1821,7 +1841,7 @@ export default function TextForm(props: TextFormProps) {
                     <div className="tu-sidebar-panel-empty">
                       No favourite tools yet.
                       <br />
-                      Click ♡ on any tool to add it here.
+                      Click <HeartIcon size={11} /> on any tool to add it here.
                     </div>
                   ) : toolViewMode === 'grid' ? (
                     <div className="tu-tpanel-list">
@@ -1844,7 +1864,7 @@ export default function TextForm(props: TextFormProps) {
                               }}
                               title="Remove from favourites"
                             >
-                              ♥
+                              <HeartIcon size={13} fill="currentColor" />
                             </button>
                           </div>
                         ))}
@@ -1865,7 +1885,7 @@ export default function TextForm(props: TextFormProps) {
                               }}
                               title="Remove from favourites"
                             >
-                              ♥
+                              <HeartIcon size={13} fill="currentColor" />
                             </button>
                           </div>
                         </div>
@@ -1907,7 +1927,9 @@ export default function TextForm(props: TextFormProps) {
                       className="tu-sidebar-panel-item"
                       onClick={() => templates.handleLoadTemplate(i)}
                     >
-                      <span className="tu-sidebar-panel-item-icon">📄</span>
+                      <span className="tu-sidebar-panel-item-icon">
+                        <FileTextIcon size={13} />
+                      </span>
                       <span className="tu-sidebar-panel-item-name">{tpl.name}</span>
                       <span className="tu-sidebar-panel-item-meta">
                         {new Date(tpl.updatedAt as string).toLocaleDateString()}
@@ -1920,7 +1942,7 @@ export default function TextForm(props: TextFormProps) {
                         }}
                         title="Delete template"
                       >
-                        ✕
+                        <XIcon size={12} />
                       </button>
                     </div>
                   ))}
@@ -1981,7 +2003,9 @@ export default function TextForm(props: TextFormProps) {
                         const i = history.history.length - 1 - ri;
                         return (
                           <div key={i} className="tu-sidebar-panel-item">
-                            <span className="tu-sidebar-panel-item-icon">⚡</span>
+                            <span className="tu-sidebar-panel-item-icon">
+                              <ZapIcon size={13} />
+                            </span>
                             <span className="tu-sidebar-panel-item-name">{h.operation}</span>
                             <span className="tu-sidebar-panel-item-meta">
                               {new Date(h.timestamp).toLocaleTimeString([], {
@@ -1997,7 +2021,7 @@ export default function TextForm(props: TextFormProps) {
                               }}
                               title="Restore input"
                             >
-                              ↩
+                              <CornerUpLeftIcon size={13} />
                             </button>
                             <button
                               className="tu-sidebar-panel-item-action"
@@ -2007,7 +2031,7 @@ export default function TextForm(props: TextFormProps) {
                               }}
                               title="Restore result"
                             >
-                              ↪
+                              <CornerUpRightIcon size={13} />
                             </button>
                           </div>
                         );
@@ -2045,7 +2069,9 @@ export default function TextForm(props: TextFormProps) {
                       <div className="tu-sidebar-panel-list">
                         {serverHistory.items.map((h) => (
                           <div key={h.id} className="tu-sidebar-panel-item">
-                            <span className="tu-sidebar-panel-item-icon">⚡</span>
+                            <span className="tu-sidebar-panel-item-icon">
+                              <ZapIcon size={13} />
+                            </span>
                             <span className="tu-sidebar-panel-item-name">{h.tool_label}</span>
                             <span className="tu-sidebar-panel-item-meta">
                               {new Date(h.created_at).toLocaleDateString([], {
@@ -2065,7 +2091,7 @@ export default function TextForm(props: TextFormProps) {
                               }}
                               title="Restore input"
                             >
-                              ↩
+                              <CornerUpLeftIcon size={13} />
                             </button>
                             <button
                               className="tu-sidebar-panel-item-action"
@@ -2075,7 +2101,7 @@ export default function TextForm(props: TextFormProps) {
                               }}
                               title="Restore output"
                             >
-                              ↪
+                              <CornerUpRightIcon size={13} />
                             </button>
                             <button
                               className="tu-sidebar-panel-item-action tu-sidebar-panel-item-action--danger"
@@ -2086,7 +2112,7 @@ export default function TextForm(props: TextFormProps) {
                               }}
                               title="Delete entry"
                             >
-                              ✕
+                              <XIcon size={12} />
                             </button>
                           </div>
                         ))}
@@ -2246,7 +2272,6 @@ export default function TextForm(props: TextFormProps) {
                         ))}
                       </div>
                     </div>
-
                   </div>
 
                   {/* Category grid + Shortcuts */}
@@ -3375,7 +3400,9 @@ export default function TextForm(props: TextFormProps) {
                 setSettingsOpen(false);
               }}
             >
-              <span className="tu-settings-item-icon">{props.mode === 'dark' ? '☀️' : '🌙'}</span>
+              <span className="tu-settings-item-icon">
+                {props.mode === 'dark' ? <SunIcon size={15} /> : <MoonIcon size={15} />}
+              </span>
               <span className="tu-settings-item-label">
                 {props.mode === 'dark' ? 'Light Theme' : 'Dark Theme'}
               </span>
@@ -3392,7 +3419,9 @@ export default function TextForm(props: TextFormProps) {
                 setSettingsOpen(false);
               }}
             >
-              <span className="tu-settings-item-icon">⌨</span>
+              <span className="tu-settings-item-icon">
+                <KeyboardIcon size={15} />
+              </span>
               <span className="tu-settings-item-label">Command Palette</span>
               <kbd className="tu-settings-item-kbd">Ctrl+K</kbd>
             </button>
@@ -3405,7 +3434,9 @@ export default function TextForm(props: TextFormProps) {
                 navigate('/dashboard');
               }}
             >
-              <span className="tu-settings-item-icon">📊</span>
+              <span className="tu-settings-item-icon">
+                <BarChart3Icon size={15} />
+              </span>
               <span className="tu-settings-item-label">Dashboard</span>
               <span className="tu-settings-item-hint">Stats & settings</span>
             </button>
@@ -3419,7 +3450,9 @@ export default function TextForm(props: TextFormProps) {
                   navigate('/pricing');
                 }}
               >
-                <span className="tu-settings-item-icon">⚡</span>
+                <span className="tu-settings-item-icon">
+                  <ZapIcon size={15} />
+                </span>
                 <span className="tu-settings-item-label">Upgrade to Pro</span>
                 <span className="tu-settings-item-hint">View plans & pricing</span>
               </button>
@@ -3433,7 +3466,9 @@ export default function TextForm(props: TextFormProps) {
                 setSettingsOpen(false);
               }}
             >
-              <span className="tu-settings-item-icon">⌘</span>
+              <span className="tu-settings-item-icon">
+                <CommandIcon size={15} />
+              </span>
               <span className="tu-settings-item-label">Keyboard Shortcuts</span>
               <kbd className="tu-settings-item-kbd">Ctrl+/</kbd>
             </button>
@@ -3448,7 +3483,9 @@ export default function TextForm(props: TextFormProps) {
                   handleLogout();
                 }}
               >
-                <span className="tu-settings-item-icon">⏻</span>
+                <span className="tu-settings-item-icon">
+                  <LogOutIcon size={15} />
+                </span>
                 <span className="tu-settings-item-label">Sign Out</span>
               </button>
             ) : (
@@ -3459,7 +3496,9 @@ export default function TextForm(props: TextFormProps) {
                   navigate(ROUTES.LOGIN);
                 }}
               >
-                <span className="tu-settings-item-icon">→</span>
+                <span className="tu-settings-item-icon">
+                  <LogInIcon size={15} />
+                </span>
                 <span className="tu-settings-item-label">Sign In</span>
                 <span className="tu-settings-item-hint">Unlock AI tools</span>
               </button>

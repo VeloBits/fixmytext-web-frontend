@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RotateCcwIcon, XIcon } from '@velobits/design-system';
 import {
   formatShortcut,
   eventToBinding,
@@ -67,7 +68,7 @@ function ShortcutRow({
                 onClick={() => onReset(sc.id)}
                 title="Reset to default"
               >
-                ↺
+                <RotateCcwIcon size={12} />
               </button>
             )}
           </>
@@ -249,8 +250,8 @@ export default function KeyboardShortcuts({
                   Reset All
                 </button>
               )}
-              <button className="tu-shortcuts-close" onClick={onClose}>
-                ✕
+              <button className="tu-shortcuts-close" onClick={onClose} aria-label="Close">
+                <XIcon size={14} />
               </button>
             </div>
 

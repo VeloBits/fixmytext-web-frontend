@@ -1,7 +1,8 @@
 import { WEB_APP_BASE_URL } from '@velobits/api-client';
+import type { IconProps } from '@velobits/design-system';
 
 interface Props {
-  emoji: string;
+  icon: (props: IconProps) => React.JSX.Element;
   title: string;
   description: string;
 }
@@ -11,11 +12,13 @@ interface Props {
  * (not found / expired / fetch failure). Mirrors the shell SharePage's
  * error states so both share routes speak the same language.
  */
-export default function ShareStatusView({ emoji, title, description }: Props) {
+export default function ShareStatusView({ icon: Icon, title, description }: Props) {
   return (
     <div className="sh-page min-h-screen bg-[var(--bg)] flex items-center justify-center px-4">
       <div className="max-w-md text-center">
-        <div className="text-5xl mb-4">{emoji}</div>
+        <div className="mb-4 flex justify-center text-[var(--text-3)]">
+          <Icon size={44} />
+        </div>
         <h1 className="text-2xl font-extrabold text-[var(--text)] mb-2">{title}</h1>
         <p className="text-sm text-[var(--text-3)] mb-6">{description}</p>
         <a

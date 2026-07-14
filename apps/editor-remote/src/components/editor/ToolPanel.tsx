@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { USE_CASE_TABS, TOOL_GROUPS } from '@velobits/app-core/constants/tools';
 import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
 import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
+import { HeartIcon } from '@velobits/design-system';
 
 interface TooltipState {
   text: string;
@@ -105,8 +106,10 @@ function ToolPanelItem({
             e.stopPropagation();
             onToggleFavorite?.(tool.id);
           }}
+          aria-label={isFavorite ? 'Remove from favourites' : 'Add to favourites'}
+          aria-pressed={isFavorite}
         >
-          {isFavorite ? '♥' : '♡'}
+          <HeartIcon size={13} fill={isFavorite ? 'currentColor' : 'none'} />
         </button>
       </div>
     </div>
@@ -207,8 +210,10 @@ function ToolGridCard({
           e.stopPropagation();
           onToggleFavorite?.(tool.id);
         }}
+        aria-label={isFavorite ? 'Remove from favourites' : 'Add to favourites'}
+        aria-pressed={isFavorite}
       >
-        {isFavorite ? '♥' : '♡'}
+        <HeartIcon size={13} fill={isFavorite ? 'currentColor' : 'none'} />
       </button>
     </div>
   );

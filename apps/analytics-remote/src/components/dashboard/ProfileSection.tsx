@@ -3,6 +3,7 @@ import { PERSONAS } from '@velobits/app-core/constants/tools';
 import type { PersonaContextValue, User } from '@velobits/app-core/types/context';
 import type { AlertLevel } from '@velobits/app-core/types/alert';
 import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
+import { CheckIcon, MoonIcon, SunIcon } from '@velobits/design-system';
 
 interface ProfileSectionProps {
   user: User | null;
@@ -234,7 +235,11 @@ export default function ProfileSection({
             >
               <span className="tu-dash-persona-icon">{p.icon}</span>
               <span className="tu-dash-persona-label">{p.label}</span>
-              {persona?.persona === key && <span className="tu-dash-persona-check">✓</span>}
+              {persona?.persona === key && (
+                <span className="tu-dash-persona-check">
+                  <CheckIcon size={13} />
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -250,13 +255,13 @@ export default function ProfileSection({
               className={`tu-dash-theme-btn${mode === 'light' ? ' tu-dash-theme-btn--active' : ''}`}
               onClick={() => setMode('light')}
             >
-              <span>☀️</span> Light
+              <SunIcon size={14} /> Light
             </button>
             <button
               className={`tu-dash-theme-btn${mode === 'dark' ? ' tu-dash-theme-btn--active' : ''}`}
               onClick={() => setMode('dark')}
             >
-              <span>🌙</span> Dark
+              <MoonIcon size={14} /> Dark
             </button>
           </div>
         </div>

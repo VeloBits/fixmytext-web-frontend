@@ -86,7 +86,7 @@ describe('TemplatesDrawer', () => {
     const handleDeleteTemplate = vi.fn();
     const templates = [{ name: 'T1', text: 'test', tool_id: '' }];
     renderTemplates({ templates, handleDeleteTemplate });
-    fireEvent.click(screen.getByText('✕'));
+    fireEvent.click(screen.getByLabelText('Delete template'));
     expect(handleDeleteTemplate).toHaveBeenCalledWith(0);
   });
 

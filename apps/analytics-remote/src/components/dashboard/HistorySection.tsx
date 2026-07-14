@@ -1,5 +1,6 @@
 import { TOOLS } from '@velobits/app-core/constants/tools';
 import type { QuestOp } from '@velobits/app-core/types/tools';
+import { TrendingUpIcon, WrenchIcon } from '@velobits/design-system';
 
 interface HistorySectionProps {
   recentOps?: QuestOp[];
@@ -20,7 +21,9 @@ export default function HistorySection({ recentOps = [] }: HistorySectionProps) 
 
       {recentOps.length === 0 ? (
         <div className="tu-dash-empty-page">
-          <span className="tu-dash-empty-icon">📈</span>
+          <span className="tu-dash-empty-icon">
+            <TrendingUpIcon size={32} />
+          </span>
           <span>No activity this session</span>
           <span className="tu-dash-empty-hint">Start using tools to see your history here</span>
         </div>
@@ -33,7 +36,9 @@ export default function HistorySection({ recentOps = [] }: HistorySectionProps) 
               return (
                 <div key={i} className="tu-dash-history-item">
                   <span className="tu-dash-history-dot" />
-                  <span className="tu-dash-history-icon">{tool?.icon || '🔧'}</span>
+                  <span className="tu-dash-history-icon">
+                    {tool?.icon || <WrenchIcon size={13} />}
+                  </span>
                   <span className="tu-dash-history-name">{tool?.label || op.id}</span>
                   <span className="tu-dash-history-meta">
                     {op.isNew && <span className="tu-dash-history-new">NEW</span>}
@@ -57,7 +62,11 @@ export default function HistorySection({ recentOps = [] }: HistorySectionProps) 
         </div>
         <div className="tu-dash-discovered-grid">
           {TOOLS.map((tool) => (
-            <div key={tool.id} className="tu-dash-discovered tu-dash-discovered--locked" title="???">
+            <div
+              key={tool.id}
+              className="tu-dash-discovered tu-dash-discovered--locked"
+              title="???"
+            >
               <span>?</span>
             </div>
           ))}

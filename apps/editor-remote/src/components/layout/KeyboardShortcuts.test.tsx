@@ -114,7 +114,7 @@ describe('KeyboardShortcuts', () => {
   it('renders close button', () => {
     const onClose = vi.fn();
     renderShortcuts({ onClose });
-    fireEvent.click(screen.getByText('✕'));
+    fireEvent.click(screen.getByLabelText('Close'));
     expect(onClose).toHaveBeenCalled();
   });
 

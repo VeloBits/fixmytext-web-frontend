@@ -4,6 +4,15 @@ import { TOOLS } from '@velobits/app-core/constants/tools';
 import { useGetToolStatsQuery } from '@velobits/app-core/store/api/userDataApi';
 import { useGetHistoryQuery } from '@velobits/app-core/store/api/historyApi';
 import type { AnalyticsPageProps } from '@velobits/app-core/contract';
+import {
+  BarChart3Icon,
+  GiftIcon,
+  HeartIcon,
+  TrendingUpIcon,
+  UserIcon,
+  WrenchIcon,
+  ZapIcon,
+} from '@velobits/design-system';
 
 // Extracted dashboard section components
 import OverviewSection from '@/components/dashboard/OverviewSection';
@@ -115,12 +124,12 @@ export default function DashboardPage({
   }, [toolStatsData]);
 
   const sections = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'subscription', label: 'Subscription', icon: '⚡' },
-    { id: 'rewards', label: 'Rewards', icon: '🎰' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'favorites', label: 'Favorites', icon: '❤️' },
-    { id: 'history', label: 'Usage History', icon: '📈' },
+    { id: 'overview', label: 'Overview', icon: BarChart3Icon },
+    { id: 'subscription', label: 'Subscription', icon: ZapIcon },
+    { id: 'rewards', label: 'Rewards', icon: GiftIcon },
+    { id: 'profile', label: 'Profile', icon: UserIcon },
+    { id: 'favorites', label: 'Favorites', icon: HeartIcon },
+    { id: 'history', label: 'Usage History', icon: TrendingUpIcon },
   ];
 
   // Build props for the active section component
@@ -174,7 +183,9 @@ export default function DashboardPage({
               }`}
               onClick={() => setActiveSection(s.id)}
             >
-              <span className="tu-dash-nav-icon">{s.icon}</span>
+              <span className="tu-dash-nav-icon">
+                <s.icon size={15} />
+              </span>
               <span>{s.label}</span>
             </button>
           ))}
@@ -183,7 +194,7 @@ export default function DashboardPage({
         {/* Quick stats in sidebar: ops count from the server-side tool stats. */}
         <div className="tu-dash-sidebar-stats">
           <div className="tu-dash-sidebar-stat">
-            <span>🔧</span>
+            <WrenchIcon size={14} />
             <span>{statsTotalOps} operations</span>
           </div>
         </div>

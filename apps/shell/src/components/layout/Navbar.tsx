@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import { MenuIcon, XIcon } from '@velobits/design-system';
 import type { AlertLevel } from '@/contexts/AlertContext';
 import type { ThemeMode } from '@/contexts/ThemeContext';
 
@@ -179,7 +180,7 @@ export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) 
           aria-label="Toggle menu"
           aria-expanded={menuOpen}
         >
-          {menuOpen ? '✕' : '☰'}
+          {menuOpen ? <XIcon size={18} /> : <MenuIcon size={18} />}
         </button>
       </div>
 

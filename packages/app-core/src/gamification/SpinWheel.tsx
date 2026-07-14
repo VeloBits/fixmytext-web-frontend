@@ -1,5 +1,17 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DropletIcon,
+  FlameIcon,
+  GemIcon,
+  GiftIcon,
+  SparklesIcon,
+  StarIcon,
+  TargetIcon,
+  TrophyIcon,
+  WrenchIcon,
+  ZapIcon,
+} from '@velobits/design-system';
 
 export interface SpinHistoryItem {
   spin_date: string;
@@ -29,24 +41,33 @@ export interface SpinWheelProps {
 }
 
 const WHEEL_SEGMENTS = [
-  { label: '1 Credit', color: '#4a9eff', icon: '💧' },
-  { label: '3 Credits', color: '#7c5cff', icon: '💎' },
-  { label: 'Quick Fix', color: '#ff6b6b', icon: '🔧' },
-  { label: 'Tinkerer', color: '#ffa726', icon: '⚡' },
-  { label: 'Day Single', color: '#66bb6a', icon: '🎯' },
-  { label: 'Day Triple', color: '#ec407a', icon: '🌟' },
+  { label: '1 Credit', color: '#4a9eff', icon: DropletIcon },
+  { label: '3 Credits', color: '#7c5cff', icon: GemIcon },
+  { label: 'Quick Fix', color: '#ff6b6b', icon: WrenchIcon },
+  { label: 'Tinkerer', color: '#ffa726', icon: ZapIcon },
+  { label: 'Day Single', color: '#66bb6a', icon: TargetIcon },
+  { label: 'Day Triple', color: '#ec407a', icon: StarIcon },
 ];
 
 const SEGMENT_ARC = 360 / WHEEL_SEGMENTS.length; // 60 degrees each
 
-const CONFETTI_EMOJIS = ['🎉', '🎊', '✨', '⭐', '🌟', '💫', '🏆', '🔥'];
+const CONFETTI_PARTICLES = [
+  { icon: SparklesIcon, color: '#ffd54f' },
+  { icon: StarIcon, color: '#ffb300' },
+  { icon: TrophyIcon, color: '#ffa726' },
+  { icon: FlameIcon, color: '#ff7043' },
+  { icon: GemIcon, color: '#7c5cff' },
+  { icon: ZapIcon, color: '#4a9eff' },
+  { icon: GiftIcon, color: '#ec407a' },
+  { icon: StarIcon, color: '#66bb6a' },
+];
 
 interface ConfettiParticleProps {
   index: number;
 }
 
 function ConfettiParticle({ index }: ConfettiParticleProps) {
-  const emoji = CONFETTI_EMOJIS[index % CONFETTI_EMOJIS.length];
+  const { icon: Icon, color } = CONFETTI_PARTICLES[index % CONFETTI_PARTICLES.length]!;
   const { left, delay, duration, size } = useMemo(
     () => ({
       left: 10 + Math.random() * 80,
@@ -63,7 +84,8 @@ function ConfettiParticle({ index }: ConfettiParticleProps) {
         position: 'absolute',
         left: `${left}%`,
         top: 0,
-        fontSize: `${size}rem`,
+        color,
+        lineHeight: 0,
         pointerEvents: 'none',
         zIndex: 10,
       }}
@@ -71,7 +93,7 @@ function ConfettiParticle({ index }: ConfettiParticleProps) {
       animate={{ opacity: [0, 1, 1, 0], y: [0, 80, 180, 260], rotate: [0, 180, 360] }}
       transition={{ duration, delay, ease: 'easeOut' }}
     >
-      {emoji}
+      <Icon size={Math.round(size * 16)} fill="currentColor" fillOpacity={0.25} />
     </motion.span>
   );
 }
@@ -280,28 +302,25 @@ export default function SpinWheel({ subscription, isAuthenticated }: SpinWheelPr
                     stroke="rgba(255,255,255,0.25)"
                     strokeWidth="2"
                   />
-                  <text
-                    x={pos.x}
-                    y={pos.y}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    transform={`rotate(${pos.rotate}, ${pos.x}, ${pos.y})`}
-                    style={{
-                      fontSize: '0.7rem',
-                      fontWeight: 600,
-                      fill: '#fff',
-                      textShadow: '0 1px 2px rgba(0,0,0,0.4)',
-                      pointerEvents: 'none',
-                      userSelect: 'none',
-                    }}
-                  >
-                    <tspan x={pos.x} dy="-0.5em">
-                      {seg.icon}
-                    </tspan>
-                    <tspan x={pos.x} dy="1.2em">
+                  <g transform={`rotate(${pos.rotate}, ${pos.x}, ${pos.y})`}>
+                    <seg.icon x={pos.x - 8} y={pos.y - 21} size={16} stroke="#fff" />
+                    <text
+                      x={pos.x}
+                      y={pos.y + 8}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      style={{
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        fill: '#fff',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+                        pointerEvents: 'none',
+                        userSelect: 'none',
+                      }}
+                    >
                       {seg.label}
-                    </tspan>
-                  </text>
+                    </text>
+                  </g>
                 </g>
               );
             })}
@@ -414,9 +433,9 @@ export default function SpinWheel({ subscription, isAuthenticated }: SpinWheelPr
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.3, 1] }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}
+              style={{ color: 'var(--tu-accent, #7c5cff)', lineHeight: 0, marginBottom: '0.5rem' }}
             >
-              {result.reward_type === 'credits' ? '💎' : '🎁'}
+              {result.reward_type === 'credits' ? <GemIcon size={40} /> : <GiftIcon size={40} />}
             </motion.div>
 
             <motion.p

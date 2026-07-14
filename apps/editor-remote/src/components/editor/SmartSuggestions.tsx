@@ -2,6 +2,7 @@ import { memo } from 'react';
 import type { MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ToolDefinition } from '@velobits/app-core/types/tools';
+import { LightbulbIcon, XIcon } from '@velobits/design-system';
 
 interface SmartSuggestionsProps {
   suggestions: ToolDefinition[] | null;
@@ -18,7 +19,9 @@ export default memo(function SmartSuggestions({
 
   return (
     <div className="tu-suggestions">
-      <span className="tu-suggestion-label">💡 Try:</span>
+      <span className="tu-suggestion-label">
+        <LightbulbIcon size={13} /> Try:
+      </span>
       <AnimatePresence>
         {suggestions.map((tool, i) => (
           <motion.button
@@ -35,12 +38,14 @@ export default memo(function SmartSuggestions({
             <span>{tool.label}</span>
             <span
               className="tu-suggestion-dismiss"
+              role="button"
+              aria-label="Dismiss suggestion"
               onClick={(e: MouseEvent) => {
                 e.stopPropagation();
                 onDismiss(tool.id);
               }}
             >
-              ✕
+              <XIcon size={11} />
             </span>
           </motion.button>
         ))}

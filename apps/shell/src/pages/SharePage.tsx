@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useGetShareQuery } from '@velobits/app-core/store/api/shareApi';
 import { TOOLS } from '@velobits/app-core/constants/tools';
 import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
+import { ClockIcon, LinkIcon } from '@velobits/design-system';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
 interface SharePageProps {
@@ -47,7 +48,9 @@ export default function SharePage({ showAlert }: SharePageProps) {
     return (
       <div className="sh-page">
         <div className="sh-state">
-          <div className="sh-state-emoji">{expired ? '⏱' : '🔗'}</div>
+          <div className="sh-state-icon">
+            {expired ? <ClockIcon size={40} /> : <LinkIcon size={40} />}
+          </div>
           <h2 className="sh-state-title">
             {expired ? 'This share has expired' : 'Share not found'}
           </h2>

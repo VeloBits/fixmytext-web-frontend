@@ -1,5 +1,6 @@
 import { TOOLS } from '@velobits/app-core/constants/tools';
 import type { FavoritesContextValue } from '@velobits/app-core/types/context';
+import { HeartIcon, LayoutGridIcon, WrenchIcon } from '@velobits/design-system';
 
 export interface TopTool {
   id: string;
@@ -97,12 +98,16 @@ export default function OverviewSection({
       {/* Usage stats grid */}
       <div className="tu-dash-stats-grid">
         <div className="tu-dash-stat-card">
-          <span className="tu-dash-stat-icon">🔧</span>
+          <span className="tu-dash-stat-icon">
+            <WrenchIcon size={20} />
+          </span>
           <span className="tu-dash-stat-value">{statsTotalOps}</span>
           <span className="tu-dash-stat-label">Operations</span>
         </div>
         <div className="tu-dash-stat-card">
-          <span className="tu-dash-stat-icon">🧰</span>
+          <span className="tu-dash-stat-icon">
+            <LayoutGridIcon size={20} />
+          </span>
           <span className="tu-dash-stat-value">
             {statsToolCount}
             <small>/{TOOLS.length}</small>
@@ -110,7 +115,9 @@ export default function OverviewSection({
           <span className="tu-dash-stat-label">Tools Used</span>
         </div>
         <div className="tu-dash-stat-card">
-          <span className="tu-dash-stat-icon">❤️</span>
+          <span className="tu-dash-stat-icon">
+            <HeartIcon size={20} />
+          </span>
           <span className="tu-dash-stat-value">{favoritesCount}</span>
           <span className="tu-dash-stat-label">Favorites</span>
         </div>
@@ -130,10 +137,10 @@ export default function OverviewSection({
                 return (
                   <div key={entry.id} className="tu-dash-history-item">
                     <span className="tu-dash-history-dot" />
-                    <span className="tu-dash-history-icon">{tool?.icon || '🔧'}</span>
-                    <span className="tu-dash-history-name">
-                      {tool?.label || entry.tool_label}
+                    <span className="tu-dash-history-icon">
+                      {tool?.icon || <WrenchIcon size={13} />}
                     </span>
+                    <span className="tu-dash-history-name">{tool?.label || entry.tool_label}</span>
                     <span className="tu-dash-history-time">
                       {new Date(entry.created_at).toLocaleString()}
                     </span>

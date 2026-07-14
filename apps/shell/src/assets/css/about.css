@@ -411,7 +411,7 @@
 }
 
 .about-feature-icon {
-  font-size: 1.1rem;
+  color: var(--feature-color, var(--accent));
 }
 
 .about-feature-title {
@@ -530,7 +530,7 @@
 }
 
 .about-audience-icon {
-  font-size: 1.15rem;
+  color: var(--accent);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -634,7 +634,7 @@
 }
 
 .about-principle-icon {
-  font-size: 1.5rem;
+  color: var(--principle-accent, var(--accent));
   display: block;
   margin-bottom: 10px;
 }

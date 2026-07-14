@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRightIcon } from '@velobits/design-system';
 
 interface PipelineStepItem {
   toolId?: string;
@@ -28,12 +29,16 @@ export default function PipelineStrip({ steps, onClear }: PipelineStripProps) {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: 'spring', stiffness: 300, damping: 22 }}
           >
-            <span className="tu-pipeline-arrow">→</span>
+            <span className="tu-pipeline-arrow">
+              <ArrowRightIcon size={12} />
+            </span>
             <span className="tu-pipeline-node">{step.label}</span>
           </motion.div>
         ))}
       </AnimatePresence>
-      <span className="tu-pipeline-arrow">→</span>
+      <span className="tu-pipeline-arrow">
+        <ArrowRightIcon size={12} />
+      </span>
       <span className="tu-pipeline-node tu-pipeline-node--output">Output</span>
       <button className="tu-pipeline-clear" onClick={onClear}>
         Clear

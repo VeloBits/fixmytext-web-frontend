@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import { XIcon } from '@velobits/design-system';
 
 interface Template {
   name: string;
@@ -91,8 +92,9 @@ export default function TemplatesDrawer({
                 className="tu-btn tu-btn--tools"
                 style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', color: 'var(--rose)' }}
                 onClick={() => handleDeleteTemplate(i)}
+                aria-label="Delete template"
               >
-                ✕
+                <XIcon size={12} />
               </button>
             </div>
           ))}

@@ -41,7 +41,7 @@ describe('PipelineStrip', () => {
   it('renders arrows between steps', () => {
     const steps = [{ label: 'Step1', timestamp: 1 }];
     render(<PipelineStrip steps={steps} onClear={vi.fn()} />);
-    const arrows = screen.getAllByText('\u2192');
+    const arrows = document.querySelectorAll('.tu-pipeline-arrow');
     expect(arrows.length).toBeGreaterThanOrEqual(2); // before step and after step
   });
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { XIcon } from '@velobits/design-system';
 
 type DrawerColor = 'teal' | 'purple' | 'amber' | 'sky' | 'green' | 'rose' | 'slate';
 
@@ -35,7 +36,7 @@ export default function DrawerPanel({ title, color, onClose, children }: DrawerP
           {title}
         </span>
         <button className="tu-drawer-close" onClick={onClose} title="Close">
-          ✕
+          <XIcon size={13} />
         </button>
       </div>
       <div className="tu-drawer-body">{children}</div>

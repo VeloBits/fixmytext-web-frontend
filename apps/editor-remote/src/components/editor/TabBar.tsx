@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
+import { XIcon } from '@velobits/design-system';
 
 interface WorkspaceTabTool {
   id: string;
@@ -162,7 +163,7 @@ export default function TabBar({
               }}
               aria-label={`Close ${tab.label} tab`}
             >
-              ✕
+              <XIcon size={12} />
             </button>
           </div>
         ))}
