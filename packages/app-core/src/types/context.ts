@@ -56,8 +56,16 @@ export interface SubscriptionContextValue {
   region: string;
   toolUsesToday: Record<string, number>;
   dailyLoginBonus: boolean;
+  /** Base free uses per tool per day (server-driven; login bonus not included). */
+  freeUsesPerTool: number;
+  /** When the current Pro period ends (ISO string; null when not Pro). */
+  proExpiresAt: string | null;
+  /** True when Pro is cancelled but access continues until proExpiresAt. */
+  proCancelled: boolean;
   getToolUsage: (toolId: string) => ToolUsage;
   checkToolAccess: (tool: ToolDefinition | null | undefined) => boolean;
+  /** Server said 402 for this tool: open the upsell modal and resync counters. */
+  notifyBlocked: (tool: ToolDefinition) => void;
   showUpgradeModal: boolean;
   dismissUpgradeModal: () => void;
   blockedTool: ToolDefinition | null;
@@ -66,8 +74,8 @@ export interface SubscriptionContextValue {
   upgradeLoading: boolean;
   cancelLoading: boolean;
   // from usePasses spread
-  activePasses: unknown[];
-  activeCredits: unknown[];
+  activePasses: components['schemas']['ActivePass'][];
+  activeCredits: components['schemas']['ActiveCredit'][];
   totalCredits: number;
   hasPassFor: (toolId: string) => boolean;
   handleBuyPass: (passId: string, toolIds?: string[]) => Promise<void>;

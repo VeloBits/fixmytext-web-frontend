@@ -225,6 +225,47 @@ describe('useSubscription', () => {
     expect(result.current.checkToolAccess(null)).toBe(true);
   });
 
+  it('notifyBlocked opens the upsell modal and resyncs from the server', () => {
+    mockSubscriptionQuery.mockReturnValue({
+      data: {
+        tier: 'free',
+        tool_uses_today: {}, // client counter thinks there's quota left…
+        daily_login_bonus: false,
+        region: 'US',
+        free_uses_per_tool: 3,
+      },
+      refetch: mockRefetchStatus,
+    });
+    const tool = { id: 'uppercase', type: 'api' } as unknown as ToolDefinition;
+    const { result } = renderHook(() => useSubscription({ showAlert }));
+    act(() => {
+      // …but the server said 402: its verdict wins.
+      result.current.notifyBlocked(tool);
+    });
+    expect(result.current.showUpgradeModal).toBe(true);
+    expect(result.current.blockedTool).toEqual(tool);
+    expect(mockRefetchStatus).toHaveBeenCalled();
+  });
+
+  it('exposes freeUsesPerTool and Pro expiry fields from status', () => {
+    mockSubscriptionQuery.mockReturnValue({
+      data: {
+        tier: 'pro',
+        tool_uses_today: {},
+        daily_login_bonus: false,
+        region: 'US',
+        free_uses_per_tool: 5,
+        pro_expires_at: '2026-08-14T00:00:00Z',
+        pro_cancelled: true,
+      },
+      refetch: mockRefetchStatus,
+    });
+    const { result } = renderHook(() => useSubscription({ showAlert }));
+    expect(result.current.freeUsesPerTool).toBe(5);
+    expect(result.current.proExpiresAt).toBe('2026-08-14T00:00:00Z');
+    expect(result.current.proCancelled).toBe(true);
+  });
+
   it('dismissUpgradeModal clears modal state', () => {
     mockSubscriptionQuery.mockReturnValue({
       data: {

@@ -1,25 +1,43 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { userManager } from '@velobits/app-core/auth/userManager';
 import PageSkeleton from '@/components/layout/PageSkeleton';
 import '@/assets/css/auth.css';
 
+// Same rule AuthCallback enforces on the way back: only same-origin
+// router-relative paths may ride along as the post-login destination.
+function isSafeReturnTo(p: string | null): p is string {
+  return (
+    typeof p === 'string' &&
+    p.startsWith('/') &&
+    !p.startsWith('//') &&
+    !p.startsWith('/\\') &&
+    !p.includes('://')
+  );
+}
+
 export function LoginPage() {
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Depend on the extracted string, not the params object, so the redirect
+  // effect never re-fires from a mere object-identity change.
+  const returnTo = searchParams.get('returnTo');
 
   // Kick off the redirect to Keycloak's hosted login. If Keycloak is
   // unreachable the promise rejects — surface an error card with a retry
   // instead of stranding the user on a skeleton forever.
   const redirect = useCallback(() => {
     setError(false);
-    userManager.signinRedirect().catch((err) => {
-      Sentry.captureException(err);
-      console.error('signinRedirect (login) failed', err);
-      setError(true);
-    });
-  }, []);
+    userManager
+      .signinRedirect(isSafeReturnTo(returnTo) ? { state: { returnTo } } : undefined)
+      .catch((err) => {
+        Sentry.captureException(err);
+        console.error('signinRedirect (login) failed', err);
+        setError(true);
+      });
+  }, [returnTo]);
 
   useEffect(() => {
     redirect();

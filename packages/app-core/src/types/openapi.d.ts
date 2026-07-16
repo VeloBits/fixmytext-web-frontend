@@ -5304,6 +5304,17 @@ export interface components {
       active_passes_count: number;
       /** Region */
       region?: string | null;
+      /**
+       * Pro Expires At
+       * @description When the current Pro period ends (null when not Pro).
+       */
+      pro_expires_at?: string | null;
+      /**
+       * Pro Cancelled
+       * @description True when the Pro plan is cancelled but still in its paid period.
+       * @default false
+       */
+      pro_cancelled?: boolean;
     };
     /**
      * SubstitutionRequest

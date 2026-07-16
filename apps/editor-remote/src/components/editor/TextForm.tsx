@@ -417,13 +417,34 @@ export default function TextForm(props: TextFormProps) {
     history.pushHistory(label, text, result, { toolType: 'local' });
   });
   const history = useHistory(setText, showAlert);
+  // Server-authoritative 402 (daily quota exhausted): open the pass-purchase
+  // upsell for signed-in users; guests get a sign-in prompt instead. The
+  // client-side counter gate can desync from the server — the server verdict
+  // always wins here.
+  const handleToolBlocked = useCallback(
+    (toolId: string): void => {
+      const tool = TOOLS.find((t) => t.id === toolId);
+      if (isAuthenticated && tool && props.subscription?.notifyBlocked) {
+        props.subscription.notifyBlocked(tool);
+        return;
+      }
+      showAlert(
+        isAuthenticated
+          ? 'Daily limit reached for this tool. Get a pass or go Pro for more uses.'
+          : 'Daily free limit reached — sign in for an extra free use, or get a pass.',
+        'warning'
+      );
+    },
+    [isAuthenticated, props.subscription, showAlert]
+  );
   const ai = useAiTools(
     text,
     setText,
     setMarkdownMode,
     setPreviewMode,
     showAlert,
-    history.pushHistory
+    history.pushHistory,
+    handleToolBlocked
   ) as ReturnType<typeof useAiTools> & Record<string, unknown>;
   const speech = useSpeech(text, setText, showAlert);
   const exportTools = useExport(setLocalLoading, showAlert);
@@ -656,6 +677,10 @@ export default function TextForm(props: TextFormProps) {
         showAlert(notice ?? successMsg, notice ? 'info' : 'success');
         return { success: true, result: data.result };
       } catch (err) {
+        if ((err as { status?: number }).status === 402) {
+          handleToolBlocked((toolMeta?.toolId as string) || '');
+          return { success: false };
+        }
         const detail = (err as { data?: { detail?: unknown } }).data?.detail;
         const message =
           typeof detail === 'string'
@@ -666,7 +691,7 @@ export default function TextForm(props: TextFormProps) {
         return { success: false };
       }
     },
-    [transformText, ai, history, showAlert]
+    [transformText, ai, history, showAlert, handleToolBlocked]
   );
 
   // ── Generic API handler with extra params (for drawer tools) ──
@@ -692,6 +717,10 @@ export default function TextForm(props: TextFormProps) {
       showAlert(notice ?? successMsg, notice ? 'info' : 'success');
       return { success: true, result: data.result };
     } catch (err) {
+      if ((err as { status?: number }).status === 402) {
+        handleToolBlocked((toolMeta?.toolId as string) || '');
+        return { success: false };
+      }
       const detail = (err as { data?: { detail?: unknown } }).data?.detail;
       const message =
         typeof detail === 'string'

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import './assets/css/App.css';
 import Alert from './components/layout/Alert';
 import EmailVerificationBanner from './components/layout/EmailVerificationBanner';
@@ -11,6 +11,7 @@ import * as Sentry from '@sentry/react';
 import { AuthCallback } from '@velobits/app-core/auth/AuthCallback';
 import { SilentCallback } from '@velobits/app-core/auth/SilentCallback';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import { attemptSilentRestore, hasAuthHint } from '@velobits/app-core/auth/userManager';
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
 import { AppProvider, useAppContext } from './contexts/AppContext';
@@ -45,13 +46,40 @@ const DashboardPage = lazy(() =>
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, login } = useOidcAuth();
-  if (isLoading) return <PageSkeleton />;
-  if (!isAuthenticated) {
-    login();
-    // login() triggers a full-page redirect to Keycloak; keep the skeleton up
-    // until the browser navigates away so there's no white flash.
-    return <PageSkeleton />;
-  }
+  const location = useLocation();
+  // 'idle' → not yet needed; 'trying' → silent restore in flight;
+  // 'failed' → no restorable session, a full Keycloak login is required.
+  const [restore, setRestore] = useState<'idle' | 'trying' | 'failed'>('idle');
+
+  // When the access token quietly expired (e.g. a minutes-long Razorpay
+  // checkout outlived it), first try a silent renew from the Keycloak SSO
+  // cookie instead of bouncing through a full-page login — the bounce used to
+  // eat the post-purchase ?purchase=… params and their success alert.
+  useEffect(() => {
+    if (isLoading || isAuthenticated || restore !== 'idle') return;
+    if (hasAuthHint()) {
+      setRestore('trying');
+      void attemptSilentRestore().then((ok) => setRestore(ok ? 'idle' : 'failed'));
+    } else {
+      setRestore('failed');
+    }
+  }, [isLoading, isAuthenticated, restore]);
+
+  useEffect(() => {
+    if (restore === 'failed' && !isLoading && !isAuthenticated) {
+      // Full login round trip; returnTo restores the exact path + query
+      // (e.g. /dashboard?tab=subscription&purchase=success&kind=pass).
+      void login({ returnTo: location.pathname + location.search });
+    }
+  }, [restore, isLoading, isAuthenticated, login, location.pathname, location.search]);
+
+  // Reset the restore machine once a session exists again so a later
+  // expiry re-runs the silent attempt instead of hard-failing.
+  useEffect(() => {
+    if (isAuthenticated && restore === 'failed') setRestore('idle');
+  }, [isAuthenticated, restore]);
+
+  if (!isAuthenticated) return <PageSkeleton />;
   return <>{children}</>;
 }
 

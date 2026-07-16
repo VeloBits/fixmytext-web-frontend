@@ -48,6 +48,18 @@ function formatToolError(err: ToolError, fallback: string): ErrorResult {
       };
     }
   }
+  if (err?.status === 402) {
+    const msg402 =
+      typeof detail === 'string'
+        ? detail
+        : typeof detail === 'object' && detail !== null
+          ? (detail as { message?: string }).message
+          : undefined;
+    return {
+      message: msg402 || 'Daily free limit reached — sign in for more free uses, or get a pass.',
+      tone: 'warning',
+    };
+  }
   if (err?.status === 429) {
     const msg429 =
       typeof detail === 'string'
@@ -504,7 +516,10 @@ export default function useAiTools(
   showAlert: (msg: string, type: AlertType) => void,
   pushHistory:
     | ((label: string, orig: string, result: string, meta: Record<string, string>) => void)
-    | undefined
+    | undefined,
+  /** Called instead of a toast when a tool API returns HTTP 402 (server-side
+   * daily quota exhausted) — the caller opens the pass-purchase upsell. */
+  onBlocked?: (toolId: string) => void
 ) {
   const { isAuthenticated } = useOidcAuth();
   const [aiResult, setAiResult] = useState<AiResult | null>(null);
@@ -534,6 +549,24 @@ export default function useAiTools(
   }, [text, showAlert]);
 
   const hasMarkdown = (str: string): boolean => /[|#*-]{2,}|^\s*[•\-\d]+[.)]\s|^\|.+\|$/m.test(str);
+
+  /**
+   * Route a tool-API failure to the right surface: HTTP 402 (server says the
+   * daily quota is exhausted) opens the pass-purchase upsell via onBlocked
+   * when wired; everything else becomes a toast via formatToolError.
+   */
+  const reportToolError = useCallback(
+    (err: unknown, fallback: string, toolId?: string): void => {
+      const e = err as ToolError;
+      if (e?.status === 402 && toolId && onBlocked) {
+        onBlocked(toolId);
+        return;
+      }
+      const { message, tone } = formatToolError(e, fallback);
+      showAlert(message, tone);
+    },
+    [onBlocked, showAlert]
+  );
 
   /**
    * Core AI call function. Sends text to an endpoint and processes the result.
@@ -602,11 +635,11 @@ export default function useAiTools(
           'success'
         );
       } catch (err) {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          errorMsg || 'Daily AI limit reached. Upgrade to Pro for unlimited access.'
+        reportToolError(
+          err,
+          errorMsg || 'Daily AI limit reached. Upgrade to Pro for unlimited access.',
+          toolId || label.toLowerCase().replace(/\s+/g, '_')
         );
-        showAlert(message, tone);
       }
     },
     [
@@ -618,6 +651,7 @@ export default function useAiTools(
       setPreviewMode,
       pushHistory,
       showAlert,
+      reportToolError,
     ]
   );
 
@@ -673,8 +707,7 @@ export default function useAiTools(
         'success'
       );
     } catch (err) {
-      const { message, tone } = formatToolError(err as ToolError, 'Could not continue writing.');
-      showAlert(message, tone);
+      reportToolError(err, 'Could not continue writing.', 'continue_writing');
     }
   };
 
@@ -696,13 +729,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'change_format', toolType: 'select' });
       showAlert(`Reformatted as ${fmt}`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not change format. Please try again.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not change format. Please try again.', 'change_format');
     }
   };
 
@@ -720,13 +747,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'change_tone', toolType: 'select' });
       showAlert(`Tone changed to ${tone}`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not change tone. Please try again.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not change tone. Please try again.', 'change_tone');
     }
   };
 
@@ -765,13 +786,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'translate', toolType: 'select' });
       showAlert(`Translated to ${lang}`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not translate text. Please try again.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not translate text. Please try again.', 'translate');
     }
   };
 
@@ -793,13 +808,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'transliterate', toolType: 'select' });
       showAlert(`Transliterated to ${lang} script`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not transliterate text. Please try again.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not transliterate text. Please try again.', 'transliterate');
     }
   };
 
@@ -822,13 +831,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'split_to_lines', toolType: 'select' });
       showAlert('Text split to lines', 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not split text. Please try again.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not split text. Please try again.', 'split_to_lines');
     }
   };
 
@@ -850,13 +853,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'join_lines', toolType: 'select' });
       showAlert('Lines joined', 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not join lines. Please try again.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not join lines. Please try again.', 'join_lines');
     }
   };
 
@@ -874,13 +871,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'caesar_cipher', toolType: 'select' });
       showAlert(`Caesar cipher applied (shift ${shift})`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not apply Caesar cipher.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not apply Caesar cipher.', 'caesar_cipher');
     }
   };
 
@@ -902,13 +893,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'rail_fence_enc', toolType: 'select' });
       showAlert(`Rail fence encrypted (${rails} rails)`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not encrypt with Rail Fence.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not encrypt with Rail Fence.', 'rail_fence_enc');
     }
   };
 
@@ -930,13 +915,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'rail_fence_dec', toolType: 'select' });
       showAlert(`Rail fence decrypted (${rails} rails)`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not decrypt Rail Fence.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not decrypt Rail Fence.', 'rail_fence_dec');
     }
   };
 
@@ -1093,13 +1072,7 @@ export default function useAiTools(
         pushHistory(label, original, data.result, { toolId: 'pad_lines', toolType: 'select' });
       showAlert(`Lines padded (${align})`, 'success');
     } catch (err) {
-      {
-        const { message, tone } = formatToolError(
-          err as ToolError,
-          'Could not pad lines. Please try again.'
-        );
-        showAlert(message, tone);
-      }
+      reportToolError(err, 'Could not pad lines. Please try again.', 'pad_lines');
     }
   };
 

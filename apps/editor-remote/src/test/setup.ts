@@ -22,6 +22,8 @@ vi.mock('@velobits/app-core/auth/userManager', () => ({
   // Resolve to null (unauthenticated) so tests don't hit the real silent-renew.
   loadUser: vi.fn().mockResolvedValue(null),
   resetLoadUser: vi.fn(),
+  attemptSilentRestore: vi.fn().mockResolvedValue(false),
+  broadcastAuthMessage: vi.fn(),
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     storeUser: vi.fn().mockResolvedValue(undefined),
@@ -41,6 +43,8 @@ vi.mock('@velobits/app-core/auth/userManager', () => ({
       removeUserSignedIn: vi.fn(),
       addUserSignedOut: vi.fn(),
       removeUserSignedOut: vi.fn(),
+      addAccessTokenExpired: vi.fn(),
+      removeAccessTokenExpired: vi.fn(),
       addSilentRenewError: vi.fn(),
       removeSilentRenewError: vi.fn(),
     },

@@ -199,15 +199,23 @@ if (typeof BroadcastChannel !== 'undefined') {
 // foreground, reconcile the in-memory user against it: acquire the session
 // this tab missed, or drop one it should no longer have. No-op (one getUser
 // on the in-memory store) when tab and hint already agree.
-let _reconciling = false;
+let _reconcilePromise: Promise<void> | null = null;
 
-async function reconcileSessionWithHint(): Promise<void> {
-  if (_reconciling) return;
+function reconcileSessionWithHint(): Promise<void> {
+  if (_reconcilePromise) return _reconcilePromise;
   // Callback routes are driven by signinRedirectCallback/signinSilentCallback;
   // a concurrent signinSilent here would race them (same guard as loadUser).
   const path = window.location.pathname;
-  if (path.includes('/auth/callback') || path.includes('/auth/silent-callback')) return;
-  _reconciling = true;
+  if (path.includes('/auth/callback') || path.includes('/auth/silent-callback')) {
+    return Promise.resolve();
+  }
+  _reconcilePromise = doReconcileSessionWithHint().finally(() => {
+    _reconcilePromise = null;
+  });
+  return _reconcilePromise;
+}
+
+async function doReconcileSessionWithHint(): Promise<void> {
   try {
     const user = await userManager.getUser();
     let hint = false;
@@ -230,9 +238,21 @@ async function reconcileSessionWithHint(): Promise<void> {
       resetLoadUser();
       await userManager.removeUser();
     }
-  } finally {
-    _reconciling = false;
+  } catch {
+    // best-effort — a failed reconcile leaves the tab in its previous state
   }
+}
+
+// Try to restore a live session without a full-page Keycloak redirect (e.g.
+// when a protected route is hit right after a long Razorpay checkout outlived
+// the access token). Returns true when a non-expired user exists afterwards;
+// callers should fall back to login({ returnTo }) on false.
+export async function attemptSilentRestore(): Promise<boolean> {
+  const path = window.location.pathname;
+  if (path.includes('/auth/callback') || path.includes('/auth/silent-callback')) return false;
+  await reconcileSessionWithHint();
+  const user = await userManager.getUser();
+  return !!user && !user.expired;
 }
 
 if (typeof window !== 'undefined') {

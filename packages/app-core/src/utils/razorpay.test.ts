@@ -226,6 +226,67 @@ describe('executeCheckoutFlow', () => {
     expect(navigate).toHaveBeenCalledWith('/success');
   });
 
+  it('appends welcome=1 when verify reports the first-purchase gift', async () => {
+    createOrder.mockResolvedValue({ orderId: 'o1' });
+    verifyPayment.mockResolvedValue({ status: 'success', welcome_gift: true });
+
+    await executeCheckoutFlow({
+      createOrder,
+      openCheckout,
+      verifyPayment,
+      successPath: '/success?purchase=success',
+      failPath: '/fail',
+      showAlert,
+      navigate,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
+    await callArgs.onSuccess({ razorpay_payment_id: 'pay_1' });
+    expect(navigate).toHaveBeenCalledWith('/success?purchase=success&welcome=1');
+  });
+
+  it('navigates to refundedPath when the backend auto-refunded the payment', async () => {
+    createOrder.mockResolvedValue({ orderId: 'o1' });
+    verifyPayment.mockResolvedValue({ status: 'refunded' });
+
+    await executeCheckoutFlow({
+      createOrder,
+      openCheckout,
+      verifyPayment,
+      successPath: '/success',
+      failPath: '/fail',
+      refundedPath: '/refunded',
+      showAlert,
+      navigate,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
+    await callArgs.onSuccess({ razorpay_payment_id: 'pay_1' });
+    expect(navigate).toHaveBeenCalledWith('/refunded');
+  });
+
+  it('falls back to failPath for refunded when no refundedPath given', async () => {
+    createOrder.mockResolvedValue({ orderId: 'o1' });
+    verifyPayment.mockResolvedValue({ status: 'refunded' });
+
+    await executeCheckoutFlow({
+      createOrder,
+      openCheckout,
+      verifyPayment,
+      successPath: '/success',
+      failPath: '/fail',
+      showAlert,
+      navigate,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callArgs = (openCheckout.mock as any).calls[0][0];
+    await callArgs.onSuccess({ razorpay_payment_id: 'pay_1' });
+    expect(navigate).toHaveBeenCalledWith('/fail');
+  });
+
   it('navigates to failPath when verification fails', async () => {
     createOrder.mockResolvedValue({ orderId: 'o1' });
     verifyPayment.mockRejectedValue(new Error('fail'));

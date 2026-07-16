@@ -3,12 +3,20 @@ import type { User as OidcUser } from 'oidc-client-ts';
 import * as Sentry from '@sentry/react';
 import { clearSession } from '@velobits/api-client';
 import {
+  attemptSilentRestore,
   broadcastAuthMessage,
   hasAuthHint,
   loadUser,
   resetLoadUser,
   userManager,
 } from './userManager';
+
+export interface LoginOptions {
+  /** Router-relative path (e.g. "/pricing?tab=day") to restore after the
+   * Keycloak round trip. Carried through the OIDC state and validated by
+   * AuthCallback (same-origin relative paths only). */
+  returnTo?: string;
+}
 
 export interface OidcAuthState {
   isAuthenticated: boolean;
@@ -20,7 +28,7 @@ export interface OidcAuthState {
   wasAuthenticated: boolean;
   accessToken: string | null;
   oidcUser: OidcUser | null;
-  login: () => Promise<void>;
+  login: (opts?: LoginOptions) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -52,19 +60,34 @@ export function useOidcAuth(): OidcAuthState {
       Sentry.setUser(null);
     };
 
+    // Backstop for automaticSilentRenew getting throttled/frozen during long
+    // overlay flows (e.g. a minutes-long Razorpay checkout): when the access
+    // token expires anyway, try one silent restore. attemptSilentRestore
+    // dedupes concurrent runs and clears the hint when the SSO session is
+    // genuinely gone, so this cannot loop.
+    const onExpired = () => void attemptSilentRestore();
+
     userManager.events.addUserLoaded(onLoaded);
     userManager.events.addUserUnloaded(onUnloaded);
     userManager.events.addUserSignedOut(onUnloaded);
+    userManager.events.addAccessTokenExpired(onExpired);
 
     return () => {
       cancelled = true;
       userManager.events.removeUserLoaded(onLoaded);
       userManager.events.removeUserUnloaded(onUnloaded);
       userManager.events.removeUserSignedOut(onUnloaded);
+      userManager.events.removeAccessTokenExpired(onExpired);
     };
   }, []);
 
-  const login = useCallback(() => userManager.signinRedirect(), []);
+  const login = useCallback(
+    (opts?: LoginOptions) =>
+      userManager.signinRedirect(
+        opts?.returnTo ? { state: { returnTo: opts.returnTo } } : undefined
+      ),
+    []
+  );
   const logout = useCallback(async () => {
     // Clear the per-app session cookie FIRST (best-effort), then redirect to
     // Keycloak end-session which clears the SSO cookie.

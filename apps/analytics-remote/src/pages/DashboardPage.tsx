@@ -57,31 +57,44 @@ export default function DashboardPage({
     return searchParams.get('tab') || 'overview';
   });
 
-  // Handle payment redirect -- auto-open subscription tab and show result
+  // Handle payment redirect -- auto-open subscription tab and show result.
+  // Scheme: purchase={success|verify-failed|refunded}&kind={pro|pass|credit}
+  // (+ welcome=1 for the one-time first-purchase gift). The legacy upgrade=…
+  // params are still parsed for stale links from the previous release.
   useEffect(() => {
     const upgrade = searchParams.get('upgrade');
-    const purchase = searchParams.get('purchase');
-    if (upgrade === 'success') {
+    let purchase = searchParams.get('purchase');
+    let kind = searchParams.get('kind') || '';
+    const welcome = searchParams.get('welcome') === '1';
+    if (!purchase && (upgrade === 'success' || upgrade === 'verify-failed')) {
+      purchase = upgrade;
+      kind = 'pro';
+    }
+    if (purchase === 'success') {
       setActiveSection('subscription');
-      showAlert('Welcome to Pro! Your subscription is active.', 'success');
-      subscription?.refetchStatus?.();
-    } else if (upgrade === 'verify-failed') {
-      setActiveSection('subscription');
+      const base =
+        kind === 'pro'
+          ? 'Welcome to Pro! Your subscription is active.'
+          : 'Purchase successful! Your pass or credits are now active.';
       showAlert(
-        'Payment received but verification failed. Please contact support if your plan is not active.',
-        'danger'
+        welcome ? `${base} A one-time welcome bonus of 10 credits was added!` : base,
+        'success'
       );
-    } else if (upgrade === 'cancelled') {
-      setActiveSection('subscription');
-    } else if (purchase === 'success') {
-      setActiveSection('subscription');
-      showAlert('Purchase successful! Your pass or credits are now active.', 'success');
       subscription?.refetchStatus?.();
     } else if (purchase === 'verify-failed') {
       setActiveSection('subscription');
       showAlert(
-        'Payment received but verification failed. Please contact support if your purchase is not reflected.',
+        kind === 'pro'
+          ? 'Payment received but verification failed. Please contact support if your plan is not active.'
+          : 'Payment received but verification failed. Please contact support if your purchase is not reflected.',
         'danger'
+      );
+    } else if (purchase === 'refunded') {
+      setActiveSection('subscription');
+      showAlert(
+        'We could not validate your order, so your payment was automatically refunded ' +
+          '(it should reach your account in 5–7 business days). Please try again or contact support.',
+        'warning'
       );
     }
     if (upgrade || purchase) {

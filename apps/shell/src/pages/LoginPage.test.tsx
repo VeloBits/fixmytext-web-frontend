@@ -14,6 +14,7 @@ vi.mock('@velobits/app-core/auth/userManager', () => ({
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+  useSearchParams: () => [new URLSearchParams(window.location.search)],
 }));
 
 vi.mock('@/components/layout/PageSkeleton', () => ({
@@ -29,8 +30,8 @@ describe('LoginPage', () => {
   it('calls signinRedirect on mount and shows the skeleton', () => {
     render(<LoginPage />);
     expect(mockSigninRedirect).toHaveBeenCalledTimes(1);
-    // LoginPage calls signinRedirect() with no arguments (plain hosted login).
-    expect(mockSigninRedirect).toHaveBeenCalledWith();
+    // No ?returnTo= in the test URL → plain hosted login without OIDC state.
+    expect(mockSigninRedirect).toHaveBeenCalledWith(undefined);
     expect(screen.getByTestId('page-skeleton')).toBeInTheDocument();
   });
 

@@ -1,17 +1,18 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetPassCatalogQuery } from '@velobits/app-core/store/api/passesApi';
 import useSubscription from '@velobits/app-core/hooks/useSubscription';
 import formatPriceUtil from '@velobits/app-core/utils/formatPrice';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import { PRO_PRICES, type SupportedCurrency } from '@velobits/app-core/constants/pricing';
+import ToolPickerModal from '@velobits/app-core/components/subscription/ToolPickerModal';
 import type { AlertLevel } from '@/contexts/AlertContext';
 import type { SubscriptionContextValue } from '@/contexts/AppContext';
 import type { components } from '@velobits/app-core/types/openapi';
 
 type PassCatalogItem = components['schemas']['PassCatalogItem'];
 type CreditPackItem = components['schemas']['CreditPackItem'];
-type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
 
 // SVG icons extracted to a shared module for reusability
 import {
@@ -34,8 +35,6 @@ import {
   BarrelIcon,
   GiftIcon,
 } from '@/components/icons/PricingIcons';
-
-const PRO_PRICES = { inr: '₹399', usd: '$5', gbp: '£4', eur: '€4.50' };
 
 const PASS_GROUPS = [
   {
@@ -167,7 +166,7 @@ interface PricingPageProps {
 
 export default function PricingPage({ showAlert, subscription: subProp }: PricingPageProps) {
   const navigate = useNavigate();
-  const { isAuthenticated } = useOidcAuth();
+  const { isAuthenticated, login } = useOidcAuth();
   const fallbackSub = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
   const subscription = subProp || fallbackSub;
   const { data: catalog, isLoading, error: catalogError } = useGetPassCatalogQuery();
@@ -175,6 +174,9 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
   const [selectedPass, setSelectedPass] = useState<string | null>(null);
   const [selectedCredit, setSelectedCredit] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  // Tool-scoped passes require picking exactly N tools before checkout.
+  const [pickerPass, setPickerPass] = useState<PassCatalogItem | null>(null);
+  const detailCloseRef = useRef<HTMLButtonElement>(null);
 
   const passes = useMemo(() => catalog?.passes || [], [catalog]);
   const creditPacks = useMemo(() => catalog?.credit_packs || [], [catalog]);
@@ -208,24 +210,36 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
     [activeGroup, passMap]
   );
 
-  const handleBuyPass = async (passId: string) => {
-    if (!isAuthenticated) {
-      showAlert?.('Sign in to purchase a pass', 'warning');
-      navigate('/login');
-      return;
-    }
+  const doBuyPass = async (passId: string, toolIds: string[]) => {
     setBuyingId(passId);
     try {
-      await subscription.handleBuyPass(passId, []);
+      await subscription.handleBuyPass(passId, toolIds);
     } finally {
       setBuyingId(null);
     }
   };
 
+  const handleBuyPass = async (passId: string) => {
+    if (!isAuthenticated) {
+      showAlert?.('Sign in to purchase a pass', 'warning');
+      login({ returnTo: '/pricing' });
+      return;
+    }
+    const pass = passMap[passId];
+    // Tool-scoped pass: the buyer picks exactly N tools first — the selection
+    // becomes the server-validated pass scope.
+    if (pass && pass.tools > 0) {
+      setSelectedPass(null); // close the detail drawer under the picker
+      setPickerPass(pass);
+      return;
+    }
+    await doBuyPass(passId, []);
+  };
+
   const handleBuyCredits = async (packId: string) => {
     if (!isAuthenticated) {
       showAlert?.('Sign in to purchase credits', 'warning');
-      navigate('/login');
+      login({ returnTo: '/pricing' });
       return;
     }
     setBuyingId(packId);
@@ -238,6 +252,21 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
 
   const detailPass = selectedPass ? passMap[selectedPass] : null;
   const detailCredit = selectedCredit ? creditMap[selectedCredit] : null;
+
+  // Detail modals: close on Escape, focus the close button on open.
+  const detailOpen = Boolean(detailPass || detailCredit);
+  useEffect(() => {
+    if (!detailOpen) return;
+    detailCloseRef.current?.focus();
+    const onKeyDown = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') {
+        setSelectedPass(null);
+        setSelectedCredit(null);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [detailOpen]);
 
   return (
     <div className="tu-pricing">
@@ -317,20 +346,44 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                 <small>/mo</small>
               </span>
               {subscription?.isPro ? (
-                <span className="tu-pricing-pro-current">Your Current Plan</span>
+                <>
+                  <span className="tu-pricing-pro-current">Your Current Plan</span>
+                  {subscription.proExpiresAt && (
+                    <span className="tu-pricing-pro-guarantee">
+                      {subscription.proCancelled ? 'Access until' : 'Pro until'}{' '}
+                      {new Date(subscription.proExpiresAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  )}
+                  {(subscription.proCancelled ||
+                    (subscription.proExpiresAt &&
+                      new Date(subscription.proExpiresAt).getTime() - Date.now() <
+                        7 * 24 * 60 * 60 * 1000)) && (
+                    <button
+                      className="tu-pricing-pro-btn"
+                      onClick={() => subscription.handleUpgrade()}
+                      disabled={subscription?.upgradeLoading}
+                    >
+                      {subscription?.upgradeLoading ? 'Opening checkout…' : 'Renew Pro'}
+                    </button>
+                  )}
+                </>
               ) : (
                 <button
                   className="tu-pricing-pro-btn"
                   onClick={() => {
                     if (!isAuthenticated) {
-                      navigate('/login');
+                      login({ returnTo: '/pricing' });
                       return;
                     }
                     subscription.handleUpgrade();
                   }}
                   disabled={subscription?.upgradeLoading}
                 >
-                  {subscription?.upgradeLoading ? 'Redirecting...' : 'Upgrade to Pro'}
+                  {subscription?.upgradeLoading ? 'Opening checkout…' : 'Upgrade to Pro'}
                 </button>
               )}
               <span className="tu-pricing-pro-guarantee">30-day money-back guarantee</span>
@@ -526,13 +579,21 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
           >
             <motion.div
               className="tu-pass-detail"
+              role="dialog"
+              aria-modal="true"
+              aria-label={detailPass.name}
               initial={{ opacity: 0, scale: 0.92, y: 24 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 24 }}
               transition={{ type: 'spring', damping: 26, stiffness: 340 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button className="tu-pass-detail-close" onClick={() => setSelectedPass(null)}>
+              <button
+                ref={detailCloseRef}
+                className="tu-pass-detail-close"
+                aria-label="Close"
+                onClick={() => setSelectedPass(null)}
+              >
                 <svg
                   width="18"
                   height="18"
@@ -617,10 +678,10 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                       {detailPass.duration_days > 1 ? 's' : ''} from purchase
                     </li>
                     <li>Uses reset daily at midnight</li>
-                    {detailPass.tools > 0 && detailPass.tools <= 5 && (
+                    {detailPass.tools > 0 && (
                       <li>
-                        You choose which tool{detailPass.tools > 1 ? 's' : ''} to unlock after
-                        purchase
+                        Choose your {detailPass.tools > 1 ? `${detailPass.tools} tools` : 'tool'}{' '}
+                        before checkout
                       </li>
                     )}
                   </ul>
@@ -631,15 +692,15 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                   <div className="tu-pass-detail-steps">
                     <div className="tu-pass-detail-step">
                       <span className="tu-pass-detail-step-num">1</span>
-                      <span>Purchase via secure Razorpay checkout</span>
+                      <span>
+                        {detailPass.tools > 0
+                          ? `Pick your ${detailPass.tools > 1 ? `${detailPass.tools} tools` : 'tool'}`
+                          : 'All tools included'}
+                      </span>
                     </div>
                     <div className="tu-pass-detail-step">
                       <span className="tu-pass-detail-step-num">2</span>
-                      <span>
-                        {detailPass.tools > 0 && detailPass.tools <= 15
-                          ? 'Select your tools from the panel'
-                          : 'All tools unlocked instantly'}
-                      </span>
+                      <span>Pay via secure Razorpay checkout</span>
                     </div>
                     <div className="tu-pass-detail-step">
                       <span className="tu-pass-detail-step-num">3</span>
@@ -689,13 +750,21 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
           >
             <motion.div
               className="tu-pass-detail"
+              role="dialog"
+              aria-modal="true"
+              aria-label={detailCredit.name}
               initial={{ opacity: 0, scale: 0.92, y: 24 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 24 }}
               transition={{ type: 'spring', damping: 26, stiffness: 340 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button className="tu-pass-detail-close" onClick={() => setSelectedCredit(null)}>
+              <button
+                ref={detailCloseRef}
+                className="tu-pass-detail-close"
+                aria-label="Close"
+                onClick={() => setSelectedCredit(null)}
+              >
                 <svg
                   width="18"
                   height="18"
@@ -813,6 +882,20 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* -- Tool Picker (scoped passes) -- */}
+      <ToolPickerModal
+        open={Boolean(pickerPass)}
+        requiredCount={pickerPass?.tools ?? 1}
+        passName={pickerPass?.name ?? ''}
+        priceLabel={pickerPass ? formatPrice(pickerPass.price) : undefined}
+        onConfirm={(toolIds) => {
+          const passId = pickerPass?.id;
+          setPickerPass(null);
+          if (passId) void doBuyPass(passId, toolIds);
+        }}
+        onCancel={() => setPickerPass(null)}
+      />
     </div>
   );
 }

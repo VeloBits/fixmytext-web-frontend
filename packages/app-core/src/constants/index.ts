@@ -5,6 +5,8 @@
  * so they can be updated in a single place.
  */
 
+export * from './pricing';
+
 /** Route paths */
 export const ROUTES = {
   HOME: '/',
