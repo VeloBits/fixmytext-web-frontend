@@ -79,6 +79,7 @@
     "@module-federation/dts-plugin": {
       "typescript": "$typescript"
     },
+    "adm-zip": "^0.6.0",
     "openapi-typescript": {
       "typescript": "$typescript"
     },
