@@ -157,7 +157,9 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -356,7 +358,7 @@
   font-size: 0.55rem;
   font-weight: 700;
   letter-spacing: 0.03em;
-  color: var(--accent);
+  color: var(--text-2);
   margin-left: 8px;
   background: var(--accent-glow);
   padding: 2px 7px;
@@ -515,7 +517,9 @@
   font-size: 0.7rem;
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity var(--t), background var(--t);
+  transition:
+    opacity var(--t),
+    background var(--t);
 }
 .tu-sidebar-panel-item:hover .tu-sidebar-panel-item-del,
 .tu-sidebar-panel-item:hover .tu-sidebar-panel-item-action {
@@ -552,7 +556,9 @@
   font-size: 0.7rem;
   cursor: pointer;
   text-align: center;
-  transition: color var(--t), border-color var(--t);
+  transition:
+    color var(--t),
+    border-color var(--t);
 }
 .tu-sidebar-panel-tab:hover {
   color: var(--sidebar-fg);
@@ -595,7 +601,7 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ── Sidebar Footer (Gamification) ────────────────── */
+/* ── Sidebar Footer (PRO / credits badge) ──────────── */
 .tu-sidebar-footer {
   flex-shrink: 0;
   border-top: 1px solid var(--sidebar-border);
@@ -613,19 +619,10 @@
   font-size: 0.68rem;
 }
 
-.tu-sf-level-icon {
-  font-size: 0.72rem;
-}
-
 .tu-sf-label {
   font-weight: 700;
   color: var(--text);
   font-size: 0.78rem;
-}
-
-.tu-sf-sublabel {
-  color: var(--text-3);
-  font-size: 0.72rem;
 }
 
 .tu-sf-value {
@@ -634,72 +631,6 @@
   font-size: 0.72rem;
   font-family: var(--font-mono);
   font-weight: 600;
-}
-
-.tu-sf-xp-track {
-  width: 100%;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--xp-bar-bg);
-  overflow: hidden;
-}
-
-.tu-sf-xp-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--accent);
-  transition: width 0.5s ease-out;
-  min-width: 0;
-}
-
-.tu-sf-stats {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.tu-sf-stat {
-  font-size: 0.72rem;
-  color: var(--text-3);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  white-space: nowrap;
-}
-
-.tu-sf-stat b {
-  color: var(--text-2);
-  font-weight: 600;
-}
-
-.tu-sf-quest {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  padding: 4px 6px;
-  border-radius: 3px;
-  background: var(--sidebar-highlight);
-  border: 1px solid var(--border);
-}
-
-.tu-sf-quest--done {
-  opacity: 0.55;
-}
-
-.tu-sf-quest--done .tu-sf-quest-text {
-  text-decoration: line-through;
-}
-
-.tu-sf-quest-icon {
-  font-size: 0.72rem;
-  flex-shrink: 0;
-  line-height: 1.4;
-}
-
-.tu-sf-quest-text {
-  font-size: 0.72rem;
-  color: var(--text-2);
-  line-height: 1.4;
 }
 
 /* ── Editor Center Area ────────────────────────────── */
@@ -1308,7 +1239,9 @@
 .tu-gen-strength-fill {
   height: 100%;
   border-radius: 3px;
-  transition: width 0.3s ease, background 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
 }
 .tu-gen-strength-label {
   font-size: 0.65rem;
@@ -1845,7 +1778,9 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: color var(--t), border-color var(--t);
+  transition:
+    color var(--t),
+    border-color var(--t);
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2515,8 +2450,100 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   .tu-activity-bar {
     display: none;
   }
-  .tu-forge-sidebar {
+  /* Sidebar becomes a slide-up bottom sheet (toggled by the Tools FAB and
+     the landing category cards via the existing sidebarOpen state) */
+  .tu-forge .tu-forge-sidebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    /* definite height: the panel list inside relies on flex:1 to size+scroll */
+    height: 75vh;
+    height: 75dvh;
+    z-index: 400;
+    border-right: none;
+    border-top: 1px solid var(--border-strong);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.45);
+    transform: translateY(100%);
+    visibility: hidden;
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s;
+    overscroll-behavior: contain;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tu-forge:not(.tu-forge--sidebar-collapsed) .tu-forge-sidebar {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  .tu-resize-handle--sidebar {
     display: none;
+  }
+  .tu-tools-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 390;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+  }
+  .tu-tools-fab:active {
+    background: var(--accent-hover);
+  }
+  .tu-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 395;
+    background: rgba(0, 0, 0, 0.45);
+  }
+  /* Sheet: quick access to the activity-bar panels + touch-sized controls */
+  .tu-sheet-tabs {
+    display: flex;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .tu-sheet-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 44px;
+    padding: 0 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .tu-sheet-tab--active {
+    color: var(--accent);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+  .tu-sidebar-header-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .tu-tpanel-tab {
+    min-height: 40px;
   }
   .tu-editor-split {
     grid-template-columns: 1fr !important;
@@ -2643,7 +2670,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   cursor: pointer;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
   font-family: inherit;
   color: var(--text);
 }
@@ -2744,7 +2773,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   font-size: 0.8rem;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color var(--t), background var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t);
   white-space: nowrap;
 }
 
@@ -2762,36 +2793,6 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   font-size: 0.62rem;
   font-family: var(--font-mono);
   color: var(--text-3);
-}
-
-/* XP progress bar */
-.tu-landing-xp-bar {
-  max-width: 960px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.tu-landing-xp-track {
-  width: 100%;
-  height: 6px;
-  background: var(--surface-2);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.tu-landing-xp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), #3bacff);
-  border-radius: 3px;
-  transition: width 0.5s ease;
-}
-
-.tu-landing-xp-label {
-  font-size: 0.65rem;
-  color: var(--text-3);
-  text-align: right;
 }
 
 /* Dashboard cards grid */
@@ -2827,50 +2828,6 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
 
 .tu-landing-card-icon {
   font-size: 0.85rem;
-}
-
-/* Quest card */
-.tu-landing-quest-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tu-landing-quest-text {
-  font-size: 0.85rem;
-  color: var(--text);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.tu-landing-quest-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tu-landing-quest-xp {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--accent);
-  font-family: var(--font-mono);
-}
-
-.tu-landing-quest-done {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: var(--emerald, #4ec9b0);
-  background: rgba(78, 201, 176, 0.12);
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
-}
-
-.tu-landing-quest-pending {
-  font-size: 0.68rem;
-  color: var(--text-3);
-  background: var(--surface-2);
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
 }
 
 /* Mini stats */
@@ -2962,7 +2919,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   border: 1px solid transparent;
   border-radius: var(--r-sm);
   cursor: pointer;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
   font-family: inherit;
   color: var(--text);
   text-align: left;
@@ -3056,7 +3015,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background var(--t), transform var(--t);
+  transition:
+    background var(--t),
+    transform var(--t);
 }
 
 .tu-landing-cta:hover {
@@ -3076,7 +3037,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   font-size: 0.85rem;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color var(--t), background var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t);
 }
 
 .tu-landing-cta-secondary:hover {
@@ -3234,9 +3197,6 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   .tu-landing-dash-grid {
     grid-template-columns: 1fr 1fr;
   }
-  .tu-landing-dash-grid .tu-landing-card--achievements {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 700px) {
@@ -3363,7 +3323,9 @@ body:not(.dark) .tu-bottom-panel .tu-btn--ai-dismiss:hover {
   border: none;
   border-radius: var(--r-sm);
   cursor: pointer;
-  transition: background var(--t), opacity var(--t);
+  transition:
+    background var(--t),
+    opacity var(--t);
 }
 
 .tu-modal-btn--primary {

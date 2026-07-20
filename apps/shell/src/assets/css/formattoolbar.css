@@ -12,7 +12,9 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
   animation: tu-fmt-in 0.12s ease-out;
 }
 

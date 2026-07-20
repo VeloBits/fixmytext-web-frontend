@@ -4,9 +4,6 @@ export type { AlertLevel, Alert, AlertContextValue } from './AlertContext';
 export { AppProvider, useAppContext } from './AppContext';
 export type {
   User,
-  GamificationStreak,
-  GamificationDailyQuest,
-  GamificationContextValue,
   ToolUsage,
   SubscriptionContextValue,
   AppContextValue,

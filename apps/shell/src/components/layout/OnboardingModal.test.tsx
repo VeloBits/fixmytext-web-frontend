@@ -2,10 +2,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</div>,
-    button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <button {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</button>,
-    span: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <span {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</span>,
-    p: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <p {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</p>,
+    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+      <div {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</div>
+    ),
+    button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+      <button {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</button>
+    ),
+    span: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+      <span {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</span>
+    ),
+    p: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+      <p {...(filterMotionProps(props) as Record<string, unknown>)}>{children}</p>
+    ),
   },
   AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
 }));
@@ -28,14 +36,58 @@ function filterMotionProps(props: Record<string, unknown>) {
   return filtered;
 }
 
-vi.mock('@/constants/tools', () => ({
-  PERSONAS: {
-    writer: { label: 'Writer / Blogger', icon: 'Wr', defaultTab: 'writing' },
-    student: { label: 'Student', icon: 'St', defaultTab: 'writing' },
-    developer: { label: 'Developer', icon: '</>', defaultTab: 'code' },
-    social: { label: 'Social Media', icon: '@s', defaultTab: 'ai' },
-    explorer: { label: 'Just Exploring', icon: '?>', defaultTab: 'all' },
-  },
+const WRITER_KIT = {
+  id: 'writer',
+  label: 'Writer / Blogger',
+  icon: 'Wr',
+  groupName: 'Writing essentials',
+  defaultTab: 'writing',
+  toolIds: ['fix_grammar', 'paraphrase'],
+};
+
+vi.mock('@velobits/app-core/constants/tools', () => ({
+  STARTER_KITS: [
+    {
+      id: 'writer',
+      label: 'Writer / Blogger',
+      icon: 'Wr',
+      groupName: 'Writing essentials',
+      defaultTab: 'writing',
+      toolIds: ['fix_grammar', 'paraphrase'],
+    },
+    {
+      id: 'student',
+      label: 'Student',
+      icon: 'St',
+      groupName: 'Study essentials',
+      defaultTab: 'writing',
+      toolIds: ['summarize'],
+    },
+    {
+      id: 'developer',
+      label: 'Developer',
+      icon: '</>',
+      groupName: 'Developer toolkit',
+      defaultTab: 'code',
+      toolIds: ['json_fmt'],
+    },
+    {
+      id: 'social',
+      label: 'Social Media',
+      icon: '@s',
+      groupName: 'Social media kit',
+      defaultTab: 'ai',
+      toolIds: ['hashtags'],
+    },
+    {
+      id: 'explorer',
+      label: 'Just Exploring',
+      icon: '?>',
+      groupName: '',
+      defaultTab: 'all',
+      toolIds: [],
+    },
+  ],
 }));
 
 import OnboardingModal from './OnboardingModal';
@@ -47,7 +99,7 @@ describe('OnboardingModal', () => {
     expect(document.body.textContent).toContain('Welcome');
   });
 
-  it('renders persona cards', () => {
+  it('renders starter-kit cards', () => {
     render(<OnboardingModal onComplete={vi.fn()} />);
     expect(screen.getByText('Writer / Blogger')).toBeInTheDocument();
     expect(screen.getByText('Student')).toBeInTheDocument();
@@ -56,21 +108,46 @@ describe('OnboardingModal', () => {
     expect(screen.getByText('Just Exploring')).toBeInTheDocument();
   });
 
-  it('calls onComplete with persona id when clicked', () => {
+  it('calls onComplete with the full kit when a card is clicked', () => {
     const onComplete = vi.fn();
     render(<OnboardingModal onComplete={onComplete} />);
     fireEvent.click(screen.getByText('Writer / Blogger'));
-    expect(onComplete).toHaveBeenCalledWith('writer');
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining(WRITER_KIT));
+  });
+
+  it('calls onComplete with null on X (dismiss creates nothing)', () => {
+    const onComplete = vi.fn();
+    render(<OnboardingModal onComplete={onComplete} />);
+    fireEvent.click(screen.getByLabelText('Skip — explore all tools'));
+    expect(onComplete).toHaveBeenCalledWith(null);
+  });
+
+  it('calls onComplete with null on Escape', () => {
+    const onComplete = vi.fn();
+    render(<OnboardingModal onComplete={onComplete} />);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(onComplete).toHaveBeenCalledWith(null);
+  });
+
+  it('explorer card completes with an empty kit (no group created)', () => {
+    const onComplete = vi.fn();
+    render(<OnboardingModal onComplete={onComplete} />);
+    fireEvent.click(screen.getByText('Just Exploring'));
+    expect(onComplete).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'explorer', toolIds: [], groupName: '' })
+    );
   });
 
   it('renders footer text', () => {
     render(<OnboardingModal onComplete={vi.fn()} />);
-    expect(screen.getByText('You can change this anytime in settings')).toBeInTheDocument();
+    expect(
+      screen.getByText('Your kit becomes an editable group — rename or change it anytime')
+    ).toBeInTheDocument();
   });
 
   it('renders subtitle text', () => {
     render(<OnboardingModal onComplete={vi.fn()} />);
-    expect(screen.getByText(/Pick your path/)).toBeInTheDocument();
+    expect(screen.getByText(/Pick a starter kit/)).toBeInTheDocument();
   });
 
   it('renders logo icon', () => {

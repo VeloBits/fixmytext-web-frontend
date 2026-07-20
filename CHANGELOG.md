@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Email-verification banner (`EmailVerificationBanner`) now resends via the account-svc `POST /auth/resend-verification` endpoint instead of redirecting to Keycloak's reset-credentials page; the user stays in the app and gets a success/error alert
+- Post-logout redirect target changed from `/app/login` to `/app/` so a signed-out user is not immediately bounced back to the Keycloak login form
+- Onboarding persona overlay is suppressed on auth routes (`/login`, `/signup`, `/forgot-password`, `/auth/*`) so it no longer covers the "Couldn't reach sign-in" retry card or the callback error card
+- `AuthCallback` now recovers from a replayed/refreshed callback URL (consumed OIDC state) by restoring the existing session and returning home, instead of stranding the user on an error card
+- Persona selection is mirrored to `sessionStorage` even when authenticated, so the onboarding modal does not reappear immediately after logout
+
+### Removed
+
+- Dead `keycloakClient.ts` (`sendMagicLink`) — the magic-link workaround had no callers; `ForgotPasswordPage` builds its own Keycloak reset-credentials URL from `keycloakConfig`
+
 ## [1.0.0] - 2026-04-02
 
 ### Added
@@ -39,13 +51,17 @@ Copy this block when preparing a new release:
 ## [X.Y.Z] - YYYY-MM-DD
 
 ### Added
+
 -
 
 ### Changed
+
 -
 
 ### Fixed
+
 -
 
 ### Removed
+
 -

@@ -18,7 +18,7 @@
     "blakejs": "^1.2.1",
     "blueimp-md5": "^2.19.0",
     "docx": "9.6.1",
-    "dompurify": "3.4.3",
+    "dompurify": "3.4.11",
     "framer-motion": "^12.38.0",
     "js-sha256": "^0.11.1",
     "js-sha3": "^0.9.3",
@@ -68,15 +68,25 @@
     "openapi-typescript": "^7.13.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3",
-    "vite": "^8.0.12",
+    "vite": "^8.0.16",
     "vitest": "^4.1.6",
     "vitest-axe": "^0.1.0"
   },
   "overrides": {
-    "ws": "8.21.0",
-    "@module-federation/dts-plugin": {
-      "ws": "8.21.0"
+    "@emoji-mart/react": {
+      "react": "$react"
     },
+    "@module-federation/dts-plugin": {
+      "typescript": "$typescript"
+    },
+    "adm-zip": "^0.6.0",
+    "openapi-typescript": {
+      "typescript": "$typescript"
+    },
+    "ws": "8.21.0",
+    "esbuild": "0.28.1",
+    "form-data": "4.0.6",
+    "js-yaml": "4.2.0",
     "next": {
       "postcss": "^8.5.15"
     }
@@ -106,8 +116,8 @@
     "typecheck": "npm run --workspaces --if-present typecheck",
     "prepare": "husky",
     "deploy:shell": "npm run build:shell && npx wrangler pages deploy apps/shell/dist --project-name fixmytext-shell",
-    "deploy:editor": "npm run build:editor && npx wrangler pages deploy apps/editor-remote/dist --project-name fixmytext-editor-remote",
-    "deploy:analytics": "npm run build:analytics && npx wrangler pages deploy apps/analytics-remote/dist --project-name fixmytext-analytics-remote",
+    "deploy:editor": "npm run build:editor && find apps/editor-remote/dist -name '*.map' -delete && npx wrangler pages deploy apps/editor-remote/dist --project-name fixmytext-editor-remote",
+    "deploy:analytics": "npm run build:analytics && find apps/analytics-remote/dist -name '*.map' -delete && npx wrangler pages deploy apps/analytics-remote/dist --project-name fixmytext-analytics-remote",
     "deploy:content": "npm run build:cf -w @velobits/content-app && cd apps/content && npx wrangler deploy",
     "deploy:worker": "npm run deploy -w @velobits/cf-router-worker"
   }

@@ -1,10 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {
-  API_URL,
-  apiPost,
-  registerVerifiedUser,
-  razorpaySignature,
-} from './helpers';
+import { API_URL, apiPost, registerVerifiedUser, razorpaySignature } from './helpers';
 
 /**
  * Purchases a pass end-to-end against the backend with PAYMENTS_BACKEND=fake.
@@ -20,10 +15,7 @@ import {
  * Requires backend env: PAYMENTS_BACKEND=fake, RAZORPAY_KEY_ID=rzp_test_fake,
  * RAZORPAY_KEY_SECRET set to the value E2E_RAZORPAY_KEY_SECRET below.
  */
-test('purchase a pass via Razorpay (test mode, signed verify)', async ({
-  page,
-  request,
-}) => {
+test('purchase a pass via Razorpay (test mode, signed verify)', async ({ page, request }) => {
   const secret = process.env.E2E_RAZORPAY_KEY_SECRET || 'fake_secret_for_e2e';
 
   // Auth: create a verified user and grab an access token.
@@ -51,7 +43,7 @@ test('purchase a pass via Razorpay (test mode, signed verify)', async ({
     request,
     '/api/v1/passes/order',
     { pass_id: passId, tool_ids: toolIds, region: 'IN' },
-    token,
+    token
   );
   expect(orderRes.ok(), `order failed: ${await orderRes.text()}`).toBeTruthy();
   const order = await orderRes.json();
@@ -71,7 +63,7 @@ test('purchase a pass via Razorpay (test mode, signed verify)', async ({
       item_type: 'pass',
       tool_ids: toolIds,
     },
-    token,
+    token
   );
   expect(verifyRes.ok(), `verify failed: ${await verifyRes.text()}`).toBeTruthy();
 

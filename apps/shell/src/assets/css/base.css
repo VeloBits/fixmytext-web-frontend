@@ -17,8 +17,24 @@
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  font-family:
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   min-height: 100vh;
   overflow: hidden;
+}
+
+/* Mobile: the fixed-viewport IDE layout switches to a document-flow layout
+   (.tu-forge gets height auto), so the page must scroll natively instead of
+   relying on inner scroll panes */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }

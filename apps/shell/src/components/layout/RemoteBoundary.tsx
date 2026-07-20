@@ -18,9 +18,7 @@ interface Props {
 export default function RemoteBoundary({ name, children }: Props) {
   return (
     <RemoteErrorBoundary name={name}>
-      <Suspense fallback={<PageSkeleton />}>
-        {children}
-      </Suspense>
+      <Suspense fallback={<PageSkeleton />}>{children}</Suspense>
     </RemoteErrorBoundary>
   );
 }

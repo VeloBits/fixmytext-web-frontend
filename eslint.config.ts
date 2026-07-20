@@ -9,7 +9,7 @@ import tseslint from 'typescript-eslint';
 export default [
   js.configs.recommended,
   {
-    files: ['apps/shell/src/**/*.{ts,tsx}'],
+    files: ['apps/*/src/**/*.{ts,tsx}'],
     plugins: {
       react,
       'react-hooks': reactHooks,
@@ -41,7 +41,7 @@ export default [
   },
   // Test files: add Vitest globals and relax rules that don't apply in tests
   {
-    files: ['apps/shell/src/**/*.test.{ts,tsx}', 'apps/shell/src/test/**/*.{ts,tsx}'],
+    files: ['apps/*/src/**/*.test.{ts,tsx}', 'apps/*/src/test/**/*.{ts,tsx}'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -85,7 +85,7 @@ export default [
     },
   }),
   {
-    files: ['apps/shell/src/**/*.{ts,tsx}', 'packages/**/*.{ts,tsx}'],
+    files: ['apps/*/src/**/*.{ts,tsx}', 'packages/**/*.{ts,tsx}'],
     plugins: { security },
     rules: {
       ...security.configs.recommended.rules,

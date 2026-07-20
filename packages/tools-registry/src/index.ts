@@ -1,13 +1,10 @@
 export {
   TOOLS,
   TOOL_GROUPS,
-  PERSONAS,
+  STARTER_KITS,
   USE_CASE_TABS,
   SMART_SUGGESTION_RULES,
   SEARCH_INTENTS,
-  ACHIEVEMENTS,
-  QUEST_TEMPLATES,
-  LEVELS,
 } from './tools';
 export { getToolBySlug, getAllSlugs, getToolsByGroup, getAllGroups } from './slugs';
 export type {
@@ -18,11 +15,8 @@ export type {
   ToolColor,
   SelectOption,
   UseCaseTab,
-  Persona,
-  Achievement,
-  AchievementStats,
-  QuestTemplate,
+  StarterKit,
+  StarterKitId,
   QuestOp,
-  LevelDefinition,
   SmartSuggestionRule,
 } from './types';

@@ -2,8 +2,6 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import EmailVerificationBanner from './EmailVerificationBanner';
 
-const mockResendVerification = vi.fn();
-
 interface MockAuthState {
   accessToken: string | null;
   user: { email: string; is_email_verified: boolean } | null;
@@ -19,9 +17,10 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -30,11 +29,15 @@ vi.mock('@/auth/useOidcAuth', () => ({
   }),
 }));
 
-vi.mock('@/store/api/authApi', () => ({
-  useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
+// Resend is an account-svc mutation (POST /auth/resend-verification), not a
+// Keycloak page navigation — mock the RTK hook so no store Provider is needed.
+const mockResendTrigger = vi.fn();
+let mockIsResending = false;
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
+  useResendVerificationMutation: () => [mockResendTrigger, { isLoading: mockIsResending }],
 }));
 
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 function setAuth({ accessToken = null, user = null }: Partial<MockAuthState> = {}) {
@@ -42,6 +45,7 @@ function setAuth({ accessToken = null, user = null }: Partial<MockAuthState> = {
   // Keep OIDC in sync with Redux mock state
   mockUseOidcAuth.mockReturnValue({
     isAuthenticated: !!accessToken,
+    wasAuthenticated: !!accessToken,
     isLoading: false,
     accessToken,
     oidcUser: null,
@@ -56,6 +60,8 @@ describe('EmailVerificationBanner', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    mockIsResending = false;
+    mockResendTrigger.mockReturnValue({ unwrap: () => Promise.resolve() });
     setAuth(); // resets both mockState and mockUseOidcAuth to unauthenticated
   });
 
@@ -81,7 +87,7 @@ describe('EmailVerificationBanner', () => {
     expect(screen.getByRole('button', { name: 'Resend email' })).toBeInTheDocument();
   });
 
-  it('resends successfully and shows Keycloak redirect message', async () => {
+  it('resend calls the account-svc mutation and confirms via alert', async () => {
     setAuth({
       accessToken: 'tok',
       user: { email: 'u@example.com', is_email_verified: false },
@@ -90,34 +96,36 @@ describe('EmailVerificationBanner', () => {
     render(<EmailVerificationBanner showAlert={showAlert} />);
     fireEvent.click(screen.getByRole('button', { name: 'Resend email' }));
 
-    await waitFor(() => {
-      expect(showAlert).toHaveBeenCalledWith(
-        'Please check your Keycloak account to resend the verification email.',
-        'info'
-      );
-    });
-    // Button stays enabled (no cooldown in new Keycloak-based flow)
-    expect(screen.getByRole('button', { name: 'Resend email' })).not.toBeDisabled();
+    await waitFor(() => expect(mockResendTrigger).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('u@example.com'), 'success')
+    );
   });
 
-  it('parses backend 429 "wait N seconds" into a countdown', async () => {
+  it('resend failure surfaces a danger alert instead of throwing', async () => {
+    mockResendTrigger.mockReturnValue({ unwrap: () => Promise.reject(new Error('502')) });
     setAuth({
       accessToken: 'tok',
       user: { email: 'u@example.com', is_email_verified: false },
     });
 
-    // New behavior: clicking resend shows the Keycloak message (no API call, no 429)
     render(<EmailVerificationBanner showAlert={showAlert} />);
     fireEvent.click(screen.getByRole('button', { name: 'Resend email' }));
 
-    await waitFor(() => {
-      expect(showAlert).toHaveBeenCalledWith(
-        'Please check your Keycloak account to resend the verification email.',
-        'info'
-      );
+    await waitFor(() =>
+      expect(showAlert).toHaveBeenCalledWith(expect.stringContaining('Could not send'), 'danger')
+    );
+  });
+
+  it('resend button is disabled while the request is in flight', () => {
+    mockIsResending = true;
+    setAuth({
+      accessToken: 'tok',
+      user: { email: 'u@example.com', is_email_verified: false },
     });
-    // No cooldown in new implementation
-    expect(screen.queryByRole('button', { name: /resend in \d+s/i })).not.toBeInTheDocument();
+
+    render(<EmailVerificationBanner showAlert={showAlert} />);
+    expect(screen.getByRole('button', { name: 'Sending…' })).toBeDisabled();
   });
 
   it('dismiss button hides the banner and persists the dismissal', () => {

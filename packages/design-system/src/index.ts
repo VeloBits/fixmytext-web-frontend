@@ -10,5 +10,7 @@ export type { InputProps } from './components/Input';
 export { ToolCard } from './components/ToolCard';
 export type { ToolCardProps } from './components/ToolCard';
 
+export * from './components/icons';
+
 export { tokens } from './tokens';
 export type { TokenColor } from './tokens';

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { Component, type ReactNode } from 'react';
 
 interface Props {
@@ -22,8 +23,6 @@ export default class RemoteErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const Sentry = require('@sentry/react');
       Sentry.captureException(error, { tags: { remote: this.props.name } });
     } catch {
       // Sentry not available
@@ -68,7 +67,8 @@ export default class RemoteErrorBoundary extends Component<Props, State> {
               {this.props.name} couldn&apos;t be loaded
             </p>
             <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-3)' }}>
-              This section is temporarily unavailable. It may be deploying or there&apos;s a network issue.
+              This section is temporarily unavailable. It may be deploying or there&apos;s a network
+              issue.
             </p>
           </div>
 

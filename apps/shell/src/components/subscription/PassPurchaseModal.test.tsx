@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PassPurchaseModal from './PassPurchaseModal';
 import type { PassPurchaseModalProps } from './PassPurchaseModal';
-import type { ToolDefinition } from '@/types/tools';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 import type { SubscriptionContextValue } from '@/contexts/AppContext';
 
 vi.mock('framer-motion', () => {
@@ -18,13 +18,21 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({
+    children,
+    to,
+    ...props
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => vi.fn(),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
   useParams: () => ({}),
 }));
 
-vi.mock('@/store/api/passesApi', () => ({
+vi.mock('@velobits/app-core/store/api/passesApi', () => ({
   useGetPassCatalogQuery: vi.fn(() => ({
     data: {
       passes: [
@@ -36,14 +44,21 @@ vi.mock('@/store/api/passesApi', () => ({
           symbol: '$',
           currency: 'usd',
         },
-        { id: 'day_triple', name: 'Day Triple', price: 199, symbol: '$', currency: 'usd' },
+        {
+          id: 'day_triple',
+          name: 'Day Triple',
+          price: 199,
+          tools: 3,
+          symbol: '$',
+          currency: 'usd',
+        },
       ],
       credit_packs: [{ id: 'pack_5', name: '5 Credits', credits: 5, price: 299 }],
     },
   })),
 }));
 
-vi.mock('@/utils/formatPrice', () => ({
+vi.mock('@velobits/app-core/utils/formatPrice', () => ({
   default: (price: number) => `$${(price / 100).toFixed(2)}`,
 }));
 
@@ -111,9 +126,9 @@ describe('PassPurchaseModal', () => {
     expect(baseProps.onDismiss).toHaveBeenCalled();
   });
 
-  it('shows quest hint', () => {
+  it('shows free-pass hint', () => {
     render(<PassPurchaseModal {...baseProps} />);
-    expect(screen.getByText(/Complete today/)).toBeInTheDocument();
+    expect(screen.getByText(/weekly reward spin/)).toBeInTheDocument();
   });
 
   it('shows browse all passes link', () => {
@@ -148,9 +163,15 @@ describe('PassPurchaseModal', () => {
     expect(baseProps.onDismiss).toHaveBeenCalled();
   });
 
-  it('calls onDismiss when Day Triple option is clicked', () => {
+  it('opens the tool picker (prefilled with the blocked tool) for Day Triple', () => {
     render(<PassPurchaseModal {...baseProps} />);
     fireEvent.click(screen.getByText('Day Triple').closest('div')!.parentElement!);
-    expect(baseProps.onDismiss).toHaveBeenCalled();
+    // The picker replaces the old navigate-away behavior: buying stays in flow.
+    expect(baseProps.onDismiss).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('dialog', { name: /choose 3 tools for day triple/i })
+    ).toBeInTheDocument();
+    // Prefilled with the tool that triggered the upsell.
+    expect(screen.getByTestId('tool-picker-counter')).toHaveTextContent('1 of 3 selected');
   });
 });

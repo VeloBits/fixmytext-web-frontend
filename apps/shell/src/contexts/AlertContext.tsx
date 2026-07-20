@@ -1,8 +1,11 @@
 import { createContext, useContext } from 'react';
 import type React from 'react';
 import { useAlert } from '@/hooks/useAlert';
+import type { AlertLevel } from '@velobits/app-core/types/alert';
 
-export type AlertLevel = 'success' | 'danger' | 'warning' | 'info';
+// Canonical AlertLevel lives in @velobits/app-core (shared with the host<->remote
+// contract). Re-exported here so existing `@/contexts/AlertContext` imports work.
+export type { AlertLevel };
 
 export interface Alert {
   id: number;
@@ -19,11 +22,7 @@ export interface AlertContextValue {
    * Show a toast notification.
    * Returns the numeric ID of the new alert, or -1 if a duplicate was suppressed.
    */
-  showAlert: (
-    message: unknown,
-    type?: AlertLevel,
-    options?: { duration?: number }
-  ) => number;
+  showAlert: (message: unknown, type?: AlertLevel, options?: { duration?: number }) => number;
   /** Dismiss an alert by its numeric ID. */
   dismissAlert: (id: number) => void;
 }

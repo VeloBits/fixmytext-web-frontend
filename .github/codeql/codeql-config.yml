@@ -1,11 +1,11 @@
-name: "Custom CodeQL Config"
+name: 'Custom CodeQL Config'
 
 paths-ignore:
-  - "src/types/openapi.d.ts"
-  - "src/types/vendor.d.ts"
-  - "**/*.test.ts"
-  - "**/*.test.tsx"
-  - "e2e/**"
+  - 'src/types/openapi.d.ts'
+  - 'src/types/vendor.d.ts'
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - 'e2e/**'
 
 queries:
   - uses: security-extended

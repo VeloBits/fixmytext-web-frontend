@@ -17,9 +17,10 @@ export interface ApiError {
 
 function getDefaultBaseUrl(): string {
   // Vite env (import.meta.env is injected at build time by the Vite bundler)
-  const viteEnv = (typeof import.meta !== 'undefined'
-    ? (import.meta as unknown as { env?: Record<string, string> }).env
-    : undefined);
+  const viteEnv =
+    typeof import.meta !== 'undefined'
+      ? (import.meta as unknown as { env?: Record<string, string> }).env
+      : undefined;
   if (viteEnv?.VITE_API_URL) return viteEnv.VITE_API_URL;
 
   // Next.js env (process is a Node.js global; guard with typeof for browser safety)
@@ -74,7 +75,7 @@ export async function apiFetch<T = unknown>(
   });
 
   if (!response.ok) {
-    const detail = await response.json().catch(() => undefined) as unknown;
+    const detail = (await response.json().catch(() => undefined)) as unknown;
     const error: ApiError = {
       status: response.status,
       message: response.statusText,

@@ -8,9 +8,7 @@ export const metadata: Metadata = {
   },
   description:
     '254+ free text transformation tools: case converters, encoders, ciphers, AI writing tools, and more. No signup required.',
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fixmytext.velobits.dev'
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fixmytext.velobits.dev'),
   openGraph: {
     siteName: 'FixMyText',
     type: 'website',
@@ -24,7 +22,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      {/* The share viewer's theme-init script adds `dark` to <body> before
+          hydration (see app/share/[id]/layout.tsx) — suppress the resulting
+          className mismatch warning. */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

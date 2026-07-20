@@ -50,11 +50,45 @@ jobs:
         run: npm run build -w @velobits/shell
         env:
           VITE_API_URL: http://localhost:8000
+          # Federation remote entry points — Vite bakes these into the host bundle at
+          # build time. Use repo vars for the real deployment URLs; fall back to the
+          # local router path so the build check still exercises a prefixed (non-localhost)
+          # remoteEntry URL rather than the vite.config localhost:3101/3102 defaults.
+          VITE_EDITOR_REMOTE_ENTRY: ${{ vars.VITE_EDITOR_REMOTE_ENTRY || 'http://localhost:3000/remotes/editor/remoteEntry.js' }}
+          VITE_ANALYTICS_REMOTE_ENTRY: ${{ vars.VITE_ANALYTICS_REMOTE_ENTRY || 'http://localhost:3000/remotes/analytics/remoteEntry.js' }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
           VITE_SENTRY_ENVIRONMENT: production
           VITE_SENTRY_RELEASE: ${{ github.sha }}
+
+  build-remotes:
+    name: Build Check (${{ matrix.remote }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        remote:
+          - editor-remote
+          - analytics-remote
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The remotes are independently-deployed Module Federation bundles.
+      # Building them in CI ensures a shell change can't silently break a remote
+      # (their source is no longer a hollow re-export of shell/src).
+      - name: Build ${{ matrix.remote }}
+        run: npm run build -w @velobits/${{ matrix.remote }}
+        env:
+          VITE_API_URL: http://localhost:8000
 
   test-web:
     name: Tests & Coverage (shell app)
@@ -73,6 +107,102 @@ jobs:
 
       - name: Run tests with coverage
         run: npm run test:coverage -w @velobits/shell
+
+  test-remotes:
+    name: Tests & Coverage (${{ matrix.remote }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        remote:
+          - editor-remote
+          - analytics-remote
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage -w @velobits/${{ matrix.remote }}
+
+  federation-smoke:
+    name: Federation Smoke (host↔remote contract)
+    runs-on: ubuntu-latest
+    # Heavy E2E gate — runs only for `main` (pushes to main + PRs targeting main).
+    # Skipped on `develop`: push to develop has github.ref refs/heads/develop;
+    # a PR into develop has github.base_ref == 'develop'. Both are excluded here.
+    if: github.ref != 'refs/heads/develop' && github.base_ref != 'develop'
+    # Fail fast if a step hangs (e.g. a stalled Playwright CDN download) instead of
+    # sitting until GitHub's 6-hour default — which makes the run look permanently stuck.
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Cache the downloaded browser binaries (~270 MB) keyed on the resolved
+      # Playwright version. On a cache hit we skip the slow CDN download entirely
+      # and only run install-deps (apt) below.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}
+
+      # Cache hit: browsers already present, only install the OS deps (fast).
+      # Cache miss: download chromium + headless shell + ffmpeg, then deps.
+      - name: Install Playwright browser (on cache miss)
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Install Playwright OS dependencies
+        run: npx playwright install-deps chromium
+
+      # Bring up the production simulation: built shell + remotes behind the nginx
+      # router on :3000 — the topology that actually exercises the remote `base` paths
+      # and the shell's baked VITE_*_REMOTE_ENTRY URLs (Phase 6.1/6.2). The backend +
+      # Keycloak are mocked inside the smoke spec, so no real services are needed.
+      - name: Start prod compose stack
+        run: |
+          cp .env.docker.prod.example .env.docker.prod
+          docker compose --profile prod up --build -d
+
+      - name: Wait for router (shell at /app)
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:3000/app; then
+              echo "router up"; exit 0
+            fi
+            sleep 5
+          done
+          echo "router did not become ready" >&2
+          docker compose --profile prod logs --no-color | tail -100 >&2
+          exit 1
+
+      - name: Run federation smoke
+        run: npm run test:smoke -w @velobits/shell
+
+      - name: Tear down
+        if: always()
+        run: docker compose --profile prod down -v
 
   build-content:
     name: Build Check (content app)
@@ -103,6 +233,7 @@ jobs:
     strategy:
       matrix:
         package:
+          - app-core
           - design-system
           - api-client
           - auth-shared

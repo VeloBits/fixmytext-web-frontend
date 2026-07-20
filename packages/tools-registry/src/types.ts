@@ -144,11 +144,22 @@ export interface UseCaseTab {
   color: string;
 }
 
-/** A persona entry from PERSONAS. */
-export interface Persona {
+/** Valid starter-kit keys — literal union (not derived from STARTER_KITS) to avoid a types→tools import cycle. */
+export type StarterKitId = 'writer' | 'student' | 'developer' | 'social' | 'explorer';
+
+/** A starter-kit entry from STARTER_KITS: an onboarding card whose pick seeds
+ * the user's first custom tool group (replaced personas, 2026-07-14). */
+export interface StarterKit {
+  id: StarterKitId;
   label: string;
   icon: string;
+  /** Name of the custom group the kit creates. Empty string = the kit creates
+   * nothing (explorer). Must stay in sync with backend migration 0004 seeds. */
+  groupName: string;
+  /** Tab activated once right after the pick; not persisted anywhere. */
   defaultTab: string;
+  /** Tool ids seeded into the created group. */
+  toolIds: string[];
 }
 
 /** A smart-suggestion rule that maps a text-detection function to tool IDs. */
@@ -157,51 +168,10 @@ export interface SmartSuggestionRule {
   toolIds: string[];
 }
 
-/** Stats object passed to achievement condition functions. */
-export interface AchievementStats {
-  totalOps: number;
-  discoveredTools: string[];
-  sessionOps: number;
-  speedCount: number;
-  aiToolsUsed: number;
-  devToolsUsed: number;
-  languagesUsed: number;
-  streak: number;
-  totalChars: number;
-  favoritesCount: number;
-  savedPipelines: number;
-  nightOwl: boolean;
-  earlyBird: boolean;
-}
-
-/** A gamification achievement definition. */
-export interface Achievement {
-  id: string;
-  label: string;
-  description: string;
-  icon: string;
-  condition: (stats: AchievementStats) => boolean;
-}
-
-/** An operation record used in quest check functions. */
+/** A single tool-use operation record (e.g. the analytics recent-activity list). */
 export interface QuestOp {
   id?: string;
   tab?: string;
   isNew?: boolean;
   time?: number;
-}
-
-/** A daily quest template. */
-export interface QuestTemplate {
-  id: string;
-  text: string;
-  xp: number;
-  check: (ops: QuestOp[]) => boolean;
-}
-
-/** A player level definition. */
-export interface LevelDefinition {
-  level: number;
-  xp: number;
-  title: string;
 }

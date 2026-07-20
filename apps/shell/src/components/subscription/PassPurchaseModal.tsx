@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetPassCatalogQuery } from '@/store/api/passesApi';
-import formatPriceUtil from '@/utils/formatPrice';
+import { useGetPassCatalogQuery } from '@velobits/app-core/store/api/passesApi';
+import formatPriceUtil from '@velobits/app-core/utils/formatPrice';
+import { PRO_PRICES, type SupportedCurrency } from '@velobits/app-core/constants/pricing';
+import ToolPickerModal from '@velobits/app-core/components/subscription/ToolPickerModal';
 import type { SubscriptionContextValue, ToolUsage } from '@/contexts/AppContext';
-import type { ToolDefinition } from '@/types/tools';
-
-type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
+import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 export interface PassPurchaseModalProps {
   show: boolean;
@@ -90,10 +90,16 @@ const SparkleIcon = () => (
   </svg>
 );
 
-export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscription }: PassPurchaseModalProps) {
+export default function PassPurchaseModal({
+  show,
+  onDismiss,
+  blockedTool,
+  subscription,
+}: PassPurchaseModalProps) {
   const navigate = useNavigate();
   const { data: catalog } = useGetPassCatalogQuery(undefined, { skip: !show });
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   if (!show || !blockedTool) return null;
 
@@ -108,7 +114,11 @@ export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscr
     }
   };
 
-  const usage: ToolUsage = subscription?.getToolUsage?.(blockedTool.id) || { uses: 3, max: 3, hasPass: false };
+  const usage: ToolUsage = subscription?.getToolUsage?.(blockedTool.id) || {
+    uses: 3,
+    max: 3,
+    hasPass: false,
+  };
   const passes = catalog?.passes || [];
   const creditPacks = catalog?.credit_packs || [];
   const symbol = catalog?.passes?.[0]?.symbol || '$';
@@ -230,11 +240,10 @@ export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscr
 
             {triplePass && (
               <motion.div
-                className="tu-pass-option"
-                onClick={() => {
-                  onDismiss();
-                  navigate('/dashboard?tab=subscription');
-                }}
+                className={`tu-pass-option${
+                  buyingId === 'day_triple' ? ' tu-pass-option--loading' : ''
+                }`}
+                onClick={() => !buyingId && setPickerOpen(true)}
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.985 }}
               >
@@ -243,9 +252,18 @@ export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscr
                 </div>
                 <div className="tu-pass-option-body">
                   <span className="tu-pass-option-name">{triplePass.name}</span>
-                  <span className="tu-pass-option-desc">Pick any 3 tools, 24 hours</span>
+                  <span className="tu-pass-option-desc">
+                    Pick {triplePass.tools} tools — {blockedTool.label} + {triplePass.tools - 1}{' '}
+                    more, 24 hours
+                  </span>
                 </div>
-                <span className="tu-pass-option-price">{formatPrice(triplePass.price)}</span>
+                <span className="tu-pass-option-price">
+                  {buyingId === 'day_triple' ? (
+                    <span className="tu-pass-spinner" />
+                  ) : (
+                    formatPrice(triplePass.price)
+                  )}
+                </span>
               </motion.div>
             )}
 
@@ -293,13 +311,13 @@ export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscr
                 Or go <strong>Pro</strong> — unlimited everything
               </span>
             </div>
-            <span className="tu-pass-pro-price">{currency === 'inr' ? '₹399/mo' : '$5/mo'}</span>
+            <span className="tu-pass-pro-price">{`${PRO_PRICES[currency] || '$5'}/mo`}</span>
           </motion.div>
 
           {/* Hints */}
           <div className="tu-pass-hints">
             <p>
-              <SparkleIcon /> Complete today&apos;s quest for a chance to earn a free pass!
+              <SparkleIcon /> Try the weekly reward spin for a chance to earn a free pass!
             </p>
             <button
               className="tu-upgrade-footer-link"
@@ -313,6 +331,22 @@ export default function PassPurchaseModal({ show, onDismiss, blockedTool, subscr
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Tool picker for the multi-tool pass option */}
+      {triplePass && (
+        <ToolPickerModal
+          open={pickerOpen}
+          requiredCount={triplePass.tools}
+          passName={triplePass.name}
+          priceLabel={formatPrice(triplePass.price)}
+          initialSelection={[blockedTool.id]}
+          onConfirm={(toolIds) => {
+            setPickerOpen(false);
+            void handleBuy(subscription.handleBuyPass, 'day_triple', toolIds);
+          }}
+          onCancel={() => setPickerOpen(false)}
+        />
+      )}
     </AnimatePresence>
   );
 }

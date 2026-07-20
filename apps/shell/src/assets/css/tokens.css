@@ -111,10 +111,6 @@ body {
   --suggestion-bg: #eaeaeb;
   --suggestion-border: #c8c8c8;
 
-  /* XP / Progress */
-  --xp-bar-bg: #c8c8c8;
-  --xp-bar-fill: linear-gradient(90deg, #007acc, #1c8cd9);
-
   /* Pipeline */
   --pipeline-bg: #f0f0f0;
   --pipeline-line: #c8c8c8;
@@ -153,7 +149,7 @@ body.dark {
   --border-strong: #4d4d4d;
   --text: #d4d4d4;
   --text-2: #ababab;
-  --text-3: #858585;
+  --text-3: #9a9a9a;
   --nav-bg: #323233;
 
   --card-hover-shadow: 0 0 8px rgba(0, 122, 204, 0.08);
@@ -196,7 +192,6 @@ body.dark {
   --list-active: #094771;
   --list-focus: #062f4a;
 
-  --xp-bar-bg: #3c3c3c;
   --pipeline-bg: #1e1e1e;
   --pipeline-line: #3c3c3c;
   --suggestion-bg: #252526;
@@ -254,4 +249,10 @@ body.dark {
 
 *::-webkit-scrollbar-corner {
   background: var(--scrollbar-track);
+}
+
+/* Razorpay injects a "Test Mode" ribbon with rgb(214,68,68) = 4.40:1 on white.
+   Override with a darker red that passes 4.5:1 (#cc3939 ≈ 4.99:1 on white). */
+.razorpay-backdrop > span {
+  background: #cc3939 !important;
 }

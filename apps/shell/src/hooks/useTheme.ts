@@ -3,8 +3,11 @@
  * Syncs to DB when authenticated, falls back to localStorage.
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useGetPreferencesQuery, useUpdatePreferencesMutation } from '@/store/api/userDataApi';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import {
+  useGetPreferencesQuery,
+  useUpdatePreferencesMutation,
+} from '@velobits/app-core/store/api/userDataApi';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 
 /** Light or dark theme mode — mirrors ThemeContext.ThemeMode */
 type ThemeMode = 'light' | 'dark';
@@ -47,7 +50,7 @@ export function useTheme(): ThemeContextValue {
         localStorage.setItem(MODE_KEY, dbMode);
       }
     }
-  }, [prefs]);
+  }, [prefs, mode]);
 
   // Reset hydration on logout
   useEffect(() => {

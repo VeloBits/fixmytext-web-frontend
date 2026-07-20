@@ -14,18 +14,19 @@ The frontend uses [ESLint](https://eslint.org/) for linting and [Prettier](https
 ## Configuration
 
 **ESLint** — `eslint.config.js`:
+
 - Rules: `@eslint/js` recommended + `react` + `react-hooks` plugins
 - `react/prop-types` and `react/display-name` are disabled
 
 **Prettier** — `.prettierrc`:
 
-| Setting | Value |
-|---------|-------|
-| Semicolons | required |
-| Quotes | single |
-| Tab width | 2 spaces |
-| Trailing commas | ES5 |
-| Print width | 100 characters |
+| Setting         | Value          |
+| --------------- | -------------- |
+| Semicolons      | required       |
+| Quotes          | single         |
+| Tab width       | 2 spaces       |
+| Trailing commas | ES5            |
+| Print width     | 100 characters |
 
 ---
 
@@ -63,13 +64,13 @@ npm run lint:fix && npx prettier --write src/
 
 ## Common violations
 
-| Tool | Violation | Fix |
-|------|-----------|-----|
-| ESLint | `no-unused-vars` | Remove the unused variable or import |
-| ESLint | `react-hooks/rules-of-hooks` | Move the hook call to the top level of the component |
-| ESLint | `react-hooks/exhaustive-deps` | Add the missing dependency to the `useEffect` array |
-| Prettier | Wrong quotes or semicolons | Run `npx prettier --write src/` |
-| Prettier | Line exceeds 100 chars | Prettier will wrap it automatically |
+| Tool     | Violation                     | Fix                                                  |
+| -------- | ----------------------------- | ---------------------------------------------------- |
+| ESLint   | `no-unused-vars`              | Remove the unused variable or import                 |
+| ESLint   | `react-hooks/rules-of-hooks`  | Move the hook call to the top level of the component |
+| ESLint   | `react-hooks/exhaustive-deps` | Add the missing dependency to the `useEffect` array  |
+| Prettier | Wrong quotes or semicolons    | Run `npx prettier --write src/`                      |
+| Prettier | Line exceeds 100 chars        | Prettier will wrap it automatically                  |
 
 ---
 

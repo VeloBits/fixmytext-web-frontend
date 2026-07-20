@@ -7,9 +7,10 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn((fn) => fn({ auth: { accessToken: null } })),
 }));
 
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -18,14 +19,14 @@ vi.mock('@/auth/useOidcAuth', () => ({
   }),
 }));
 
-vi.mock('@/store/api/userDataApi', () => ({
+vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetPreferencesQuery: vi.fn(() => ({ data: undefined })),
   useUpdatePreferencesMutation: () => [mockUpdatePrefs],
 }));
 
 import { useSelector } from 'react-redux';
-import { useGetPreferencesQuery } from '@/store/api/userDataApi';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useGetPreferencesQuery } from '@velobits/app-core/store/api/userDataApi';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 
 // vi.mock returns loose types; cast to access mock methods
 const mockUseSelector = vi.mocked(useSelector);
@@ -44,6 +45,7 @@ describe('useTheme', () => {
     // Default: not authenticated (must re-set after vi.clearAllMocks())
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: false,
+      wasAuthenticated: false,
       isLoading: false,
       accessToken: null,
       oidcUser: null,
@@ -86,6 +88,7 @@ describe('useTheme', () => {
   it('syncs to backend when authenticated', () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,
@@ -110,6 +113,7 @@ describe('useTheme', () => {
   it('hydrates from DB preferences when authenticated', () => {
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'tok',
       oidcUser: null,

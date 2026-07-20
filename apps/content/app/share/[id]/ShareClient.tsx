@@ -48,9 +48,7 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
                 {tool.icon}
               </span>
             )}
-            <h1 className="text-2xl font-extrabold text-[var(--text)]">
-              {share.tool_label}
-            </h1>
+            <h1 className="text-2xl font-extrabold text-[var(--text)]">{share.tool_label}</h1>
           </div>
           <div className="flex items-center justify-center gap-3 text-sm text-[var(--text-3)] mb-6">
             <span>{createdDate}</span>
@@ -73,14 +71,32 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
             >
               {copied ? (
                 <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                   Copied!
                 </>
               ) : (
                 <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <rect x="9" y="9" width="13" height="13" rx="2" />
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                   </svg>
@@ -92,7 +108,16 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
               href={editorUrl}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--r-lg)] text-sm font-semibold bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] transition-colors"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
               Try FixMyText
@@ -117,7 +142,16 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
               title="Copy"
               className="text-[var(--text-3)] hover:text-[var(--text)] transition-colors"
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <rect x="9" y="9" width="13" height="13" rx="2" />
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
               </svg>
@@ -140,7 +174,9 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
 
           {/* Status bar */}
           <div className="flex items-center gap-4 px-4 py-2 bg-[var(--accent)] text-white text-xs">
-            <span>{lines.length} {lines.length === 1 ? 'line' : 'lines'}</span>
+            <span>
+              {lines.length} {lines.length === 1 ? 'line' : 'lines'}
+            </span>
             <span>{words} words</span>
             <span>{chars} chars</span>
             <span className="ml-auto">UTF-8</span>

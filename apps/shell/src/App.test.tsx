@@ -1,6 +1,19 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mutable state consumed by hoisted vi.mock factories below.
+const mockState = vi.hoisted(() => ({
+  onboarded: true,
+  shareRouteMatch: null as object | null,
+  auth: {
+    isAuthenticated: false,
+    wasAuthenticated: false,
+    isLoading: false,
+    accessToken: null as string | null,
+  },
+  reduxUser: null as object | null,
+}));
 
 // ── framer-motion mock ──
 vi.mock('framer-motion', () => {
@@ -34,23 +47,35 @@ vi.mock('react-router-dom', () => ({
     React.createElement('div', { 'data-testid': 'router' }, children),
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/', search: '' }),
+  useMatch: () => mockState.shareRouteMatch,
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
+  Link: ({
+    children,
+    to,
+    ...p
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...p }, children),
   MemoryRouter: ({ children }: { children?: React.ReactNode }) => children,
-  Routes: ({ children }: { children?: React.ReactNode }) => React.createElement('div', { 'data-testid': 'routes' }, children),
+  Routes: ({ children }: { children?: React.ReactNode }) =>
+    React.createElement('div', { 'data-testid': 'routes' }, children),
   Route: ({ element }: { element?: React.ReactNode }) => element,
-  Navigate: ({ to }: { to: string }) => React.createElement('div', { 'data-testid': 'navigate', 'data-to': to }),
+  Navigate: ({ to }: { to: string }) =>
+    React.createElement('div', { 'data-testid': 'navigate', 'data-to': to }),
 }));
 
 // ── react-redux mock ──
+// AppContext's only selector reads s.auth.user (the /auth/me profile).
 vi.mock('react-redux', () => ({
-  useSelector: vi.fn(() => ({ accessToken: null })),
+  useSelector: vi.fn(() => mockState.reduxUser),
   useDispatch: () => vi.fn(),
   Provider: ({ children }: { children?: React.ReactNode }) => children,
 }));
 
 // ── API mocks (authApi needed because AppContext calls useGetMeQuery) ──
-vi.mock('@/store/api/authApi', () => ({
+vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useGetMeQuery: vi.fn().mockReturnValue({ data: null, isLoading: false }),
   authApi: { reducerPath: 'authApi' },
 }));
@@ -63,17 +88,44 @@ vi.mock('./hooks/useTheme', () => ({
   useTheme: () => ({ mode: 'light', setMode: vi.fn() }),
 }));
 // AppContext uses useOidcAuth + useGetMeQuery directly (no legacy useAuth hook).
-vi.mock('./hooks/useGamification', () => ({
-  default: () => ({
-    onboarded: true,
-    setPersona: vi.fn(),
-    xp: 0,
-    level: 1,
-    streak: { current: 0 },
-    totalOps: 0,
+// Mock it so tests render a deterministic unauthenticated state instead of
+// triggering the real OIDC bootstrap (loadUser -> signinSilent iframe), which
+// resolves asynchronously after render and trips React's act() warnings.
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
+  useOidcAuth: () => ({
+    ...mockState.auth,
+    oidcUser: null,
+    login: vi.fn(),
+    logout: vi.fn(),
   }),
 }));
-vi.mock('./hooks/useSubscription', () => ({
+// AppContext composes the tool-groups/favorites/subscription hooks; the shell
+// gates onboarding via its local useOnboardingGate hook (mocked below).
+vi.mock('@velobits/app-core/hooks/useToolGroups', () => ({
+  default: () => ({
+    groups: [],
+    ready: true,
+    createGroup: vi.fn(),
+    renameGroup: vi.fn(),
+    deleteGroup: vi.fn(),
+    addToolToGroup: vi.fn(),
+    removeToolFromGroup: vi.fn(),
+  }),
+}));
+vi.mock('./hooks/useOnboardingGate', () => ({
+  default: () => ({
+    seen: mockState.onboarded,
+    resolved: true,
+    markSeen: vi.fn(),
+  }),
+}));
+vi.mock('@velobits/app-core/hooks/useFavorites', () => ({
+  default: () => ({
+    favorites: [],
+    toggleFavorite: vi.fn(),
+  }),
+}));
+vi.mock('@velobits/app-core/hooks/useSubscription', () => ({
   default: () => ({
     showUpgradeModal: false,
     dismissUpgradeModal: vi.fn(),
@@ -95,9 +147,6 @@ vi.mock('./hooks/useSubscription', () => ({
 vi.mock('editor-remote/EditorPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'home-page' }),
 }));
-vi.mock('./pages/Home', () => ({
-  default: () => React.createElement('div', { 'data-testid': 'home-page' }),
-}));
 vi.mock('./pages/AboutPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'about-page' }),
 }));
@@ -112,9 +161,8 @@ vi.mock('./pages/ForgotPasswordPage', () => ({
 }));
 // ResetPasswordPage and VerifyEmailPage are not in the router (Keycloak handles these flows).
 // Mocks omitted — no routes exist to test.
-vi.mock('./pages/DashboardPage', () => ({
-  default: () => React.createElement('div', { 'data-testid': 'dashboard-page' }),
-}));
+// DashboardPage lives in analytics-remote now; its route renders analytics-remote/AnalyticsPage
+// (resolved via the vitest alias), so no ./pages/DashboardPage mock is needed.
 vi.mock('./pages/PricingPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'pricing-page' }),
 }));
@@ -140,6 +188,18 @@ vi.mock('./components/subscription/PassPurchaseModal', () => ({
 import App from './App';
 
 describe('App', () => {
+  beforeEach(() => {
+    mockState.onboarded = true;
+    mockState.shareRouteMatch = null;
+    mockState.auth = {
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+    };
+    mockState.reduxUser = null;
+  });
+
   it('renders without crashing', () => {
     render(<App />);
   });
@@ -165,10 +225,17 @@ describe('App', () => {
   });
 
   it('shows OnboardingModal when not onboarded', () => {
-    // This test checks the behavior when onboarded=false — the mock already returns onboarded:true
-    // so we verify the opposite is also logical by checking the default doesn't show it
+    mockState.onboarded = false;
     render(<App />);
-    // onboarded is true in default mock, so modal should NOT be present
+    expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
+  });
+
+  it('does not show OnboardingModal on the share viewer even when not onboarded', () => {
+    // A share recipient may be a first-time visitor; the starter-kit picker must
+    // not block the read-only share page (its overlay swallows all pointer events).
+    mockState.onboarded = false;
+    mockState.shareRouteMatch = { pathname: '/share/some-id' };
+    render(<App />);
     expect(screen.queryByTestId('onboarding-modal')).not.toBeInTheDocument();
   });
 
@@ -208,5 +275,49 @@ describe('App', () => {
     unmount();
     expect(removeEventListenerSpy).toHaveBeenCalledWith('rtk-api-error', expect.any(Function));
     removeEventListenerSpy.mockRestore();
+  });
+
+  // ── auth-restore gate (guest-flash-on-refresh regression) ──
+  // H-8 keeps tokens in memory, so a refresh of a signed-in session silently
+  // re-acquires them. Until that settles the shell must hold the skeleton, not
+  // paint guest chrome that flips to signed-in a moment later.
+
+  it('holds the skeleton during session restore when a previous session existed', () => {
+    mockState.auth = { ...mockState.auth, isLoading: true, wasAuthenticated: true };
+    const { container } = render(<App />);
+    expect(container.querySelector('.page-skeleton')).toBeInTheDocument();
+    expect(screen.queryByTestId('navbar')).not.toBeInTheDocument();
+  });
+
+  it('renders guest UI immediately when no previous session existed', () => {
+    mockState.auth = { ...mockState.auth, isLoading: true, wasAuthenticated: false };
+    render(<App />);
+    expect(screen.getByTestId('navbar')).toBeInTheDocument();
+  });
+
+  it('keeps the skeleton up until /auth/me lands after the token restore', () => {
+    mockState.auth = {
+      isAuthenticated: true,
+      wasAuthenticated: true,
+      isLoading: false,
+      accessToken: 'token',
+    };
+    mockState.reduxUser = null; // profile fetch still in flight
+    const { container } = render(<App />);
+    expect(container.querySelector('.page-skeleton')).toBeInTheDocument();
+    expect(screen.queryByTestId('navbar')).not.toBeInTheDocument();
+  });
+
+  it('renders the app once the restored session and profile are both loaded', () => {
+    mockState.auth = {
+      isAuthenticated: true,
+      wasAuthenticated: true,
+      isLoading: false,
+      accessToken: 'token',
+    };
+    mockState.reduxUser = { display_name: 'Logout Tester' };
+    render(<App />);
+    expect(screen.getByTestId('navbar')).toBeInTheDocument();
+    expect(screen.getByTestId('home-page')).toBeInTheDocument();
   });
 });

@@ -8,7 +8,15 @@ export interface ToolCardProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
 }
 
-export function ToolCard({ icon, label, description, color, active = false, className = '', ...props }: ToolCardProps) {
+export function ToolCard({
+  icon,
+  label,
+  description,
+  color,
+  active = false,
+  className = '',
+  ...props
+}: ToolCardProps) {
   return (
     <button
       title={description}
