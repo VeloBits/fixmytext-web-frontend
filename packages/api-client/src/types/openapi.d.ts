@@ -3786,6 +3786,83 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/user/tool-groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Tool Groups
+     * @description Return all of the authenticated user's tool groups in display order.
+     */
+    get: operations['list_tool_groups_api_v1_user_tool_groups_get'];
+    put?: never;
+    /**
+     * Create Tool Group
+     * @description Create a named tool group, optionally pre-filled with tools.
+     *
+     *     Idempotent by name: if the user already has a group with this name, the
+     *     existing group is returned unchanged (200) — tool_ids are NOT merged in.
+     */
+    post: operations['create_tool_group_api_v1_user_tool_groups_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/{group_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Rename Tool Group
+     * @description Rename a tool group owned by the authenticated user.
+     */
+    put: operations['rename_tool_group_api_v1_user_tool_groups__group_id__put'];
+    post?: never;
+    /**
+     * Delete Tool Group
+     * @description Delete a tool group (and its items) owned by the authenticated user.
+     */
+    delete: operations['delete_tool_group_api_v1_user_tool_groups__group_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/{group_id}/tools/{tool_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Add Tool To Group
+     * @description Add a tool to one of the authenticated user's groups.
+     *
+     *     Idempotent: returns the existing entry if the tool is already in the group.
+     */
+    post: operations['add_tool_to_group_api_v1_user_tool_groups__group_id__tools__tool_id__post'];
+    /**
+     * Remove Tool From Group
+     * @description Remove a tool from one of the authenticated user's groups.
+     */
+    delete: operations['remove_tool_from_group_api_v1_user_tool_groups__group_id__tools__tool_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/user/tool-stats': {
     parameters: {
       query?: never;
@@ -4929,8 +5006,6 @@ export interface components {
     PreferencesUpdate: {
       /** Theme */
       theme?: string | null;
-      /** Persona */
-      persona?: string | null;
       /** Theme Skin */
       theme_skin?: string | null;
     };
@@ -5229,6 +5304,17 @@ export interface components {
       active_passes_count: number;
       /** Region */
       region?: string | null;
+      /**
+       * Pro Expires At
+       * @description When the current Pro period ends (null when not Pro).
+       */
+      pro_expires_at?: string | null;
+      /**
+       * Pro Cancelled
+       * @description True when the Pro plan is cancelled but still in its paid period.
+       * @default false
+       */
+      pro_cancelled?: boolean;
     };
     /**
      * SubstitutionRequest
@@ -5353,6 +5439,63 @@ export interface components {
       tone: 'formal' | 'casual' | 'friendly';
     };
     /**
+     * ToolGroupCreate
+     * @description Schema for creating a tool group, optionally pre-filled with tools.
+     */
+    ToolGroupCreate: {
+      /** Name */
+      name: string;
+      /**
+       * Tool Ids
+       * @default []
+       */
+      tool_ids: string[];
+    };
+    /**
+     * ToolGroupItemOut
+     * @description A single tool within a group, with its sort position.
+     */
+    ToolGroupItemOut: {
+      /** Tool Id */
+      tool_id: string;
+      /** Sort Order */
+      sort_order: number;
+    };
+    /**
+     * ToolGroupResponse
+     * @description A named tool group with its tools, as returned by the API.
+     */
+    ToolGroupResponse: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Sort Order */
+      sort_order: number;
+      /** Tools */
+      tools: components['schemas']['ToolGroupItemOut'][];
+      /** Created At */
+      created_at: string;
+      /** Updated At */
+      updated_at: string;
+    };
+    /**
+     * ToolGroupUpdate
+     * @description Schema for renaming a tool group.
+     */
+    ToolGroupUpdate: {
+      /** Name */
+      name?: string | null;
+    };
+    /**
+     * ToolGroupsResponse
+     * @description All of the user's tool groups in display order.
+     */
+    ToolGroupsResponse: {
+      /** Groups */
+      groups: components['schemas']['ToolGroupResponse'][];
+    };
+    /**
      * ToolStatItem
      * @description Usage statistics for a single tool.
      */
@@ -5430,6 +5573,11 @@ export interface components {
       panel_sizes: {
         [key: string]: unknown;
       };
+      /**
+       * Onboarding Seen
+       * @default false
+       */
+      onboarding_seen: boolean;
     };
     /**
      * UiSettingsUpdate
@@ -5446,6 +5594,8 @@ export interface components {
       panel_sizes?: {
         [key: string]: unknown;
       } | null;
+      /** Onboarding Seen */
+      onboarding_seen?: boolean | null;
     };
     /**
      * UserResponse
@@ -11752,6 +11902,185 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_tool_groups_api_v1_user_tool_groups_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupsResponse'];
+        };
+      };
+    };
+  };
+  create_tool_group_api_v1_user_tool_groups_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupCreate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  rename_tool_group_api_v1_user_tool_groups__group_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  delete_tool_group_api_v1_user_tool_groups__group_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  add_tool_to_group_api_v1_user_tool_groups__group_id__tools__tool_id__post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  remove_tool_from_group_api_v1_user_tool_groups__group_id__tools__tool_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
         tool_id: string;
       };
       cookie?: never;

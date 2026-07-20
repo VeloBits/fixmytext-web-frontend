@@ -1,49 +1,58 @@
 import { ENDPOINTS } from '@velobits/api-client';
-import type {
-  ToolDefinition,
-  Persona,
-  PersonaId,
-  UseCaseTab,
-  SmartSuggestionRule,
-} from './types';
+import type { ToolDefinition, StarterKit, UseCaseTab, SmartSuggestionRule } from './types';
 
 /* ═══════════════════════════════════════════════════════
    Tool & Category Configuration — Data-driven tool system
    ═══════════════════════════════════════════════════════ */
 
-export const PERSONAS: Record<PersonaId, Persona> = {
-  writer: {
+// Starter kits: the onboarding picker's cards. Picking one creates a normal,
+// fully editable custom tool group named `groupName`, seeded with `toolIds`
+// (it is NOT a persistent identity — personas were replaced 2026-07-14).
+// groupName values must stay in sync with the seed names in backend
+// account-svc migration 0004.
+export const STARTER_KITS: StarterKit[] = [
+  {
+    id: 'writer',
     label: 'Writer / Blogger',
     icon: 'Wr',
+    groupName: 'Writing essentials',
     defaultTab: 'writing',
-    suggestedTools: ['fix_grammar', 'paraphrase', 'change_tone', 'proofread'],
+    toolIds: ['fix_grammar', 'paraphrase', 'change_tone', 'proofread'],
   },
-  student: {
+  {
+    id: 'student',
     label: 'Student',
     icon: 'St',
+    groupName: 'Study essentials',
     defaultTab: 'writing',
-    suggestedTools: ['summarize', 'eli5', 'translate'],
+    toolIds: ['summarize', 'eli5', 'translate'],
   },
-  developer: {
+  {
+    id: 'developer',
     label: 'Developer',
     icon: '</>',
+    groupName: 'Developer toolkit',
     defaultTab: 'code',
-    suggestedTools: ['json_fmt', 'regex_test', 'base64_enc', 'jwt_decode'],
+    toolIds: ['json_fmt', 'regex_test', 'base64_enc', 'jwt_decode'],
   },
-  social: {
+  {
+    id: 'social',
     label: 'Social Media',
     icon: '@s',
+    groupName: 'Social media kit',
     defaultTab: 'ai',
-    suggestedTools: ['hashtags', 'seo_titles', 'tweet_shorten', 'meta_desc'],
+    toolIds: ['hashtags', 'seo_titles', 'tweet_shorten', 'meta_desc'],
   },
-  explorer: {
-    // "Just Exploring" promises the full catalog — no For You group on purpose
+  {
+    // "Just Exploring" promises the full catalog — creates no group on purpose
+    id: 'explorer',
     label: 'Just Exploring',
     icon: '?>',
+    groupName: '',
     defaultTab: 'all',
-    suggestedTools: [],
+    toolIds: [],
   },
-};
+];
 
 export const USE_CASE_TABS: UseCaseTab[] = [
   { id: 'all', label: 'All Tools', icon: '*', color: 'gray' },

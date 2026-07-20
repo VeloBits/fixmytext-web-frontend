@@ -44,7 +44,14 @@ vi.mock('@velobits/app-core/store/api/passesApi', () => ({
           symbol: '$',
           currency: 'usd',
         },
-        { id: 'day_triple', name: 'Day Triple', price: 199, symbol: '$', currency: 'usd' },
+        {
+          id: 'day_triple',
+          name: 'Day Triple',
+          price: 199,
+          tools: 3,
+          symbol: '$',
+          currency: 'usd',
+        },
       ],
       credit_packs: [{ id: 'pack_5', name: '5 Credits', credits: 5, price: 299 }],
     },
@@ -156,9 +163,15 @@ describe('PassPurchaseModal', () => {
     expect(baseProps.onDismiss).toHaveBeenCalled();
   });
 
-  it('calls onDismiss when Day Triple option is clicked', () => {
+  it('opens the tool picker (prefilled with the blocked tool) for Day Triple', () => {
     render(<PassPurchaseModal {...baseProps} />);
     fireEvent.click(screen.getByText('Day Triple').closest('div')!.parentElement!);
-    expect(baseProps.onDismiss).toHaveBeenCalled();
+    // The picker replaces the old navigate-away behavior: buying stays in flow.
+    expect(baseProps.onDismiss).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('dialog', { name: /choose 3 tools for day triple/i })
+    ).toBeInTheDocument();
+    // Prefilled with the tool that triggered the upsell.
+    expect(screen.getByTestId('tool-picker-counter')).toHaveTextContent('1 of 3 selected');
   });
 });

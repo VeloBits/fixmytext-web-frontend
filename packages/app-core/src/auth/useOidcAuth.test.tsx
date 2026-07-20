@@ -17,6 +17,7 @@ vi.mock('./userManager', () => ({
   resetLoadUser: vi.fn(),
   broadcastAuthMessage: vi.fn(),
   hasAuthHint: vi.fn().mockReturnValue(false),
+  attemptSilentRestore: vi.fn().mockResolvedValue(false),
   userManager: {
     getUser: vi.fn().mockResolvedValue(null),
     signinRedirect: vi.fn().mockResolvedValue(undefined),
@@ -25,9 +26,11 @@ vi.mock('./userManager', () => ({
       addUserLoaded: vi.fn(),
       addUserUnloaded: vi.fn(),
       addUserSignedOut: vi.fn(),
+      addAccessTokenExpired: vi.fn(),
       removeUserLoaded: vi.fn(),
       removeUserUnloaded: vi.fn(),
       removeUserSignedOut: vi.fn(),
+      removeAccessTokenExpired: vi.fn(),
     },
   },
 }));

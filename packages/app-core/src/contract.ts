@@ -8,8 +8,8 @@
 
 import type {
   FavoritesContextValue,
-  PersonaContextValue,
   SubscriptionContextValue,
+  ToolGroupsContextValue,
   User,
 } from './types/context';
 import type { AlertLevel } from './types/alert';
@@ -18,7 +18,7 @@ export interface EditorPageProps {
   mode: string;
   setMode: (mode: string) => void;
   showAlert: (message: string, type: string) => void;
-  persona: PersonaContextValue;
+  toolGroups: ToolGroupsContextValue;
   favorites: FavoritesContextValue;
   user: User | null;
   isAuthenticated: boolean;
@@ -26,7 +26,6 @@ export interface EditorPageProps {
 }
 
 export interface AnalyticsPageProps {
-  persona: PersonaContextValue;
   favorites: FavoritesContextValue;
   user: User | null;
   isAuthenticated: boolean;

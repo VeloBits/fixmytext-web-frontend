@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import './assets/css/App.css';
 import Alert from './components/layout/Alert';
 import EmailVerificationBanner from './components/layout/EmailVerificationBanner';
@@ -11,10 +11,12 @@ import * as Sentry from '@sentry/react';
 import { AuthCallback } from '@velobits/app-core/auth/AuthCallback';
 import { SilentCallback } from '@velobits/app-core/auth/SilentCallback';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import { attemptSilentRestore, hasAuthHint } from '@velobits/app-core/auth/userManager';
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
 import { AppProvider, useAppContext } from './contexts/AppContext';
-import type { PersonaId } from '@velobits/app-core/types/tools';
+import type { StarterKit } from '@velobits/app-core/types/tools';
+import useOnboardingGate from './hooks/useOnboardingGate';
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 import PassPurchaseModal from './components/subscription/PassPurchaseModal';
 import { ROUTES } from '@velobits/app-core/constants';
@@ -44,13 +46,40 @@ const DashboardPage = lazy(() =>
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, login } = useOidcAuth();
-  if (isLoading) return <PageSkeleton />;
-  if (!isAuthenticated) {
-    login();
-    // login() triggers a full-page redirect to Keycloak; keep the skeleton up
-    // until the browser navigates away so there's no white flash.
-    return <PageSkeleton />;
-  }
+  const location = useLocation();
+  // 'idle' → not yet needed; 'trying' → silent restore in flight;
+  // 'failed' → no restorable session, a full Keycloak login is required.
+  const [restore, setRestore] = useState<'idle' | 'trying' | 'failed'>('idle');
+
+  // When the access token quietly expired (e.g. a minutes-long Razorpay
+  // checkout outlived it), first try a silent renew from the Keycloak SSO
+  // cookie instead of bouncing through a full-page login — the bounce used to
+  // eat the post-purchase ?purchase=… params and their success alert.
+  useEffect(() => {
+    if (isLoading || isAuthenticated || restore !== 'idle') return;
+    if (hasAuthHint()) {
+      setRestore('trying');
+      void attemptSilentRestore().then((ok) => setRestore(ok ? 'idle' : 'failed'));
+    } else {
+      setRestore('failed');
+    }
+  }, [isLoading, isAuthenticated, restore]);
+
+  useEffect(() => {
+    if (restore === 'failed' && !isLoading && !isAuthenticated) {
+      // Full login round trip; returnTo restores the exact path + query
+      // (e.g. /dashboard?tab=subscription&purchase=success&kind=pass).
+      void login({ returnTo: location.pathname + location.search });
+    }
+  }, [restore, isLoading, isAuthenticated, login, location.pathname, location.search]);
+
+  // Reset the restore machine once a session exists again so a later
+  // expiry re-runs the silent attempt instead of hard-failing.
+  useEffect(() => {
+    if (isAuthenticated && restore === 'failed') setRestore('idle');
+  }, [isAuthenticated, restore]);
+
+  if (!isAuthenticated) return <PageSkeleton />;
   return <>{children}</>;
 }
 
@@ -58,8 +87,9 @@ function AppInner() {
   const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
   const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
-  const { user, isAuthenticated, userResolving, persona, favorites, subscription } =
+  const { user, isAuthenticated, userResolving, toolGroups, favorites, subscription } =
     useAppContext();
+  const onboarding = useOnboardingGate(toolGroups);
   const { isLoading: authLoading, wasAuthenticated } = useOidcAuth();
   const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
 
@@ -71,18 +101,28 @@ function AppInner() {
     return () => window.removeEventListener('rtk-api-error', handler as EventListener);
   }, [showAlert]);
 
-  const handleOnboardingComplete = (personaId: PersonaId) => {
-    persona.setPersona(personaId);
+  const handleOnboardingComplete = (kit: StarterKit | null) => {
+    if (kit && kit.toolIds.length > 0) {
+      toolGroups.createGroup(kit.groupName, kit.toolIds);
+    }
+    if (kit) {
+      // One-shot: the editor listens and lands on the kit's tab (transient,
+      // nothing persisted).
+      window.dispatchEvent(
+        new CustomEvent('fmx:onboarding-tab', { detail: { tab: kit.defaultTab } })
+      );
+    }
+    onboarding.markSeen();
   };
 
-  // A share link is often someone's first visit; the persona picker has no
-  // dismiss affordance and its overlay blocks the whole page, so a recipient
-  // couldn't even read/copy the share. Onboard them when they enter the editor.
+  // A share link is often someone's first visit; the starter-kit overlay
+  // blocks the whole page, so a recipient couldn't even read/copy the share.
+  // Onboard them when they enter the editor.
   const isShareView = useMatch(ROUTES.SHARE) !== null;
 
   // Same blocking problem on auth screens: they render their own status and
   // error cards ("Couldn't reach sign-in" with Retry, callback errors), and
-  // the persona overlay would sit on top and make those buttons unclickable
+  // the onboarding overlay would sit on top and make those buttons unclickable
   // for a first-time visitor. Onboarding waits until the user is on app content.
   const { pathname } = useLocation();
   const isAuthScreen =
@@ -104,7 +144,7 @@ function AppInner() {
 
   return (
     <>
-      {!persona.onboarded && !isShareView && !isAuthScreen && (
+      {onboarding.resolved && !onboarding.seen && !isShareView && !isAuthScreen && (
         <OnboardingModal onComplete={handleOnboardingComplete} />
       )}
 
@@ -129,7 +169,7 @@ function AppInner() {
                   mode={mode}
                   setMode={setMode as (mode: string) => void}
                   showAlert={showAlert as (message: string, type: string) => void}
-                  persona={persona}
+                  toolGroups={toolGroups}
                   favorites={favorites}
                   user={user}
                   isAuthenticated={isAuthenticated}
@@ -155,7 +195,6 @@ function AppInner() {
               <ProtectedRoute>
                 <RemoteBoundary name="Dashboard">
                   <DashboardPage
-                    persona={persona}
                     favorites={favorites}
                     user={user}
                     isAuthenticated={isAuthenticated}

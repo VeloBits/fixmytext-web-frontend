@@ -3,7 +3,6 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
   FavoritesContextValue,
-  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -84,12 +83,6 @@ vi.mock('@velobits/app-core/utils/formatPrice', () => ({
 
 import DashboardPage from './DashboardPage';
 
-const defaultPersona = {
-  persona: 'writer',
-  setPersona: vi.fn(),
-  onboarded: true,
-} as unknown as PersonaContextValue;
-
 const defaultFavorites = {
   favorites: [],
   toggleFavorite: vi.fn(),
@@ -118,7 +111,6 @@ const defaultUser = {
 function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
-      persona={defaultPersona}
       favorites={defaultFavorites}
       user={defaultUser}
       isAuthenticated={true}
@@ -269,10 +261,11 @@ describe('DashboardPage', () => {
     expect(screen.getByText(/Dark/)).toBeInTheDocument();
   });
 
-  it('shows persona grid on profile', () => {
+  it('shows no persona picker on profile (feature replaced by custom tool groups)', () => {
     renderDash();
     fireEvent.click(screen.getByText('Profile'));
-    expect(screen.getByText(/Writer/i)).toBeInTheDocument();
+    expect(screen.queryByText('Persona')).not.toBeInTheDocument();
+    expect(document.querySelector('.tu-dash-persona-grid')).not.toBeInTheDocument();
   });
 
   // ── Favorites tab ──
@@ -398,15 +391,6 @@ describe('DashboardPage', () => {
     const input = screen.getByPlaceholderText('Display name') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Bob' } });
     expect(input.value).toBe('Bob');
-  });
-
-  it('calls setPersona when persona card clicked', () => {
-    renderDash();
-    fireEvent.click(screen.getByText('Profile'));
-    // Click a persona button
-    const writerBtn = screen.getAllByText(/Writer/i)[0]!;
-    fireEvent.click(writerBtn);
-    expect(defaultPersona.setPersona).toHaveBeenCalled();
   });
 
   // ── Favorites with items ──

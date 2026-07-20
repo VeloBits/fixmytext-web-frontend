@@ -67,7 +67,7 @@ export default defineConfig({
         // Pinned (not '*') so a breaking app-core/store-contract change forces a
         // coordinated remote rebuild instead of silent runtime version skew
         // (M-2). Bump in lockstep with packages/app-core/package.json's version.
-        '@velobits/app-core': { singleton: true, requiredVersion: '^0.2.0' },
+        '@velobits/app-core': { singleton: true, requiredVersion: '^0.3.0' },
       },
     }),
     react(),

@@ -3,8 +3,8 @@ import { render } from '@testing-library/react';
 import Home from './Home';
 import type {
   FavoritesContextValue,
-  PersonaContextValue,
   SubscriptionContextValue,
+  ToolGroupsContextValue,
 } from '@velobits/app-core/types/context';
 
 // Mock TextForm since it's a complex component
@@ -18,7 +18,15 @@ const baseProps = {
   mode: 'dark',
   setMode: vi.fn(),
   showAlert: vi.fn(),
-  persona: { persona: null, setPersona: vi.fn(), onboarded: false } as PersonaContextValue,
+  toolGroups: {
+    groups: [],
+    ready: true,
+    createGroup: vi.fn(),
+    renameGroup: vi.fn(),
+    deleteGroup: vi.fn(),
+    addToolToGroup: vi.fn(),
+    removeToolFromGroup: vi.fn(),
+  } as ToolGroupsContextValue,
   favorites: { favorites: [], toggleFavorite: vi.fn() } as FavoritesContextValue,
   user: null,
   isAuthenticated: false,
@@ -33,7 +41,7 @@ describe('Home', () => {
     expect(content).toContain('mode');
     expect(content).toContain('setMode');
     expect(content).toContain('showAlert');
-    expect(content).toContain('persona');
+    expect(content).toContain('toolGroups');
     expect(content).toContain('favorites');
     expect(content).toContain('subscription');
   });

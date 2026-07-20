@@ -3,7 +3,6 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
   FavoritesContextValue,
-  PersonaContextValue,
   SubscriptionContextValue,
   User,
 } from '@velobits/app-core/types/context';
@@ -101,12 +100,6 @@ vi.mock('@velobits/app-core/utils/formatPrice', () => ({
 
 import DashboardPage from './DashboardPage';
 
-const defaultPersona = {
-  persona: 'writer',
-  setPersona: vi.fn(),
-  onboarded: true,
-} as unknown as PersonaContextValue;
-
 const defaultFavorites = {
   favorites: [],
   toggleFavorite: vi.fn(),
@@ -135,7 +128,6 @@ const defaultUser = {
 function renderDash(props: Record<string, unknown> = {}) {
   return render(
     <DashboardPage
-      persona={defaultPersona}
       favorites={defaultFavorites}
       user={defaultUser}
       isAuthenticated={true}
@@ -203,12 +195,35 @@ describe('DashboardPage — payment redirects and tool stats', () => {
     expect(mockSetSearchParams).toHaveBeenCalledWith({}, { replace: true });
   });
 
-  it('handles upgrade=cancelled: opens subscription without alerting', () => {
-    searchParamsValue = new URLSearchParams('upgrade=cancelled');
+  it('handles purchase=success&kind=pro with the Pro welcome alert', () => {
+    searchParamsValue = new URLSearchParams('purchase=success&kind=pro');
     const showAlert = vi.fn();
     renderDash({ showAlert });
-    expect(screen.getByText('Manage your plan and billing')).toBeInTheDocument();
-    expect(showAlert).not.toHaveBeenCalled();
+    expect(showAlert).toHaveBeenCalledWith(
+      'Welcome to Pro! Your subscription is active.',
+      'success'
+    );
+    expect(mockSetSearchParams).toHaveBeenCalledWith({}, { replace: true });
+  });
+
+  it('appends the welcome-gift note when welcome=1 rides along', () => {
+    searchParamsValue = new URLSearchParams('purchase=success&kind=credit&welcome=1');
+    const showAlert = vi.fn();
+    renderDash({ showAlert });
+    expect(showAlert).toHaveBeenCalledWith(
+      expect.stringContaining('welcome bonus of 10 credits'),
+      'success'
+    );
+  });
+
+  it('handles purchase=refunded with a warning alert', () => {
+    searchParamsValue = new URLSearchParams('purchase=refunded&kind=pass');
+    const showAlert = vi.fn();
+    renderDash({ showAlert });
+    expect(showAlert).toHaveBeenCalledWith(
+      expect.stringContaining('automatically refunded'),
+      'warning'
+    );
     expect(mockSetSearchParams).toHaveBeenCalledWith({}, { replace: true });
   });
 

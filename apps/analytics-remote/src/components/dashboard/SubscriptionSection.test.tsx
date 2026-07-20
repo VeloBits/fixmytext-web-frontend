@@ -169,7 +169,7 @@ describe('SubscriptionSection', () => {
     const { subscription, navigate, showAlert } = renderSub({ isAuthenticated: false });
     fireEvent.click(screen.getAllByText('Buy')[0]!);
     expect(showAlert).toHaveBeenCalledWith('Sign in to purchase', 'warning');
-    expect(navigate).toHaveBeenCalledWith('/login');
+    expect(navigate).toHaveBeenCalledWith('/login?returnTo=%2Fdashboard%3Ftab%3Dsubscription');
     expect(subscription.handleBuyPass).not.toHaveBeenCalled();
   });
 
@@ -183,13 +183,13 @@ describe('SubscriptionSection', () => {
   it('redirects to login on upgrade when unauthenticated', () => {
     const { subscription, navigate } = renderSub({ isAuthenticated: false });
     fireEvent.click(screen.getByText('Upgrade to Pro'));
-    expect(navigate).toHaveBeenCalledWith('/login');
+    expect(navigate).toHaveBeenCalledWith('/login?returnTo=%2Fdashboard%3Ftab%3Dsubscription');
     expect(subscription.handleUpgrade).not.toHaveBeenCalled();
   });
 
-  it('shows Loading... on the upgrade button while upgradeLoading', () => {
+  it('shows the checkout-opening state on the upgrade button while upgradeLoading', () => {
     renderSub({ subscription: makeSubscription({ upgradeLoading: true }) });
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Opening checkout…')).toBeInTheDocument();
   });
 
   // ── Pricing / currency ──
@@ -253,5 +253,86 @@ describe('SubscriptionSection', () => {
     expect(screen.getByText('Unlimited access to all tools')).toBeInTheDocument();
     expect(screen.queryByText('Go Pro')).not.toBeInTheDocument();
     expect(screen.queryByText('Popular Passes')).not.toBeInTheDocument();
+  });
+});
+
+describe('SubscriptionSection — active passes & credit breakdown', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders active passes with usage, tools, expiry, and source', () => {
+    const expires = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString();
+    renderSub({
+      subscription: makeSubscription({
+        activePasses: [
+          {
+            id: 'up-1',
+            pass_id: 'day_triple',
+            name: 'Day Triple',
+            tool_ids: ['fix_grammar', 'translate', 'summarize'],
+            tools_count: 3,
+            uses_per_day: 20,
+            uses_today: 7,
+            expires_at: expires,
+            source: 'purchase',
+          },
+          {
+            id: 'up-2',
+            pass_id: 'sprint_all',
+            name: 'Sprint All',
+            tool_ids: ['*'],
+            tools_count: -1,
+            uses_per_day: 50,
+            uses_today: 0,
+            expires_at: expires,
+            source: 'spin',
+          },
+        ],
+        activeCredits: [],
+      }),
+    });
+    expect(screen.getByText('Active Passes')).toBeInTheDocument();
+    const cards = screen.getAllByTestId('active-pass');
+    expect(cards).toHaveLength(2);
+    expect(screen.getByText('7/20 uses today')).toBeInTheDocument();
+    expect(screen.getByText('All tools')).toBeInTheDocument();
+    expect(screen.getByText(/expires in 4 days · Purchased/)).toBeInTheDocument();
+    expect(screen.getByText(/expires in 4 days · Spin reward/)).toBeInTheDocument();
+  });
+
+  it('labels the welcome bonus in the credit breakdown', () => {
+    renderSub({
+      subscription: makeSubscription({
+        activePasses: [],
+        activeCredits: [
+          { id: 'c1', credits_remaining: 5, credits_total: 5, source: 'purchase' },
+          { id: 'c2', credits_remaining: 10, credits_total: 10, source: 'welcome' },
+        ],
+        totalCredits: 15,
+      }),
+    });
+    expect(screen.getByRole('heading', { name: 'Credits' })).toBeInTheDocument();
+    expect(screen.getByText('Welcome bonus')).toBeInTheDocument();
+    expect(screen.getByText('10/10 remaining')).toBeInTheDocument();
+  });
+
+  it('hides the ownership block when nothing is owned', () => {
+    renderSub();
+    expect(screen.queryByText('Active Passes')).not.toBeInTheDocument();
+  });
+
+  it('shows Pro expiry and a Renew button for a cancelled in-period plan', () => {
+    renderSub({
+      subscription: makeSubscription({
+        isPro: true,
+        proExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+        proCancelled: true,
+      }),
+    });
+    expect(screen.getByText(/access until/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /renew pro/i })).toBeInTheDocument();
+    // Cancelled plans don't show Manage Plan (nothing left to cancel).
+    expect(screen.queryByText('Manage Plan')).not.toBeInTheDocument();
   });
 });

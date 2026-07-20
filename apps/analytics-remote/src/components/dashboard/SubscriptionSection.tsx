@@ -2,19 +2,49 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useGetPassCatalogQuery } from '@velobits/app-core/store/api/passesApi';
 import formatPriceUtil from '@velobits/app-core/utils/formatPrice';
+import { PRO_PRICES, type SupportedCurrency } from '@velobits/app-core/constants/pricing';
+import { TOOLS } from '@velobits/app-core/constants/tools';
+import ToolPickerModal from '@velobits/app-core/components/subscription/ToolPickerModal';
 import type { SubscriptionContextValue } from '@velobits/app-core/types/context';
 import type { AlertLevel } from '@velobits/app-core/types/alert';
 import type { NavigateFunction } from 'react-router-dom';
+import type { components } from '@velobits/app-core/types/openapi';
 
-type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
+type PassCatalogItem = components['schemas']['PassCatalogItem'];
 
-const PRO_PRICES: Record<SupportedCurrency, string> = {
-  inr: '₹399',
-  usd: '$5',
-  gbp: '£4',
-  eur: '€4.50',
-};
 const POPULAR_PASS_IDS = ['day_single', 'day_triple', 'day_all', 'sprint_all'];
+
+const CREDIT_SOURCE_LABELS: Record<string, string> = {
+  purchase: 'Purchased',
+  welcome: 'Welcome bonus',
+  spin: 'Spin reward',
+  referral: 'Referral',
+};
+
+const PASS_SOURCE_LABELS: Record<string, string> = {
+  purchase: 'Purchased',
+  spin: 'Spin reward',
+  referral: 'Referral',
+  welcome: 'Welcome',
+};
+
+/** "expires in 3h" / "expires in 4 days" / "expires soon". */
+function formatExpiry(expiresAt: string): string {
+  const ms = new Date(expiresAt).getTime() - Date.now();
+  if (ms <= 0) return 'expired';
+  const hours = Math.round(ms / 3_600_000);
+  if (hours < 1) return 'expires soon';
+  if (hours < 48) return `expires in ${hours}h`;
+  return `expires in ${Math.round(hours / 24)} days`;
+}
+
+function toolLabels(toolIds: string[], toolsCount: number): string {
+  if (toolsCount === -1 || toolIds.includes('*')) return 'All tools';
+  return toolIds
+    .map((id) => TOOLS.find((t) => t.id === id)?.label || id)
+    .filter(Boolean)
+    .join(', ');
+}
 
 interface SubscriptionSectionProps {
   subscription: SubscriptionContextValue;
@@ -40,6 +70,8 @@ export default function SubscriptionSection({
     refetch,
   } = useGetPassCatalogQuery();
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  // Tool-scoped passes require picking exactly N tools before checkout.
+  const [pickerPass, setPickerPass] = useState<PassCatalogItem | null>(null);
 
   const passes = useMemo(() => catalog?.passes || [], [catalog?.passes]);
   const symbol = passes[0]?.symbol || '$';
@@ -54,16 +86,36 @@ export default function SubscriptionSection({
     [passes]
   );
 
+  const loginReturnTo = '/login?returnTo=' + encodeURIComponent('/dashboard?tab=subscription');
+
+  const doBuyPass = async (id: string, toolIds: string[]) => {
+    setBuyingId(id);
+    try {
+      await subscription.handleBuyPass(id, toolIds);
+    } finally {
+      setBuyingId(null);
+    }
+  };
+
   const handleBuy = async (type: string, id: string, toolIds: string[] = []) => {
     if (!isAuthenticated) {
       showAlert?.('Sign in to purchase', 'warning');
-      navigate('/login');
+      navigate(loginReturnTo);
+      return;
+    }
+    if (type === 'pass') {
+      const pass = passes.find((p) => p.id === id);
+      // Tool-scoped pass without a selection yet: collect exactly N tools first.
+      if (pass && pass.tools > 0 && toolIds.length === 0) {
+        setPickerPass(pass);
+        return;
+      }
+      await doBuyPass(id, toolIds);
       return;
     }
     setBuyingId(id);
     try {
-      if (type === 'pass') await subscription.handleBuyPass(id, toolIds);
-      else await subscription.handleBuyCredits(id);
+      await subscription.handleBuyCredits(id);
     } finally {
       setBuyingId(null);
     }
@@ -71,11 +123,25 @@ export default function SubscriptionSection({
 
   const handleUpgrade = () => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate(loginReturnTo);
       return;
     }
     subscription.handleUpgrade();
   };
+
+  const proExpiryDate = subscription?.proExpiresAt
+    ? new Date(subscription.proExpiresAt).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : null;
+  const proNearExpiry = subscription?.proExpiresAt
+    ? new Date(subscription.proExpiresAt).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000
+    : false;
+
+  const activePasses = subscription?.activePasses || [];
+  const activeCredits = subscription?.activeCredits || [];
 
   if (catalogError) {
     return (
@@ -137,24 +203,49 @@ export default function SubscriptionSection({
               </span>
               <span className="tu-sub-plan-desc">
                 {subscription?.isPro
-                  ? 'Unlimited access to all tools'
-                  : `3 free uses per tool per day${
+                  ? `Unlimited access to all tools${
+                      proExpiryDate
+                        ? subscription.proCancelled
+                          ? ` · access until ${proExpiryDate}`
+                          : ` · Pro until ${proExpiryDate}`
+                        : ''
+                    }`
+                  : `${subscription?.freeUsesPerTool ?? 3} free uses per tool per day${
                       subscription?.totalCredits ? ` · ${subscription.totalCredits} credits` : ''
                     }`}
               </span>
             </div>
           </div>
           {subscription?.isPro && (
-            <button
-              className="tu-sub-btn tu-sub-btn--secondary"
-              onClick={() => {
-                if (window.confirm('Cancel your Pro subscription?'))
-                  subscription.handleCancelSubscription();
-              }}
-              disabled={subscription.cancelLoading}
-            >
-              {subscription.cancelLoading ? 'Cancelling...' : 'Manage Plan'}
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {(subscription.proCancelled || proNearExpiry) && (
+                <button
+                  className="tu-sub-btn tu-sub-btn--primary"
+                  onClick={handleUpgrade}
+                  disabled={subscription.upgradeLoading}
+                >
+                  {subscription.upgradeLoading ? 'Opening checkout…' : 'Renew Pro'}
+                </button>
+              )}
+              {!subscription.proCancelled && (
+                <button
+                  className="tu-sub-btn tu-sub-btn--secondary"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        proExpiryDate
+                          ? `Cancel your Pro subscription? You keep access until ${proExpiryDate}.`
+                          : 'Cancel your Pro subscription?'
+                      )
+                    )
+                      subscription.handleCancelSubscription();
+                  }}
+                  disabled={subscription.cancelLoading}
+                >
+                  {subscription.cancelLoading ? 'Cancelling...' : 'Manage Plan'}
+                </button>
+              )}
+            </div>
           )}
         </div>
 
@@ -166,7 +257,9 @@ export default function SubscriptionSection({
             </div>
             <div className="tu-sub-stat-divider" />
             <div className="tu-sub-stat">
-              <span className="tu-sub-stat-val">3</span>
+              <span className="tu-sub-stat-val">
+                {(subscription?.freeUsesPerTool ?? 3) + (subscription?.dailyLoginBonus ? 1 : 0)}
+              </span>
               <span className="tu-sub-stat-label">Uses/day</span>
             </div>
             <div className="tu-sub-stat-divider" />
@@ -177,6 +270,69 @@ export default function SubscriptionSection({
           </div>
         )}
       </div>
+
+      {/* Active Passes + Credit breakdown (what the user actually owns) */}
+      {(activePasses.length > 0 || activeCredits.length > 0) && (
+        <div className="tu-sub-section">
+          {activePasses.length > 0 && (
+            <>
+              <div className="tu-sub-section-header">
+                <h3 className="tu-sub-section-title">Active Passes</h3>
+              </div>
+              <div className="tu-sub-pass-grid">
+                {activePasses.map((pass) => (
+                  <div key={pass.id} className="tu-sub-pass-card" data-testid="active-pass">
+                    <span className="tu-sub-pass-name">{pass.name}</span>
+                    <span className="tu-sub-pass-meta">
+                      {pass.uses_today}/{pass.uses_per_day} uses today
+                    </span>
+                    <div
+                      className="tu-upgrade-usage-track"
+                      style={{ margin: '0.35rem 0', height: 4 }}
+                    >
+                      <div
+                        className="tu-upgrade-usage-fill"
+                        style={{
+                          width: `${Math.min((pass.uses_today / pass.uses_per_day) * 100, 100)}%`,
+                          height: '100%',
+                        }}
+                      />
+                    </div>
+                    <span className="tu-sub-pass-meta">
+                      {toolLabels(pass.tool_ids, pass.tools_count)}
+                    </span>
+                    <span className="tu-sub-pass-meta">
+                      {formatExpiry(pass.expires_at)}
+                      {pass.source && PASS_SOURCE_LABELS[pass.source]
+                        ? ` · ${PASS_SOURCE_LABELS[pass.source]}`
+                        : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          {activeCredits.length > 0 && (
+            <>
+              <div className="tu-sub-section-header" style={{ marginTop: '0.75rem' }}>
+                <h3 className="tu-sub-section-title">Credits</h3>
+              </div>
+              <div className="tu-sub-pass-grid">
+                {activeCredits.map((credit) => (
+                  <div key={credit.id} className="tu-sub-pass-card" data-testid="credit-pack">
+                    <span className="tu-sub-pass-name">
+                      {CREDIT_SOURCE_LABELS[credit.source] || credit.source}
+                    </span>
+                    <span className="tu-sub-pass-meta">
+                      {credit.credits_remaining}/{credit.credits_total} remaining
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Pro Upgrade Card */}
       {!subscription?.isPro && (
@@ -275,7 +431,7 @@ export default function SubscriptionSection({
                 >
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
-                {subscription?.upgradeLoading ? 'Loading...' : 'Upgrade to Pro'}
+                {subscription?.upgradeLoading ? 'Opening checkout…' : 'Upgrade to Pro'}
               </button>
             </div>
           </div>
@@ -338,6 +494,20 @@ export default function SubscriptionSection({
           )}
         </div>
       )}
+
+      {/* Tool picker for tool-scoped passes */}
+      <ToolPickerModal
+        open={Boolean(pickerPass)}
+        requiredCount={pickerPass?.tools ?? 1}
+        passName={pickerPass?.name ?? ''}
+        priceLabel={pickerPass ? formatPrice(pickerPass.price) : undefined}
+        onConfirm={(toolIds) => {
+          const passId = pickerPass?.id;
+          setPickerPass(null);
+          if (passId) void doBuyPass(passId, toolIds);
+        }}
+        onCancel={() => setPickerPass(null)}
+      />
     </div>
   );
 }

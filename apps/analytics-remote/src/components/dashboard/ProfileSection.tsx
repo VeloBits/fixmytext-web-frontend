@@ -1,14 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { PERSONAS } from '@velobits/app-core/constants/tools';
-import type { PersonaContextValue, User } from '@velobits/app-core/types/context';
+import type { User } from '@velobits/app-core/types/context';
 import type { AlertLevel } from '@velobits/app-core/types/alert';
-import type { Persona, PersonaId } from '@velobits/app-core/types/tools';
-import { CheckIcon, MoonIcon, SunIcon } from '@velobits/design-system';
+import { MoonIcon, SunIcon } from '@velobits/design-system';
 
 interface ProfileSectionProps {
   user: User | null;
   isAuthenticated: boolean;
-  persona: PersonaContextValue;
   mode: string;
   setMode: (mode: string) => void;
   showAlert: (msg: string, type?: AlertLevel) => void;
@@ -16,12 +13,13 @@ interface ProfileSectionProps {
 
 /**
  * Dashboard profile section.
- * Allows editing display name, selecting persona, and toggling theme.
+ * Allows editing display name and toggling theme. (The persona picker that
+ * lived here was removed with the persona feature — custom tool groups are
+ * managed in the editor's tool panel.)
  */
 export default function ProfileSection({
   user,
   isAuthenticated,
-  persona,
   mode,
   setMode,
   showAlert,
@@ -216,34 +214,6 @@ export default function ProfileSection({
           </div>
         </div>
       )}
-
-      {/* Persona */}
-      <div className="tu-dash-card">
-        <h3 className="tu-dash-card-title">Persona</h3>
-        <p className="tu-dash-card-desc">Choose your persona to get tailored tool suggestions</p>
-        <div className="tu-dash-persona-grid">
-          {(Object.entries(PERSONAS) as [PersonaId, Persona][]).map(([key, p]) => (
-            <button
-              key={key}
-              className={`tu-dash-persona-card${
-                persona?.persona === key ? ' tu-dash-persona-card--active' : ''
-              }`}
-              onClick={() => {
-                persona.setPersona(key);
-                showAlert(`Persona changed to ${p.label}`, 'success');
-              }}
-            >
-              <span className="tu-dash-persona-icon">{p.icon}</span>
-              <span className="tu-dash-persona-label">{p.label}</span>
-              {persona?.persona === key && (
-                <span className="tu-dash-persona-check">
-                  <CheckIcon size={13} />
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Appearance */}
       <div className="tu-dash-card">

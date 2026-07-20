@@ -1,18 +1,12 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProfileSection from './ProfileSection';
-import type { PersonaContextValue, User } from '@velobits/app-core/types/context';
+import type { User } from '@velobits/app-core/types/context';
 
 const mockResendVerification = vi.fn();
 
 vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useResendVerificationMutation: () => [mockResendVerification, { isLoading: false }],
-}));
-
-vi.mock('@velobits/app-core/constants/tools', () => ({
-  PERSONAS: {
-    writer: { label: 'Writer', icon: 'W' },
-  },
 }));
 
 interface RenderProfileOptions {
@@ -21,16 +15,10 @@ interface RenderProfileOptions {
 }
 
 function renderProfile({ user, isAuthenticated = true }: RenderProfileOptions = {}) {
-  const persona = {
-    persona: 'writer',
-    setPersona: vi.fn(),
-    onboarded: true,
-  } as unknown as PersonaContextValue;
   return render(
     <ProfileSection
       user={(user ?? null) as User | null}
       isAuthenticated={isAuthenticated}
-      persona={persona}
       mode="dark"
       setMode={vi.fn()}
       showAlert={vi.fn()}
@@ -84,9 +72,6 @@ describe('ProfileSection — email verification', () => {
       <ProfileSection
         user={user}
         isAuthenticated
-        persona={
-          { persona: 'writer', setPersona: vi.fn(), onboarded: true } as unknown as PersonaContextValue
-        }
         mode="dark"
         setMode={vi.fn()}
         showAlert={showAlertLocal}
@@ -117,9 +102,6 @@ describe('ProfileSection — email verification', () => {
           } as User
         }
         isAuthenticated
-        persona={
-          { persona: 'writer', setPersona: vi.fn(), onboarded: true } as unknown as PersonaContextValue
-        }
         mode="dark"
         setMode={vi.fn()}
         showAlert={showAlertLocal}
@@ -139,22 +121,10 @@ describe('ProfileSection — email verification', () => {
   });
 });
 
-describe('ProfileSection — persona picker (persona prop)', () => {
-  it('marks the active persona and calls setPersona from the persona prop', () => {
-    const setPersona = vi.fn();
-    const showAlert = vi.fn();
-    render(
-      <ProfileSection
-        user={null}
-        isAuthenticated={false}
-        persona={{ persona: null, setPersona, onboarded: false } as unknown as PersonaContextValue}
-        mode="dark"
-        setMode={vi.fn()}
-        showAlert={showAlert}
-      />
-    );
-    fireEvent.click(screen.getByText('Writer'));
-    expect(setPersona).toHaveBeenCalledWith('writer');
-    expect(showAlert).toHaveBeenCalledWith('Persona changed to Writer', 'success');
+describe('ProfileSection — persona removal', () => {
+  it('renders no persona picker (feature replaced by custom tool groups)', () => {
+    renderProfile({ user: { email: 'a@b.c', display_name: 'A' } as Partial<User> });
+    expect(screen.queryByText('Persona')).not.toBeInTheDocument();
+    expect(document.querySelector('.tu-dash-persona-grid')).not.toBeInTheDocument();
   });
 });

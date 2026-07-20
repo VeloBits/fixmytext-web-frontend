@@ -1,34 +1,29 @@
-import { PERSONAS, USE_CASE_TABS, TOOL_GROUPS, TOOLS, SMART_SUGGESTION_RULES } from './tools';
+import { STARTER_KITS, USE_CASE_TABS, TOOL_GROUPS, TOOLS, SMART_SUGGESTION_RULES } from './tools';
 
-describe('PERSONAS', () => {
-  it('is a non-empty object', () => {
-    expect(Object.keys(PERSONAS).length).toBeGreaterThan(0);
+describe('STARTER_KITS', () => {
+  it('is a non-empty array', () => {
+    expect(STARTER_KITS.length).toBeGreaterThan(0);
   });
 
-  it('contains expected persona keys', () => {
-    expect(PERSONAS).toHaveProperty('writer');
-    expect(PERSONAS).toHaveProperty('student');
-    expect(PERSONAS).toHaveProperty('developer');
-    expect(PERSONAS).toHaveProperty('social');
-    expect(PERSONAS).toHaveProperty('explorer');
+  it('contains expected kit ids', () => {
+    const ids = STARTER_KITS.map((k) => k.id);
+    expect(ids).toEqual(['writer', 'student', 'developer', 'social', 'explorer']);
   });
 
-  it('each persona has label, icon, defaultTab, and suggestedTools', () => {
-    for (const persona of Object.values(PERSONAS)) {
-      expect(persona).toHaveProperty('label');
-      expect(persona).toHaveProperty('icon');
-      expect(persona).toHaveProperty('defaultTab');
-      expect(typeof persona.label).toBe('string');
-      expect(typeof persona.icon).toBe('string');
-      expect(typeof persona.defaultTab).toBe('string');
-      expect(Array.isArray(persona.suggestedTools)).toBe(true);
+  it('each kit has label, icon, groupName, defaultTab, and toolIds', () => {
+    for (const kit of STARTER_KITS) {
+      expect(typeof kit.label).toBe('string');
+      expect(typeof kit.icon).toBe('string');
+      expect(typeof kit.groupName).toBe('string');
+      expect(typeof kit.defaultTab).toBe('string');
+      expect(Array.isArray(kit.toolIds)).toBe(true);
     }
   });
 
-  it('every suggested tool id references a known tool', () => {
+  it('every kit tool id references a known tool', () => {
     const toolIds = new Set(TOOLS.map((t) => t.id));
-    for (const persona of Object.values(PERSONAS)) {
-      for (const id of persona.suggestedTools) {
+    for (const kit of STARTER_KITS) {
+      for (const id of kit.toolIds) {
         expect(toolIds.has(id)).toBe(true);
       }
     }

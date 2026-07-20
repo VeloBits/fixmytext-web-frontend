@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TOOLS, TOOL_GROUPS, USE_CASE_TABS, PERSONAS } from '../src/tools';
+import { TOOLS, TOOL_GROUPS, USE_CASE_TABS, STARTER_KITS } from '../src/tools';
 import { getToolBySlug, getAllSlugs, getToolsByGroup, getAllGroups } from '../src/slugs';
 
 describe('TOOLS registry', () => {
@@ -51,41 +51,45 @@ describe('USE_CASE_TABS', () => {
   });
 });
 
-describe('PERSONAS', () => {
-  it('every suggestedTools id references a known tool', () => {
+describe('STARTER_KITS', () => {
+  it('every toolIds entry references a known tool', () => {
     const toolIds = new Set(TOOLS.map((t) => t.id));
-    for (const [key, persona] of Object.entries(PERSONAS)) {
-      for (const id of persona.suggestedTools) {
-        expect(toolIds.has(id), `${key}: unknown suggested tool '${id}'`).toBe(true);
+    for (const kit of STARTER_KITS) {
+      for (const id of kit.toolIds) {
+        expect(toolIds.has(id), `${kit.id}: unknown kit tool '${id}'`).toBe(true);
       }
     }
   });
 
   it('every defaultTab is a valid use-case tab', () => {
     const tabIds = new Set<string>(USE_CASE_TABS.map((t) => t.id));
-    for (const [key, persona] of Object.entries(PERSONAS)) {
-      expect(tabIds.has(persona.defaultTab), `${key}: unknown tab '${persona.defaultTab}'`).toBe(
-        true
-      );
+    for (const kit of STARTER_KITS) {
+      expect(tabIds.has(kit.defaultTab), `${kit.id}: unknown tab '${kit.defaultTab}'`).toBe(true);
     }
   });
 
-  it('every persona except explorer suggests at least one tool', () => {
-    for (const [key, persona] of Object.entries(PERSONAS)) {
-      if (key === 'explorer') {
-        // "Just Exploring" promises the whole catalog — no For You group
-        expect(persona.suggestedTools).toEqual([]);
+  it('every kit except explorer seeds a named, non-empty group', () => {
+    for (const kit of STARTER_KITS) {
+      if (kit.id === 'explorer') {
+        // "Just Exploring" promises the whole catalog — creates no group
+        expect(kit.toolIds).toEqual([]);
+        expect(kit.groupName).toBe('');
       } else {
-        expect(persona.suggestedTools.length, `${key} has no suggested tools`).toBeGreaterThan(0);
+        expect(kit.toolIds.length, `${kit.id} seeds no tools`).toBeGreaterThan(0);
+        expect(kit.groupName.length, `${kit.id} has no group name`).toBeGreaterThan(0);
       }
     }
   });
 
-  it('suggested tool ids are unique within each persona', () => {
-    for (const [key, persona] of Object.entries(PERSONAS)) {
-      expect(new Set(persona.suggestedTools).size, `${key} has duplicate ids`).toBe(
-        persona.suggestedTools.length
-      );
+  it('kit ids and group names are unique', () => {
+    expect(new Set(STARTER_KITS.map((k) => k.id)).size).toBe(STARTER_KITS.length);
+    const names = STARTER_KITS.map((k) => k.groupName).filter(Boolean);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it('tool ids are unique within each kit', () => {
+    for (const kit of STARTER_KITS) {
+      expect(new Set(kit.toolIds).size, `${kit.id} has duplicate ids`).toBe(kit.toolIds.length);
     }
   });
 });

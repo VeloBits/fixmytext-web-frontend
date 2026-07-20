@@ -17,6 +17,21 @@ import { broadcastAuthMessage, hasAuthHint, userManager } from './userManager';
 let _callbackPromise: Promise<void> | null = null;
 let _callbackSettled = false;
 
+/**
+ * Accept only same-origin router-relative paths from the OIDC state: must be a
+ * string starting with a single "/" (no protocol-relative "//", no "/\\" IE
+ * quirk, no absolute URLs). Anything else falls back to "/".
+ */
+function isSafeReturnTo(p: unknown): p is string {
+  return (
+    typeof p === 'string' &&
+    p.startsWith('/') &&
+    !p.startsWith('//') &&
+    !p.startsWith('/\\') &&
+    !p.includes('://')
+  );
+}
+
 export function AuthCallback() {
   const navigate = useNavigate();
   const [error, setError] = useState(false);
@@ -27,7 +42,7 @@ export function AuthCallback() {
     _callbackSettled = false;
     _callbackPromise = userManager
       .signinRedirectCallback()
-      .then(() => {
+      .then((user) => {
         _callbackSettled = true;
         // Notify other open tabs so they silently acquire tokens without a
         // page refresh. Only the initiating tab broadcasts — silent renewals
@@ -38,7 +53,8 @@ export function AuthCallback() {
         // the SPA — and the in-memory user — alive.
         // _callbackPromise intentionally kept non-null here so any StrictMode
         // double-invoke between .then() and unmount sees a truthy guard.
-        navigate('/', { replace: true });
+        const returnTo = (user?.state as { returnTo?: unknown } | undefined)?.returnTo;
+        navigate(isSafeReturnTo(returnTo) ? returnTo : '/', { replace: true });
       })
       .catch((err) => {
         _callbackSettled = true;

@@ -36,15 +36,16 @@ root.render(
   </React.StrictMode>
 );
 
-// One-time cleanup of the removed gamification feature's localStorage blob.
-// ORDERING: usePersona's state initializer still reads this key as a legacy
-// persona fallback during the FIRST render, so the removal is deferred until
-// after React has mounted (setTimeout 0 runs after the synchronous render
-// pass above). Once the legacy read in usePersona is dropped, this cleanup
-// can be dropped with it in a future release.
+// One-time cleanup of removed features' storage: the gamification blob and
+// the guest persona keys (personas were replaced by custom tool groups;
+// usePersona and its legacy read are gone, so nothing reads these anymore).
+// Deferred to after mount out of caution; drop the whole block in a future
+// release once stale tabs have cycled.
 setTimeout(() => {
   try {
     localStorage.removeItem('fmx_gamification');
+    sessionStorage.removeItem('fmx_guest_persona');
+    sessionStorage.removeItem('fmx_guest_persona_owner');
   } catch {
     /* storage unavailable (e.g. blocked third-party context) — ignore */
   }

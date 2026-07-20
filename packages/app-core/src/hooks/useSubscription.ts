@@ -9,19 +9,8 @@ import {
 import usePasses from './usePasses';
 import { openRazorpayCheckout, executeCheckoutFlow } from '../utils/razorpay';
 import { useOidcAuth } from '../auth/useOidcAuth';
+import { ALWAYS_FREE_IDS } from '../constants/pricing';
 import type { ToolDefinition } from '../types/tools';
-
-const ALWAYS_FREE_IDS = new Set([
-  'find_replace',
-  'compare',
-  'random_text',
-  'password',
-  'fmt_settings',
-  'regex_test',
-  'markdown',
-  'save_txt',
-  'save_json',
-]);
 
 interface UseSubscriptionOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- variadic showAlert accepts any alert params
@@ -57,6 +46,8 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
   const dailyLoginBonus = status?.daily_login_bonus || false;
   const region = status?.region || '';
   const freeUsesPerTool = status?.free_uses_per_tool ?? 3;
+  const proExpiresAt = status?.pro_expires_at ?? null;
+  const proCancelled = status?.pro_cancelled ?? false;
 
   // Unified tool access check
   const checkToolAccess = useCallback(
@@ -92,6 +83,27 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
     setBlockedTool(null);
   }, []);
 
+  const refetchAll = useCallback((): void => {
+    // The status query is skipped while signed out; refetching it then throws.
+    if (!isAuthenticated) return;
+    refetchStatus();
+    passes.refetchPasses();
+  }, [isAuthenticated, refetchStatus, passes.refetchPasses]);
+
+  /**
+   * Server-authoritative block signal: called when a tool API returns
+   * HTTP 402 (quota exhausted). Opens the upsell modal and refetches
+   * status/passes so a desynced client-side counter realigns with the server.
+   */
+  const notifyBlocked = useCallback(
+    (tool: ToolDefinition): void => {
+      setBlockedTool(tool);
+      setShowUpgradeModal(true);
+      refetchAll();
+    },
+    [refetchAll]
+  );
+
   // Upgrade to Pro via Razorpay order (one-time payment)
   const handleUpgrade = useCallback(async (): Promise<void> => {
     await executeCheckoutFlow({
@@ -124,18 +136,27 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_signature: response.razorpay_signature,
         }).unwrap(),
-      successPath: '/dashboard?tab=subscription&upgrade=success',
-      failPath: '/dashboard?tab=subscription&upgrade=verify-failed',
+      successPath: '/dashboard?tab=subscription&purchase=success&kind=pro',
+      failPath: '/dashboard?tab=subscription&purchase=verify-failed&kind=pro',
+      refundedPath: '/dashboard?tab=subscription&purchase=refunded&kind=pro',
       showAlert,
       navigate,
       errorMessage: 'Failed to start subscription. Please try again.',
     });
   }, [createProCheckout, verifyProPayment, showAlert, navigate]);
 
-  // Cancel Pro subscription
+  // Cancel Pro subscription (access continues until the paid period ends)
   const handleCancelSubscription = useCallback(async (): Promise<void> => {
     try {
-      await cancelSub().unwrap();
+      const res = (await cancelSub().unwrap()) as { access_until?: string } | undefined;
+      if (res?.access_until) {
+        const until = new Date(res.access_until).toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        showAlert?.(`Your Pro plan is cancelled — access continues until ${until}.`, 'info');
+      }
       refetchStatus();
     } catch (err) {
       const apiErr = err as { data?: { detail?: string } } | null;
@@ -155,21 +176,18 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
     [isPro, toolUsesToday, dailyLoginBonus, freeUsesPerTool, passes.hasPassFor]
   );
 
-  const refetchAll = useCallback((): void => {
-    // The status query is skipped while signed out; refetching it then throws.
-    if (!isAuthenticated) return;
-    refetchStatus();
-    passes.refetchPasses();
-  }, [isAuthenticated, refetchStatus, passes.refetchPasses]);
-
   return {
     tier,
     isPro,
     region,
     toolUsesToday,
     dailyLoginBonus,
+    freeUsesPerTool,
+    proExpiresAt,
+    proCancelled,
     getToolUsage,
     checkToolAccess,
+    notifyBlocked,
     showUpgradeModal,
     dismissUpgradeModal,
     blockedTool,

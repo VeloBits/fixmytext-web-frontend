@@ -129,9 +129,17 @@ export interface ExecuteCheckoutFlowParams {
   verifyPayment: (response: RazorpayPaymentResponse) => Promise<unknown>;
   successPath: string;
   failPath: string;
+  /** Where to land when the backend refunded the payment instead of
+   * fulfilling it (verify returns status: "refunded"). Falls back to failPath. */
+  refundedPath?: string;
   showAlert?: (msg: string, variant: string) => void;
   navigate: (path: string) => void;
   errorMessage?: string;
+}
+
+interface VerifyResult {
+  status?: string;
+  welcome_gift?: boolean;
 }
 
 /**
@@ -144,6 +152,7 @@ export async function executeCheckoutFlow({
   verifyPayment,
   successPath,
   failPath,
+  refundedPath,
   showAlert,
   navigate,
   errorMessage = 'Failed to create order. Please try again.',
@@ -154,8 +163,12 @@ export async function executeCheckoutFlow({
       ...orderData,
       onSuccess: async (response: RazorpayPaymentResponse): Promise<void> => {
         try {
-          await verifyPayment(response);
-          navigate(successPath);
+          const result = (await verifyPayment(response)) as VerifyResult | undefined;
+          if (result?.status === 'refunded') {
+            navigate(refundedPath ?? failPath);
+            return;
+          }
+          navigate(result?.welcome_gift ? `${successPath}&welcome=1` : successPath);
         } catch {
           navigate(failPath);
         }

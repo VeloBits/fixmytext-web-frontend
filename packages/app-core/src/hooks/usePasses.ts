@@ -127,8 +127,9 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
             item_type: 'pass',
             tool_ids: toolIds,
           }).unwrap(),
-        successPath: '/dashboard?tab=subscription&purchase=success',
-        failPath: '/dashboard?tab=subscription&purchase=verify-failed',
+        successPath: '/dashboard?tab=subscription&purchase=success&kind=pass',
+        failPath: '/dashboard?tab=subscription&purchase=verify-failed&kind=pass',
+        refundedPath: '/dashboard?tab=subscription&purchase=refunded&kind=pass',
         showAlert,
         navigate,
       });
@@ -173,8 +174,9 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
             item_type: 'credit',
             tool_ids: [],
           }).unwrap(),
-        successPath: '/dashboard?tab=subscription&purchase=success',
-        failPath: '/dashboard?tab=subscription&purchase=verify-failed',
+        successPath: '/dashboard?tab=subscription&purchase=success&kind=credit',
+        failPath: '/dashboard?tab=subscription&purchase=verify-failed&kind=credit',
+        refundedPath: '/dashboard?tab=subscription&purchase=refunded&kind=credit',
         showAlert,
         navigate,
       });

@@ -10,8 +10,8 @@ export type {
   ToolColor,
   SelectOption,
   UseCaseTab,
-  Persona,
-  PersonaId,
+  StarterKit,
+  StarterKitId,
   QuestOp,
   SmartSuggestionRule,
 } from '@velobits/tools-registry';

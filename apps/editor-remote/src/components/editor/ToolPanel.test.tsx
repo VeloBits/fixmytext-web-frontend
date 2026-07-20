@@ -24,8 +24,12 @@ vi.mock('framer-motion', () => {
       ].forEach((k) => delete p[k]);
       return React.createElement(tag, p as Record<string, unknown>, children);
     };
+  // Memoize per tag: a fresh component identity on every property access
+  // would remount the whole subtree on each render, detaching elements a
+  // test holds between fireEvent calls.
+  const cache: Record<string, ReturnType<typeof m>> = {};
   return {
-    motion: new Proxy({}, { get: (_, t: string) => m(t) }),
+    motion: new Proxy({}, { get: (_, t: string) => (cache[t] ??= m(t)) }),
     AnimatePresence: ({ children }: { children?: ReactNode }) => children,
     useReducedMotion: () => false,
   };
@@ -81,6 +85,21 @@ const sampleTools = [
   },
 ] as unknown as ToolDefinition[];
 
+const emptyToolGroups = {
+  groups: [] as { id: string; name: string; toolIds: string[] }[],
+  ready: true,
+  createGroup: vi.fn(),
+  renameGroup: vi.fn(),
+  deleteGroup: vi.fn(),
+  addToolToGroup: vi.fn(),
+  removeToolFromGroup: vi.fn(),
+};
+
+const makeToolGroups = (groups: { id: string; name: string; toolIds: string[] }[]) => ({
+  ...emptyToolGroups,
+  groups,
+});
+
 const defaultProps = {
   tools: sampleTools,
   activeTab: 'all',
@@ -89,6 +108,7 @@ const defaultProps = {
   disabled: false,
   // Favorites are their own standalone context.
   favorites: { favorites: [] as string[], toggleFavorite: vi.fn() },
+  toolGroups: emptyToolGroups,
   activeToolId: null,
   hideTabs: false,
   viewMode: 'list',
@@ -222,76 +242,155 @@ describe('ToolPanel', () => {
     expect(screen.getByText('suggested')).toBeInTheDocument();
   });
 
-  it('renders For You group from personaToolIds in curated order', () => {
-    render(<ToolPanel {...defaultProps} personaToolIds={['fix_grammar', 'base64']} />);
-    const forYouGroup = screen.getByText('For You').closest('.tu-group')!;
-    const labels = Array.from(forYouGroup.querySelectorAll('.tu-titem-name')).map(
-      (el) => el.textContent
-    );
-    // Curated order preserved: fix_grammar first even though 'Base64 Encode' sorts before it
-    expect(labels).toEqual(['Fix Grammar', 'Base64 Encode']);
-  });
+  describe('custom tool groups', () => {
+    it('renders custom groups above catalog groups, tools in curated order', () => {
+      const toolGroups = makeToolGroups([
+        { id: 'g1', name: 'My Kit', toolIds: ['fix_grammar', 'base64'] },
+      ]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
+      const labels = Array.from(kitGroup.querySelectorAll('.tu-titem-name')).map(
+        (el) => el.textContent
+      );
+      // Curated order preserved: fix_grammar first even though 'Base64 Encode' sorts before it
+      expect(labels).toEqual(['Fix Grammar', 'Base64 Encode']);
+      // custom section sits above the catalog groups
+      const headers = Array.from(document.querySelectorAll('.tu-group-header')).map(
+        (el) => el.textContent
+      );
+      expect(headers[0]).toContain('My Kit');
+    });
 
-  it('renders For You tools even when their tabs exclude the active tab', () => {
-    // base64 only has tabs ['all','encode'] — must still show on 'writing'
-    render(<ToolPanel {...defaultProps} activeTab="writing" personaToolIds={['base64']} />);
-    expect(screen.getByText('For You')).toBeInTheDocument();
-    expect(screen.getByText('Base64 Encode')).toBeInTheDocument();
-  });
+    it('renders custom group tools even when their tabs exclude the active tab', () => {
+      // base64 only has tabs ['all','encode'] — must still show on 'writing'
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: ['base64'] }]);
+      render(<ToolPanel {...defaultProps} activeTab="writing" toolGroups={toolGroups} />);
+      expect(screen.getByText('My Kit')).toBeInTheDocument();
+      expect(screen.getByText('Base64 Encode')).toBeInTheDocument();
+    });
 
-  it('does not render For You group when personaToolIds is empty or omitted', () => {
-    const { rerender } = render(<ToolPanel {...defaultProps} personaToolIds={[]} />);
-    expect(screen.queryByText('For You')).not.toBeInTheDocument();
-    rerender(<ToolPanel {...defaultProps} />);
-    expect(screen.queryByText('For You')).not.toBeInTheDocument();
-  });
+    it('renders an empty custom group with a hint row', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'Fresh Group', toolIds: [] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      expect(screen.getByText('Fresh Group')).toBeInTheDocument();
+      expect(document.querySelector('.tu-group-empty-hint')).toBeInTheDocument();
+    });
 
-  it('ignores unknown ids in personaToolIds', () => {
-    render(<ToolPanel {...defaultProps} personaToolIds={['does_not_exist']} />);
-    expect(screen.queryByText('For You')).not.toBeInTheDocument();
-  });
+    it('ignores unknown tool ids in a group', () => {
+      const toolGroups = makeToolGroups([
+        { id: 'g1', name: 'My Kit', toolIds: ['does_not_exist', 'base64'] },
+      ]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
+      expect(kitGroup.querySelectorAll('.tu-titem').length).toBe(1);
+    });
 
-  it('clicking a For You tool calls onToolClick', () => {
-    const onToolClick = vi.fn();
-    render(
-      <ToolPanel
-        {...defaultProps}
-        activeTab="writing"
-        personaToolIds={['base64']}
-        onToolClick={onToolClick}
-      />
-    );
-    fireEvent.click(screen.getByText('Base64 Encode'));
-    expect(onToolClick).toHaveBeenCalledWith(sampleTools[3]);
-  });
+    it('clicking a custom-group tool calls onToolClick', () => {
+      const onToolClick = vi.fn();
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: ['base64'] }]);
+      render(
+        <ToolPanel
+          {...defaultProps}
+          activeTab="writing"
+          toolGroups={toolGroups}
+          onToolClick={onToolClick}
+        />
+      );
+      fireEvent.click(screen.getByText('Base64 Encode'));
+      expect(onToolClick).toHaveBeenCalledWith(sampleTools[3]);
+    });
 
-  it('excludes favorited tools from For You (already pinned above)', () => {
-    const favorites = { favorites: ['fix_grammar'], toggleFavorite: vi.fn() };
-    render(
-      <ToolPanel
-        {...defaultProps}
-        favorites={favorites}
-        personaToolIds={['fix_grammar', 'base64']}
-      />
-    );
-    expect(screen.getByText('Pinned')).toBeInTheDocument();
-    const forYouGroup = screen.getByText('For You').closest('.tu-group')!;
-    expect(forYouGroup.textContent).toContain('Base64 Encode');
-    // fix_grammar sits in Pinned already — not duplicated into For You
-    expect(forYouGroup.textContent).not.toContain('Fix Grammar');
-  });
+    it('rename: pencil opens an inline input, Enter commits', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: [] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      fireEvent.click(screen.getByLabelText('Rename My Kit group'));
+      const input = screen.getByLabelText('Group name');
+      fireEvent.change(input, { target: { value: 'Blog Kit' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+      expect(toolGroups.renameGroup).toHaveBeenCalledWith('g1', 'Blog Kit');
+    });
 
-  it('pinned favorites and For You work together', () => {
-    // Favorites + persona picks are independent contexts driving the pinned
-    // and For You groups.
-    const toggleFavorite = vi.fn();
-    const favorites = { favorites: ['uppercase'], toggleFavorite };
-    render(<ToolPanel {...defaultProps} favorites={favorites} personaToolIds={['fix_grammar']} />);
-    expect(screen.getByText('Pinned')).toBeInTheDocument();
-    expect(screen.getByText('For You')).toBeInTheDocument();
-    const heart = document.querySelector('.tu-titem-fav--active');
-    fireEvent.click(heart!);
-    expect(toggleFavorite).toHaveBeenCalledWith('uppercase');
+    it('delete: trash asks for a confirming second click', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: [] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      fireEvent.click(screen.getByLabelText('Delete My Kit group'));
+      expect(toolGroups.deleteGroup).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByLabelText('Confirm delete My Kit group'));
+      expect(toolGroups.deleteGroup).toHaveBeenCalledWith('g1');
+    });
+
+    it('minus button inside a custom group removes the tool from it', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: ['base64'] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
+      fireEvent.click(
+        kitGroup.querySelector('[aria-label="Remove Base64 Encode from this group"]')!
+      );
+      expect(toolGroups.removeToolFromGroup).toHaveBeenCalledWith('g1', 'base64');
+    });
+
+    it('+ on a catalog tool opens the add-to-group menu and toggles membership', () => {
+      const toolGroups = makeToolGroups([
+        { id: 'g1', name: 'My Kit', toolIds: ['uppercase'] },
+        { id: 'g2', name: 'Other Kit', toolIds: [] },
+      ]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      fireEvent.click(screen.getByLabelText('Add lowercase to a group'));
+      const menu = document.querySelector('.tu-group-menu')!;
+      expect(menu).toBeInTheDocument();
+      // not a member yet → add
+      fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Other Kit' }));
+      expect(toolGroups.addToolToGroup).toHaveBeenCalledWith('g2', 'lowercase');
+      // already a member (uppercase) → open its menu and remove
+      fireEvent.click(document.querySelector('.tu-group-menu-backdrop')!);
+      fireEvent.click(screen.getByLabelText('Add UPPERCASE to a group'));
+      fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'My Kit' }));
+      expect(toolGroups.removeToolFromGroup).toHaveBeenCalledWith('g1', 'uppercase');
+    });
+
+    it('menu "New group…" creates a group seeded with the tool', () => {
+      const toolGroups = makeToolGroups([]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      fireEvent.click(screen.getByLabelText('Add UPPERCASE to a group'));
+      fireEvent.click(screen.getByText('New group…'));
+      const input = screen.getByLabelText('New group name');
+      fireEvent.change(input, { target: { value: 'Case Kit' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+      expect(toolGroups.createGroup).toHaveBeenCalledWith('Case Kit', ['uppercase']);
+    });
+
+    it('"New Group" row creates an empty group', () => {
+      const toolGroups = makeToolGroups([]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      fireEvent.click(screen.getByText('New Group'));
+      const input = screen.getByLabelText('New group name');
+      fireEvent.change(input, { target: { value: 'Scratch' } });
+      expect((input as HTMLInputElement).value).toBe('Scratch');
+      fireEvent.keyDown(input, { key: 'Enter' });
+      expect(toolGroups.createGroup).toHaveBeenCalledWith('Scratch');
+    });
+
+    it('never renders a "For You" section (personas removed)', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: ['base64'] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      expect(screen.queryByText('For You')).not.toBeInTheDocument();
+    });
+
+    it('pinned favorites and custom groups render together, favorites not excluded', () => {
+      const toggleFavorite = vi.fn();
+      const favorites = { favorites: ['fix_grammar'], toggleFavorite };
+      const toolGroups = makeToolGroups([
+        { id: 'g1', name: 'My Kit', toolIds: ['fix_grammar', 'base64'] },
+      ]);
+      render(<ToolPanel {...defaultProps} favorites={favorites} toolGroups={toolGroups} />);
+      expect(screen.getByText('Pinned')).toBeInTheDocument();
+      // a favorited tool STAYS in the custom group (user curated it there)
+      const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
+      expect(kitGroup.textContent).toContain('Fix Grammar');
+      const heart = document.querySelector('.tu-titem-fav--active');
+      fireEvent.click(heart!);
+      expect(toggleFavorite).toHaveBeenCalledWith('fix_grammar');
+    });
   });
 
   it('collapses group when group header is clicked', () => {

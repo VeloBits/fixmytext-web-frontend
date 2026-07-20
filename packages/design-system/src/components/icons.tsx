@@ -294,6 +294,8 @@ export const MenuIcon = createIcon(
   </>
 );
 
+export const MinusIcon = createIcon('MinusIcon', <path d="M5 12h14" />);
+
 export const MoonIcon = createIcon('MoonIcon', <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />);
 
 export const PenLineIcon = createIcon(
@@ -305,6 +307,14 @@ export const PenLineIcon = createIcon(
 );
 
 export const PlayIcon = createIcon('PlayIcon', <polygon points="6 3 20 12 6 21 6 3" />);
+
+export const PlusIcon = createIcon(
+  'PlusIcon',
+  <>
+    <path d="M5 12h14" />
+    <path d="M12 5v14" />
+  </>
+);
 
 export const RotateCcwIcon = createIcon(
   'RotateCcwIcon',
@@ -374,6 +384,17 @@ export const TargetIcon = createIcon(
     <circle cx="12" cy="12" r="10" />
     <circle cx="12" cy="12" r="6" />
     <circle cx="12" cy="12" r="2" />
+  </>
+);
+
+export const Trash2Icon = createIcon(
+  'Trash2Icon',
+  <>
+    <path d="M3 6h18" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
   </>
 );
 

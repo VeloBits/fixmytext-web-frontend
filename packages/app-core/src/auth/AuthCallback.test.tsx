@@ -63,3 +63,34 @@ describe('AuthCallback', () => {
     consoleSpy.mockRestore();
   });
 });
+
+describe('AuthCallback returnTo', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockHasAuthHint.mockReturnValue(false);
+  });
+
+  it('navigates to a safe relative returnTo carried in the OIDC state', async () => {
+    mockSigninRedirectCallback.mockResolvedValueOnce({
+      state: { returnTo: '/pricing?tab=day' },
+    });
+    render(<AuthCallback />);
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith('/pricing?tab=day', { replace: true })
+    );
+  });
+
+  it.each([
+    'https://evil.example.com/phish',
+    '//evil.example.com',
+    '/\\evil.example.com',
+    'javascript://alert(1)',
+    42,
+  ])('falls back to home for unsafe returnTo %s', async (returnTo) => {
+    mockSigninRedirectCallback.mockResolvedValueOnce({ state: { returnTo } });
+    render(<AuthCallback />);
+
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true }));
+  });
+});
