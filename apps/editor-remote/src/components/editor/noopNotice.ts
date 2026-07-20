@@ -10,11 +10,7 @@
  * Returns the message to surface (as an `info` alert), or `null` when the
  * result actually differs — the caller shows the normal success toast then.
  */
-export function noopNotice(
-  original: string,
-  result: string,
-  toolGroup?: string
-): string | null {
+export function noopNotice(original: string, result: string, toolGroup?: string): string | null {
   if (result !== original) return null;
 
   // Casing tools no-op two ways: the text has no cased characters, or it's

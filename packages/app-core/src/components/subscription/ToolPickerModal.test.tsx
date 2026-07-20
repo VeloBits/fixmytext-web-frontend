@@ -100,9 +100,7 @@ describe('ToolPickerModal', () => {
     fireEvent.change(screen.getByLabelText(/search tools/i), {
       target: { value: target.label },
     });
-    expect(
-      screen.getAllByRole('menuitemcheckbox').length
-    ).toBeLessThan(billable.length);
+    expect(screen.getAllByRole('menuitemcheckbox').length).toBeLessThan(billable.length);
   });
 
   it('closes on Escape and on the close button', () => {
