@@ -561,9 +561,7 @@ describe('TextForm', () => {
     render(<TextForm {...defaultProps} />);
     expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent('fmx:onboarding-tab', { detail: { tab: 'code' } })
-      );
+      window.dispatchEvent(new CustomEvent('fmx:onboarding-tab', { detail: { tab: 'code' } }));
     });
     expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('Code & Data');
   });
@@ -1167,9 +1165,7 @@ describe('TextForm tool groups and favorites (post-gamification-removal)', () =>
       ...defaultProps,
       toolGroups: {
         ...defaultToolGroups,
-        groups: [
-          { id: 'g1', name: 'Writing essentials', toolIds: ['fix_grammar', 'paraphrase'] },
-        ],
+        groups: [{ id: 'g1', name: 'Writing essentials', toolIds: ['fix_grammar', 'paraphrase'] }],
       },
       favorites: { favorites: ['fix_grammar'], toggleFavorite: vi.fn() },
     };

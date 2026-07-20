@@ -213,9 +213,9 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Operations')).toBeInTheDocument();
     expect(screen.getByText('Tools Used')).toBeInTheDocument();
     // 'Favorites' also matches the nav entry, so scope it to a stat card
-    expect(
-      screen.getAllByText('Favorites').some((el) => el.closest('.tu-dash-stat-card'))
-    ).toBe(true);
+    expect(screen.getAllByText('Favorites').some((el) => el.closest('.tu-dash-stat-card'))).toBe(
+      true
+    );
   });
 
   it('shows empty tools message when no tools used', () => {

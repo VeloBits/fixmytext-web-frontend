@@ -350,8 +350,17 @@ function CustomGroupHeader({
 
 /* ── Grid view tool card ───────────────────────────── */
 function ToolGridCard(props: ToolItemProps) {
-  const { tool, disabled, onClick, isFavorite, onToggleFavorite, isActive, isSuggested, onHover, onLeave } =
-    props;
+  const {
+    tool,
+    disabled,
+    onClick,
+    isFavorite,
+    onToggleFavorite,
+    isActive,
+    isSuggested,
+    onHover,
+    onLeave,
+  } = props;
   const isDisabled = disabled && tool.type !== 'drawer' && (tool.type as string) !== 'action';
   const cardRef = useRef<HTMLDivElement | null>(null);
 
