@@ -4,7 +4,12 @@
  * and have access to the API via the internal network or the public gateway.
  */
 
-const API_BASE = process.env.CONTENT_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://api-dev.velobits.dev';
+const API_BASE =
+  process.env.CONTENT_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://api-dev.velobits.dev';
+
+// Share ids are UUIDs. Validate before building the upstream URL so the raw
+// `[id]` route param can't be used for path/SSRF injection (FE-SSRF-01).
+const SHARE_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface ShareResult {
   id: string;
@@ -14,19 +19,30 @@ export interface ShareResult {
   created_at: string;
 }
 
+export type ShareLookup =
+  | { status: 'ok'; share: ShareResult }
+  | { status: 'not_found' }
+  | { status: 'expired' }
+  | { status: 'error' };
+
 /**
  * Fetch a shared result by its public ID.
- * Returns null on 404 and throws on network errors.
+ *
+ * The API distinguishes 404 (unknown id) from 410 (expired share), and a
+ * network failure means neither — collapsing them all into "not found" hides
+ * outages and loses the expiry message, so each maps to its own status.
  */
-export async function getShareResult(id: string): Promise<ShareResult | null> {
+export async function getShareResult(id: string): Promise<ShareLookup> {
+  if (!SHARE_ID_RE.test(id)) return { status: 'not_found' }; // not a share id — don't hit the API
   try {
-    const res = await fetch(`${API_BASE}/api/v1/share/${id}`, {
+    const res = await fetch(`${API_BASE}/api/v1/share/${encodeURIComponent(id)}`, {
       next: { revalidate: 300 },
     });
-    if (res.status === 404 || res.status === 410) return null;
+    if (res.status === 404) return { status: 'not_found' };
+    if (res.status === 410) return { status: 'expired' };
     if (!res.ok) throw new Error(`Share fetch failed: ${res.status}`);
-    return (await res.json()) as ShareResult;
+    return { status: 'ok', share: (await res.json()) as ShareResult };
   } catch {
-    return null;
+    return { status: 'error' };
   }
 }

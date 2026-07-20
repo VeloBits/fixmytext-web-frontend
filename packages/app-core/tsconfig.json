@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@velobits/api-client": ["../api-client/src/index.ts"],
+      "@velobits/api-client/*": ["../api-client/src/*"],
+      "@velobits/tools-registry": ["../tools-registry/src/index.ts"],
+      "@velobits/tools-registry/*": ["../tools-registry/src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

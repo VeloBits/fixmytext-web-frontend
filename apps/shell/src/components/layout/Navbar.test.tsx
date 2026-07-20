@@ -7,9 +7,10 @@ import Navbar from './Navbar';
 import { expectNoA11yViolations } from '@/test/axeHelper';
 
 // Mock useOidcAuth so we can control isAuthenticated per test
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,
+    wasAuthenticated: false,
     isLoading: false,
     accessToken: null,
     oidcUser: null,
@@ -18,7 +19,7 @@ vi.mock('@/auth/useOidcAuth', () => ({
   }),
 }));
 
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 function makeStore(accessToken: string | null = null) {
@@ -34,6 +35,7 @@ function renderNavbar(props = {}, accessToken: string | null = null) {
   // and also update the OIDC mock since Navbar uses useOidcAuth.
   mockUseOidcAuth.mockReturnValue({
     isAuthenticated: !!accessToken,
+    wasAuthenticated: !!accessToken,
     isLoading: false,
     accessToken,
     oidcUser: null,
@@ -206,5 +208,57 @@ describe('Navbar', () => {
   it('has no axe violations', async () => {
     const { container } = renderNavbar();
     await expectNoA11yViolations(container);
+  });
+});
+
+describe('Navbar mobile account menu', () => {
+  const authedUser = { display_name: 'Jane Doe', email: 'jane@example.com' };
+
+  it('shows profile info, Dashboard and Sign Out when authenticated', () => {
+    renderNavbar({ user: authedUser }, 'token-123');
+    fireEvent.click(screen.getByLabelText('Toggle menu'));
+    expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+    expect(screen.getByText('jane@example.com')).toBeInTheDocument();
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Sign Out')).toBeInTheDocument();
+  });
+
+  it('Sign Out calls the OIDC logout', () => {
+    renderNavbar({ user: authedUser }, 'token-123');
+    fireEvent.click(screen.getByLabelText('Toggle menu'));
+    fireEvent.click(screen.getByText('Sign Out'));
+    const results = mockUseOidcAuth.mock.results;
+    const { logout } = results[results.length - 1]!.value;
+    expect(logout).toHaveBeenCalled();
+    // menu closes
+    expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
+  });
+
+  it('hides Dashboard and Sign Out when logged out', () => {
+    renderNavbar();
+    fireEvent.click(screen.getByLabelText('Toggle menu'));
+    expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sign Out')).not.toBeInTheDocument();
+    // navbar CTA + mobile menu entry
+    expect(screen.getAllByText('Sign In').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('theme toggle calls setMode with the flipped mode', () => {
+    const setMode = vi.fn();
+    renderNavbar({ mode: 'dark', setMode });
+    fireEvent.click(screen.getByLabelText('Toggle menu'));
+    fireEvent.click(screen.getByText('Light Theme'));
+    expect(setMode).toHaveBeenCalledWith('light');
+  });
+
+  it('mobile search button dispatches the Ctrl+K palette event', () => {
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    renderNavbar();
+    fireEvent.click(screen.getByLabelText('Search tools'));
+    const kEvent = dispatchSpy.mock.calls
+      .map(([e]) => e)
+      .find((e): e is KeyboardEvent => e instanceof KeyboardEvent && e.key === 'k');
+    expect(kEvent?.ctrlKey).toBe(true);
+    dispatchSpy.mockRestore();
   });
 });

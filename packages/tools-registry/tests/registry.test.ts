@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TOOLS, TOOL_GROUPS, USE_CASE_TABS } from '../src/tools';
+import { TOOLS, TOOL_GROUPS, USE_CASE_TABS, STARTER_KITS } from '../src/tools';
 import { getToolBySlug, getAllSlugs, getToolsByGroup, getAllGroups } from '../src/slugs';
 
 describe('TOOLS registry', () => {
@@ -48,6 +48,49 @@ describe('TOOL_GROUPS', () => {
 describe('USE_CASE_TABS', () => {
   it('has 7 tabs', () => {
     expect(USE_CASE_TABS).toHaveLength(7);
+  });
+});
+
+describe('STARTER_KITS', () => {
+  it('every toolIds entry references a known tool', () => {
+    const toolIds = new Set(TOOLS.map((t) => t.id));
+    for (const kit of STARTER_KITS) {
+      for (const id of kit.toolIds) {
+        expect(toolIds.has(id), `${kit.id}: unknown kit tool '${id}'`).toBe(true);
+      }
+    }
+  });
+
+  it('every defaultTab is a valid use-case tab', () => {
+    const tabIds = new Set<string>(USE_CASE_TABS.map((t) => t.id));
+    for (const kit of STARTER_KITS) {
+      expect(tabIds.has(kit.defaultTab), `${kit.id}: unknown tab '${kit.defaultTab}'`).toBe(true);
+    }
+  });
+
+  it('every kit except explorer seeds a named, non-empty group', () => {
+    for (const kit of STARTER_KITS) {
+      if (kit.id === 'explorer') {
+        // "Just Exploring" promises the whole catalog — creates no group
+        expect(kit.toolIds).toEqual([]);
+        expect(kit.groupName).toBe('');
+      } else {
+        expect(kit.toolIds.length, `${kit.id} seeds no tools`).toBeGreaterThan(0);
+        expect(kit.groupName.length, `${kit.id} has no group name`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('kit ids and group names are unique', () => {
+    expect(new Set(STARTER_KITS.map((k) => k.id)).size).toBe(STARTER_KITS.length);
+    const names = STARTER_KITS.map((k) => k.groupName).filter(Boolean);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it('tool ids are unique within each kit', () => {
+    for (const kit of STARTER_KITS) {
+      expect(new Set(kit.toolIds).size, `${kit.id} has duplicate ids`).toBe(kit.toolIds.length);
+    }
   });
 });
 

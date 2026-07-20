@@ -2,7 +2,10 @@
   "files": [],
   "references": [
     { "path": "./apps/shell" },
+    { "path": "./apps/editor-remote" },
+    { "path": "./apps/analytics-remote" },
     { "path": "./apps/content" },
+    { "path": "./packages/app-core" },
     { "path": "./packages/design-system" },
     { "path": "./packages/api-client" },
     { "path": "./packages/auth-shared" },

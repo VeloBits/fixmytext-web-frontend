@@ -22,7 +22,9 @@
   border-radius: var(--r-lg);
   padding: 28px 24px 20px;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
 }
 
 .tu-upgrade-close {
@@ -36,7 +38,9 @@
   padding: 4px;
   border-radius: var(--r-sm);
   line-height: 0;
-  transition: color var(--t), background var(--t);
+  transition:
+    color var(--t),
+    background var(--t);
 }
 .tu-upgrade-close:hover {
   color: var(--text);
@@ -62,7 +66,9 @@
   border-radius: 15px;
   background: linear-gradient(135deg, rgba(0, 122, 204, 0.3), rgba(197, 134, 192, 0.2));
   z-index: -1;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   padding: 1px;
 }
@@ -216,7 +222,10 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--t), box-shadow var(--t), transform var(--t);
+  transition:
+    background var(--t),
+    box-shadow var(--t),
+    transform var(--t);
   white-space: nowrap;
 }
 .tu-sub-btn--primary {
@@ -533,7 +542,9 @@
   flex-direction: column;
   gap: 6px;
   cursor: default;
-  transition: border-color var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    box-shadow var(--t);
 }
 .tu-sub-pass-card:hover {
   border-color: var(--accent);
@@ -584,7 +595,10 @@
   font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--t), border-color var(--t), color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t),
+    color var(--t);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -618,7 +632,9 @@
   gap: 3px;
   text-align: center;
   cursor: default;
-  transition: border-color var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    box-shadow var(--t);
 }
 .tu-sub-credit-card:hover {
   border-color: var(--cyan);

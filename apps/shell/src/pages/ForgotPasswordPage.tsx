@@ -1,15 +1,14 @@
 import { useEffect } from 'react';
+import {
+  KEYCLOAK_CLIENT_ID,
+  KEYCLOAK_REALM,
+  KEYCLOAK_URL,
+} from '@velobits/app-core/auth/keycloakConfig';
 import '@/assets/css/auth.css';
-
-const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080';
-const KEYCLOAK_REALM = import.meta.env.VITE_KEYCLOAK_REALM ?? 'fixmytext';
-const KEYCLOAK_CLIENT_ID = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'fixmytext-frontend';
 
 export function ForgotPasswordPage() {
   useEffect(() => {
-    const url = new URL(
-      `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/login-actions/reset-credentials`,
-    );
+    const url = new URL(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/login-actions/reset-credentials`);
     url.searchParams.set('client_id', KEYCLOAK_CLIENT_ID);
     window.location.replace(url.toString());
   }, []);

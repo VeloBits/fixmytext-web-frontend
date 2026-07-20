@@ -94,7 +94,7 @@ test('create share via API and verify OG card', async ({ request, page }) => {
     test.skip(); // backend may require auth for share creation in some configs
     return;
   }
-  const share = await res.json() as { id: string };
+  const share = (await res.json()) as { id: string };
 
   await page.goto(`/share/${share.id}`);
 

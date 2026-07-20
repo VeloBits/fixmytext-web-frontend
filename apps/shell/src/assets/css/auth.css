@@ -392,7 +392,9 @@
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--t), opacity var(--t);
+  transition:
+    background var(--t),
+    opacity var(--t);
   white-space: nowrap;
   line-height: 1.4;
 }
@@ -418,7 +420,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background var(--t), color var(--t);
+  transition:
+    background var(--t),
+    color var(--t);
 }
 
 .verify-banner__dismiss:hover {
@@ -464,7 +468,7 @@
   display: flex;
   gap: 0;
   margin-bottom: 24px;
-  border-bottom: 2px solid var(--border, rgba(255,255,255,0.08));
+  border-bottom: 2px solid var(--border, rgba(255, 255, 255, 0.08));
 }
 
 .auth-tab {
@@ -475,7 +479,7 @@
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--text-muted, rgba(255,255,255,0.5));
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
   transition: color 0.15s;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
@@ -496,7 +500,7 @@
   align-items: center;
   gap: 12px;
   margin: 20px 0;
-  color: var(--text-muted, rgba(255,255,255,0.4));
+  color: var(--text-muted, rgba(255, 255, 255, 0.4));
   font-size: 0.8rem;
 }
 
@@ -505,7 +509,7 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--border, rgba(255,255,255,0.08));
+  background: var(--border, rgba(255, 255, 255, 0.08));
 }
 
 .auth-social-buttons {
@@ -521,16 +525,18 @@
   gap: 10px;
   padding: 10px;
   background: transparent;
-  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text, #f0f2ff);
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .auth-btn--social:hover {
-  background: var(--surface-hover, rgba(255,255,255,0.05));
-  border-color: var(--border-hover, rgba(255,255,255,0.2));
+  background: var(--surface-hover, rgba(255, 255, 255, 0.05));
+  border-color: var(--border-hover, rgba(255, 255, 255, 0.2));
 }

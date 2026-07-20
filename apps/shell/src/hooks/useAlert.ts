@@ -63,8 +63,8 @@ export function useAlert(): AlertContextValue {
             typeof obj.msg === 'string'
               ? obj.msg
               : typeof obj.message === 'string'
-              ? obj.message
-              : JSON.stringify(message);
+                ? obj.message
+                : JSON.stringify(message);
         } else {
           msg = String(message);
         }

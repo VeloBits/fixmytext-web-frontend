@@ -16,7 +16,15 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...props }, children),
+  Link: ({
+    children,
+    to,
+    ...props
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...props }, children),
   useNavigate: () => vi.fn(),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
   useParams: () => ({}),

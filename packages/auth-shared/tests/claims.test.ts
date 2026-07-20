@@ -12,7 +12,10 @@ function makePayload(overrides: Record<string, unknown> = {}): string {
     iat: Math.floor(Date.now() / 1000),
     ...overrides,
   };
-  const b64 = btoa(JSON.stringify(payload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const b64 = btoa(JSON.stringify(payload))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
   return `${b64}.fake-hmac-sig`;
 }
 

@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useOidcAuth } from '@/auth/useOidcAuth';
-import type { RootState } from '@/store/store';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
+import { useResendVerificationMutation } from '@velobits/app-core/store/api/authApi';
+import type { RootState } from '@velobits/app-core/store/store';
 import type { AlertLevel } from '@/contexts/AlertContext';
 
 const DISMISSAL_KEY = 'fmt:email-verify-dismissed-until';
@@ -78,8 +79,8 @@ function CloseIcon() {
  * Renders nothing when the user is verified, signed out, still loading, or
  * has dismissed the banner within the soft-cooldown window (1 hour).
  *
- * `showAlert` is required and is used to report the outcome of resend
- * requests — the banner itself stays minimal.
+ * `showAlert` is required and is used to report a fallback when we can't build
+ * the Keycloak verification link — the banner itself stays minimal.
  */
 export interface EmailVerificationBannerProps {
   showAlert: (message: string, type: AlertLevel) => void;
@@ -88,9 +89,8 @@ export interface EmailVerificationBannerProps {
 export default function EmailVerificationBanner({ showAlert }: EmailVerificationBannerProps) {
   const user = useSelector((s: RootState) => s.auth.user);
   const { isAuthenticated } = useOidcAuth();
+  const [resendVerification, { isLoading: isResending }] = useResendVerificationMutation();
 
-  // TODO: resend-verification endpoint removed in Keycloak migration. Email verification is now handled by Keycloak.
-  const [isLoading] = useState(false);
   const [dismissed, setDismissed] = useState(() => {
     try {
       const until = Number(localStorage.getItem(DISMISSAL_KEY) || 0);
@@ -99,42 +99,27 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
       return false;
     }
   });
-  const [cooldownUntil] = useState(0);
-  const [, forceTick] = useState(0);
-  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const isVisible = isAuthenticated && !!user && !user.is_email_verified && !dismissed;
   useChromeOffset(bannerRef, isVisible);
 
-  // Tick once a second while a cooldown is active so the countdown updates.
-  useEffect(() => {
-    if (cooldownUntil <= Date.now()) {
-      if (tickRef.current) clearInterval(tickRef.current);
-      tickRef.current = null;
-      return;
-    }
-    tickRef.current = setInterval(() => {
-      forceTick((n) => n + 1);
-      if (cooldownUntil <= Date.now() && tickRef.current) {
-        clearInterval(tickRef.current);
-        tickRef.current = null;
-      }
-    }, 1000);
-    return () => {
-      if (tickRef.current) clearInterval(tickRef.current);
-      tickRef.current = null;
-    };
-  }, [cooldownUntil]);
-
   if (!isVisible) {
     return null;
   }
 
+  // account-svc owns the resend: with the realm's blocking verify-email
+  // requirement disabled, Keycloak's reset-credentials screen is a plain
+  // password reset and would NOT re-send the verification link. The endpoint
+  // calls Keycloak Admin's send-verify-email for the current user instead —
+  // no page navigation, the user stays in the app.
   const handleResend = async () => {
-    // TODO: Email verification resend is now handled by Keycloak.
-    // Redirect the user to Keycloak to resend the verification email.
-    showAlert('Please check your Keycloak account to resend the verification email.', 'info');
+    try {
+      await resendVerification().unwrap();
+      showAlert(`Verification email sent to ${user?.email}.`, 'success');
+    } catch {
+      showAlert('Could not send the verification email. Please try again later.', 'danger');
+    }
   };
 
   const handleDismiss = () => {
@@ -147,10 +132,6 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
     }
     setDismissed(true);
   };
-
-  const cooldownSecs = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
-  const buttonLabel =
-    cooldownSecs > 0 ? `Resend in ${cooldownSecs}s` : isLoading ? 'Sending...' : 'Resend email';
 
   return (
     <div
@@ -176,9 +157,9 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
           type="button"
           className="verify-banner__resend"
           onClick={handleResend}
-          disabled={isLoading || cooldownSecs > 0}
+          disabled={isResending}
         >
-          {buttonLabel}
+          {isResending ? 'Sending…' : 'Resend email'}
         </button>
         <button
           type="button"

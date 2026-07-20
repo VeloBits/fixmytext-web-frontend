@@ -9,11 +9,11 @@
 import { test, expect } from '@playwright/test';
 
 const SAMPLE_SLUGS = [
-  'alternating_case',   // case group
-  'md5_hash',           // hashing group
-  'base64_encode',      // encoding group
-  'fix_grammar',        // ai group
-  'sort_lines_asc',     // lines group
+  'alternating_case', // case group
+  'md5_hash', // hashing group
+  'base64_encode', // encoding group
+  'fix_grammar', // ai group
+  'sort_lines_asc', // lines group
 ];
 
 test.describe('Tool index page', () => {

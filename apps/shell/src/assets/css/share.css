@@ -18,8 +18,8 @@
   padding-top: 180px;
   text-align: center;
 }
-.sh-state-emoji {
-  font-size: 3rem;
+.sh-state-icon {
+  color: var(--text-3);
   line-height: 1;
 }
 .sh-state-title {
@@ -210,7 +210,9 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
   background: var(--editor-bg);
 }
 

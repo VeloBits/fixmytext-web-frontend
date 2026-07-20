@@ -178,9 +178,16 @@
   line-height: 2;
 }
 .tu-pricing-pro-features li::before {
-  content: '✓ ';
-  color: #4ec9b0;
-  font-weight: 700;
+  content: '';
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 6px;
+  background-color: #4ec9b0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    no-repeat center / contain;
 }
 
 .tu-pricing-pro-right {
@@ -725,9 +732,16 @@
   line-height: 1.9;
 }
 .tu-pass-detail-list li::before {
-  content: '✓ ';
-  color: #4ec9b0;
-  font-weight: 700;
+  content: '';
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 6px;
+  background-color: #4ec9b0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    no-repeat center / contain;
 }
 
 /* Steps */

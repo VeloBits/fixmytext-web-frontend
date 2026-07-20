@@ -16,6 +16,7 @@ Download from [docker.com](https://www.docker.com/products/docker-desktop/). Mak
 The OIDC auth flow (Keycloak) redirects to named subdomains. Add these entries once on your dev machine:
 
 **macOS / Linux:**
+
 ```bash
 sudo tee -a /etc/hosts <<EOF
 127.0.0.1 auth-dev.velobits.dev
@@ -25,6 +26,7 @@ EOF
 ```
 
 **Windows (run PowerShell as Administrator):**
+
 ```powershell
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "`n127.0.0.1 auth-dev.velobits.dev`n127.0.0.1 api-dev.velobits.dev`n127.0.0.1 develop-fixmytext.velobits.dev"
 ```
@@ -75,17 +77,17 @@ All traffic enters through the nginx router on port **3000**. Each path prefix i
 
 ### Which frontend serves what
 
-| URL pattern | Container | Port | Framework | What's here |
-|-------------|-----------|------|-----------|-------------|
-| `localhost:3000/` | `content-dev` | 3103 | Next.js 15 | Landing page |
-| `localhost:3000/tools/[slug]` | `content-dev` | 3103 | Next.js 15 | Tool detail pages (SSG) |
-| `localhost:3000/share/[id]` | `content-dev` | 3103 | Next.js 15 | Share page (SSR) |
-| `localhost:3000/about` | `content-dev` | 3103 | Next.js 15 | About page |
-| `localhost:3000/pricing` | `content-dev` | 3103 | Next.js 15 | Pricing page |
-| `localhost:3000/app/` | `shell-dev` | 3100 | Vite + React | Editor surface |
-| `localhost:3000/app/dashboard` | `shell-dev` | 3100 | Vite + React | Analytics / dashboard |
-| `localhost:3000/app/login` | `shell-dev` | 3100 | Vite + React | Login page |
-| `localhost:3101/remoteEntry.js` | `editor-remote-dev` | 3101 | Vite + React | Editor MFE bundle (loaded by shell at runtime) |
+| URL pattern                     | Container              | Port | Framework    | What's here                                       |
+| ------------------------------- | ---------------------- | ---- | ------------ | ------------------------------------------------- |
+| `localhost:3000/`               | `content-dev`          | 3103 | Next.js 15   | Landing page                                      |
+| `localhost:3000/tools/[slug]`   | `content-dev`          | 3103 | Next.js 15   | Tool detail pages (SSG)                           |
+| `localhost:3000/share/[id]`     | `content-dev`          | 3103 | Next.js 15   | Share page (SSR)                                  |
+| `localhost:3000/about`          | `content-dev`          | 3103 | Next.js 15   | About page                                        |
+| `localhost:3000/pricing`        | `content-dev`          | 3103 | Next.js 15   | Pricing page                                      |
+| `localhost:3000/app/`           | `shell-dev`            | 3100 | Vite + React | Editor surface                                    |
+| `localhost:3000/app/dashboard`  | `shell-dev`            | 3100 | Vite + React | Analytics / dashboard                             |
+| `localhost:3000/app/login`      | `shell-dev`            | 3100 | Vite + React | Login page                                        |
+| `localhost:3101/remoteEntry.js` | `editor-remote-dev`    | 3101 | Vite + React | Editor MFE bundle (loaded by shell at runtime)    |
 | `localhost:3102/remoteEntry.js` | `analytics-remote-dev` | 3102 | Vite + React | Analytics MFE bundle (loaded by shell at runtime) |
 
 > **MFE isolation:** Each container is independent. If `content-dev` is down, `localhost:3000/app/` still works. If `editor-remote-dev` is down, the shell falls back to its local copy of the editor page (the `.catch()` in App.tsx).
@@ -94,12 +96,12 @@ All traffic enters through the nginx router on port **3000**. Each path prefix i
 
 Hit these to isolate a specific service without going through nginx — useful when debugging a single container.
 
-| Direct URL | Container | Same as via router |
-|------------|-----------|-------------------|
-| `http://localhost:3100` | `shell-dev` | `localhost:3000/app/` |
-| `http://localhost:3101` | `editor-remote-dev` | `localhost:3000/remotes/editor/` |
+| Direct URL              | Container              | Same as via router                  |
+| ----------------------- | ---------------------- | ----------------------------------- |
+| `http://localhost:3100` | `shell-dev`            | `localhost:3000/app/`               |
+| `http://localhost:3101` | `editor-remote-dev`    | `localhost:3000/remotes/editor/`    |
 | `http://localhost:3102` | `analytics-remote-dev` | `localhost:3000/remotes/analytics/` |
-| `http://localhost:3103` | `content-dev` | `localhost:3000/` |
+| `http://localhost:3103` | `content-dev`          | `localhost:3000/`                   |
 
 > **Note:** When hitting direct ports, the shell still tries to load remotes from `localhost:3000/remotes/...` (baked into `.env.docker.dev`), so the router must also be running for module federation to work.
 
@@ -122,13 +124,13 @@ This matches the Cloudflare Worker routing in `worker/src/index.ts` exactly — 
 
 ## Architecture at a Glance
 
-| Service | Package | Framework | Container port | Profile |
-|---------|---------|-----------|---------------|---------|
-| nginx router | — | nginx | 3000 (→ host) | dev + prod |
-| shell | `@velobits/shell` | Vite + React | 3100 | dev + prod |
-| editor-remote | `@velobits/editor-remote` | Vite + React | 3101 | dev + prod |
-| analytics-remote | `@velobits/analytics-remote` | Vite + React | 3102 | dev + prod |
-| content | `@velobits/content-app` | Next.js 15 | 3103 | dev + prod |
+| Service          | Package                      | Framework    | Container port | Profile    |
+| ---------------- | ---------------------------- | ------------ | -------------- | ---------- |
+| nginx router     | —                            | nginx        | 3000 (→ host)  | dev + prod |
+| shell            | `@velobits/shell`            | Vite + React | 3100           | dev + prod |
+| editor-remote    | `@velobits/editor-remote`    | Vite + React | 3101           | dev + prod |
+| analytics-remote | `@velobits/analytics-remote` | Vite + React | 3102           | dev + prod |
+| content          | `@velobits/content-app`      | Next.js 15   | 3103           | dev + prod |
 
 All three Vite apps resolve `@/` imports to `apps/shell/src` — the shell owns the source, and the remotes are thin build targets that share it without duplication.
 

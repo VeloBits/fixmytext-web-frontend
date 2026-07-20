@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { SubscriptionContextValue } from '@/contexts/AppContext';
 
@@ -35,7 +35,15 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/pricing', search: '' }),
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Link: ({ children, to, ...p }: { children?: React.ReactNode; to: string; [key: string]: unknown }) => React.createElement('a', { href: to, ...p }, children),
+  Link: ({
+    children,
+    to,
+    ...p
+  }: {
+    children?: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href: to, ...p }, children),
 }));
 
 // ── react-redux mock ──
@@ -47,9 +55,10 @@ vi.mock('react-redux', () => ({
 }));
 
 // ── useOidcAuth mock ──
-vi.mock('@/auth/useOidcAuth', () => ({
+vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: true,
+    wasAuthenticated: true,
     isLoading: false,
     accessToken: 'token123',
     oidcUser: null,
@@ -59,18 +68,18 @@ vi.mock('@/auth/useOidcAuth', () => ({
 }));
 
 // ── hooks mock ──
-vi.mock('@/hooks/useSubscription', () => ({
+vi.mock('@velobits/app-core/hooks/useSubscription', () => ({
   default: () => defaultSubscription,
 }));
 
 // ── API mock ──
 const mockCatalogQuery = vi.fn();
-vi.mock('@/store/api/passesApi', () => ({
+vi.mock('@velobits/app-core/store/api/passesApi', () => ({
   useGetPassCatalogQuery: () => mockCatalogQuery(),
 }));
 
 // ── formatPrice mock ──
-vi.mock('@/utils/formatPrice', () => ({
+vi.mock('@velobits/app-core/utils/formatPrice', () => ({
   default: (price: number) => `$${price}`,
 }));
 
@@ -129,6 +138,7 @@ function renderPricing(
   mockUseSelector.mockReturnValue({ accessToken });
   mockUseOidcAuth.mockReturnValue({
     isAuthenticated: !!accessToken,
+    wasAuthenticated: !!accessToken,
     isLoading: false,
     accessToken,
     oidcUser: null,
@@ -147,7 +157,7 @@ function renderPricing(
 
 import PricingPage from './PricingPage';
 import { expectNoA11yViolations } from '@/test/axeHelper';
-import { useOidcAuth } from '@/auth/useOidcAuth';
+import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('PricingPage', () => {
@@ -159,6 +169,7 @@ describe('PricingPage', () => {
     // Default: authenticated (reset after any per-test override)
     mockUseOidcAuth.mockReturnValue({
       isAuthenticated: true,
+      wasAuthenticated: true,
       isLoading: false,
       accessToken: 'token123',
       oidcUser: null,
@@ -221,7 +232,25 @@ describe('PricingPage', () => {
 
   it('navigates to login if not authenticated when upgrading', () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
-    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    const mockLogin = vi.fn();
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: mockLogin,
+      logout: vi.fn(),
+    });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [samplePass], credit_packs: [] },
       isLoading: false,
@@ -229,7 +258,8 @@ describe('PricingPage', () => {
     });
     render(<PricingPage showAlert={vi.fn()} subscription={defaultSubscription} />);
     fireEvent.click(screen.getByText('Upgrade to Pro'));
-    expect(mockNavigate).toHaveBeenCalledWith('/login');
+    // Login carries a returnTo so the user lands back on pricing afterwards.
+    expect(mockLogin).toHaveBeenCalledWith({ returnTo: '/pricing' });
   });
 
   // ── Pass group tabs ──
@@ -261,28 +291,66 @@ describe('PricingPage', () => {
     expect(buyBtns.length).toBeGreaterThan(0);
   });
 
-  it('calls handleBuyPass when Buy Now is clicked', async () => {
+  it('opens the tool picker for a scoped pass, then buys with the selection', async () => {
     renderPricing();
+    // samplePass (tools: 1) is scoped: Buy Now must collect the tool first.
+    const buyBtns = screen.getAllByText('Buy Now');
+    fireEvent.click(buyBtns[0]!);
+    expect(defaultSubscriptionMocks.handleBuyPass).not.toHaveBeenCalled();
+    const dialog = screen.getByRole('dialog', { name: /choose 1 tool/i });
+    expect(dialog).toBeInTheDocument();
+    fireEvent.click(within(dialog).getAllByRole('menuitemcheckbox')[0]!);
+    fireEvent.click(within(dialog).getByRole('button', { name: /continue to pay/i }));
+    await waitFor(() => {
+      expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalledWith(
+        'day_single',
+        expect.arrayContaining([expect.any(String)])
+      );
+    });
+  });
+
+  it('buys an all-tools pass directly without the picker', async () => {
+    renderPricing();
+    // Switch to the Multi-Day tab where the all-tools sample pass lives.
+    fireEvent.click(screen.getByText('Multi-Day'));
     const buyBtns = screen.getAllByText('Buy Now');
     fireEvent.click(buyBtns[0]!);
     await waitFor(() => {
-      expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalled();
+      expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalledWith('sprint_all', []);
     });
   });
 
   it('navigates to login if not authenticated when buying pass', async () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
-    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [samplePass], credit_packs: [] },
       isLoading: false,
       error: null,
     });
     const mockShowAlert = vi.fn();
+    const mockLogin = vi.fn();
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: mockLogin,
+      logout: vi.fn(),
+    });
     render(<PricingPage showAlert={mockShowAlert} subscription={defaultSubscription} />);
     fireEvent.click(screen.getByText('Buy Now'));
     expect(mockShowAlert).toHaveBeenCalledWith('Sign in to purchase a pass', 'warning');
-    expect(mockNavigate).toHaveBeenCalledWith('/login');
+    expect(mockLogin).toHaveBeenCalledWith({ returnTo: '/pricing' });
   });
 
   // ── Credit packs ──
@@ -405,7 +473,15 @@ describe('PricingPage', () => {
 
   it('calls handleBuyCredits via unauthenticated user shows alert', async () => {
     mockUseSelector.mockReturnValue({ accessToken: null });
-    mockUseOidcAuth.mockReturnValue({ isAuthenticated: false, isLoading: false, accessToken: null, oidcUser: null, login: vi.fn(), logout: vi.fn() });
+    mockUseOidcAuth.mockReturnValue({
+      isAuthenticated: false,
+      wasAuthenticated: false,
+      isLoading: false,
+      accessToken: null,
+      oidcUser: null,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
     mockCatalogQuery.mockReturnValue({
       data: { passes: [], credit_packs: [sampleCredit] },
       isLoading: false,
@@ -427,7 +503,7 @@ describe('PricingPage', () => {
     if (overlay) fireEvent.click(overlay);
   });
 
-  it('calls handleBuyPass from within drawer detail CTA', async () => {
+  it('opens the tool picker from the drawer detail CTA for a scoped pass', async () => {
     renderPricing();
     fireEvent.click(screen.getByLabelText(/View 1-Day Single details/i));
     // Find the CTA buy button inside the detail panel
@@ -435,8 +511,15 @@ describe('PricingPage', () => {
       .getAllByRole('button')
       .filter((b) => b.textContent.includes('Buy Now'));
     fireEvent.click(buyNowBtns[buyNowBtns.length - 1]!);
+    // Scoped pass: the drawer closes and the picker collects the tool first.
+    const dialog = await screen.findByRole('dialog', { name: /choose 1 tool/i });
+    fireEvent.click(within(dialog).getAllByRole('menuitemcheckbox')[0]!);
+    fireEvent.click(within(dialog).getByRole('button', { name: /continue to pay/i }));
     await waitFor(() => {
-      expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalled();
+      expect(defaultSubscriptionMocks.handleBuyPass).toHaveBeenCalledWith(
+        'day_single',
+        expect.arrayContaining([expect.any(String)])
+      );
     });
   });
 
@@ -459,7 +542,8 @@ describe('PricingPage', () => {
 
   it('shows upgradeLoading state on pro button', () => {
     renderPricing({ subscription: { ...defaultSubscription, upgradeLoading: true } });
-    expect(screen.getByText('Redirecting...')).toBeInTheDocument();
+    // Checkout opens as an in-page Razorpay overlay — there is no redirect.
+    expect(screen.getByText('Opening checkout…')).toBeInTheDocument();
   });
 
   it('retry button is visible on catalog error', () => {

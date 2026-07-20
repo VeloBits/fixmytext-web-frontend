@@ -12,9 +12,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:smoke": "playwright test --config playwright.smoke.config.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.e2e.json"
   },
   "dependencies": {
-    "@module-federation/vite": "^1.16.2"
+    "@module-federation/vite": "^1.16.8"
   }
 }

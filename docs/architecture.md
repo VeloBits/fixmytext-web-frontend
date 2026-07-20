@@ -1,92 +1,152 @@
 # Frontend Architecture
 
-> System overview of the FixMyText React + Vite frontend.
+> System overview of the FixMyText micro-frontend monorepo.
 
 ## Overview
 
-The frontend is a single-page application built with React 18 and bundled by Vite 6. It communicates with the FastAPI backend exclusively through RTK Query API slices. All 254 tools are data-driven — no per-tool components or conditionals in routing.
+The frontend is a **micro-frontend (MFE)** monorepo composed of a Module Federation host, two independently-deployed remotes, a Next.js content app, and shared workspace packages. All 254 tools are data-driven — no per-tool components or conditionals in routing.
+
+## App Topology
+
+```
+Browser
+  └── apps/shell  (host, /app/*)
+        ├── Redux store + OIDC auth (from @velobits/app-core — federation singleton)
+        ├── Context providers (Alert, App, Theme) → inject props to remotes
+        ├── apps/editor-remote  (remote, loaded at /app/ and /app/editor/*)
+        │     └── owns: editor surface, drawers, 18 editor hooks, CommandPalette
+        └── apps/analytics-remote  (remote, loaded at /app/dashboard)
+              └── owns: dashboard page, 7 dashboard section components
+```
+
+The shell is the **only** Module Federation host — it provides the Redux store, RTK Query API instances, and OIDC auth to remotes via:
+
+1. `@velobits/app-core` declared as a federation singleton (deduplicated at runtime)
+2. Explicit prop injection (`mode`, `setMode`, `showAlert`, `gamification`, `user`, `isAuthenticated`, `subscription`) passed to each remote's exposed component
+
+## Dev Ports
+
+| App              | Package                      | Port (Docker/nginx) | Port (host vite) |
+| ---------------- | ---------------------------- | ------------------- | ---------------- |
+| shell            | `@velobits/shell`            | 3000                | 3000             |
+| editor-remote    | `@velobits/editor-remote`    | 3101                | 3101             |
+| analytics-remote | `@velobits/analytics-remote` | 3102                | 3102             |
+| content          | `@velobits/content-app`      | 3103 (nginx)        | 3001             |
+
+> Note: `apps/content` runs on port 3001 locally but is served via nginx on port 3103 in the Docker Compose stack. This is intentional — nginx handles the path-based routing at 3000.
 
 ## Layer Diagram
 
 ```mermaid
 graph TD
-    Browser["Browser (index.html)"]
-    React["React Components<br/>(pages / editor / drawers)"]
-    Contexts["Context Providers<br/>(AlertContext · AppContext · ThemeContext)"]
-    RTK["RTK Query API Slices<br/>(textApi · authApi · userDataApi · historyApi · subscriptionApi · passApi · shareApi)"]
-    Backend["FastAPI Backend<br/>http://localhost:8000"]
+    Browser["Browser"]
+    Shell["apps/shell (host)<br/>OIDC · store Provider · chrome · routing"]
+    AppCore["@velobits/app-core (singleton)<br/>Redux store · RTK Query slices · shared hooks · gamification UI"]
+    EditorRemote["apps/editor-remote<br/>editor surface · drawers · hooks"]
+    AnalyticsRemote["apps/analytics-remote<br/>dashboard surface"]
+    Content["apps/content (Next.js)<br/>SEO pages · /tools/[slug] · /share/[id]"]
+    Backend["FastAPI Backend"]
 
-    Browser --> React
-    React --> Contexts
-    React --> RTK
-    RTK -->|"HTTP POST/GET"| Backend
+    Browser --> Shell
+    Browser --> Content
+    Shell --> AppCore
+    Shell -->|"Module Federation · props"| EditorRemote
+    Shell -->|"Module Federation · props"| AnalyticsRemote
+    EditorRemote --> AppCore
+    AnalyticsRemote --> AppCore
+    AppCore -->|"RTK Query HTTP"| Backend
 ```
 
-## Context Providers
+## Source Ownership
 
-The three React context providers are composed in `src/App.jsx` in this order (outermost first):
+| Surface                                                         | Owned by                                                                               | Shared via           |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------- |
+| Editor page + drawers + editor hooks                            | `apps/editor-remote/src/`                                                              | —                    |
+| Dashboard page + sections                                       | `apps/analytics-remote/src/`                                                           | —                    |
+| Auth, layout chrome, About/Pricing pages, SharePage             | `apps/shell/src/`                                                                      | —                    |
+| Redux store, RTK Query APIs, gamification UI, shared data hooks | `packages/app-core/src/`                                                               | federation singleton |
+| OIDC / Keycloak integration                                     | `packages/app-core/src/auth/` (userManager, useOidcAuth, AuthCallback, SilentCallback) | injected as props    |
+| Context providers (Alert, App, Theme)                           | `apps/shell/src/contexts/`                                                             | injected as props    |
 
-| Provider | File | What it exposes |
-|----------|------|----------------|
-| `ThemeProvider` | `src/contexts/ThemeContext.jsx` | Dark/light mode state and toggle, backed by `useTheme` and persisted to `localStorage` |
-| `AlertProvider` | `src/contexts/AlertContext.jsx` | `showAlert` / `dismissAlert` methods backed by `useAlert`; surfaces toast notifications app-wide |
-| `AppProvider` | `src/contexts/AppContext.jsx` | Aggregates `useAuth` (user, isAuthenticated), `useGamification` (XP, streaks, achievements), and `useSubscription` (billing tier, passes) into a single memoized value |
+## `@velobits/app-core` — Federation Singleton
 
-Components consume these via the matching `use*Context()` hooks exported from each file.
+`app-core` is declared `{ singleton: true }` in **all three** Vite federation configs (shell host + both remotes). This ensures exactly one copy of the Redux store and RTK Query API instances exists at runtime — remotes' hooks dispatch to shell's store, and queries cache correctly.
 
-## RTK Query Slices
+### RTK Query Slices
 
-All network I/O goes through RTK Query. Slices live in `src/store/api/`:
+| Slice             | Reducer path      | Purpose                                          |
+| ----------------- | ----------------- | ------------------------------------------------ |
+| `textApi`         | `textApi`         | `transformText` mutation used by every text tool |
+| `authApi`         | `authApi`         | Login, register, refresh, logout, current-user   |
+| `userDataApi`     | `userDataApi`     | Profile, gamification stats, user settings       |
+| `historyApi`      | `historyApi`      | Operation history — paginated fetch + delete     |
+| `subscriptionApi` | `subscriptionApi` | Razorpay order creation, subscription tier       |
+| `passesApi`       | `passesApi`       | Prepaid pass purchase and balance                |
+| `shareApi`        | `shareApi`        | Create/retrieve shareable link                   |
 
-| File | Reducer path | Purpose |
-|------|-------------|---------|
-| `baseQuery.js` | — | Shared base query with JWT auto-refresh (mutex-protected) and `X-Visitor-Id` header injection |
-| `textApi.js` | `textApi` | Single `transformText` mutation used by every text tool |
-| `authApi.js` | `authApi` | Login, register, refresh, logout, current-user (`/api/v1/auth/`) |
-| `userDataApi.js` | `userDataApi` | Profile, gamification stats, user settings (`/api/v1/user-data/`) |
-| `historyApi.js` | `historyApi` | Operation history — fetch paginated list, delete entry (`/api/v1/history/`) |
-| `subscriptionApi.js` | `subscriptionApi` | Razorpay order creation, webhook status, subscription tier (`/api/v1/subscription/`) |
-| `passApi.js` | `passApi` | Prepaid pass purchase and balance (`/api/v1/passes/`) |
-| `shareApi.js` | `shareApi` | Create shareable link, retrieve shared result (`/api/v1/share/`) |
+`authSlice` (non-API) stores only the current `user` (populated from `authApi.getMe`); it does **not** hold tokens. OIDC tokens (incl. the refresh token) live **only in memory** via `oidc-client-ts` (`packages/app-core/src/auth/userManager.ts`, H-8) — never in `localStorage`/`sessionStorage`. On a hard reload the session is re-hydrated by a silent renew against the Keycloak SSO cookie. The PKCE state store remains in `localStorage` because it must survive the full-page redirect to Keycloak.
 
-Redux state slices (non-API) live in `src/store/slices/`:
+## Cross-Tab Auth Sync
 
-| Slice | Purpose |
-|-------|---------|
-| `authSlice` | Stores `access_token` and user info; persisted to `localStorage` |
+Login/logout events are propagated across same-origin tabs via a `BroadcastChannel` (`fixmytext_auth`) declared at module scope in `userManager.ts`:
 
-Error middleware in `src/store/middleware/` intercepts RTK Query rejected actions and dispatches `showAlert` calls automatically.
+- `AuthCallback` broadcasts `{ type: 'user_loaded' }` after `signinRedirectCallback()`; other tabs respond with a `signinSilent()` so they pick up the session without a refresh.
+- `useOidcAuth.logout()` broadcasts `{ type: 'user_signed_out' }`; other tabs call `removeUser()` to drop the in-memory user immediately.
+
+The channel listener is registered once at module scope (not per hook instance), so each event is handled exactly once regardless of how many `useOidcAuth` consumers are mounted.
+
+## Context Providers (shell)
+
+Composed in `apps/shell/src/App.tsx` (outermost first):
+
+| Provider        | Exposes                                                                                   |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `ThemeProvider` | dark/light mode + toggle, persisted to `localStorage`                                     |
+| `AlertProvider` | `showAlert` / `dismissAlert` — toast notifications                                        |
+| `AppProvider`   | Aggregates `useAuth`, `useGamification`, `useSubscription` → injected to remotes as props |
+
+## Shell Routes (`/app` basename)
+
+| Route                   | Component                        | Auth |
+| ----------------------- | -------------------------------- | ---- |
+| `/`                     | Home (editor-remote)             | No   |
+| `/login`                | LoginPage                        | No   |
+| `/signup`               | SignupPage                       | No   |
+| `/forgot-password`      | ForgotPasswordPage               | No   |
+| `/dashboard`            | DashboardPage (analytics-remote) | Yes  |
+| `/about`                | AboutPage                        | No   |
+| `/pricing`              | PricingPage                      | No   |
+| `/auth/callback`        | AuthCallback                     | No   |
+| `/auth/silent-callback` | SilentCallback                   | No   |
+| `/share/:id`            | SharePage                        | No   |
 
 ## Tool Data-Flow
 
 Every text tool follows the same path from definition to backend call:
 
 ```
-src/constants/tools.js          — static tool definition (id, type, endpoint, …)
+packages/app-core/src/constants/tools.ts   — tool definition (re-exported from @velobits/tools-registry)
         ↓
-useTransformText hook           — wraps useTransformTextMutation from textApi
+useTransformTextMutation (editor-remote)   — RTK Query hook generated by textApi
         ↓
-textApi RTK slice               — POST to tool.endpoint with { text, …params }
-                                  injects X-Visitor-Id header
+textApi RTK slice (app-core)               — POST to tool.endpoint with { text, …params }
+                                             injects X-Visitor-Id header (baseQuery)
         ↓
-FastAPI backend                 — /api/v1/text/{slug}
+FastAPI backend                            — /api/v1/text/{slug}
         ↓
 TextResponse { original, result, operation }
         ↓
-useTransformText                — returns result to the editor component
+useTransformTextMutation                   — returns result to TextForm in editor-remote
 ```
-
-The `endpoint` field in each tool definition uses a named constant from `src/constants/endpoints.js` (e.g., `ENDPOINTS.REVERSE_WORDS`), which resolves to the exact URL path registered in the backend router.
 
 ## Build Pipeline
 
-| Item | Detail |
-|------|--------|
-| Bundler | Vite 6.2 |
-| Entry point | `index.html` → `src/index.jsx` |
-| Output directory | `dist/` |
-| Dev server port | 3000 (with HMR) |
-| Plugin | `@vitejs/plugin-react` (Babel-based Fast Refresh) |
-| Manual chunks | `vendor-export` (jsPDF, docx), `vendor-format` (Prettier), `vendor-hash` (crypto libraries) |
-
-The manual chunk split keeps the main bundle lean by isolating heavy export and hashing libraries into separate lazily-loaded chunks.
+| Item                  | Detail                                                                                               |
+| --------------------- | ---------------------------------------------------------------------------------------------------- |
+| Bundler               | Vite 8 (all apps)                                                                                    |
+| Federation            | `@module-federation/vite`                                                                            |
+| Shell entry           | `apps/shell/src/index.tsx`                                                                           |
+| Remote entries        | `apps/*/src/index.ts` (each exposes one component)                                                   |
+| Shared singletons     | react, react-dom, react-router-dom, @reduxjs/toolkit, react-redux, @sentry/react, @velobits/app-core |
+| Manual chunks (shell) | `vendor-export` (jsPDF, docx), `vendor-format` (Prettier), `vendor-hash` (crypto libs)               |
+| Content bundler       | Next.js 15 App Router                                                                                |

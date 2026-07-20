@@ -6,13 +6,13 @@ Three apps deploy as **Cloudflare Pages** (static Vite builds). The content app 
 
 ## Deployment targets
 
-| App | CF Target | Type | Build command |
-|-----|-----------|------|---------------|
-| `apps/shell` | `fixmytext-shell` | Cloudflare Pages | `npm run build:shell` |
-| `apps/editor-remote` | `fixmytext-editor-remote` | Cloudflare Pages | `npm run build:editor` |
-| `apps/analytics-remote` | `fixmytext-analytics-remote` | Cloudflare Pages | `npm run build:analytics` |
-| `apps/content` | `fixmytext-content` | **Cloudflare Worker** (OpenNext) | `npm run build:cf -w @velobits/content-app` |
-| `worker/` | `fixmytext-router` | Cloudflare Worker | `npm run deploy:worker` |
+| App                     | CF Target                    | Type                             | Build command                               |
+| ----------------------- | ---------------------------- | -------------------------------- | ------------------------------------------- |
+| `apps/shell`            | `fixmytext-shell`            | Cloudflare Pages                 | `npm run build:shell`                       |
+| `apps/editor-remote`    | `fixmytext-editor-remote`    | Cloudflare Pages                 | `npm run build:editor`                      |
+| `apps/analytics-remote` | `fixmytext-analytics-remote` | Cloudflare Pages                 | `npm run build:analytics`                   |
+| `apps/content`          | `fixmytext-content`          | **Cloudflare Worker** (OpenNext) | `npm run build:cf -w @velobits/content-app` |
+| `worker/`               | `fixmytext-router`           | Cloudflare Worker                | `npm run deploy:worker`                     |
 
 ## Initial Setup
 
@@ -54,6 +54,7 @@ npm run deploy:content
 This runs `@opennextjs/cloudflare build` then `wrangler deploy` from `apps/content/`.
 
 After deploying, note the Worker URL (e.g. `fixmytext-content.workers.dev`) and update `worker/wrangler.toml`:
+
 ```toml
 CONTENT_URL = "https://fixmytext-content.workers.dev"
 ```
@@ -78,12 +79,12 @@ npm run deploy:analytics
 
 The router Worker at `fixmytext.com` routes:
 
-| Path | Target | Type |
-|------|--------|------|
-| `/remotes/editor/*` | `fixmytext-editor-remote.pages.dev` (prefix stripped) | CF Pages |
-| `/remotes/analytics/*` | `fixmytext-analytics-remote.pages.dev` (prefix stripped) | CF Pages |
-| `/app*` | `fixmytext-shell.pages.dev` | CF Pages |
-| `/*` | `fixmytext-content.workers.dev` | CF Worker |
+| Path                   | Target                                                   | Type      |
+| ---------------------- | -------------------------------------------------------- | --------- |
+| `/remotes/editor/*`    | `fixmytext-editor-remote.pages.dev` (prefix stripped)    | CF Pages  |
+| `/remotes/analytics/*` | `fixmytext-analytics-remote.pages.dev` (prefix stripped) | CF Pages  |
+| `/app*`                | `fixmytext-shell.pages.dev`                              | CF Pages  |
+| `/*`                   | `fixmytext-content.workers.dev`                          | CF Worker |
 
 ## Module Federation URLs
 

@@ -1,8 +1,12 @@
 # apps/content production image.
 # Runs: @opennextjs/cloudflare build (handles next build internally) → wrangler dev
 # Single-stage so wrangler and its node_modules are available at runtime.
+#
+# Must be a glibc (Debian) base: wrangler dev spawns workerd, which Cloudflare
+# ships as a glibc-linked binary — on musl (alpine) it dies with
+# `spawn .../workerd-linux-64/bin/workerd ENOENT`.
 
-FROM node:24-alpine
+FROM node:24-bookworm-slim
 
 WORKDIR /app
 
@@ -15,6 +19,9 @@ COPY packages/tools-registry/package.json ./packages/tools-registry/
 
 RUN npm ci --silent
 
+# apps/content/tsconfig.json extends the monorepo base — next build hard-fails
+# (TS5083) without it in the build context.
+COPY tsconfig.base.json ./
 COPY packages/ ./packages/
 COPY apps/content/ ./apps/content/
 

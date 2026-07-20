@@ -4,13 +4,13 @@
 
 ## Stack
 
-| Tool | Role |
-|------|------|
-| [Vitest](https://vitest.dev/) | Test runner |
-| [jsdom](https://github.com/jsdom/jsdom) | Browser environment simulation |
-| [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/) | Component rendering & queries |
-| [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) | Custom DOM matchers |
-| [v8](https://v8.dev/blog/javascript-code-coverage) | Coverage provider |
+| Tool                                                                                    | Role                           |
+| --------------------------------------------------------------------------------------- | ------------------------------ |
+| [Vitest](https://vitest.dev/)                                                           | Test runner                    |
+| [jsdom](https://github.com/jsdom/jsdom)                                                 | Browser environment simulation |
+| [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/) | Component rendering & queries  |
+| [@testing-library/jest-dom](https://github.com/testing-library/jest-dom)                | Custom DOM matchers            |
+| [v8](https://v8.dev/blog/javascript-code-coverage)                                      | Coverage provider              |
 
 ---
 
@@ -76,10 +76,10 @@ npx vitest run --reporter=verbose src/hooks/useAiTools.test.js
 
 After running with `--coverage`, two outputs are produced:
 
-| Output | Location | Use |
-|--------|----------|-----|
-| Terminal summary | Printed after tests | Quick pass/fail check |
-| HTML report | `coverage/lcov-report/index.html` | Line-by-line visual breakdown |
+| Output           | Location                          | Use                           |
+| ---------------- | --------------------------------- | ----------------------------- |
+| Terminal summary | Printed after tests               | Quick pass/fail check         |
+| HTML report      | `coverage/lcov-report/index.html` | Line-by-line visual breakdown |
 
 Open the HTML report in a browser:
 
@@ -125,35 +125,37 @@ src/
 ### Component test (basic pattern)
 
 ```jsx
-import { render, screen, fireEvent } from '@testing-library/react'
-import MyComponent from './MyComponent'
+import { render, screen, fireEvent } from '@testing-library/react';
+import MyComponent from './MyComponent';
 
 describe('MyComponent', () => {
   it('renders the title', () => {
-    render(<MyComponent title="Hello" />)
-    expect(screen.getByText('Hello')).toBeInTheDocument()
-  })
+    render(<MyComponent title="Hello" />);
+    expect(screen.getByText('Hello')).toBeInTheDocument();
+  });
 
   it('calls onClick when button is clicked', () => {
-    const onClick = vi.fn()
-    render(<MyComponent onClick={onClick} />)
-    fireEvent.click(screen.getByRole('button'))
-    expect(onClick).toHaveBeenCalled()
-  })
-})
+    const onClick = vi.fn();
+    render(<MyComponent onClick={onClick} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(onClick).toHaveBeenCalled();
+  });
+});
 ```
 
 ### Hook test (basic pattern)
 
 ```js
-import { renderHook, act } from '@testing-library/react'
-import useCounter from './useCounter'
+import { renderHook, act } from '@testing-library/react';
+import useCounter from './useCounter';
 
 it('increments the count', () => {
-  const { result } = renderHook(() => useCounter())
-  act(() => { result.current.increment() })
-  expect(result.current.count).toBe(1)
-})
+  const { result } = renderHook(() => useCounter());
+  act(() => {
+    result.current.increment();
+  });
+  expect(result.current.count).toBe(1);
+});
 ```
 
 ### Mocking modules
@@ -162,30 +164,34 @@ it('increments the count', () => {
 // Mock a module before imports
 vi.mock('../store/api/textApi', () => ({
   useTransformTextMutation: () => [vi.fn()],
-}))
+}));
 
 // Mock react-redux
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(() => ({ accessToken: 'token' })),
   useDispatch: () => vi.fn(),
-}))
+}));
 ```
 
 ### Mocking framer-motion (required for animated components)
 
 ```js
 vi.mock('framer-motion', () => {
-  const m = (tag) => ({ children, ...props }) => {
-    const p = { ...props }
-    ;['initial', 'animate', 'exit', 'transition', 'whileTap', 'whileHover'].forEach(k => delete p[k])
-    return React.createElement(tag, p, children)
-  }
+  const m =
+    (tag) =>
+    ({ children, ...props }) => {
+      const p = { ...props };
+      ['initial', 'animate', 'exit', 'transition', 'whileTap', 'whileHover'].forEach(
+        (k) => delete p[k]
+      );
+      return React.createElement(tag, p, children);
+    };
   return {
     motion: new Proxy({}, { get: (_, t) => m(t) }),
     AnimatePresence: ({ children }) => children,
     useReducedMotion: () => false,
-  }
-})
+  };
+});
 ```
 
 ### Avoiding TDZ errors with vi.hoisted
@@ -195,11 +201,11 @@ When a mock factory references a variable defined with `const`, use `vi.hoisted`
 ```js
 const mocks = vi.hoisted(() => ({
   mockFn: vi.fn(),
-}))
+}));
 
 vi.mock('../utils/someModule', () => ({
   someExport: mocks.mockFn,
-}))
+}));
 ```
 
 ---
@@ -211,31 +217,31 @@ vi.mock('../utils/someModule', () => ({
 Use `document.body.textContent` when text is rendered as individual characters (e.g. typing animations):
 
 ```js
-expect(document.body.textContent).toContain('Welcome')
+expect(document.body.textContent).toContain('Welcome');
 ```
 
 ### Multiple elements with the same text
 
 ```js
 // Instead of getByText (throws if multiple match):
-expect(screen.getAllByText('Submit').length).toBeGreaterThan(0)
+expect(screen.getAllByText('Submit').length).toBeGreaterThan(0);
 
 // Or target by role for specificity:
-expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
 ```
 
 ### Async interactions
 
 ```js
-import { waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react';
 
 it('shows result after async action', async () => {
-  render(<MyComponent />)
-  fireEvent.click(screen.getByText('Fetch'))
+  render(<MyComponent />);
+  fireEvent.click(screen.getByText('Fetch'));
   await waitFor(() => {
-    expect(screen.getByText('Result')).toBeInTheDocument()
-  })
-})
+    expect(screen.getByText('Result')).toBeInTheDocument();
+  });
+});
 ```
 
 ---
@@ -252,15 +258,17 @@ Global test setup lives in `src/test/setup.js`. It runs before every test file a
 ## Debugging a Failing Test
 
 1. **Run the single file** to isolate noise:
+
    ```bash
    npx vitest run path/to/Failing.test.jsx --reporter=verbose
    ```
 
 2. **Print the rendered DOM** inside a test:
+
    ```js
-   import { render } from '@testing-library/react'
-   const { debug } = render(<MyComponent />)
-   debug() // logs the full DOM to the terminal
+   import { render } from '@testing-library/react';
+   const { debug } = render(<MyComponent />);
+   debug(); // logs the full DOM to the terminal
    ```
 
 3. **Check mock is wired correctly** — `require()` bypasses the Vitest mock registry in ESM. Always use `import` at the top of the file for mocked modules.

@@ -1,0 +1,47 @@
+# End-to-end smoke tests (manual / on-demand).
+#
+# These Playwright suites validate the host<->remote Module Federation contract
+# and full user journeys (signup, tools, purchase, share, cross-app navigation).
+# They run against a DEPLOYED environment — the shell config has no webServer and
+# the specs hit a real backend + Keycloak — so this is intentionally NOT a blocking
+# PR gate. Trigger it manually after deploying, or point E2E_FRONTEND_URL at any
+# running stack (e.g. a `docker compose --profile prod` host).
+name: E2E (on-demand)
+
+on:
+  workflow_dispatch:
+    inputs:
+      frontend_url:
+        description: 'Origin to test against (overrides E2E_FRONTEND_URL var)'
+        required: false
+        type: string
+
+jobs:
+  e2e:
+    name: E2E (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - shell
+          - content-app
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run ${{ matrix.app }} E2E
+        run: npm run test:e2e -w @velobits/${{ matrix.app }}
+        env:
+          E2E_FRONTEND_URL: ${{ inputs.frontend_url || vars.E2E_FRONTEND_URL }}
