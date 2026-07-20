@@ -180,7 +180,16 @@ services:
     env_file: .env.docker.prod
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:3103']
+      # The app 307-redirects / to /app (owned by the shell via the router), so a
+      # redirect-following wget always lands on a 404 — probe with node instead
+      # and treat any non-5xx answer as "workerd is up and serving".
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3103/',{redirect:'manual'}).then((r)=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
