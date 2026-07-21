@@ -185,10 +185,10 @@ jobs:
           cp .env.docker.prod.example .env.docker.prod
           docker compose --profile prod up --build -d
 
-      - name: Wait for router (shell at /app)
+      - name: Wait for router (shell at /)
         run: |
           for i in $(seq 1 60); do
-            if curl -sf -o /dev/null http://localhost:3000/app; then
+            if curl -sf -o /dev/null http://localhost:3000/; then
               echo "router up"; exit 0
             fi
             sleep 5

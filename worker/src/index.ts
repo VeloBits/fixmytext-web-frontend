@@ -2,7 +2,6 @@ interface Env {
   SHELL_PAGES_URL: string;
   EDITOR_PAGES_URL: string;
   ANALYTICS_PAGES_URL: string;
-  CONTENT_URL: string; // Cloudflare Worker (OpenNext), not a Pages project
   // Optional override of the Content-Security-Policy (otherwise DEFAULT_CSP).
   CSP?: string;
 }
@@ -59,15 +58,18 @@ export default {
       const target = pathname.replace('/remotes/analytics', '');
       res = await fetch(`${env.ANALYTICS_PAGES_URL}${target}${search}`, request);
     } else if (pathname === '/app' || pathname.startsWith('/app/')) {
-      // shell SPA — built with base '/app' but deployed at the Pages webroot, so
-      // the prefix must be stripped or asset requests fall into the SPA fallback
-      // (mirrors the /app rewrite in docker/nginx.router.prod.conf). Segment
-      // boundary required: /appfoo belongs to the content app, not the shell.
-      const target = pathname.slice('/app'.length) || '/';
-      res = await fetch(`${env.SHELL_PAGES_URL}${target}${search}`, request);
+      // Legacy prefix: the shell used to live under /app — permanent redirect
+      // so old bookmarks/share links land on the root-based equivalents.
+      // Segment boundary in the condition above: /appfoo is NOT redirected.
+      const stripped = pathname === '/app' ? '/' : pathname.slice('/app'.length);
+      return withSecurityHeaders(
+        Response.redirect(new URL(`${stripped}${search}`, url.origin).toString(), 301),
+        env
+      );
     } else {
-      // everything else → Next.js content app (Cloudflare Worker via OpenNext)
-      res = await fetch(`${env.CONTENT_URL}${pathname}${search}`, request);
+      // everything else → shell SPA (owns the origin root; built with base '/',
+      // Pages' index.html fallback handles client-side routes)
+      res = await fetch(`${env.SHELL_PAGES_URL}${pathname}${search}`, request);
     }
 
     return withSecurityHeaders(res, env);

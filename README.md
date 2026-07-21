@@ -24,13 +24,12 @@ frontend/
 
 | URL prefix             | App                     | Framework                        |
 | ---------------------- | ----------------------- | -------------------------------- |
-| `/app/*`               | `apps/shell`            | Vite + React (host)              |
 | `/remotes/editor/*`    | `apps/editor-remote`    | Vite + Module Federation remote  |
 | `/remotes/analytics/*` | `apps/analytics-remote` | Vite + Module Federation remote  |
-| `/tools/[slug]`        | `apps/content`          | Next.js 15 SSG                   |
-| `/share/[id]`          | `apps/content`          | Next.js 15 SSR                   |
-| `/about`, `/pricing`   | `apps/content`          | Next.js 15                       |
-| `/`                    | `apps/content`          | Next.js 15 (redirects to `/app`) |
+| `/*` (everything else) | `apps/shell`            | Vite + React (host)              |
+
+> `apps/content` (Next.js) is no longer routed on this origin — the shell owns
+> the origin root. The container is parked and only reachable directly.
 
 ## Prerequisites
 
@@ -77,10 +76,10 @@ Start the full stack via Docker (recommended — node_modules live in Docker vol
 
 ```bash
 docker compose --profile dev up
-# shell → http://localhost:3000 (served at /app/*)
+# shell → http://localhost:3000 (served at /)
 # editor-remote → http://localhost:3101 (federation remote)
 # analytics-remote → http://localhost:3102 (federation remote)
-# content → http://localhost:3001 (served at /)
+# content → http://localhost:3001 (parked — not routed via :3000)
 ```
 
 To run the production simulation (built artifacts behind the nginx router, mirroring
@@ -171,7 +170,7 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 
 ### `apps/shell` (MFE host)
 
-- **React 19** + react-router-dom 7 (basename `/app`)
+- **React 19** + react-router-dom 7 (served at the origin root, no basename)
 - **Vite 8** + `@module-federation/vite` — host that loads editor-remote and analytics-remote at runtime
 - **TypeScript 6** — strict mode
 - **Tailwind CSS v4** — utility-first styling via `@tailwindcss/vite`
@@ -194,11 +193,11 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 
 ## Routing — `apps/shell`
 
-All routes are relative to the `/app` basename (react-router):
+All routes are served from the origin root (react-router, no basename):
 
 | Route                   | Component                            | Auth Required |
 | ----------------------- | ------------------------------------ | ------------- |
-| `/` (→ `/app/`)         | Home (editor, via editor-remote)     | No            |
+| `/`                     | Home (editor, via editor-remote)     | No            |
 | `/login`                | LoginPage                            | No            |
 | `/signup`               | SignupPage                           | No            |
 | `/forgot-password`      | ForgotPasswordPage                   | No            |

@@ -79,18 +79,15 @@ All traffic enters through the nginx router on port **3000**. Each path prefix i
 
 | URL pattern                     | Container              | Port | Framework    | What's here                                       |
 | ------------------------------- | ---------------------- | ---- | ------------ | ------------------------------------------------- |
-| `localhost:3000/`               | `content-dev`          | 3103 | Next.js 15   | Landing page                                      |
-| `localhost:3000/tools/[slug]`   | `content-dev`          | 3103 | Next.js 15   | Tool detail pages (SSG)                           |
-| `localhost:3000/share/[id]`     | `content-dev`          | 3103 | Next.js 15   | Share page (SSR)                                  |
-| `localhost:3000/about`          | `content-dev`          | 3103 | Next.js 15   | About page                                        |
-| `localhost:3000/pricing`        | `content-dev`          | 3103 | Next.js 15   | Pricing page                                      |
-| `localhost:3000/app/`           | `shell-dev`            | 3100 | Vite + React | Editor surface                                    |
-| `localhost:3000/app/dashboard`  | `shell-dev`            | 3100 | Vite + React | Analytics / dashboard                             |
-| `localhost:3000/app/login`      | `shell-dev`            | 3100 | Vite + React | Login page                                        |
+| `localhost:3000/`               | `shell-dev`            | 3100 | Vite + React | Editor surface (shell owns the origin root)       |
+| `localhost:3000/dashboard`      | `shell-dev`            | 3100 | Vite + React | Analytics / dashboard                             |
+| `localhost:3000/login`          | `shell-dev`            | 3100 | Vite + React | Login page                                        |
 | `localhost:3101/remoteEntry.js` | `editor-remote-dev`    | 3101 | Vite + React | Editor MFE bundle (loaded by shell at runtime)    |
 | `localhost:3102/remoteEntry.js` | `analytics-remote-dev` | 3102 | Vite + React | Analytics MFE bundle (loaded by shell at runtime) |
 
-> **MFE isolation:** Each container is independent. If `content-dev` is down, `localhost:3000/app/` still works. If `editor-remote-dev` is down, the shell falls back to its local copy of the editor page (the `.catch()` in App.tsx).
+> **Content app (parked):** the Next.js content app (`content-dev`, :3103) is no longer routed through the router — the shell owns the whole origin. Its container still runs and is reachable directly at `localhost:3103` only.
+
+> **MFE isolation:** Each container is independent. If `editor-remote-dev` is down, the shell falls back to its local copy of the editor page (the `.catch()` in App.tsx).
 
 ### Direct service ports (bypass the router)
 
@@ -98,10 +95,10 @@ Hit these to isolate a specific service without going through nginx — useful w
 
 | Direct URL              | Container              | Same as via router                  |
 | ----------------------- | ---------------------- | ----------------------------------- |
-| `http://localhost:3100` | `shell-dev`            | `localhost:3000/app/`               |
+| `http://localhost:3100` | `shell-dev`            | `localhost:3000/`                   |
 | `http://localhost:3101` | `editor-remote-dev`    | `localhost:3000/remotes/editor/`    |
 | `http://localhost:3102` | `analytics-remote-dev` | `localhost:3000/remotes/analytics/` |
-| `http://localhost:3103` | `content-dev`          | `localhost:3000/`                   |
+| `http://localhost:3103` | `content-dev`          | — (not routed)                      |
 
 > **Note:** When hitting direct ports, the shell still tries to load remotes from `localhost:3000/remotes/...` (baked into `.env.docker.dev`), so the router must also be running for module federation to work.
 
@@ -114,8 +111,7 @@ Browser → localhost:3000 (nginx router)
               │
               ├── /remotes/editor/*    → strips prefix → editor-remote-dev:3101
               ├── /remotes/analytics/* → strips prefix → analytics-remote-dev:3102
-              ├── /app*                → shell-dev:3100
-              └── /*                  → content-dev:3103
+              └── /*                   → shell-dev:3100
 ```
 
 This matches the Cloudflare Worker routing in `worker/src/index.ts` exactly — the same path rules, same prefix stripping. What works locally works on Cloudflare.
@@ -138,7 +134,7 @@ All three Vite apps resolve `@/` imports to `apps/shell/src` — the shell owns 
 
 ## Verifying MFE Wiring
 
-Open `http://localhost:3000/app/` in a browser, then open DevTools → Network tab → filter by `remoteEntry`. You should see two requests:
+Open `http://localhost:3000/` in a browser, then open DevTools → Network tab → filter by `remoteEntry`. You should see two requests:
 
 - `GET /remotes/editor/remoteEntry.js` → 200
 - `GET /remotes/analytics/remoteEntry.js` → 200

@@ -3,9 +3,9 @@ import { dismissOnboardingIfPresent } from './helpers';
 
 test('local tool (MD5) transforms input client-side', async ({ page }) => {
   // Deep-link straight into the editor with the tool pre-selected — a plain
-  // /app/ visit lands fresh guests on the marketing/landing view without a
+  // / visit lands fresh guests on the marketing/landing view without a
   // textarea until a tool is chosen.
-  await page.goto('/app/?tool=md5');
+  await page.goto('/?tool=md5');
   await dismissOnboardingIfPresent(page);
 
   const input = page.locator('textarea.tu-textarea').first();

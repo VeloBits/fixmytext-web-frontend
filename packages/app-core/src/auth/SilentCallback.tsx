@@ -10,8 +10,8 @@ import { userManager } from './userManager';
  * calls signinSilentCallback() which posts a message back to the parent
  * frame; the UserManager then updates the stored session.
  *
- * Route: /app/auth/silent-callback  (must match silent_redirect_uri in userManager)
- * Keycloak redirect: add the app's /app/auth/silent-callback URL (dev + prod) to
+ * Route: /auth/silent-callback  (must match silent_redirect_uri in userManager)
+ * Keycloak redirect: add the app's /auth/silent-callback URL (dev + prod) to
  *                    the Keycloak client's valid redirect URIs. The realm/client
  *                    coordinates come from keycloakConfig (develop-fixmytext in
  *                    dev, fixmytext in prod).

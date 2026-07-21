@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 // Auth was migrated to Keycloak (PKCE auth-code flow, hosted login/registration
-// pages). The shell's /app/signup and /app/login routes no longer render a local
+// pages). The shell's /signup and /login routes no longer render a local
 // form — they immediately call userManager.signinRedirect(), so the browser ends
 // up on Keycloak's hosted page. The previous version of this spec filled a local
 // #displayName/#email/#password form that no longer exists.
 
 test('signup redirects to the Keycloak hosted registration/login page', async ({ page }) => {
-  await page.goto('/app/signup');
+  await page.goto('/signup');
 
   // signinRedirect({ prompt: 'create' }) sends the browser to Keycloak's
   // openid-connect auth endpoint on the configured realm. Assert on /realms/
@@ -31,5 +31,5 @@ test('signup redirects to the Keycloak hosted registration/login page', async ({
 test.skip('full signup → verify email → login journey (needs a test Keycloak realm)', async () => {
   // TODO: point E2E_KEYCLOAK_URL at a disposable realm, register through the
   // hosted page, pull the verification link from the mail sink, complete the
-  // "Verify Email" required action, then sign in and assert landing on /app.
+  // "Verify Email" required action, then sign in and assert landing on the app home.
 });

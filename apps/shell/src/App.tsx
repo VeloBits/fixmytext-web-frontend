@@ -30,8 +30,8 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 // and dashboard link here ('/about', '/pricing').
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
-// In-app authenticated share view at /app/share/:id. The public, SSR/SEO share page
-// is served separately by apps/content at /share/:id.
+// In-app authenticated share view at /share/:id. The former public SSR/SEO share
+// page (apps/content) is no longer routed on this origin — the shell owns /.
 const SharePage = lazy(() => import('./pages/SharePage'));
 
 // Remote surfaces — loaded from their independently deployed MFE builds.
@@ -215,7 +215,7 @@ function AppInner() {
 
 function App() {
   return (
-    <Router basename="/app">
+    <Router>
       <AlertProvider>
         <ThemeProvider>
           <AppProvider>
