@@ -7,9 +7,16 @@ compatibility_date = "2024-09-23"
 # pattern = "fixmytext.com/*"
 # zone_name = "fixmytext.com"
 
-[vars]
-SHELL_PAGES_URL = "https://fixmytext-shell.pages.dev"
-EDITOR_PAGES_URL = "https://fixmytext-editor-remote.pages.dev"
-ANALYTICS_PAGES_URL = "https://fixmytext-analytics-remote.pages.dev"
+# [vars]
+# SHELL_PAGES_URL = "https://fixmytext-shell.pages.dev"
+# EDITOR_PAGES_URL = "https://fixmytext-editor-remote.pages.dev"
+# ANALYTICS_PAGES_URL = "https://fixmytext-analytics-remote.pages.dev"
 # content is a Cloudflare Worker (OpenNext), not a Pages project
-CONTENT_URL = "https://fixmytext-content.workers.dev"
+# CONTENT_URL = "https://fixmytext-content.workers.dev"
+
+
+[vars]
+SHELL_PAGES_URL     = "https://fixmytext-shell.pages.dev"
+EDITOR_PAGES_URL    = "https://fixmytext-editor-remote.pages.dev"
+ANALYTICS_PAGES_URL = "https://fixmytext-analytics-remote.pages.dev"
+CONTENT_URL         = "https://fixmytext-content.velobits.workers.dev"

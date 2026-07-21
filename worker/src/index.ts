@@ -58,9 +58,13 @@ export default {
       // analytics-remote bundle — strip /remotes/analytics prefix
       const target = pathname.replace('/remotes/analytics', '');
       res = await fetch(`${env.ANALYTICS_PAGES_URL}${target}${search}`, request);
-    } else if (pathname.startsWith('/app')) {
-      // shell SPA
-      res = await fetch(`${env.SHELL_PAGES_URL}${pathname}${search}`, request);
+    } else if (pathname === '/app' || pathname.startsWith('/app/')) {
+      // shell SPA — built with base '/app' but deployed at the Pages webroot, so
+      // the prefix must be stripped or asset requests fall into the SPA fallback
+      // (mirrors the /app rewrite in docker/nginx.router.prod.conf). Segment
+      // boundary required: /appfoo belongs to the content app, not the shell.
+      const target = pathname.slice('/app'.length) || '/';
+      res = await fetch(`${env.SHELL_PAGES_URL}${target}${search}`, request);
     } else {
       // everything else → Next.js content app (Cloudflare Worker via OpenNext)
       res = await fetch(`${env.CONTENT_URL}${pathname}${search}`, request);

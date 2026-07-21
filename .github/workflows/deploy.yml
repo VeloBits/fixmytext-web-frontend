@@ -12,7 +12,8 @@
 #   secrets.CLOUDFLARE_API_TOKEN, secrets.CLOUDFLARE_ACCOUNT_ID   (wrangler reads these)
 #   vars.VITE_EDITOR_REMOTE_ENTRY    = https://<prod-domain>/remotes/editor/remoteEntry.js
 #   vars.VITE_ANALYTICS_REMOTE_ENTRY = https://<prod-domain>/remotes/analytics/remoteEntry.js
-#   vars.VITE_API_URL, vars.VITE_KEYCLOAK_URL, vars.VITE_KEYCLOAK_CLIENT_ID  (+ Sentry as needed)
+#   vars.VITE_API_URL, vars.VITE_KEYCLOAK_URL, vars.VITE_KEYCLOAK_REALM,
+#   vars.VITE_KEYCLOAK_CLIENT_ID, vars.VITE_KEYCLOAK_ENABLED_PROVIDERS  (+ Sentry as needed)
 # (Confirm the CF Pages project names in package.json deploy:* scripts match your account.)
 name: Deploy (Cloudflare)
 
@@ -91,7 +92,12 @@ jobs:
           VITE_ANALYTICS_REMOTE_ENTRY: ${{ vars.VITE_ANALYTICS_REMOTE_ENTRY }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_KEYCLOAK_URL: ${{ vars.VITE_KEYCLOAK_URL }}
+          # Realm must be passed explicitly — app-core silently falls back to the
+          # DEV realm (Velobits-Dev) when unset (keycloakConfig.ts).
+          VITE_KEYCLOAK_REALM: ${{ vars.VITE_KEYCLOAK_REALM }}
           VITE_KEYCLOAK_CLIENT_ID: ${{ vars.VITE_KEYCLOAK_CLIENT_ID }}
+          VITE_KEYCLOAK_ENABLED_PROVIDERS: ${{ vars.VITE_KEYCLOAK_ENABLED_PROVIDERS }}
+          VITE_SSO_DOMAIN_MAP: ${{ vars.VITE_SSO_DOMAIN_MAP }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
