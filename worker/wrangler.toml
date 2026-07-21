@@ -11,3 +11,16 @@ compatibility_date = "2024-09-23"
 SHELL_PAGES_URL     = "https://fixmytext-shell.pages.dev"
 EDITOR_PAGES_URL    = "https://fixmytext-editor-remote.pages.dev"
 ANALYTICS_PAGES_URL = "https://fixmytext-analytics-remote.pages.dev"
+
+# ── Develop environment ──────────────────────────────────────────────────────
+# Deployed by CI from the `develop` branch (wrangler deploy --env develop) as a
+# separate worker: develop-fixmytext-router.<account-subdomain>.workers.dev.
+# URLs point at the Pages *branch aliases* created by `pages deploy --branch develop`.
+# Env blocks do not inherit top-level [vars] — every var must be redeclared here.
+[env.develop]
+name = "develop-fixmytext-router"
+
+[env.develop.vars]
+SHELL_PAGES_URL     = "https://develop.fixmytext-shell.pages.dev"
+EDITOR_PAGES_URL    = "https://develop.fixmytext-editor-remote.pages.dev"
+ANALYTICS_PAGES_URL = "https://develop.fixmytext-analytics-remote.pages.dev"
