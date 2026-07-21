@@ -60,6 +60,7 @@ export default {
     } else if (pathname === '/app' || pathname.startsWith('/app/')) {
       // Legacy prefix: the shell used to live under /app — permanent redirect
       // so old bookmarks/share links land on the root-based equivalents.
+      // Segment boundary in the condition above: /appfoo is NOT redirected.
       const stripped = pathname === '/app' ? '/' : pathname.slice('/app'.length);
       return withSecurityHeaders(
         Response.redirect(new URL(`${stripped}${search}`, url.origin).toString(), 301),
