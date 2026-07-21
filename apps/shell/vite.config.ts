@@ -94,7 +94,7 @@ export default defineConfig({
       { find: '@', replacement: path.resolve(__dirname, 'src') },
     ],
   },
-  base: '/app',
+  base: '/',
   server: { port: 3100, host: true },
   preview: { port: 3100 },
   build: {

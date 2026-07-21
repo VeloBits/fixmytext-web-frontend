@@ -73,11 +73,12 @@ describe('useOidcAuth', () => {
 
     expect(callOrder).toEqual(['clearSession', 'signoutRedirect']);
     expect(mockClearSession).toHaveBeenCalledTimes(1);
-    // Logged-out app home, NOT /app/login — the login page auto-redirects
-    // straight back to Keycloak, stranding the just-signed-out user there.
+    // Logged-out app home (origin root), NOT /login — the login page
+    // auto-redirects straight back to Keycloak, stranding the just-signed-out
+    // user there.
     expect(mockSignoutRedirect).toHaveBeenCalledWith(
       expect.objectContaining({
-        post_logout_redirect_uri: expect.stringMatching(/\/app\/$/),
+        post_logout_redirect_uri: expect.stringMatching(/^https?:\/\/[^/]+\/$/),
       })
     );
   });
@@ -101,7 +102,7 @@ describe('useOidcAuth', () => {
     expect(mockSignoutRedirect).toHaveBeenCalledWith(
       expect.objectContaining({
         id_token_hint: 'test-id-token',
-        post_logout_redirect_uri: expect.stringMatching(/\/app\/$/),
+        post_logout_redirect_uri: expect.stringMatching(/^https?:\/\/[^/]+\/$/),
       })
     );
   });
