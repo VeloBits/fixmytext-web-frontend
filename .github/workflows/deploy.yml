@@ -8,7 +8,7 @@
 #   main    → production → Pages production deployments (bare *.pages.dev URLs)
 #                          + worker `fixmytext-router`
 #   develop → develop    → Pages branch deployments (develop.<project>.pages.dev)
-#                          + worker `fixmytext-router-develop` (wrangler --env develop)
+#                          + worker `develop-fixmytext-router` (wrangler --env develop)
 #
 # ── Selective deploys (deploy "versions") ────────────────────────────────────
 # After each successful deploy, the commit is tagged `deployed/<env>/<app>`
@@ -62,10 +62,16 @@ jobs:
   changes:
     name: Detect changed apps
     runs-on: ubuntu-latest
-    # Only run for a successful CI run or a manual dispatch.
+    # Only run for a successful CI run, or a manual dispatch from a branch that
+    # maps to a real environment. Without the branch check, dispatching from a
+    # feature branch would deploy it INTO the develop environment (branch-alias
+    # uploads, develop worker, deployed/develop/* marker tags) — inconsistent
+    # state that then masquerades as develop.
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+      (github.event_name == 'workflow_dispatch' &&
+       contains(fromJSON('["main", "develop"]'), github.ref_name)) ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success')
     env:
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
       # workflow_run: always use change detection. workflow_dispatch: deploy all
@@ -196,7 +202,9 @@ jobs:
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
           VITE_SENTRY_ENVIRONMENT: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
-          VITE_SENTRY_RELEASE: ${{ github.sha }}
+          # Must match the commit actually checked out and built — for
+          # workflow_run triggers, github.sha is NOT that commit.
+          VITE_SENTRY_RELEASE: ${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Update deploy marker tag
         run: |
           git tag -f "deployed/${DEPLOY_ENV}/shell" HEAD
@@ -217,9 +225,11 @@ jobs:
     env:
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
       # Empty for production (top-level wrangler.toml config); selects the
-      # [env.develop] block — and thus the fixmytext-router-develop worker —
-      # for develop deploys.
-      WRANGLER_ENV_FLAG: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && ' ' || '--env develop' }}
+      # [env.develop] block — and thus the develop-fixmytext-router worker —
+      # for develop deploys. The non-main branch carries the truthy operand so
+      # production resolves to a genuinely empty string (`cond && '' || x`
+      # would always yield x — empty strings are falsy in GitHub expressions).
+      WRANGLER_ENV_FLAG: ${{ (github.event.workflow_run.head_branch || github.ref_name) != 'main' && '--env develop' || '' }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
