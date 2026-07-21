@@ -9,7 +9,7 @@ import { test, expect, type Response } from '@playwright/test';
  *
  *   1. Each remote's `remoteEntry.js` is reachable under its `/remotes/<name>/` prefix
  *      and returned as JS (proves the remote `base` is baked in and the router serves it).
- *   2. The shell actually mounts the editor remote at `/app/` (proves the shell's baked
+ *   2. The shell actually mounts the editor remote at `/` (proves the shell's baked
  *      VITE_*_REMOTE_ENTRY URL resolves and the @velobits/app-core store singleton boots —
  *      the editor uses RTK Query hooks, which throw on mount if the store isn't shared).
  *
@@ -42,7 +42,7 @@ test.describe('Module Federation smoke (hermetic)', () => {
     }
   });
 
-  test('shell mounts the editor remote at /app/ (single shared store boots)', async ({ page }) => {
+  test('shell mounts the editor remote at / (single shared store boots)', async ({ page }) => {
     await stubBackend(page);
 
     const remoteEntryHits: { url: string; status: number }[] = [];
@@ -54,7 +54,7 @@ test.describe('Module Federation smoke (hermetic)', () => {
 
     // Deep-link a tool so the editor view (not the guest landing) renders, and
     // dismiss the first-visit persona onboarding dialog that overlays it.
-    await page.goto('/app/?tool=md5');
+    await page.goto('/?tool=md5');
     const overlay = page.locator('.tu-onboard-overlay');
     const onboarding = await overlay
       .waitFor({ state: 'visible', timeout: 5_000 })

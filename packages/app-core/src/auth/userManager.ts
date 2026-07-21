@@ -13,14 +13,14 @@ const REALM_BASE = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
 const baseSettings: UserManagerSettings = {
   authority: REALM_BASE,
   client_id: KEYCLOAK_CLIENT_ID,
-  redirect_uri: `${window.location.origin}/app/auth/callback`,
+  redirect_uri: `${window.location.origin}/auth/callback`,
   // Static relay page (apps/shell/public/auth/silent-callback.html), NOT the
   // SPA route: the hidden silent-renew iframe only needs to postMessage the
   // response URL back to the parent. Booting the full SPA in the iframe took
   // long enough in throttled background tabs to blow the silent-request
   // timeout, so cross-tab login pickup silently failed there.
-  silent_redirect_uri: `${window.location.origin}/app/auth/silent-callback.html`,
-  post_logout_redirect_uri: `${window.location.origin}/app/login`,
+  silent_redirect_uri: `${window.location.origin}/auth/silent-callback.html`,
+  post_logout_redirect_uri: `${window.location.origin}/login`,
   response_type: 'code',
   scope: 'openid email profile',
   automaticSilentRenew: true,

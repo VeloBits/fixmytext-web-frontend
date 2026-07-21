@@ -24,7 +24,6 @@ services:
       - shell-dev
       - editor-remote-dev
       - analytics-remote-dev
-      - content-dev
     restart: unless-stopped
 
   # ── Router — prod ─────────────────────────────────────────────────────────────
@@ -42,7 +41,6 @@ services:
       - shell-prod
       - editor-remote-prod
       - analytics-remote-prod
-      - content-prod
     restart: unless-stopped
 
   # ── Shell — dev ────────────────────────────────────────────────────────────────

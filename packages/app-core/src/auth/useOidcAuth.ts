@@ -107,13 +107,13 @@ export function useOidcAuth(): OidcAuthState {
     } catch {
       // best-effort — always proceed to Keycloak SSO signout regardless
     }
-    // Land on the logged-out app home, NOT /app/login — the login page
+    // Land on the logged-out app home, NOT /login — the login page
     // immediately re-redirects to Keycloak, which would dump a user who just
     // signed out straight onto the Keycloak sign-in form with no way back.
     // The URI must be listed in the client's post.logout.redirect.uris.
     await userManager.signoutRedirect({
       id_token_hint: user?.id_token,
-      post_logout_redirect_uri: `${window.location.origin}/app/`,
+      post_logout_redirect_uri: `${window.location.origin}/`,
     });
   }, []);
 

@@ -10,12 +10,12 @@ The frontend is a **micro-frontend (MFE)** monorepo composed of a Module Federat
 
 ```
 Browser
-  └── apps/shell  (host, /app/*)
+  └── apps/shell  (host, owns the origin root /)
         ├── Redux store + OIDC auth (from @velobits/app-core — federation singleton)
         ├── Context providers (Alert, App, Theme) → inject props to remotes
-        ├── apps/editor-remote  (remote, loaded at /app/ and /app/editor/*)
+        ├── apps/editor-remote  (remote, loaded at / and /editor/*)
         │     └── owns: editor surface, drawers, 18 editor hooks, CommandPalette
-        └── apps/analytics-remote  (remote, loaded at /app/dashboard)
+        └── apps/analytics-remote  (remote, loaded at /dashboard)
               └── owns: dashboard page, 7 dashboard section components
 ```
 
@@ -105,7 +105,7 @@ Composed in `apps/shell/src/App.tsx` (outermost first):
 | `AlertProvider` | `showAlert` / `dismissAlert` — toast notifications                                        |
 | `AppProvider`   | Aggregates `useAuth`, `useGamification`, `useSubscription` → injected to remotes as props |
 
-## Shell Routes (`/app` basename)
+## Shell Routes (served at the origin root, no basename)
 
 | Route                   | Component                        | Auth |
 | ----------------------- | -------------------------------- | ---- |
