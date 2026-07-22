@@ -5550,6 +5550,24 @@ export interface components {
       max_length: number;
     };
     /**
+     * SidebarChipItem
+     * @description One tool-panel sidebar chip: a smart view or a group filter.
+     *
+     *     `view` ids are client-defined (all/pinned/recent/suggested), `group` ids
+     *     are catalog TOOL_GROUPS ids, `custom_group` ids are user_tool_groups UUIDs.
+     *     The server stays structural — semantics (e.g. 'all' never removable) are
+     *     enforced by the client that owns the vocabulary.
+     */
+    SidebarChipItem: {
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: "view" | "group" | "custom_group";
+      /** Id */
+      id: string;
+    };
+    /**
      * UiSettingsResponse
      * @description Current UI settings for the user.
      */
@@ -5578,6 +5596,11 @@ export interface components {
        * @default false
        */
       onboarding_seen: boolean;
+      /**
+       * Sidebar Chips
+       * @default []
+       */
+      sidebar_chips: components["schemas"]["SidebarChipItem"][];
     };
     /**
      * UiSettingsUpdate
@@ -5596,6 +5619,8 @@ export interface components {
       } | null;
       /** Onboarding Seen */
       onboarding_seen?: boolean | null;
+      /** Sidebar Chips */
+      sidebar_chips?: components["schemas"]["SidebarChipItem"][] | null;
     };
     /**
      * UserResponse

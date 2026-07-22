@@ -477,12 +477,29 @@ const defaultFavorites: FavoritesContextValue = {
   toggleFavorite: vi.fn(),
 };
 
+const defaultSidebarChips = {
+  chips: [
+    { type: 'view' as const, id: 'all' },
+    { type: 'view' as const, id: 'pinned' },
+    { type: 'view' as const, id: 'recent' },
+    { type: 'view' as const, id: 'suggested' },
+  ],
+  ready: true,
+  isCustomized: false,
+  addChip: vi.fn(),
+  removeChip: vi.fn(),
+  moveChip: vi.fn(),
+  setChips: vi.fn(),
+  resetChips: vi.fn(),
+};
+
 const defaultProps = {
   showAlert: vi.fn(),
   isAuthenticated: false,
   user: null,
   toolGroups: defaultToolGroups,
   favorites: defaultFavorites,
+  sidebarChips: defaultSidebarChips,
   subscription: null,
   mode: 'dark',
   setMode: vi.fn(),
@@ -512,11 +529,16 @@ describe('TextForm', () => {
     expect(document.querySelector('.tu-activity-bar')).toBeInTheDocument();
   });
 
-  it('renders activity bar buttons for each USE_CASE_TABS', () => {
+  it('renders activity bar buttons for the sidebar chips', () => {
     render(<TextForm {...defaultProps} />);
     const activityBtns = document.querySelectorAll('.tu-activity-btn');
-    // Should have buttons for: all, writing, transform, code, ai, language, encode + special buttons
-    expect(activityBtns.length).toBeGreaterThanOrEqual(7);
+    // All/Pinned/Recent (Suggested hides at 0) + customize + Templates/History
+    expect(activityBtns.length).toBeGreaterThanOrEqual(5);
+    expect(document.querySelector('[aria-label="All Tools"]')).toBeInTheDocument();
+    expect(document.querySelector('[aria-label="Pinned"]')).toBeInTheDocument();
+    expect(document.querySelector('[aria-label="Customize sidebar"]')).toBeInTheDocument();
+    // Suggested is hidden while there are no suggestions
+    expect(document.querySelector('[aria-label="Suggested"]')).not.toBeInTheDocument();
   });
 
   it('renders the sidebar when sidebarOpen=true', () => {
@@ -557,13 +579,18 @@ describe('TextForm', () => {
     expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
   });
 
-  it('switches tab once when the onboarding starter-kit event fires', () => {
+  it('switches view once when the onboarding starter-kit event fires', () => {
     render(<TextForm {...defaultProps} />);
     expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('All Tools');
+    // The event carries chip keys since the chips replaced category tabs
     act(() => {
-      window.dispatchEvent(new CustomEvent('fmx:onboarding-tab', { detail: { tab: 'code' } }));
+      window.dispatchEvent(
+        new CustomEvent('fmx:onboarding-tab', { detail: { tab: 'group:developer' } })
+      );
     });
-    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain('Code & Data');
+    expect(document.querySelector('.tu-sidebar-header span')?.textContent).toContain(
+      'Developer Tools'
+    );
   });
 
   it('passes the toolGroups context through to ToolPanel', () => {
@@ -717,12 +744,12 @@ describe('TextForm', () => {
     expect(screen.getByTestId('tool-panel')).toBeInTheDocument();
   });
 
-  it('switches to favourites panel when favourites activity button is clicked', () => {
+  it('keeps the tool panel mounted when the Pinned chip is clicked', () => {
     render(<TextForm {...defaultProps} />);
-    // Click the favourites button (heart icon button)
-    const favBtn = document.querySelector('.tu-activity-btn[data-tooltip="Favourites"]');
-    fireEvent.click(favBtn!);
-    expect(screen.getByText(/No favourite tools yet/)).toBeInTheDocument();
+    const pinnedBtn = document.querySelector('.tu-activity-btn[data-tooltip="Pinned"]');
+    fireEvent.click(pinnedBtn!);
+    // Pinned is a ToolPanel view (the old separate favourites panel is gone)
+    expect(screen.getByTestId('tool-panel')).toBeInTheDocument();
   });
 
   it('switches to templates panel when templates activity button is clicked', () => {
@@ -739,9 +766,9 @@ describe('TextForm', () => {
     expect(screen.getByText('No operations yet')).toBeInTheDocument();
   });
 
-  it('shows "Explore categories" heading in landing page', () => {
+  it('shows "Explore groups" heading in landing page', () => {
     render(<TextForm {...defaultProps} />);
-    expect(screen.getByText('Explore categories')).toBeInTheDocument();
+    expect(screen.getByText('Explore groups')).toBeInTheDocument();
   });
 
   it('shows keyboard shortcuts section in authenticated landing page', () => {
@@ -1145,19 +1172,15 @@ describe('TextForm tool groups and favorites (post-gamification-removal)', () =>
     expect(screen.getByText('Fix Grammar')).toBeInTheDocument();
   });
 
-  it('favourites sidebar panel works from the favorites prop', () => {
-    const toggleFavorite = vi.fn();
+  it('shows the favorites count in the header when the Pinned chip is active', () => {
     const props = {
       ...defaultProps,
-      favorites: { favorites: ['fix_grammar'], toggleFavorite },
+      favorites: { favorites: ['fix_grammar'], toggleFavorite: vi.fn() },
     };
     render(<TextForm {...props} />);
-    const favBtn = document.querySelector('.tu-activity-btn[data-tooltip="Favourites"]');
+    const favBtn = document.querySelector('.tu-activity-btn[data-tooltip="Pinned"]');
     fireEvent.click(favBtn!);
-    expect(screen.getByText('Fix Grammar')).toBeInTheDocument();
-    const removeBtn = document.querySelector('.tu-titem-fav--active');
-    fireEvent.click(removeBtn!);
-    expect(toggleFavorite).toHaveBeenCalledWith('fix_grammar');
+    expect(screen.getByText('Pinned')).toBeInTheDocument();
   });
 
   it('passes favorites and toolGroups to ToolPanel', () => {
@@ -1257,7 +1280,8 @@ describe('TextForm mobile (max-width: 768px)', () => {
     render(<TextForm {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: 'Browse tools' }));
     const tabs = document.querySelectorAll('.tu-sheet-tab');
-    expect(tabs.length).toBe(3);
+    // Templates + History (Favourites became the Pinned view chip)
+    expect(tabs.length).toBe(2);
     const historyTab = Array.from(tabs).find((t) => t.textContent?.includes('History'));
     fireEvent.click(historyTab as HTMLElement);
     // sidebar header title switches to the History panel

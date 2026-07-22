@@ -11,7 +11,51 @@
   overflow: hidden;
 }
 
-/* ── Category tabs (horizontal strip at top) ──────── */
+/* ── Filter box (above the chip row) ──────────────── */
+.tu-tpanel-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 8px 0;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.tu-tpanel-search:focus-within {
+  border-color: var(--accent);
+  color: var(--text-2);
+}
+.tu-tpanel-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.7rem;
+  outline: none;
+}
+.tu-tpanel-search input::placeholder {
+  color: var(--text-3);
+}
+.tu-tpanel-search-clear {
+  display: flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 1px;
+  border-radius: var(--r-sm);
+}
+.tu-tpanel-search-clear:hover {
+  color: var(--text);
+  background: var(--list-hover);
+}
+
+/* ── View chips (horizontal strip at top, mobile) ──── */
 .tu-tpanel-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -71,6 +115,157 @@
 .tu-tpanel-tab--active .tu-tpanel-tab-count {
   background: var(--accent-glow);
   color: var(--accent);
+}
+
+/* ⋯ +N overflow and + customize chips */
+.tu-tpanel-tab--more,
+.tu-tpanel-tab--edit {
+  color: var(--text-3);
+}
+.tu-tpanel-tab--more:hover,
+.tu-tpanel-tab--edit:hover {
+  color: var(--text);
+}
+
+/* ── Chip-row editor popover ──────────────────────── */
+.tu-chip-editor {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  z-index: 1200;
+  overflow: hidden;
+}
+.tu-chip-editor-title {
+  padding: 8px 12px 4px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+.tu-chip-editor-list {
+  flex-shrink: 0;
+  padding: 0 4px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.tu-chip-editor-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  font-size: 0.72rem;
+  color: var(--text);
+  background: var(--surface);
+  cursor: grab;
+  user-select: none;
+}
+.tu-chip-editor-item:hover {
+  background: var(--list-hover);
+}
+.tu-chip-editor-grip {
+  display: flex;
+  align-items: center;
+  color: var(--text-3);
+}
+.tu-chip-editor-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tu-chip-editor-remove {
+  display: flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--r-sm);
+}
+.tu-chip-editor-remove:hover {
+  color: var(--rose);
+  background: var(--list-hover);
+}
+.tu-chip-editor-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 8px 2px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-3);
+}
+.tu-chip-editor-search:focus-within {
+  border-color: var(--accent);
+}
+.tu-chip-editor-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.7rem;
+  outline: none;
+}
+.tu-chip-editor-sections {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2px 4px 6px;
+}
+.tu-chip-editor-section {
+  padding: 6px 8px 2px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+.tu-chip-editor-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.72rem;
+  text-align: left;
+  cursor: pointer;
+}
+.tu-chip-editor-add:hover {
+  background: var(--list-hover);
+  color: var(--text);
+}
+.tu-chip-editor-empty {
+  padding: 10px 12px;
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+.tu-chip-editor-reset {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.tu-chip-editor-reset:hover {
+  color: var(--text);
+  background: var(--list-hover);
 }
 
 /* ── Tool list (scrollable, file-tree style) ──────── */

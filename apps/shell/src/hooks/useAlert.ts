@@ -5,6 +5,7 @@
  *   const { alerts, showAlert, dismissAlert } = useAlert();
  */
 import { useState, useCallback, useRef } from 'react';
+import type { AlertAction } from '@velobits/app-core/types/alert';
 
 export type AlertType = 'info' | 'success' | 'warning' | 'danger';
 
@@ -12,10 +13,13 @@ export interface AlertItem {
   id: number;
   msg: string;
   type: AlertType;
+  /** Optional inline action button (e.g. Undo). */
+  action?: AlertAction;
 }
 
 export interface ShowAlertOptions {
   duration?: number;
+  action?: AlertAction;
 }
 
 export interface AlertContextValue {
@@ -84,7 +88,7 @@ export function useAlert(): AlertContextValue {
       setAlerts((prev) => {
         // Cap at 5 visible toasts
         const next = prev.length >= 5 ? prev.slice(1) : prev;
-        return [...next, { id, msg, type }];
+        return [...next, { id, msg, type, action: options.action }];
       });
 
       if (duration > 0) {
