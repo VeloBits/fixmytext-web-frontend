@@ -2,17 +2,19 @@
 # Module Federation topology requires:
 #
 #   remotes (Pages) ─▶ shell (Pages, bakes remoteEntry URLs) ─▶ router worker (last)
+#   content (Worker, OpenNext — SSR/SEO + share OG cards, bot-routed) ─┘
 #
 # ── Environments ─────────────────────────────────────────────────────────────
 # Branch → GitHub environment → Cloudflare target:
 #   main    → production → Pages production deployments (bare *.pages.dev URLs)
-#                          + worker `fixmytext-router`
+#                          + worker `fixmytext-router`   [manual dispatch only]
 #   develop → develop    → Pages branch deployments (develop.<project>.pages.dev)
 #                          + worker `develop-fixmytext-router` (wrangler --env develop)
+#                          [auto on green CI]
 #
 # ── Selective deploys (deploy "versions") ────────────────────────────────────
 # After each successful deploy, the commit is tagged `deployed/<env>/<app>`
-# (apps: editor, analytics, shell, router). The next run diffs each app's
+# (apps: editor, analytics, shell, content, router). The next run diffs each app's
 # source paths against its marker tag and SKIPS apps with no changes.
 #   - packages/** counts as a change for shell + both remotes (shared code).
 #   - Changing this workflow file redeploys everything once (safe default).
@@ -27,18 +29,22 @@
 #   vars.VITE_ANALYTICS_REMOTE_ENTRY = https://<router-host>/remotes/analytics/remoteEntry.js
 #   vars.VITE_API_URL, vars.VITE_KEYCLOAK_URL, vars.VITE_KEYCLOAK_REALM,
 #   vars.VITE_KEYCLOAK_CLIENT_ID, vars.VITE_KEYCLOAK_ENABLED_PROVIDERS  (+ Sentry as needed)
+#   vars.NEXT_PUBLIC_SITE_URL = that environment's public origin (content OG/canonical URLs)
 # (Confirm the CF Pages project names in package.json deploy:* scripts match your
 #  account, and that each Pages project's "Production branch" setting is `main`.)
 name: Deploy (Cloudflare)
 
-# Deploy ONLY after the "Frontend CI" workflow completes successfully on main or
-# develop — never on a raw push (H-6). Manual re-deploys go through
-# workflow_dispatch (the environment follows the branch you dispatch from).
+# Release model (asymmetric):
+#   develop    — deploys AUTOMATICALLY after "Frontend CI" succeeds on the
+#                develop branch (never on a raw push — H-6).
+#   production — NEVER auto-deploys. Releases are manual: Actions →
+#                "Deploy (Cloudflare)" → Run workflow from `main`. Branch
+#                protection guarantees main only carries CI-green commits.
 on:
   workflow_run:
     workflows: ['Frontend CI']
     types: [completed]
-    branches: [main, develop]
+    branches: [develop]
   workflow_dispatch:
     inputs:
       only_changed:
@@ -81,6 +87,7 @@ jobs:
       remotes: ${{ steps.detect.outputs.remotes }}
       any_remote: ${{ steps.detect.outputs.any_remote }}
       shell: ${{ steps.detect.outputs.shell }}
+      content: ${{ steps.detect.outputs.content }}
       router: ${{ steps.detect.outputs.router }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -96,6 +103,7 @@ jobs:
             [editor]="apps/editor-remote packages package.json package-lock.json tsconfig.base.json .github/workflows/deploy.yml"
             [analytics]="apps/analytics-remote packages package.json package-lock.json tsconfig.base.json .github/workflows/deploy.yml"
             [shell]="apps/shell packages package.json package-lock.json tsconfig.base.json .github/workflows/deploy.yml"
+            [content]="apps/content packages package.json package-lock.json tsconfig.base.json .github/workflows/deploy.yml"
             [router]="worker .github/workflows/deploy.yml"
           )
           changed_for() {
@@ -119,9 +127,10 @@ jobs:
             echo "remotes=[$(IFS=,; echo "${remotes[*]}")]"
             echo "any_remote=$([ ${#remotes[@]} -gt 0 ] && echo true || echo false)"
             echo "shell=$(changed_for shell)"
+            echo "content=$(changed_for content)"
             echo "router=$(changed_for router)"
           } >> "$GITHUB_OUTPUT"
-          echo "env=$DEPLOY_ENV remotes=[${remotes[*]}] shell=$(changed_for shell) router=$(changed_for router)"
+          echo "env=$DEPLOY_ENV remotes=[${remotes[*]}] shell=$(changed_for shell) content=$(changed_for content) router=$(changed_for router)"
 
   deploy-remotes:
     name: Deploy remote (${{ matrix.remote }})
@@ -210,18 +219,54 @@ jobs:
           git tag -f "deployed/${DEPLOY_ENV}/shell" HEAD
           git push --force origin "refs/tags/deployed/${DEPLOY_ENV}/shell"
 
+  deploy-content:
+    name: Deploy content (Worker / OpenNext)
+    runs-on: ubuntu-latest
+    environment: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
+    needs: changes
+    if: needs.changes.outputs.content == 'true'
+    env:
+      DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
+      # Selects [env.develop] in apps/content/wrangler.toml — and thus the
+      # develop-fixmytext-content worker — for develop deploys (see the
+      # WRANGLER_ENV_FLAG note on deploy-router for the expression shape).
+      WRANGLER_ENV_FLAG: ${{ (github.event.workflow_run.head_branch || github.ref_name) != 'main' && '--env develop' || '' }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          # Deploy the exact commit that passed CI (workflow_run.head_sha);
+          # fall back to the triggering ref for a manual dispatch.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build & deploy content app
+        # Runtime secrets (AUTH_SECRET, COOKIE_SECRET) are NOT build inputs —
+        # they live on each worker as dashboard Secrets and survive deploys.
+        run: npm run deploy:content -- $WRANGLER_ENV_FLAG
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.VITE_API_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+      - name: Update deploy marker tag
+        run: |
+          git tag -f "deployed/${DEPLOY_ENV}/content" HEAD
+          git push --force origin "refs/tags/deployed/${DEPLOY_ENV}/content"
+
   deploy-router:
     name: Deploy router worker
     runs-on: ubuntu-latest
     environment: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
     # The router stitches the deployed units together — deploy it last so it never
     # routes to a unit that hasn't been published yet.
-    needs: [changes, deploy-remotes, deploy-shell]
+    needs: [changes, deploy-remotes, deploy-shell, deploy-content]
     if: >-
       !cancelled() &&
       needs.changes.outputs.router == 'true' &&
       (needs.deploy-remotes.result == 'success' || needs.deploy-remotes.result == 'skipped') &&
-      (needs.deploy-shell.result == 'success' || needs.deploy-shell.result == 'skipped')
+      (needs.deploy-shell.result == 'success' || needs.deploy-shell.result == 'skipped') &&
+      (needs.deploy-content.result == 'success' || needs.deploy-content.result == 'skipped')
     env:
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
       # Empty for production (top-level wrangler.toml config); selects the

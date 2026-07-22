@@ -2,10 +2,13 @@
 
 ## Overview
 
-Three Vite apps deploy as **Cloudflare Pages** projects; a **router Worker** fronts them
-as a single origin, applying path routing and the security headers/CSP. The shell owns
-the origin root (built with base `/`); `/app*` URLs are legacy and 301-redirect to their
-root-based equivalents. The former Next.js content app is no longer part of this origin.
+Three Vite apps deploy as **Cloudflare Pages** projects; the Next.js content app
+deploys as a **Worker** (via OpenNext); a **router Worker** fronts everything as a
+single origin, applying path routing, bot detection, and the security headers/CSP.
+The shell owns the origin root (built with base `/`); `/app*` URLs are legacy and
+301-redirect to their root-based equivalents. The content app serves SSR/SEO pages —
+always for paths the shell doesn't have (`/tools*`, sitemap, robots), and via
+**dynamic rendering** (bots only) where the shell has in-app pages.
 
 There are **two isolated environments on the same Cloudflare account**:
 
@@ -13,6 +16,7 @@ There are **two isolated environments on the same Cloudflare account**:
 | --- | --- | --- |
 | Branch | `main` | `develop` |
 | Router worker | `fixmytext-router` | `develop-fixmytext-router` |
+| Content worker | `fixmytext-content` | `develop-fixmytext-content` |
 | Entry URL | `https://fixmytext-router.velobits.workers.dev` (custom domain later) | `https://develop-fixmytext-router.velobits.workers.dev` |
 | Pages deployments | production track (bare `*.pages.dev`) | branch track (`develop.<project>.pages.dev`) |
 | Build vars | GitHub environment `production` | GitHub environment `develop` |
@@ -33,6 +37,7 @@ Cloudflare projects to the git repo — CI is the only deployer.
 | `apps/shell` | `fixmytext-shell` | Pages | CI → `npm run deploy:shell -- --branch <branch>` |
 | `apps/editor-remote` | `fixmytext-editor-remote` | Pages | CI → `npm run deploy:editor -- --branch <branch>` |
 | `apps/analytics-remote` | `fixmytext-analytics-remote` | Pages | CI → `npm run deploy:analytics -- --branch <branch>` |
+| `apps/content` | `fixmytext-content` / `develop-fixmytext-content` | Worker (OpenNext) | CI → `npm run deploy:content -- [--env develop]` |
 | `worker/` | `fixmytext-router` / `develop-fixmytext-router` | Worker | CI → `wrangler deploy [--env develop]` |
 
 `--branch main` lands on the project's production track; `--branch develop` creates a
@@ -75,11 +80,20 @@ created automatically by its first deploy — nothing to pre-create for develop.
 
 ### Runtime config (committed, `worker/wrangler.toml`)
 
-Top-level `[vars]` = production router (bare `*.pages.dev` URLs);
+Top-level `[vars]` = production router (bare `*.pages.dev` URLs + `CONTENT_URL`);
 `[env.develop]` + `[env.develop.vars]` = develop router (name
 `develop-fixmytext-router`, `develop.*.pages.dev` URLs). Env blocks do not inherit —
-every var is redeclared. An optional `CSP` var per env overrides the router's
+every var is redeclared. Each env also declares a `CONTENT` **service binding** to its
+content worker (`[[services]]` / `[[env.develop.services]]`) — same-account
+worker→worker fetches over `workers.dev` are blocked, so the binding is mandatory.
+`apps/content/wrangler.toml` mirrors the env pattern (`develop-fixmytext-content`,
+assets redeclared). An optional `CSP` var per env overrides the router's
 `DEFAULT_CSP` (needed only if a backend moves off `*.velobits.dev`).
+
+**Content worker secrets** (dashboard, type *Secret*, per worker — survive deploys):
+`AUTH_SECRET` on both content workers now; `COOKIE_SECRET` (== that environment's
+backend `SESSION_COOKIE_SECRET`) once backends exist. GitHub variables additionally
+need `NEXT_PUBLIC_SITE_URL` per environment (content OG/canonical URLs).
 
 ## Deploying
 
@@ -109,6 +123,8 @@ router's `workers.dev` URL):
 | `/remotes/editor/*` | editor Pages deployment | prefix stripped |
 | `/remotes/analytics/*` | analytics Pages deployment | prefix stripped |
 | `/app`, `/app/*` | — | 301 → root equivalent (legacy bookmarks); regex enforces segment boundary (`/appfoo` not redirected) |
+| `/tools`, `/tools/*`, `/sitemap.xml`, `/robots.txt` | content Worker (service binding) | always — SSR/SEO, no shell equivalent |
+| `/about`, `/pricing`, `/share/*` — bots only | content Worker (service binding) | dynamic rendering: crawlers/link-preview scrapers get SSR + OG cards; humans get the shell's in-app pages. `/` excluded (content root redirects to `/app` — would loop) |
 | `/*` | shell Pages deployment | SPA fallback serves client routes |
 
 ## Module Federation URLs
