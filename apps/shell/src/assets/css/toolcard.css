@@ -9,6 +9,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  position: relative; /* anchors the drag-and-drop snackbar */
 }
 
 /* ── Category tabs (horizontal strip at top) ──────── */
@@ -238,10 +239,14 @@
   cursor: default;
 }
 .tu-group-empty-hint {
-  padding: 6px 10px 8px 22px;
+  margin: 4px 8px 6px;
+  padding: 8px 10px;
   font-size: 0.68rem;
   color: var(--text-3);
   font-style: italic;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  text-align: center;
 }
 
 /* ── Add-to-group popover ─────────────────────────── */
@@ -801,3 +806,290 @@
 
 /* On mobile the panel lives inside the .tu-forge-sidebar bottom sheet
    (see editor.css) — no mobile hiding needed here */
+
+/* ── Drag and drop (custom tool groups, 2026-07-22) ─────────────── */
+/* Grip handles: pointer drag works on the whole row/card; the grip is the
+ * visible affordance and the keyboard activator (Space/Enter lifts, arrows
+ * move, Space drops). touch-action:none lets the long-press sensor win over
+ * scroll once the delay elapses. */
+.tu-titem-grip {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0 1px;
+  margin-left: -10px;
+  color: var(--text-3);
+  cursor: grab;
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity var(--t);
+  touch-action: none;
+}
+.tu-titem-wrap:hover .tu-titem-grip,
+.tu-titem-grip:focus-visible {
+  opacity: 0.7;
+}
+.tu-titem-grip:active {
+  cursor: grabbing;
+}
+.tu-tgrid-card-grip {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  margin-left: 0;
+  padding: 2px;
+  z-index: 1;
+}
+.tu-tgrid-card:hover .tu-tgrid-card-grip,
+.tu-tgrid-card-grip:focus-visible {
+  opacity: 0.7;
+}
+.tu-group-grip {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0 1px;
+  color: var(--text-3);
+  cursor: grab;
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity var(--t);
+  touch-action: none;
+}
+.tu-group-header--custom:hover .tu-group-grip,
+.tu-group-grip:focus-visible {
+  opacity: 0.7;
+}
+.tu-group-grip:active {
+  cursor: grabbing;
+}
+
+/* Source element while its ghost is in the DragOverlay */
+.tu-dnd-dragging {
+  opacity: 0.35;
+}
+
+/* Custom group being hovered by a tool dragged from outside it */
+.tu-group--drop-target {
+  outline: 1px dashed var(--accent);
+  outline-offset: -1px;
+  background: var(--accent-glow);
+}
+.tu-group--drop-target .tu-group-empty-hint {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Ghost that follows the pointer */
+.tu-dnd-overlay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  font-size: 0.78rem;
+  color: var(--text);
+  width: max-content;
+  max-width: 240px;
+  cursor: grabbing;
+  pointer-events: none;
+}
+.tu-dnd-overlay--group {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+/* ── Snackbar (undo removals, drop feedback) ────────────────────── */
+.tu-undo-snackbar {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  font-size: 0.72rem;
+  color: var(--text);
+}
+.tu-undo-snackbar-msg {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tu-undo-snackbar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.tu-undo-snackbar-btn:hover {
+  text-decoration: underline;
+}
+.tu-undo-snackbar-close {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.tu-undo-snackbar-close:hover {
+  color: var(--text);
+}
+
+/* ── Bulk "Add tools" picker dialog ─────────────────────────────── */
+.tu-group-picker {
+  position: fixed;
+  z-index: 1000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  width: min(320px, calc(100vw - 32px));
+  max-height: min(440px, calc(100vh - 48px));
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+.tu-group-picker-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 6px;
+}
+.tu-group-picker-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tu-group-picker-close {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.tu-group-picker-close:hover {
+  color: var(--text);
+}
+.tu-group-picker-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 12px 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-3);
+}
+.tu-group-picker-search:focus-within {
+  border-color: var(--accent);
+}
+.tu-group-picker-search input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 0.75rem;
+  color: var(--text);
+}
+.tu-group-picker-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 8px 4px;
+}
+.tu-group-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--text);
+}
+.tu-group-picker-item:hover {
+  background: var(--list-hover);
+}
+.tu-group-picker-item--disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.tu-group-picker-item input {
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+.tu-group-picker-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tu-group-picker-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--border);
+}
+.tu-group-picker-count {
+  flex: 1;
+  font-size: 0.68rem;
+  color: var(--text-3);
+}
+.tu-group-picker-cancel,
+.tu-group-picker-save {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.tu-group-picker-cancel {
+  background: none;
+  color: var(--text-2);
+}
+.tu-group-picker-cancel:hover {
+  color: var(--text);
+}
+.tu-group-picker-save {
+  background: var(--accent);
+  color: var(--accent-contrast, #fff);
+}
+.tu-group-picker-save:hover {
+  filter: brightness(1.1);
+}

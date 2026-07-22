@@ -110,6 +110,8 @@ vi.mock('@velobits/app-core/hooks/useToolGroups', () => ({
     deleteGroup: vi.fn(),
     addToolToGroup: vi.fn(),
     removeToolFromGroup: vi.fn(),
+    setGroupTools: vi.fn(),
+    reorderGroups: vi.fn(),
   }),
 }));
 vi.mock('./hooks/useOnboardingGate', () => ({

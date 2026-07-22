@@ -186,6 +186,18 @@ export const GraduationCapIcon = createIcon(
   </>
 );
 
+export const GripVerticalIcon = createIcon(
+  'GripVerticalIcon',
+  <>
+    <circle cx="9" cy="12" r="1" />
+    <circle cx="9" cy="5" r="1" />
+    <circle cx="9" cy="19" r="1" />
+    <circle cx="15" cy="12" r="1" />
+    <circle cx="15" cy="5" r="1" />
+    <circle cx="15" cy="19" r="1" />
+  </>
+);
+
 export const HeartIcon = createIcon(
   'HeartIcon',
   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -321,6 +333,14 @@ export const RotateCcwIcon = createIcon(
   <>
     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
     <path d="M3 3v5h5" />
+  </>
+);
+
+export const SearchIcon = createIcon(
+  'SearchIcon',
+  <>
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.3-4.3" />
   </>
 );
 

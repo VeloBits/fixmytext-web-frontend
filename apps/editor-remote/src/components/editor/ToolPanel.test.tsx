@@ -93,6 +93,8 @@ const emptyToolGroups = {
   deleteGroup: vi.fn(),
   addToolToGroup: vi.fn(),
   removeToolFromGroup: vi.fn(),
+  setGroupTools: vi.fn(),
+  reorderGroups: vi.fn(),
 };
 
 const makeToolGroups = (groups: { id: string; name: string; toolIds: string[] }[]) => ({
@@ -368,6 +370,113 @@ describe('ToolPanel', () => {
       expect((input as HTMLInputElement).value).toBe('Scratch');
       fireEvent.keyDown(input, { key: 'Enter' });
       expect(toolGroups.createGroup).toHaveBeenCalledWith('Scratch');
+    });
+
+    it('renders drag grips for custom-group tools and the group header, not for catalog tools', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: ['base64'] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      // tool grip (keyboard reorder activator) inside the custom group
+      expect(screen.getByLabelText('Reorder Base64 Encode')).toBeInTheDocument();
+      // group grip on the custom header
+      expect(screen.getByLabelText('Reorder My Kit group')).toBeInTheDocument();
+      // catalog copies of the same tool render without a grip
+      const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
+      const gripsOutsideKit = Array.from(document.querySelectorAll('.tu-titem-grip')).filter(
+        (el) => !kitGroup.contains(el)
+      );
+      expect(gripsOutsideKit.length).toBe(0);
+    });
+
+    it('removal shows an undo snackbar; undo restores the exact previous order', () => {
+      const toolGroups = makeToolGroups([
+        { id: 'g1', name: 'My Kit', toolIds: ['fix_grammar', 'base64'] },
+      ]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
+      fireEvent.click(
+        kitGroup.querySelector('[aria-label="Remove Fix Grammar from this group"]')!
+      );
+      expect(toolGroups.removeToolFromGroup).toHaveBeenCalledWith('g1', 'fix_grammar');
+      expect(screen.getByText('Removed Fix Grammar from My Kit')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Undo'));
+      // full previous list replayed → the tool returns to its old position
+      expect(toolGroups.setGroupTools).toHaveBeenCalledWith('g1', ['fix_grammar', 'base64']);
+      expect(screen.queryByText('Removed Fix Grammar from My Kit')).not.toBeInTheDocument();
+    });
+
+    it('snackbar dismisses via its close button without undoing', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: ['base64'] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
+      fireEvent.click(
+        kitGroup.querySelector('[aria-label="Remove Base64 Encode from this group"]')!
+      );
+      fireEvent.click(screen.getByLabelText('Dismiss notification'));
+      expect(screen.queryByText(/Removed/)).not.toBeInTheDocument();
+      expect(toolGroups.setGroupTools).not.toHaveBeenCalled();
+    });
+
+    it('empty custom group hint mentions dragging', () => {
+      const toolGroups = makeToolGroups([{ id: 'g1', name: 'Fresh Group', toolIds: [] }]);
+      render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+      expect(screen.getByText('Drag tools here, or use the + on any tool')).toBeInTheDocument();
+    });
+
+    describe('bulk "Add tools" picker', () => {
+      it('opens from the group header, searches, and saves kept + newly picked tools', () => {
+        const toolGroups = makeToolGroups([
+          { id: 'g1', name: 'My Kit', toolIds: ['base64', 'fix_grammar'] },
+        ]);
+        render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+        fireEvent.click(screen.getByLabelText('Add tools to My Kit group'));
+        const dialog = screen.getByRole('dialog', { name: 'Add tools to My Kit' });
+        expect(dialog).toBeInTheDocument();
+        // existing members come pre-checked
+        const checked = dialog.querySelectorAll('input[type="checkbox"]:checked');
+        expect(checked.length).toBe(2);
+        // search narrows the list
+        fireEvent.change(screen.getByLabelText('Search tools'), {
+          target: { value: 'upper' },
+        });
+        expect(dialog.querySelector('.tu-group-picker-name')!.textContent).toBe('UPPERCASE');
+        expect(dialog.querySelectorAll('.tu-group-picker-item').length).toBe(1);
+        // pick it and save: curated order kept, new tool appended
+        fireEvent.click(dialog.querySelector('.tu-group-picker-item input')!);
+        fireEvent.click(screen.getByText('Save'));
+        expect(toolGroups.setGroupTools).toHaveBeenCalledWith('g1', [
+          'base64',
+          'fix_grammar',
+          'uppercase',
+        ]);
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      it('unchecking an existing member removes it on save', () => {
+        const toolGroups = makeToolGroups([
+          { id: 'g1', name: 'My Kit', toolIds: ['base64', 'fix_grammar'] },
+        ]);
+        render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+        fireEvent.click(screen.getByLabelText('Add tools to My Kit group'));
+        const dialog = screen.getByRole('dialog', { name: 'Add tools to My Kit' });
+        fireEvent.change(screen.getByLabelText('Search tools'), {
+          target: { value: 'Base64' },
+        });
+        fireEvent.click(dialog.querySelector('.tu-group-picker-item input')!);
+        fireEvent.click(screen.getByText('Save'));
+        expect(toolGroups.setGroupTools).toHaveBeenCalledWith('g1', ['fix_grammar']);
+      });
+
+      it('cancel and Escape close without saving', () => {
+        const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: [] }]);
+        render(<ToolPanel {...defaultProps} toolGroups={toolGroups} />);
+        fireEvent.click(screen.getByLabelText('Add tools to My Kit group'));
+        fireEvent.click(screen.getByText('Cancel'));
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        fireEvent.click(screen.getByLabelText('Add tools to My Kit group'));
+        fireEvent.keyDown(screen.getByLabelText('Search tools'), { key: 'Escape' });
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(toolGroups.setGroupTools).not.toHaveBeenCalled();
+      });
     });
 
     it('never renders a "For You" section (personas removed)', () => {
