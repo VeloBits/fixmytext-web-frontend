@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  '/api/v1/text/alternating-case': {
+  '/api/v1/text/uppercase': {
     parameters: {
       query?: never;
       header?: never;
@@ -14,870 +14,10 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * aLtErNaTiNg CaSe
-     * @description Apply the 'alternating-case' transformation to the input text.
+     * Uppercase
+     * @description Apply the 'uppercase' transformation to the input text.
      */
-    post: operations['tool_alternating_case_api_v1_text_alternating_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/ap-title-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * AP Title Case
-     * @description Apply the 'ap-title-case' transformation to the input text.
-     */
-    post: operations['tool_ap_title_case_api_v1_text_ap_title_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/ascii85-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Ascii85 Decode
-     * @description Apply the 'ascii85-decode' transformation to the input text.
-     */
-    post: operations['tool_ascii85_decode_api_v1_text_ascii85_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/ascii85-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Ascii85 Encode
-     * @description Apply the 'ascii85-encode' transformation to the input text.
-     */
-    post: operations['tool_ascii85_encode_api_v1_text_ascii85_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/atbash': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Atbash Cipher
-     * @description Apply the 'atbash' transformation to the input text.
-     */
-    post: operations['tool_atbash_api_v1_text_atbash_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/bacon-cipher': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Bacon Cipher
-     * @description Apply the 'bacon-cipher' transformation to the input text.
-     */
-    post: operations['tool_bacon_cipher_api_v1_text_bacon_cipher_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/base32-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Base32 Decode
-     * @description Apply the 'base32-decode' transformation to the input text.
-     */
-    post: operations['tool_base32_decode_api_v1_text_base32_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/base32-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Base32 Encode
-     * @description Apply the 'base32-encode' transformation to the input text.
-     */
-    post: operations['tool_base32_encode_api_v1_text_base32_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/base64-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Base64 Decode
-     * @description Apply the 'base64-decode' transformation to the input text.
-     */
-    post: operations['tool_base64_decode_api_v1_text_base64_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/base64-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Base64 Encode
-     * @description Apply the 'base64-encode' transformation to the input text.
-     */
-    post: operations['tool_base64_encode_api_v1_text_base64_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/binary-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Binary Decode
-     * @description Apply the 'binary-decode' transformation to the input text.
-     */
-    post: operations['tool_binary_decode_api_v1_text_binary_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/binary-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Binary Encode
-     * @description Apply the 'binary-encode' transformation to the input text.
-     */
-    post: operations['tool_binary_encode_api_v1_text_binary_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/brainfuck-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Brainfuck Decode
-     * @description Apply the 'brainfuck-decode' transformation to the input text.
-     */
-    post: operations['tool_brainfuck_decode_api_v1_text_brainfuck_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/brainfuck-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Brainfuck Encode
-     * @description Apply the 'brainfuck-encode' transformation to the input text.
-     */
-    post: operations['tool_brainfuck_encode_api_v1_text_brainfuck_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/caesar-brute-force': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Caesar Brute Force
-     * @description Apply the 'caesar-brute-force' transformation to the input text.
-     */
-    post: operations['tool_caesar_brute_force_api_v1_text_caesar_brute_force_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/caesar-cipher': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Caesar Cipher
-     * @description Apply the 'caesar-cipher' transformation to the input text.
-     */
-    post: operations['tool_caesar_cipher_api_v1_text_caesar_cipher_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/capitalize-words': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Capitalize Words
-     * @description Apply the 'capitalize-words' transformation to the input text.
-     */
-    post: operations['tool_capitalize_words_api_v1_text_capitalize_words_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/cobol-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * COBOL-CASE
-     * @description Apply the 'cobol-case' transformation to the input text.
-     */
-    post: operations['tool_cobol_case_api_v1_text_cobol_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/columnar-transposition': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Columnar Transposition
-     * @description Apply the 'columnar-transposition' transformation to the input text.
-     */
-    post: operations['tool_columnar_transposition_api_v1_text_columnar_transposition_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/constant-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * CONSTANT_CASE
-     * @description Apply the 'constant-case' transformation to the input text.
-     */
-    post: operations['tool_constant_case_api_v1_text_constant_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/csv-to-json': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * CSV to JSON
-     * @description Apply the 'csv-to-json' transformation to the input text.
-     */
-    post: operations['tool_csv_to_json_api_v1_text_csv_to_json_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/csv-to-table': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * CSV to Table
-     * @description Apply the 'csv-to-table' transformation to the input text.
-     */
-    post: operations['tool_csv_to_table_api_v1_text_csv_to_table_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/decimal-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Decimal Decode
-     * @description Apply the 'decimal-decode' transformation to the input text.
-     */
-    post: operations['tool_decimal_decode_api_v1_text_decimal_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/decimal-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Decimal Encode
-     * @description Apply the 'decimal-encode' transformation to the input text.
-     */
-    post: operations['tool_decimal_encode_api_v1_text_decimal_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/dot-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * dot.case
-     * @description Apply the 'dot-case' transformation to the input text.
-     */
-    post: operations['tool_dot_case_api_v1_text_dot_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/extract-nth-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Extract Nth Lines
-     * @description Apply the 'extract-nth-lines' transformation to the input text.
-     */
-    post: operations['tool_extract_nth_lines_api_v1_text_extract_nth_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/filter-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Filter Lines
-     * @description Apply the 'filter-lines' transformation to the input text.
-     */
-    post: operations['tool_filter_lines_api_v1_text_filter_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/fix-line-endings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Fix Line Endings
-     * @description Apply the 'fix-line-endings' transformation to the input text.
-     */
-    post: operations['tool_fix_line_endings_api_v1_text_fix_line_endings_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/flat-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * flatcase
-     * @description Apply the 'flat-case' transformation to the input text.
-     */
-    post: operations['tool_flat_case_api_v1_text_flat_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/format-json': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Format JSON
-     * @description Apply the 'format-json' transformation to the input text.
-     */
-    post: operations['tool_format_json_api_v1_text_format_json_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/hex-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Hex Decode
-     * @description Apply the 'hex-decode' transformation to the input text.
-     */
-    post: operations['tool_hex_decode_api_v1_text_hex_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/hex-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Hex Encode
-     * @description Apply the 'hex-encode' transformation to the input text.
-     */
-    post: operations['tool_hex_encode_api_v1_text_hex_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/html-escape': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * HTML Escape
-     * @description Apply the 'html-escape' transformation to the input text.
-     */
-    post: operations['tool_html_escape_api_v1_text_html_escape_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/html-unescape': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * HTML Unescape
-     * @description Apply the 'html-unescape' transformation to the input text.
-     */
-    post: operations['tool_html_unescape_api_v1_text_html_unescape_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/inverse-word-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Inverse Word Case
-     * @description Apply the 'inverse-word-case' transformation to the input text.
-     */
-    post: operations['tool_inverse_word_case_api_v1_text_inverse_word_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/inversecase': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Inverse Case
-     * @description Apply the 'inversecase' transformation to the input text.
-     */
-    post: operations['tool_inversecase_api_v1_text_inversecase_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/join-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Join Lines
-     * @description Apply the 'join-lines' transformation to the input text.
-     */
-    post: operations['tool_join_lines_api_v1_text_join_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/json-escape': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * JSON Escape
-     * @description Apply the 'json-escape' transformation to the input text.
-     */
-    post: operations['tool_json_escape_api_v1_text_json_escape_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/json-to-csv': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * JSON to CSV
-     * @description Apply the 'json-to-csv' transformation to the input text.
-     */
-    post: operations['tool_json_to_csv_api_v1_text_json_to_csv_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/json-to-yaml': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * JSON to YAML
-     * @description Apply the 'json-to-yaml' transformation to the input text.
-     */
-    post: operations['tool_json_to_yaml_api_v1_text_json_to_yaml_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/json-unescape': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * JSON Unescape
-     * @description Apply the 'json-unescape' transformation to the input text.
-     */
-    post: operations['tool_json_unescape_api_v1_text_json_unescape_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/kebab-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * kebab-case
-     * @description Apply the 'kebab-case' transformation to the input text.
-     */
-    post: operations['tool_kebab_case_api_v1_text_kebab_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/line-frequency': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Line Frequency
-     * @description Apply the 'line-frequency' transformation to the input text.
-     */
-    post: operations['tool_line_frequency_api_v1_text_line_frequency_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/lower-camel-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * lowerCamelCase
-     * @description Apply the 'lower-camel-case' transformation to the input text.
-     */
-    post: operations['tool_lower_camel_case_api_v1_text_lower_camel_case_post'];
+    post: operations['tool_uppercase_api_v1_text_uppercase_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -904,7 +44,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/morse-decode': {
+  '/api/v1/text/inversecase': {
     parameters: {
       query?: never;
       header?: never;
@@ -914,430 +54,10 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Morse Decode
-     * @description Apply the 'morse-decode' transformation to the input text.
+     * Inverse Case
+     * @description Apply the 'inversecase' transformation to the input text.
      */
-    post: operations['tool_morse_decode_api_v1_text_morse_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/morse-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Morse Encode
-     * @description Apply the 'morse-encode' transformation to the input text.
-     */
-    post: operations['tool_morse_encode_api_v1_text_morse_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/nato-phonetic': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * NATO Phonetic
-     * @description Apply the 'nato-phonetic' transformation to the input text.
-     */
-    post: operations['tool_nato_phonetic_api_v1_text_nato_phonetic_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/normalize-punctuation': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Normalize Punctuation
-     * @description Apply the 'normalize-punctuation' transformation to the input text.
-     */
-    post: operations['tool_normalize_punctuation_api_v1_text_normalize_punctuation_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/normalize-whitespace': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Normalize Whitespace
-     * @description Apply the 'normalize-whitespace' transformation to the input text.
-     */
-    post: operations['tool_normalize_whitespace_api_v1_text_normalize_whitespace_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/number-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Number Lines
-     * @description Apply the 'number-lines' transformation to the input text.
-     */
-    post: operations['tool_number_lines_api_v1_text_number_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/octal-decode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Octal Decode
-     * @description Apply the 'octal-decode' transformation to the input text.
-     */
-    post: operations['tool_octal_decode_api_v1_text_octal_decode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/octal-encode': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Octal Encode
-     * @description Apply the 'octal-encode' transformation to the input text.
-     */
-    post: operations['tool_octal_encode_api_v1_text_octal_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/pad-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Pad Lines
-     * @description Apply the 'pad-lines' transformation to the input text.
-     */
-    post: operations['tool_pad_lines_api_v1_text_pad_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/path-case': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * path/case
-     * @description Apply the 'path-case' transformation to the input text.
-     */
-    post: operations['tool_path_case_api_v1_text_path_case_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/playfair-encrypt': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Playfair Encrypt
-     * @description Apply the 'playfair-encrypt' transformation to the input text.
-     */
-    post: operations['tool_playfair_encrypt_api_v1_text_playfair_encrypt_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/rail-fence-decrypt': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Rail Fence Decrypt
-     * @description Apply the 'rail-fence-decrypt' transformation to the input text.
-     */
-    post: operations['tool_rail_fence_decrypt_api_v1_text_rail_fence_decrypt_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/rail-fence-encrypt': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Rail Fence Encrypt
-     * @description Apply the 'rail-fence-encrypt' transformation to the input text.
-     */
-    post: operations['tool_rail_fence_encrypt_api_v1_text_rail_fence_encrypt_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/remove-accents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Remove Accents
-     * @description Apply the 'remove-accents' transformation to the input text.
-     */
-    post: operations['tool_remove_accents_api_v1_text_remove_accents_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/remove-all-spaces': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Remove All Spaces
-     * @description Apply the 'remove-all-spaces' transformation to the input text.
-     */
-    post: operations['tool_remove_all_spaces_api_v1_text_remove_all_spaces_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/remove-duplicate-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Remove Duplicate Lines
-     * @description Apply the 'remove-duplicate-lines' transformation to the input text.
-     */
-    post: operations['tool_remove_duplicate_lines_api_v1_text_remove_duplicate_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/remove-extra-spaces': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Remove Extra Spaces
-     * @description Apply the 'remove-extra-spaces' transformation to the input text.
-     */
-    post: operations['tool_remove_extra_spaces_api_v1_text_remove_extra_spaces_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/remove-line-breaks': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Remove Line Breaks
-     * @description Apply the 'remove-line-breaks' transformation to the input text.
-     */
-    post: operations['tool_remove_line_breaks_api_v1_text_remove_line_breaks_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/remove-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Remove Lines
-     * @description Apply the 'remove-lines' transformation to the input text.
-     */
-    post: operations['tool_remove_lines_api_v1_text_remove_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/reverse': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Reverse Text
-     * @description Apply the 'reverse' transformation to the input text.
-     */
-    post: operations['tool_reverse_api_v1_text_reverse_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/reverse-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Reverse Lines
-     * @description Apply the 'reverse-lines' transformation to the input text.
-     */
-    post: operations['tool_reverse_lines_api_v1_text_reverse_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/rot13': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * ROT13
-     * @description Apply the 'rot13' transformation to the input text.
-     */
-    post: operations['tool_rot13_api_v1_text_rot13_post'];
+    post: operations['tool_inversecase_api_v1_text_inversecase_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1364,7 +84,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/shuffle-lines': {
+  '/api/v1/text/titlecase': {
     parameters: {
       query?: never;
       header?: never;
@@ -1374,17 +94,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Shuffle Lines
-     * @description Apply the 'shuffle-lines' transformation to the input text.
+     * Title Case
+     * @description Apply the 'titlecase' transformation to the input text.
      */
-    post: operations['tool_shuffle_lines_api_v1_text_shuffle_lines_post'];
+    post: operations['tool_titlecase_api_v1_text_titlecase_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/small-caps': {
+  '/api/v1/text/upper-camel-case': {
     parameters: {
       query?: never;
       header?: never;
@@ -1394,10 +114,30 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Small Caps
-     * @description Apply the 'small-caps' transformation to the input text.
+     * UpperCamelCase
+     * @description Apply the 'upper-camel-case' transformation to the input text.
      */
-    post: operations['tool_small_caps_api_v1_text_small_caps_post'];
+    post: operations['tool_upper_camel_case_api_v1_text_upper_camel_case_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/lower-camel-case': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * lowerCamelCase
+     * @description Apply the 'lower-camel-case' transformation to the input text.
+     */
+    post: operations['tool_lower_camel_case_api_v1_text_lower_camel_case_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1424,7 +164,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/sort-by-length': {
+  '/api/v1/text/kebab-case': {
     parameters: {
       query?: never;
       header?: never;
@@ -1434,17 +174,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Sort by Length
-     * @description Apply the 'sort-by-length' transformation to the input text.
+     * kebab-case
+     * @description Apply the 'kebab-case' transformation to the input text.
      */
-    post: operations['tool_sort_by_length_api_v1_text_sort_by_length_post'];
+    post: operations['tool_kebab_case_api_v1_text_kebab_case_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/sort-lines-asc': {
+  '/api/v1/text/capitalize-words': {
     parameters: {
       query?: never;
       header?: never;
@@ -1454,17 +194,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Sort Lines A-Z
-     * @description Apply the 'sort-lines-asc' transformation to the input text.
+     * Capitalize Words
+     * @description Apply the 'capitalize-words' transformation to the input text.
      */
-    post: operations['tool_sort_lines_asc_api_v1_text_sort_lines_asc_post'];
+    post: operations['tool_capitalize_words_api_v1_text_capitalize_words_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/sort-lines-desc': {
+  '/api/v1/text/alternating-case': {
     parameters: {
       query?: never;
       header?: never;
@@ -1474,17 +214,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Sort Lines Z-A
-     * @description Apply the 'sort-lines-desc' transformation to the input text.
+     * aLtErNaTiNg CaSe
+     * @description Apply the 'alternating-case' transformation to the input text.
      */
-    post: operations['tool_sort_lines_desc_api_v1_text_sort_lines_desc_post'];
+    post: operations['tool_alternating_case_api_v1_text_alternating_case_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/sort-numeric': {
+  '/api/v1/text/inverse-word-case': {
     parameters: {
       query?: never;
       header?: never;
@@ -1494,17 +234,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Sort Numeric
-     * @description Apply the 'sort-numeric' transformation to the input text.
+     * Inverse Word Case
+     * @description Apply the 'inverse-word-case' transformation to the input text.
      */
-    post: operations['tool_sort_numeric_api_v1_text_sort_numeric_post'];
+    post: operations['tool_inverse_word_case_api_v1_text_inverse_word_case_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/split-to-lines': {
+  '/api/v1/text/wide-text': {
     parameters: {
       query?: never;
       header?: never;
@@ -1514,17 +254,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Split to Lines
-     * @description Apply the 'split-to-lines' transformation to the input text.
+     * W i d e  Text
+     * @description Apply the 'wide-text' transformation to the input text.
      */
-    post: operations['tool_split_to_lines_api_v1_text_split_to_lines_post'];
+    post: operations['tool_wide_text_api_v1_text_wide_text_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/sql-insert-gen': {
+  '/api/v1/text/small-caps': {
     parameters: {
       query?: never;
       header?: never;
@@ -1534,10 +274,30 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * SQL INSERT Generator
-     * @description Apply the 'sql-insert-gen' transformation to the input text.
+     * Small Caps
+     * @description Apply the 'small-caps' transformation to the input text.
      */
-    post: operations['tool_sql_insert_gen_api_v1_text_sql_insert_gen_post'];
+    post: operations['tool_small_caps_api_v1_text_small_caps_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/upside-down': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Upside Down
+     * @description Apply the 'upside-down' transformation to the input text.
+     */
+    post: operations['tool_upside_down_api_v1_text_upside_down_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1564,7 +324,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/strip-emails': {
+  '/api/v1/text/ap-title-case': {
     parameters: {
       query?: never;
       header?: never;
@@ -1574,190 +334,10 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Strip Emails
-     * @description Apply the 'strip-emails' transformation to the input text.
+     * AP Title Case
+     * @description Apply the 'ap-title-case' transformation to the input text.
      */
-    post: operations['tool_strip_emails_api_v1_text_strip_emails_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-emoji': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip Emoji
-     * @description Apply the 'strip-emoji' transformation to the input text.
-     */
-    post: operations['tool_strip_emoji_api_v1_text_strip_emoji_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-empty-lines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip Empty Lines
-     * @description Apply the 'strip-empty-lines' transformation to the input text.
-     */
-    post: operations['tool_strip_empty_lines_api_v1_text_strip_empty_lines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-html': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip HTML
-     * @description Apply the 'strip-html' transformation to the input text.
-     */
-    post: operations['tool_strip_html_api_v1_text_strip_html_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-invisible': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip Invisible
-     * @description Apply the 'strip-invisible' transformation to the input text.
-     */
-    post: operations['tool_strip_invisible_api_v1_text_strip_invisible_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-markdown': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip Markdown
-     * @description Apply the 'strip-markdown' transformation to the input text.
-     */
-    post: operations['tool_strip_markdown_api_v1_text_strip_markdown_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-non-ascii': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip Non-ASCII
-     * @description Apply the 'strip-non-ascii' transformation to the input text.
-     */
-    post: operations['tool_strip_non_ascii_api_v1_text_strip_non_ascii_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-numbers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip Numbers
-     * @description Apply the 'strip-numbers' transformation to the input text.
-     */
-    post: operations['tool_strip_numbers_api_v1_text_strip_numbers_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/strip-urls': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Strip URLs
-     * @description Apply the 'strip-urls' transformation to the input text.
-     */
-    post: operations['tool_strip_urls_api_v1_text_strip_urls_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/substitution-cipher': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Substitution Cipher
-     * @description Apply the 'substitution-cipher' transformation to the input text.
-     */
-    post: operations['tool_substitution_cipher_api_v1_text_substitution_cipher_post'];
+    post: operations['tool_ap_title_case_api_v1_text_ap_title_case_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1784,7 +364,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/titlecase': {
+  '/api/v1/text/dot-case': {
     parameters: {
       query?: never;
       header?: never;
@@ -1794,17 +374,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Title Case
-     * @description Apply the 'titlecase' transformation to the input text.
+     * dot.case
+     * @description Apply the 'dot-case' transformation to the input text.
      */
-    post: operations['tool_titlecase_api_v1_text_titlecase_post'];
+    post: operations['tool_dot_case_api_v1_text_dot_case_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/toggle-smart-quotes': {
+  '/api/v1/text/constant-case': {
     parameters: {
       query?: never;
       header?: never;
@@ -1814,10 +394,10 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Toggle Smart Quotes
-     * @description Apply the 'toggle-smart-quotes' transformation to the input text.
+     * CONSTANT_CASE
+     * @description Apply the 'constant-case' transformation to the input text.
      */
-    post: operations['tool_toggle_smart_quotes_api_v1_text_toggle_smart_quotes_post'];
+    post: operations['tool_constant_case_api_v1_text_constant_case_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1844,6 +424,306 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/text/path-case': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * path/case
+     * @description Apply the 'path-case' transformation to the input text.
+     */
+    post: operations['tool_path_case_api_v1_text_path_case_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/flat-case': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * flatcase
+     * @description Apply the 'flat-case' transformation to the input text.
+     */
+    post: operations['tool_flat_case_api_v1_text_flat_case_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/cobol-case': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * COBOL-CASE
+     * @description Apply the 'cobol-case' transformation to the input text.
+     */
+    post: operations['tool_cobol_case_api_v1_text_cobol_case_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/remove-extra-spaces': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Remove Extra Spaces
+     * @description Apply the 'remove-extra-spaces' transformation to the input text.
+     */
+    post: operations['tool_remove_extra_spaces_api_v1_text_remove_extra_spaces_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/remove-all-spaces': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Remove All Spaces
+     * @description Apply the 'remove-all-spaces' transformation to the input text.
+     */
+    post: operations['tool_remove_all_spaces_api_v1_text_remove_all_spaces_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/remove-line-breaks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Remove Line Breaks
+     * @description Apply the 'remove-line-breaks' transformation to the input text.
+     */
+    post: operations['tool_remove_line_breaks_api_v1_text_remove_line_breaks_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-html': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip HTML
+     * @description Apply the 'strip-html' transformation to the input text.
+     */
+    post: operations['tool_strip_html_api_v1_text_strip_html_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/remove-accents': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Remove Accents
+     * @description Apply the 'remove-accents' transformation to the input text.
+     */
+    post: operations['tool_remove_accents_api_v1_text_remove_accents_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/toggle-smart-quotes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Toggle Smart Quotes
+     * @description Apply the 'toggle-smart-quotes' transformation to the input text.
+     */
+    post: operations['tool_toggle_smart_quotes_api_v1_text_toggle_smart_quotes_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-invisible': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip Invisible
+     * @description Apply the 'strip-invisible' transformation to the input text.
+     */
+    post: operations['tool_strip_invisible_api_v1_text_strip_invisible_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-emoji': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip Emoji
+     * @description Apply the 'strip-emoji' transformation to the input text.
+     */
+    post: operations['tool_strip_emoji_api_v1_text_strip_emoji_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/normalize-whitespace': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Normalize Whitespace
+     * @description Apply the 'normalize-whitespace' transformation to the input text.
+     */
+    post: operations['tool_normalize_whitespace_api_v1_text_normalize_whitespace_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-non-ascii': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip Non-ASCII
+     * @description Apply the 'strip-non-ascii' transformation to the input text.
+     */
+    post: operations['tool_strip_non_ascii_api_v1_text_strip_non_ascii_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/fix-line-endings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Fix Line Endings
+     * @description Apply the 'fix-line-endings' transformation to the input text.
+     */
+    post: operations['tool_fix_line_endings_api_v1_text_fix_line_endings_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-markdown': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip Markdown
+     * @description Apply the 'strip-markdown' transformation to the input text.
+     */
+    post: operations['tool_strip_markdown_api_v1_text_strip_markdown_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/text/trim-lines': {
     parameters: {
       query?: never;
@@ -1864,7 +744,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/truncate-lines': {
+  '/api/v1/text/strip-empty-lines': {
     parameters: {
       query?: never;
       header?: never;
@@ -1874,10 +754,370 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Truncate Lines
-     * @description Apply the 'truncate-lines' transformation to the input text.
+     * Strip Empty Lines
+     * @description Apply the 'strip-empty-lines' transformation to the input text.
      */
-    post: operations['tool_truncate_lines_api_v1_text_truncate_lines_post'];
+    post: operations['tool_strip_empty_lines_api_v1_text_strip_empty_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-urls': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip URLs
+     * @description Apply the 'strip-urls' transformation to the input text.
+     */
+    post: operations['tool_strip_urls_api_v1_text_strip_urls_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-emails': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip Emails
+     * @description Apply the 'strip-emails' transformation to the input text.
+     */
+    post: operations['tool_strip_emails_api_v1_text_strip_emails_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/normalize-punctuation': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Normalize Punctuation
+     * @description Apply the 'normalize-punctuation' transformation to the input text.
+     */
+    post: operations['tool_normalize_punctuation_api_v1_text_normalize_punctuation_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/strip-numbers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Strip Numbers
+     * @description Apply the 'strip-numbers' transformation to the input text.
+     */
+    post: operations['tool_strip_numbers_api_v1_text_strip_numbers_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/base64-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Base64 Encode
+     * @description Apply the 'base64-encode' transformation to the input text.
+     */
+    post: operations['tool_base64_encode_api_v1_text_base64_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/base64-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Base64 Decode
+     * @description Apply the 'base64-decode' transformation to the input text.
+     */
+    post: operations['tool_base64_decode_api_v1_text_base64_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/url-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * URL Encode
+     * @description Apply the 'url-encode' transformation to the input text.
+     */
+    post: operations['tool_url_encode_api_v1_text_url_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/url-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * URL Decode
+     * @description Apply the 'url-decode' transformation to the input text.
+     */
+    post: operations['tool_url_decode_api_v1_text_url_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/hex-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Hex Encode
+     * @description Apply the 'hex-encode' transformation to the input text.
+     */
+    post: operations['tool_hex_encode_api_v1_text_hex_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/hex-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Hex Decode
+     * @description Apply the 'hex-decode' transformation to the input text.
+     */
+    post: operations['tool_hex_decode_api_v1_text_hex_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/morse-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Morse Encode
+     * @description Apply the 'morse-encode' transformation to the input text.
+     */
+    post: operations['tool_morse_encode_api_v1_text_morse_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/morse-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Morse Decode
+     * @description Apply the 'morse-decode' transformation to the input text.
+     */
+    post: operations['tool_morse_decode_api_v1_text_morse_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/binary-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Binary Encode
+     * @description Apply the 'binary-encode' transformation to the input text.
+     */
+    post: operations['tool_binary_encode_api_v1_text_binary_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/binary-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Binary Decode
+     * @description Apply the 'binary-decode' transformation to the input text.
+     */
+    post: operations['tool_binary_decode_api_v1_text_binary_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/octal-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Octal Encode
+     * @description Apply the 'octal-encode' transformation to the input text.
+     */
+    post: operations['tool_octal_encode_api_v1_text_octal_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/octal-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Octal Decode
+     * @description Apply the 'octal-decode' transformation to the input text.
+     */
+    post: operations['tool_octal_decode_api_v1_text_octal_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/decimal-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Decimal Encode
+     * @description Apply the 'decimal-encode' transformation to the input text.
+     */
+    post: operations['tool_decimal_encode_api_v1_text_decimal_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/decimal-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Decimal Decode
+     * @description Apply the 'decimal-decode' transformation to the input text.
+     */
+    post: operations['tool_decimal_decode_api_v1_text_decimal_decode_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1924,7 +1164,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/upper-camel-case': {
+  '/api/v1/text/brainfuck-encode': {
     parameters: {
       query?: never;
       header?: never;
@@ -1934,17 +1174,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * UpperCamelCase
-     * @description Apply the 'upper-camel-case' transformation to the input text.
+     * Brainfuck Encode
+     * @description Apply the 'brainfuck-encode' transformation to the input text.
      */
-    post: operations['tool_upper_camel_case_api_v1_text_upper_camel_case_post'];
+    post: operations['tool_brainfuck_encode_api_v1_text_brainfuck_encode_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/uppercase': {
+  '/api/v1/text/brainfuck-decode': {
     parameters: {
       query?: never;
       header?: never;
@@ -1954,17 +1194,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Uppercase
-     * @description Apply the 'uppercase' transformation to the input text.
+     * Brainfuck Decode
+     * @description Apply the 'brainfuck-decode' transformation to the input text.
      */
-    post: operations['tool_uppercase_api_v1_text_uppercase_post'];
+    post: operations['tool_brainfuck_decode_api_v1_text_brainfuck_decode_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/upside-down': {
+  '/api/v1/text/atbash': {
     parameters: {
       query?: never;
       header?: never;
@@ -1974,17 +1214,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Upside Down
-     * @description Apply the 'upside-down' transformation to the input text.
+     * Atbash Cipher
+     * @description Apply the 'atbash' transformation to the input text.
      */
-    post: operations['tool_upside_down_api_v1_text_upside_down_post'];
+    post: operations['tool_atbash_api_v1_text_atbash_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/url-decode': {
+  '/api/v1/text/caesar-cipher': {
     parameters: {
       query?: never;
       header?: never;
@@ -1994,17 +1234,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * URL Decode
-     * @description Apply the 'url-decode' transformation to the input text.
+     * Caesar Cipher
+     * @description Apply the 'caesar-cipher' transformation to the input text.
      */
-    post: operations['tool_url_decode_api_v1_text_url_decode_post'];
+    post: operations['tool_caesar_cipher_api_v1_text_caesar_cipher_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/url-encode': {
+  '/api/v1/text/caesar-brute-force': {
     parameters: {
       query?: never;
       header?: never;
@@ -2014,30 +1254,10 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * URL Encode
-     * @description Apply the 'url-encode' transformation to the input text.
+     * Caesar Brute Force
+     * @description Apply the 'caesar-brute-force' transformation to the input text.
      */
-    post: operations['tool_url_encode_api_v1_text_url_encode_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/vigenere-decrypt': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Vigenere Decrypt
-     * @description Apply the 'vigenere-decrypt' transformation to the input text.
-     */
-    post: operations['tool_vigenere_decrypt_api_v1_text_vigenere_decrypt_post'];
+    post: operations['tool_caesar_brute_force_api_v1_text_caesar_brute_force_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -2064,7 +1284,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/wide-text': {
+  '/api/v1/text/vigenere-decrypt': {
     parameters: {
       query?: never;
       header?: never;
@@ -2074,10 +1294,550 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * W i d e  Text
-     * @description Apply the 'wide-text' transformation to the input text.
+     * Vigenere Decrypt
+     * @description Apply the 'vigenere-decrypt' transformation to the input text.
      */
-    post: operations['tool_wide_text_api_v1_text_wide_text_post'];
+    post: operations['tool_vigenere_decrypt_api_v1_text_vigenere_decrypt_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/rail-fence-encrypt': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Rail Fence Encrypt
+     * @description Apply the 'rail-fence-encrypt' transformation to the input text.
+     */
+    post: operations['tool_rail_fence_encrypt_api_v1_text_rail_fence_encrypt_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/rail-fence-decrypt': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Rail Fence Decrypt
+     * @description Apply the 'rail-fence-decrypt' transformation to the input text.
+     */
+    post: operations['tool_rail_fence_decrypt_api_v1_text_rail_fence_decrypt_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/playfair-encrypt': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Playfair Encrypt
+     * @description Apply the 'playfair-encrypt' transformation to the input text.
+     */
+    post: operations['tool_playfair_encrypt_api_v1_text_playfair_encrypt_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/substitution-cipher': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Substitution Cipher
+     * @description Apply the 'substitution-cipher' transformation to the input text.
+     */
+    post: operations['tool_substitution_cipher_api_v1_text_substitution_cipher_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/columnar-transposition': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Columnar Transposition
+     * @description Apply the 'columnar-transposition' transformation to the input text.
+     */
+    post: operations['tool_columnar_transposition_api_v1_text_columnar_transposition_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/nato-phonetic': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * NATO Phonetic
+     * @description Apply the 'nato-phonetic' transformation to the input text.
+     */
+    post: operations['tool_nato_phonetic_api_v1_text_nato_phonetic_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/bacon-cipher': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Bacon Cipher
+     * @description Apply the 'bacon-cipher' transformation to the input text.
+     */
+    post: operations['tool_bacon_cipher_api_v1_text_bacon_cipher_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/base32-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Base32 Encode
+     * @description Apply the 'base32-encode' transformation to the input text.
+     */
+    post: operations['tool_base32_encode_api_v1_text_base32_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/base32-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Base32 Decode
+     * @description Apply the 'base32-decode' transformation to the input text.
+     */
+    post: operations['tool_base32_decode_api_v1_text_base32_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/ascii85-encode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Ascii85 Encode
+     * @description Apply the 'ascii85-encode' transformation to the input text.
+     */
+    post: operations['tool_ascii85_encode_api_v1_text_ascii85_encode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/ascii85-decode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Ascii85 Decode
+     * @description Apply the 'ascii85-decode' transformation to the input text.
+     */
+    post: operations['tool_ascii85_decode_api_v1_text_ascii85_decode_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/xml-to-json': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * XML to JSON
+     * @description Apply the 'xml-to-json' transformation to the input text.
+     */
+    post: operations['tool_xml_to_json_api_v1_text_xml_to_json_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/csv-to-table': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * CSV to Table
+     * @description Apply the 'csv-to-table' transformation to the input text.
+     */
+    post: operations['tool_csv_to_table_api_v1_text_csv_to_table_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/sql-insert-gen': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * SQL INSERT Generator
+     * @description Apply the 'sql-insert-gen' transformation to the input text.
+     */
+    post: operations['tool_sql_insert_gen_api_v1_text_sql_insert_gen_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/reverse': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Reverse Text
+     * @description Apply the 'reverse' transformation to the input text.
+     */
+    post: operations['tool_reverse_api_v1_text_reverse_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/sort-lines-asc': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Sort Lines A-Z
+     * @description Apply the 'sort-lines-asc' transformation to the input text.
+     */
+    post: operations['tool_sort_lines_asc_api_v1_text_sort_lines_asc_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/sort-lines-desc': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Sort Lines Z-A
+     * @description Apply the 'sort-lines-desc' transformation to the input text.
+     */
+    post: operations['tool_sort_lines_desc_api_v1_text_sort_lines_desc_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/remove-duplicate-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Remove Duplicate Lines
+     * @description Apply the 'remove-duplicate-lines' transformation to the input text.
+     */
+    post: operations['tool_remove_duplicate_lines_api_v1_text_remove_duplicate_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/reverse-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Reverse Lines
+     * @description Apply the 'reverse-lines' transformation to the input text.
+     */
+    post: operations['tool_reverse_lines_api_v1_text_reverse_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/number-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Number Lines
+     * @description Apply the 'number-lines' transformation to the input text.
+     */
+    post: operations['tool_number_lines_api_v1_text_number_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/shuffle-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Shuffle Lines
+     * @description Apply the 'shuffle-lines' transformation to the input text.
+     */
+    post: operations['tool_shuffle_lines_api_v1_text_shuffle_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/sort-by-length': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Sort by Length
+     * @description Apply the 'sort-by-length' transformation to the input text.
+     */
+    post: operations['tool_sort_by_length_api_v1_text_sort_by_length_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/sort-numeric': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Sort Numeric
+     * @description Apply the 'sort-numeric' transformation to the input text.
+     */
+    post: operations['tool_sort_numeric_api_v1_text_sort_numeric_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/line-frequency': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Line Frequency
+     * @description Apply the 'line-frequency' transformation to the input text.
+     */
+    post: operations['tool_line_frequency_api_v1_text_line_frequency_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/split-to-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Split to Lines
+     * @description Apply the 'split-to-lines' transformation to the input text.
+     */
+    post: operations['tool_split_to_lines_api_v1_text_split_to_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/join-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Join Lines
+     * @description Apply the 'join-lines' transformation to the input text.
+     */
+    post: operations['tool_join_lines_api_v1_text_join_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/pad-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Pad Lines
+     * @description Apply the 'pad-lines' transformation to the input text.
+     */
+    post: operations['tool_pad_lines_api_v1_text_pad_lines_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -2104,7 +1864,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/xml-to-json': {
+  '/api/v1/text/filter-lines': {
     parameters: {
       query?: never;
       header?: never;
@@ -2114,10 +1874,250 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * XML to JSON
-     * @description Apply the 'xml-to-json' transformation to the input text.
+     * Filter Lines
+     * @description Apply the 'filter-lines' transformation to the input text.
      */
-    post: operations['tool_xml_to_json_api_v1_text_xml_to_json_post'];
+    post: operations['tool_filter_lines_api_v1_text_filter_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/remove-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Remove Lines
+     * @description Apply the 'remove-lines' transformation to the input text.
+     */
+    post: operations['tool_remove_lines_api_v1_text_remove_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/truncate-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Truncate Lines
+     * @description Apply the 'truncate-lines' transformation to the input text.
+     */
+    post: operations['tool_truncate_lines_api_v1_text_truncate_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/extract-nth-lines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Extract Nth Lines
+     * @description Apply the 'extract-nth-lines' transformation to the input text.
+     */
+    post: operations['tool_extract_nth_lines_api_v1_text_extract_nth_lines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/rot13': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * ROT13
+     * @description Apply the 'rot13' transformation to the input text.
+     */
+    post: operations['tool_rot13_api_v1_text_rot13_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/format-json': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Format JSON
+     * @description Apply the 'format-json' transformation to the input text.
+     */
+    post: operations['tool_format_json_api_v1_text_format_json_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/json-to-yaml': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * JSON to YAML
+     * @description Apply the 'json-to-yaml' transformation to the input text.
+     */
+    post: operations['tool_json_to_yaml_api_v1_text_json_to_yaml_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/json-escape': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * JSON Escape
+     * @description Apply the 'json-escape' transformation to the input text.
+     */
+    post: operations['tool_json_escape_api_v1_text_json_escape_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/json-unescape': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * JSON Unescape
+     * @description Apply the 'json-unescape' transformation to the input text.
+     */
+    post: operations['tool_json_unescape_api_v1_text_json_unescape_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/html-escape': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * HTML Escape
+     * @description Apply the 'html-escape' transformation to the input text.
+     */
+    post: operations['tool_html_escape_api_v1_text_html_escape_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/html-unescape': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * HTML Unescape
+     * @description Apply the 'html-unescape' transformation to the input text.
+     */
+    post: operations['tool_html_unescape_api_v1_text_html_unescape_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/csv-to-json': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * CSV to JSON
+     * @description Apply the 'csv-to-json' transformation to the input text.
+     */
+    post: operations['tool_csv_to_json_api_v1_text_csv_to_json_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/text/json-to-csv': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * JSON to CSV
+     * @description Apply the 'json-to-csv' transformation to the input text.
+     */
+    post: operations['tool_json_to_csv_api_v1_text_json_to_csv_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -2193,6 +2193,414 @@ export interface paths {
      *     even if the browser ignores the Max-Age=0 instruction.
      */
     post: operations['clear_session_api_v1_auth_session_clear_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/preferences': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Preferences
+     * @description Return the authenticated user's preferences (theme, persona, skin).
+     */
+    get: operations['get_preferences_api_v1_user_preferences_get'];
+    /**
+     * Update Preferences
+     * @description Update the authenticated user's preferences (partial update).
+     */
+    put: operations['update_preferences_api_v1_user_preferences_put'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/gamification': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Gamification
+     * @description Transitional stub — gamification removed; returns a static zero-state.
+     */
+    get: operations['get_gamification_api_v1_user_gamification_get'];
+    /**
+     * Update Gamification
+     * @description Transitional stub — accepts any body, persists nothing, returns zero-state.
+     */
+    put: operations['update_gamification_api_v1_user_gamification_put'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/templates': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Templates
+     * @description List the authenticated user's saved templates with pagination.
+     *
+     *     Returns templates ordered newest-first so the most recently created
+     *     template appears at the top of the list.
+     */
+    get: operations['list_templates_api_v1_user_templates_get'];
+    put?: never;
+    /**
+     * Create Template
+     * @description Create a new saved template for the authenticated user.
+     */
+    post: operations['create_template_api_v1_user_templates_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/templates/{template_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Update Template
+     * @description Update an existing template owned by the authenticated user.
+     */
+    put: operations['update_template_api_v1_user_templates__template_id__put'];
+    post?: never;
+    /**
+     * Delete Template
+     * @description Delete a template owned by the authenticated user.
+     */
+    delete: operations['delete_template_api_v1_user_templates__template_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/ui-settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Ui Settings
+     * @description Return the authenticated user's UI settings (tool view, keybindings, panel sizes).
+     */
+    get: operations['get_ui_settings_api_v1_user_ui_settings_get'];
+    /**
+     * Update Ui Settings
+     * @description Update the authenticated user's UI settings (partial update).
+     */
+    put: operations['update_ui_settings_api_v1_user_ui_settings_put'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/favorites': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Favorites
+     * @description Return the authenticated user's favorited tools sorted by display order.
+     */
+    get: operations['get_favorites_api_v1_user_favorites_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/favorites/{tool_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Add Favorite
+     * @description Add a tool to the authenticated user's favorites list.
+     *
+     *     Idempotent: returns the existing entry if the tool is already favorited.
+     */
+    post: operations['add_favorite_api_v1_user_favorites__tool_id__post'];
+    /**
+     * Remove Favorite
+     * @description Remove a tool from the authenticated user's favorites list.
+     */
+    delete: operations['remove_favorite_api_v1_user_favorites__tool_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Tool Groups
+     * @description Return all of the authenticated user's tool groups in display order.
+     */
+    get: operations['list_tool_groups_api_v1_user_tool_groups_get'];
+    put?: never;
+    /**
+     * Create Tool Group
+     * @description Create a named tool group, optionally pre-filled with tools.
+     *
+     *     Idempotent by name: if the user already has a group with this name, the
+     *     existing group is returned unchanged (200) — tool_ids are NOT merged in.
+     *     This keeps guest-adoption retries and double-clicked starter-kit cards
+     *     from erroring or duplicating.
+     */
+    post: operations['create_tool_group_api_v1_user_tool_groups_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/order': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Reorder Tool Groups
+     * @description Reorder the authenticated user's tool groups.
+     *
+     *     Groups listed in `group_ids` get sort_order = array position; the user's
+     *     remaining groups keep their relative order after the listed ones. Unknown
+     *     and foreign ids are ignored. Idempotent — resending the same list is a
+     *     no-op. Returns all groups in the new display order.
+     */
+    put: operations['reorder_tool_groups_api_v1_user_tool_groups_order_put'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/{group_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Rename Tool Group
+     * @description Rename a tool group owned by the authenticated user.
+     */
+    put: operations['rename_tool_group_api_v1_user_tool_groups__group_id__put'];
+    post?: never;
+    /**
+     * Delete Tool Group
+     * @description Delete a tool group (and its items) owned by the authenticated user.
+     */
+    delete: operations['delete_tool_group_api_v1_user_tool_groups__group_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/{group_id}/tools/{tool_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Add Tool To Group
+     * @description Add a tool to one of the authenticated user's groups.
+     *
+     *     Idempotent: returns the existing entry if the tool is already in the group.
+     */
+    post: operations['add_tool_to_group_api_v1_user_tool_groups__group_id__tools__tool_id__post'];
+    /**
+     * Remove Tool From Group
+     * @description Remove a tool from one of the authenticated user's groups.
+     */
+    delete: operations['remove_tool_from_group_api_v1_user_tool_groups__group_id__tools__tool_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/{group_id}/tools': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Set Tool Group Tools
+     * @description Replace a group's tools with an explicit ordered list.
+     *
+     *     Array position becomes sort_order, so a single call covers drag-reorder,
+     *     bulk add, and bulk remove. Duplicates keep their first position.
+     *     Idempotent — resending the current list is a no-op.
+     */
+    put: operations['set_tool_group_tools_api_v1_user_tool_groups__group_id__tools_put'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-stats': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Tool Stats
+     * @description Return aggregated tool usage statistics for the authenticated user.
+     */
+    get: operations['get_tool_stats_api_v1_user_tool_stats_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/pipelines': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Pipelines
+     * @description List the authenticated user's active pipelines with pagination.
+     *
+     *     Pipelines are returned newest-first.  Each pipeline eagerly loads its
+     *     steps so the response includes the full pipeline configuration.
+     */
+    get: operations['list_pipelines_api_v1_user_pipelines_get'];
+    put?: never;
+    /**
+     * Create Pipeline
+     * @description Create a new multi-step pipeline for the authenticated user.
+     */
+    post: operations['create_pipeline_api_v1_user_pipelines_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/pipelines/{pipeline_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Update Pipeline
+     * @description Update an existing pipeline (name, description, or steps) for the authenticated user.
+     */
+    put: operations['update_pipeline_api_v1_user_pipelines__pipeline_id__put'];
+    post?: never;
+    /**
+     * Delete Pipeline
+     * @description Soft-delete a pipeline by marking it inactive (sets is_active=False).
+     */
+    delete: operations['delete_pipeline_api_v1_user_pipelines__pipeline_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/discovered-tools': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Discovered Tools
+     * @description Return paginated list of tools the authenticated user has discovered.
+     */
+    get: operations['get_discovered_tools_api_v1_user_discovered_tools_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/spin-history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Spin History
+     * @description Return the authenticated user's most recent 20 spin-wheel entries.
+     */
+    get: operations['get_spin_history_api_v1_user_spin_history_get'];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -2336,434 +2744,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/user/discovered-tools': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Discovered Tools
-     * @description Return paginated list of tools the authenticated user has discovered.
-     */
-    get: operations['get_discovered_tools_api_v1_user_discovered_tools_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/favorites': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Favorites
-     * @description Return the authenticated user's favorited tools sorted by display order.
-     */
-    get: operations['get_favorites_api_v1_user_favorites_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/favorites/{tool_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Add Favorite
-     * @description Add a tool to the authenticated user's favorites list.
-     *
-     *     Idempotent: returns the existing entry if the tool is already favorited.
-     */
-    post: operations['add_favorite_api_v1_user_favorites__tool_id__post'];
-    /**
-     * Remove Favorite
-     * @description Remove a tool from the authenticated user's favorites list.
-     */
-    delete: operations['remove_favorite_api_v1_user_favorites__tool_id__delete'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/gamification': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Gamification
-     * @description Transitional stub — gamification removed; returns a static zero-state.
-     */
-    get: operations['get_gamification_api_v1_user_gamification_get'];
-    /**
-     * Update Gamification
-     * @description Transitional stub — accepts any body, persists nothing, returns zero-state.
-     */
-    put: operations['update_gamification_api_v1_user_gamification_put'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/pipelines': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Pipelines
-     * @description List the authenticated user's active pipelines with pagination.
-     *
-     *     Pipelines are returned newest-first.  Each pipeline eagerly loads its
-     *     steps so the response includes the full pipeline configuration.
-     */
-    get: operations['list_pipelines_api_v1_user_pipelines_get'];
-    put?: never;
-    /**
-     * Create Pipeline
-     * @description Create a new multi-step pipeline for the authenticated user.
-     */
-    post: operations['create_pipeline_api_v1_user_pipelines_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/pipelines/{pipeline_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Update Pipeline
-     * @description Update an existing pipeline (name, description, or steps) for the authenticated user.
-     */
-    put: operations['update_pipeline_api_v1_user_pipelines__pipeline_id__put'];
-    post?: never;
-    /**
-     * Delete Pipeline
-     * @description Soft-delete a pipeline by marking it inactive (sets is_active=False).
-     */
-    delete: operations['delete_pipeline_api_v1_user_pipelines__pipeline_id__delete'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/preferences': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Preferences
-     * @description Return the authenticated user's preferences (theme, persona, skin).
-     */
-    get: operations['get_preferences_api_v1_user_preferences_get'];
-    /**
-     * Update Preferences
-     * @description Update the authenticated user's preferences (partial update).
-     */
-    put: operations['update_preferences_api_v1_user_preferences_put'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/spin-history': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Spin History
-     * @description Return the authenticated user's most recent 20 spin-wheel entries.
-     */
-    get: operations['get_spin_history_api_v1_user_spin_history_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/templates': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Templates
-     * @description List the authenticated user's saved templates with pagination.
-     *
-     *     Returns templates ordered newest-first so the most recently created
-     *     template appears at the top of the list.
-     */
-    get: operations['list_templates_api_v1_user_templates_get'];
-    put?: never;
-    /**
-     * Create Template
-     * @description Create a new saved template for the authenticated user.
-     */
-    post: operations['create_template_api_v1_user_templates_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/templates/{template_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Update Template
-     * @description Update an existing template owned by the authenticated user.
-     */
-    put: operations['update_template_api_v1_user_templates__template_id__put'];
-    post?: never;
-    /**
-     * Delete Template
-     * @description Delete a template owned by the authenticated user.
-     */
-    delete: operations['delete_template_api_v1_user_templates__template_id__delete'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/tool-groups': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Tool Groups
-     * @description Return all of the authenticated user's tool groups in display order.
-     */
-    get: operations['list_tool_groups_api_v1_user_tool_groups_get'];
-    put?: never;
-    /**
-     * Create Tool Group
-     * @description Create a named tool group, optionally pre-filled with tools.
-     *
-     *     Idempotent by name: if the user already has a group with this name, the
-     *     existing group is returned unchanged (200) — tool_ids are NOT merged in.
-     *     This keeps guest-adoption retries and double-clicked starter-kit cards
-     *     from erroring or duplicating.
-     */
-    post: operations['create_tool_group_api_v1_user_tool_groups_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/tool-groups/order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Reorder Tool Groups
-     * @description Reorder the authenticated user's tool groups.
-     *
-     *     Groups listed in `group_ids` get sort_order = array position; the user's
-     *     remaining groups keep their relative order after the listed ones. Unknown
-     *     and foreign ids are ignored. Idempotent — resending the same list is a
-     *     no-op. Returns all groups in the new display order.
-     */
-    put: operations['reorder_tool_groups_api_v1_user_tool_groups_order_put'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/tool-groups/{group_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Rename Tool Group
-     * @description Rename a tool group owned by the authenticated user.
-     */
-    put: operations['rename_tool_group_api_v1_user_tool_groups__group_id__put'];
-    post?: never;
-    /**
-     * Delete Tool Group
-     * @description Delete a tool group (and its items) owned by the authenticated user.
-     */
-    delete: operations['delete_tool_group_api_v1_user_tool_groups__group_id__delete'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/tool-groups/{group_id}/tools': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Set Tool Group Tools
-     * @description Replace a group's tools with an explicit ordered list.
-     *
-     *     Array position becomes sort_order, so a single call covers drag-reorder,
-     *     bulk add, and bulk remove. Duplicates keep their first position.
-     *     Idempotent — resending the current list is a no-op.
-     */
-    put: operations['set_tool_group_tools_api_v1_user_tool_groups__group_id__tools_put'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/tool-groups/{group_id}/tools/{tool_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Add Tool To Group
-     * @description Add a tool to one of the authenticated user's groups.
-     *
-     *     Idempotent: returns the existing entry if the tool is already in the group.
-     */
-    post: operations['add_tool_to_group_api_v1_user_tool_groups__group_id__tools__tool_id__post'];
-    /**
-     * Remove Tool From Group
-     * @description Remove a tool from one of the authenticated user's groups.
-     */
-    delete: operations['remove_tool_from_group_api_v1_user_tool_groups__group_id__tools__tool_id__delete'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/tool-stats': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Tool Stats
-     * @description Return aggregated tool usage statistics for the authenticated user.
-     */
-    get: operations['get_tool_stats_api_v1_user_tool_stats_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/user/ui-settings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Ui Settings
-     * @description Return the authenticated user's UI settings (tool view, keybindings, panel sizes).
-     */
-    get: operations['get_ui_settings_api_v1_user_ui_settings_get'];
-    /**
-     * Update Ui Settings
-     * @description Update the authenticated user's UI settings (partial update).
-     */
-    put: operations['update_ui_settings_api_v1_user_ui_settings_put'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/active': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Active
-     * @description Return the authenticated user's active passes and total credit balance.
-     */
-    get: operations['get_active_api_v1_passes_active_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/v1/passes/catalog': {
     parameters: {
       query?: never;
@@ -2786,43 +2766,20 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/passes/claim-referral': {
+  '/api/v1/passes/active': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
-    put?: never;
     /**
-     * Do Claim Referral
-     * @description Claim a referral code, granting rewards to both the referrer and the new user.
+     * Get Active
+     * @description Return the authenticated user's active passes and total credit balance.
      */
-    post: operations['do_claim_referral_api_v1_passes_claim_referral_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/credit-order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
+    get: operations['get_active_api_v1_passes_active_get'];
     put?: never;
-    /**
-     * Create Credit Order
-     * @description Create a Razorpay order for purchasing a credit pack.
-     *
-     *     Resolves the user's region and returns a Razorpay order with pricing
-     *     in the correct currency.
-     */
-    post: operations['create_credit_order_api_v1_passes_credit_order_post'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -2852,27 +2809,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/passes/referral-code': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Referral Code
-     * @description Get or generate the authenticated user's unique referral code and URL.
-     */
-    get: operations['get_referral_code_api_v1_passes_referral_code_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/spin': {
+  '/api/v1/passes/credit-order': {
     parameters: {
       query?: never;
       header?: never;
@@ -2882,10 +2819,13 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Do Spin
-     * @description Spin the weekly reward wheel for a random prize (pass or credits).
+     * Create Credit Order
+     * @description Create a Razorpay order for purchasing a credit pack.
+     *
+     *     Resolves the user's region and returns a Razorpay order with pricing
+     *     in the correct currency.
      */
-    post: operations['do_spin_api_v1_passes_spin_post'];
+    post: operations['create_credit_order_api_v1_passes_credit_order_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -2918,7 +2858,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/subscription/cancel': {
+  '/api/v1/passes/spin': {
     parameters: {
       query?: never;
       header?: never;
@@ -2928,20 +2868,37 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Cancel Pro
-     * @description Cancel Pro. Access continues until the paid period ends (expires_at).
-     *
-     *     Idempotent: cancelling an already-cancelled in-period plan returns the
-     *     same response without changing anything.
+     * Do Spin
+     * @description Spin the weekly reward wheel for a random prize (pass or credits).
      */
-    post: operations['cancel_pro_api_v1_subscription_cancel_post'];
+    post: operations['do_spin_api_v1_passes_spin_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/subscription/checkout': {
+  '/api/v1/passes/referral-code': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Referral Code
+     * @description Get or generate the authenticated user's unique referral code and URL.
+     */
+    get: operations['get_referral_code_api_v1_passes_referral_code_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/claim-referral': {
     parameters: {
       query?: never;
       header?: never;
@@ -2951,10 +2908,10 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Create Pro Checkout
-     * @description Create a Razorpay order for upgrading to Pro (one-time monthly payment).
+     * Do Claim Referral
+     * @description Claim a referral code, granting rewards to both the referrer and the new user.
      */
-    post: operations['create_pro_checkout_api_v1_subscription_checkout_post'];
+    post: operations['do_claim_referral_api_v1_passes_claim_referral_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -2975,6 +2932,26 @@ export interface paths {
     get: operations['subscription_status_api_v1_subscription_status_get'];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/subscription/checkout': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create Pro Checkout
+     * @description Create a Razorpay order for upgrading to Pro (one-time monthly payment).
+     */
+    post: operations['create_pro_checkout_api_v1_subscription_checkout_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -3003,6 +2980,29 @@ export interface paths {
      *          trustworthy once the order ID is confirmed authentic.
      */
     post: operations['verify_pro_payment_api_v1_subscription_verify_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/subscription/cancel': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Cancel Pro
+     * @description Cancel Pro. Access continues until the paid period ends (expires_at).
+     *
+     *     Idempotent: cancelling an already-cancelled in-period plan returns the
+     *     same response without changing anything.
+     */
+    post: operations['cancel_pro_api_v1_subscription_cancel_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -3059,29 +3059,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/ai/jobs/{job_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Job Status
-     * @description Poll the status of an enqueued AI job.
-     *
-     *     Status values: ``queued``, ``in_progress``, ``complete``, ``failed``, ``not_found``.
-     *     ``result`` is populated (with ``original``, ``result``, ``operation``) when status is ``complete``.
-     */
-    get: operations['get_job_status_api_v1_ai_jobs__job_id__get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/v1/ai/{tool_id}': {
     parameters: {
       query?: never;
@@ -3100,6 +3077,29 @@ export interface paths {
      *     the request body.
      */
     post: operations['run_ai_tool_api_v1_ai__tool_id__post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ai/{tool_id}/stream': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Stream Ai Tool
+     * @description Stream AI tool output via Server-Sent Events (token-by-token).
+     *
+     *     Returns a ``text/event-stream`` response. Only available for registered
+     *     AI tools.
+     */
+    post: operations['stream_ai_tool_api_v1_ai__tool_id__stream_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -3129,23 +3129,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/ai/{tool_id}/stream': {
+  '/api/v1/ai/jobs/{job_id}': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
-    put?: never;
     /**
-     * Stream Ai Tool
-     * @description Stream AI tool output via Server-Sent Events (token-by-token).
+     * Get Job Status
+     * @description Poll the status of an enqueued AI job.
      *
-     *     Returns a ``text/event-stream`` response. Only available for registered
-     *     AI tools.
+     *     Status values: ``queued``, ``in_progress``, ``complete``, ``failed``, ``not_found``.
+     *     ``result`` is populated (with ``original``, ``result``, ``operation``) when status is ``complete``.
      */
-    post: operations['stream_ai_tool_api_v1_ai__tool_id__stream_post'];
+    get: operations['get_job_status_api_v1_ai_jobs__job_id__get'];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -3202,16 +3202,16 @@ export interface components {
      */
     CaesarRequest: {
       /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
        * Shift
        * @description Number of positions to shift each letter.
        * @default 3
        */
       shift: number;
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
     };
     /**
      * FilterRequest
@@ -3219,29 +3219,29 @@ export interface components {
      */
     FilterRequest: {
       /**
-       * Case Sensitive
-       * @description If true, match is case-sensitive.
-       * @default false
+       * Text
+       * @description The input text to be processed.
        */
-      case_sensitive: boolean;
-      /** Compiled Pattern */
-      compiled_pattern?: unknown;
+      text: string;
       /**
        * Pattern
        * @description Word or phrase (or regex pattern) to match against each line.
        */
       pattern: string;
       /**
-       * Text
-       * @description The input text to be processed.
+       * Case Sensitive
+       * @description If true, match is case-sensitive.
+       * @default false
        */
-      text: string;
+      case_sensitive: boolean;
       /**
        * Use Regex
        * @description If true, treat pattern as a regular expression.
        * @default false
        */
       use_regex: boolean;
+      /** Compiled Pattern */
+      compiled_pattern?: unknown;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -3254,21 +3254,26 @@ export interface components {
      */
     KeyedCipherRequest: {
       /**
-       * Key
-       * @description The cipher key or passphrase.
-       */
-      key: string;
-      /**
        * Text
        * @description The input text to be processed.
        */
       text: string;
+      /**
+       * Key
+       * @description The cipher key or passphrase.
+       */
+      key: string;
     };
     /**
      * NthLineRequest
      * @description Payload for extract-nth-lines requests.
      */
     NthLineRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
       /**
        * N
        * @description Extract every Nth line.
@@ -3281,11 +3286,6 @@ export interface components {
        * @default 0
        */
       offset: number;
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
     };
     /**
      * PadRequest
@@ -3293,17 +3293,17 @@ export interface components {
      */
     PadRequest: {
       /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
        * Align
        * @description Alignment direction: left, right, or center.
        * @default left
        * @enum {string}
        */
       align: 'left' | 'right' | 'center';
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
     };
     /**
      * RailFenceRequest
@@ -3311,16 +3311,16 @@ export interface components {
      */
     RailFenceRequest: {
       /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
        * Rails
        * @description Number of rails for the cipher.
        * @default 3
        */
       rails: number;
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
     };
     /**
      * SplitJoinRequest
@@ -3328,16 +3328,16 @@ export interface components {
      */
     SplitJoinRequest: {
       /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
        * Delimiter
        * @description Delimiter or separator character(s).
        * @default ,
        */
       delimiter: string;
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
     };
     /**
      * SubstitutionRequest
@@ -3345,15 +3345,15 @@ export interface components {
      */
     SubstitutionRequest: {
       /**
-       * Mapping
-       * @description 26-character substitution alphabet (A-Z mapping).
-       */
-      mapping: string;
-      /**
        * Text
        * @description The input text to be processed.
        */
       text: string;
+      /**
+       * Mapping
+       * @description 26-character substitution alphabet (A-Z mapping).
+       */
+      mapping: string;
     };
     /**
      * TextRequest
@@ -3373,11 +3373,6 @@ export interface components {
      */
     TextResponse: {
       /**
-       * Operation
-       * @description Name of the operation performed.
-       */
-      operation: string;
-      /**
        * Original
        * @description The original input text.
        */
@@ -3387,6 +3382,11 @@ export interface components {
        * @description The transformed output text.
        */
       result: string;
+      /**
+       * Operation
+       * @description Name of the operation performed.
+       */
+      operation: string;
     };
     /**
      * TruncateRequest
@@ -3394,35 +3394,40 @@ export interface components {
      */
     TruncateRequest: {
       /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
        * Max Length
        * @description Maximum character length per line.
        * @default 80
        */
       max_length: number;
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
     };
     /** ValidationError */
     ValidationError: {
-      /** Context */
-      ctx?: Record<string, never>;
-      /** Input */
-      input?: unknown;
       /** Location */
       loc: (string | number)[];
       /** Message */
       msg: string;
       /** Error Type */
       type: string;
+      /** Input */
+      input?: unknown;
+      /** Context */
+      ctx?: Record<string, never>;
     };
     /**
      * WrapRequest
      * @description Payload for wrap-lines requests.
      */
     WrapRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
       /**
        * Prefix
        * @description Text to prepend to each line.
@@ -3435,41 +3440,36 @@ export interface components {
        * @default
        */
       suffix: string;
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
     };
     /**
      * DiscoveredToolItem
      * @description A single tool the user has discovered.
      */
     DiscoveredToolItem: {
-      /** Discovered At */
-      discovered_at: string;
       /** Tool Id */
       tool_id: string;
+      /** Discovered At */
+      discovered_at: string;
     };
     /**
      * DiscoveredToolsResponse
      * @description List of tools the user has discovered.
      */
     DiscoveredToolsResponse: {
-      /** Count */
-      count: number;
       /** Tools */
       tools: components['schemas']['DiscoveredToolItem'][];
+      /** Count */
+      count: number;
     };
     /**
      * FavoriteToolItem
      * @description A single favorited tool with its sort position.
      */
     FavoriteToolItem: {
-      /** Sort Order */
-      sort_order: number;
       /** Tool Id */
       tool_id: string;
+      /** Sort Order */
+      sort_order: number;
     };
     /**
      * FavoritesResponse
@@ -3484,91 +3484,91 @@ export interface components {
      * @description Schema for recording a new operation history entry.
      */
     HistoryCreate: {
-      /** Input Length */
-      input_length: number;
-      /** Input Preview */
-      input_preview: string;
-      /** Output Length */
-      output_length: number;
-      /** Output Preview */
-      output_preview: string;
-      /**
-       * Status
-       * @default success
-       */
-      status: string;
       /** Tool Id */
       tool_id: string;
       /** Tool Label */
       tool_label: string;
       /** Tool Type */
       tool_type: string;
+      /** Input Preview */
+      input_preview: string;
+      /** Output Preview */
+      output_preview: string;
+      /** Input Length */
+      input_length: number;
+      /** Output Length */
+      output_length: number;
+      /**
+       * Status
+       * @default success
+       */
+      status: string;
     };
     /**
      * HistoryListResponse
      * @description Paginated list of history entries.
      */
     HistoryListResponse: {
-      /** Has More */
-      has_more: boolean;
       /** Items */
       items: components['schemas']['HistoryResponse'][];
+      /** Total */
+      total: number;
       /** Page */
       page: number;
       /** Page Size */
       page_size: number;
-      /** Total */
-      total: number;
+      /** Has More */
+      has_more: boolean;
     };
     /**
      * HistoryResponse
      * @description A single history entry as returned by the API.
      */
     HistoryResponse: {
-      /** Created At */
-      created_at: string;
       /** Id */
       id: string;
-      /** Input Length */
-      input_length: number;
-      /** Input Preview */
-      input_preview: string;
-      /** Output Length */
-      output_length: number;
-      /** Output Preview */
-      output_preview: string;
-      /** Status */
-      status: string;
       /** Tool Id */
       tool_id: string;
       /** Tool Label */
       tool_label: string;
       /** Tool Type */
       tool_type: string;
+      /** Input Preview */
+      input_preview: string;
+      /** Output Preview */
+      output_preview: string;
+      /** Input Length */
+      input_length: number;
+      /** Output Length */
+      output_length: number;
+      /** Status */
+      status: string;
+      /** Created At */
+      created_at: string;
     };
     /**
      * HistoryStatsResponse
      * @description Aggregated statistics across all history entries.
      */
     HistoryStatsResponse: {
-      /** Recent Tools */
-      recent_tools: string[];
+      /** Total Operations */
+      total_operations: number;
       /** Tools Breakdown */
       tools_breakdown: {
         [key: string]: number;
       };
-      /** Total Operations */
-      total_operations: number;
+      /** Recent Tools */
+      recent_tools: string[];
     };
     /**
      * PipelineCreate
      * @description Schema for creating a new pipeline.
      */
     PipelineCreate: {
-      /** Description */
-      description?: string | null;
       /** Name */
       name: string;
+      /** Description */
+      description?: string | null;
       /**
        * Steps
        * @default []
@@ -3580,16 +3580,16 @@ export interface components {
      * @description A full pipeline with all its steps, as returned by the API.
      */
     PipelineResponse: {
-      /** Created At */
-      created_at: string;
-      /** Description */
-      description?: string | null;
       /** Id */
       id: string;
       /** Name */
       name: string;
+      /** Description */
+      description?: string | null;
       /** Steps */
       steps: components['schemas']['PipelineStepResponse'][];
+      /** Created At */
+      created_at: string;
       /** Updated At */
       updated_at: string;
     };
@@ -3598,26 +3598,22 @@ export interface components {
      * @description Input schema for a single pipeline step.
      */
     PipelineStepIn: {
-      /** Config */
-      config?: {
-        [key: string]: unknown;
-      } | null;
       /** Step Order */
       step_order: number;
       /** Tool Id */
       tool_id: string;
       /** Tool Label */
       tool_label: string;
+      /** Config */
+      config?: {
+        [key: string]: unknown;
+      } | null;
     };
     /**
      * PipelineStepResponse
      * @description A single step within a pipeline, as returned by the API.
      */
     PipelineStepResponse: {
-      /** Config */
-      config?: {
-        [key: string]: unknown;
-      } | null;
       /** Id */
       id: string;
       /** Step Order */
@@ -3626,16 +3622,20 @@ export interface components {
       tool_id: string;
       /** Tool Label */
       tool_label: string;
+      /** Config */
+      config?: {
+        [key: string]: unknown;
+      } | null;
     };
     /**
      * PipelineUpdate
      * @description Schema for updating a pipeline. All fields optional.
      */
     PipelineUpdate: {
-      /** Description */
-      description?: string | null;
       /** Name */
       name?: string | null;
+      /** Description */
+      description?: string | null;
       /** Steps */
       steps?: components['schemas']['PipelineStepIn'][] | null;
     };
@@ -3649,13 +3649,13 @@ export interface components {
      *     column drop migration.
      */
     PreferencesResponse: {
-      /** Persona */
-      persona?: string | null;
       /**
        * Theme
        * @default dark
        */
       theme: string;
+      /** Persona */
+      persona?: string | null;
       /** Theme Skin */
       theme_skin?: string | null;
     };
@@ -3677,12 +3677,12 @@ export interface components {
      * @description Schema for creating a shareable link from a tool's output.
      */
     ShareCreate: {
-      /** Output Text */
-      output_text: string;
       /** Tool Id */
       tool_id: string;
       /** Tool Label */
       tool_label: string;
+      /** Output Text */
+      output_text: string;
     };
     /**
      * ShareResponse
@@ -3699,30 +3699,30 @@ export interface components {
      * @description Public view of a shared result (no auth required).
      */
     SharedResultView: {
-      /** Created At */
-      created_at: string;
       /** Id */
       id: string;
-      /** Output Text */
-      output_text: string;
       /** Tool Id */
       tool_id: string;
       /** Tool Label */
       tool_label: string;
+      /** Output Text */
+      output_text: string;
+      /** Created At */
+      created_at: string;
     };
     /**
      * SpinHistoryItem
      * @description A single spin-the-wheel result entry.
      */
     SpinHistoryItem: {
-      /** Iso Week */
-      iso_week: number;
-      /** Reward Ref */
-      reward_ref?: string | null;
-      /** Reward Type */
-      reward_type: string;
       /** Spin Date */
       spin_date: string;
+      /** Reward Type */
+      reward_type: string;
+      /** Reward Ref */
+      reward_ref?: string | null;
+      /** Iso Week */
+      iso_week: number;
     };
     /**
      * SpinHistoryResponse
@@ -3749,8 +3749,6 @@ export interface components {
      * @description Template as returned by the API.
      */
     TemplateResponse: {
-      /** Created At */
-      created_at: string;
       /** Id */
       id: string;
       /** Name */
@@ -3759,6 +3757,8 @@ export interface components {
       text: string;
       /** Tool Id */
       tool_id?: string | null;
+      /** Created At */
+      created_at: string;
       /** Updated At */
       updated_at: string;
     };
@@ -3792,10 +3792,10 @@ export interface components {
      * @description A single tool within a group, with its sort position.
      */
     ToolGroupItemOut: {
-      /** Sort Order */
-      sort_order: number;
       /** Tool Id */
       tool_id: string;
+      /** Sort Order */
+      sort_order: number;
     };
     /**
      * ToolGroupItemsUpdate
@@ -3825,8 +3825,6 @@ export interface components {
      * @description A named tool group with its tools, as returned by the API.
      */
     ToolGroupResponse: {
-      /** Created At */
-      created_at: string;
       /** Id */
       id: string;
       /** Name */
@@ -3835,6 +3833,8 @@ export interface components {
       sort_order: number;
       /** Tools */
       tools: components['schemas']['ToolGroupItemOut'][];
+      /** Created At */
+      created_at: string;
       /** Updated At */
       updated_at: string;
     };
@@ -3859,12 +3859,12 @@ export interface components {
      * @description Usage statistics for a single tool.
      */
     ToolStatItem: {
-      /** Last Used At */
-      last_used_at: string;
       /** Tool Id */
       tool_id: string;
       /** Total Uses */
       total_uses: number;
+      /** Last Used At */
+      last_used_at: string;
     };
     /**
      * ToolStatsResponse
@@ -3880,17 +3880,17 @@ export interface components {
      */
     UiSettingsResponse: {
       /**
+       * Tool View
+       * @default grid
+       */
+      tool_view: string;
+      /**
        * Keybindings
        * @default {}
        */
       keybindings: {
         [key: string]: unknown;
       };
-      /**
-       * Onboarding Seen
-       * @default false
-       */
-      onboarding_seen: boolean;
       /**
        * Panel Sizes
        * @default {}
@@ -3899,62 +3899,62 @@ export interface components {
         [key: string]: unknown;
       };
       /**
-       * Tool View
-       * @default grid
+       * Onboarding Seen
+       * @default false
        */
-      tool_view: string;
+      onboarding_seen: boolean;
     };
     /**
      * UiSettingsUpdate
      * @description Partial update for UI settings. All fields optional.
      */
     UiSettingsUpdate: {
+      /** Tool View */
+      tool_view?: string | null;
       /** Keybindings */
       keybindings?: {
         [key: string]: unknown;
       } | null;
-      /** Onboarding Seen */
-      onboarding_seen?: boolean | null;
       /** Panel Sizes */
       panel_sizes?: {
         [key: string]: unknown;
       } | null;
-      /** Tool View */
-      tool_view?: string | null;
+      /** Onboarding Seen */
+      onboarding_seen?: boolean | null;
     };
     /**
      * UserResponse
      * @description Response containing the authenticated user's profile.
      */
     UserResponse: {
-      /** Display Name */
-      display_name: string;
-      /** Email */
-      email: string;
       /** Id */
       id: string;
-      /**
-       * Is Email Verified
-       * @default false
-       */
-      is_email_verified: boolean;
+      /** Email */
+      email: string;
+      /** Display Name */
+      display_name: string;
       /**
        * Subscription Tier
        * @default free
        */
       subscription_tier: string;
+      /**
+       * Is Email Verified
+       * @default false
+       */
+      is_email_verified: boolean;
     };
     /**
      * ActiveCredit
      * @description A credit pack with remaining balance belonging to the user.
      */
     ActiveCredit: {
+      /** Id */
+      id: string;
       /** Credits Remaining */
       credits_remaining: number;
       /** Credits Total */
       credits_total: number;
-      /** Id */
-      id: string;
       /** Source */
       source: string;
     };
@@ -3963,19 +3963,12 @@ export interface components {
      * @description An active (non-expired) pass belonging to the user.
      */
     ActivePass: {
-      /**
-       * Expires At
-       * Format: date-time
-       */
-      expires_at: string;
       /** Id */
       id: string;
-      /** Name */
-      name: string;
       /** Pass Id */
       pass_id: string;
-      /** Source */
-      source: string;
+      /** Name */
+      name: string;
       /** Tool Ids */
       tool_ids: string[];
       /** Tools Count */
@@ -3984,16 +3977,23 @@ export interface components {
       uses_per_day: number;
       /** Uses Today */
       uses_today: number;
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string;
+      /** Source */
+      source: string;
     };
     /**
      * ActiveResponse
      * @description Response containing active passes, credits, and total credit balance.
      */
     ActiveResponse: {
-      /** Credits */
-      credits: components['schemas']['ActiveCredit'][];
       /** Passes */
       passes: components['schemas']['ActivePass'][];
+      /** Credits */
+      credits: components['schemas']['ActiveCredit'][];
       /** Total Credits */
       total_credits: number;
     };
@@ -4002,10 +4002,10 @@ export interface components {
      * @description Full catalog of available passes and credit packs.
      */
     CatalogResponse: {
-      /** Credit Packs */
-      credit_packs: components['schemas']['CreditPackItem'][];
       /** Passes */
       passes: components['schemas']['PassCatalogItem'][];
+      /** Credit Packs */
+      credit_packs: components['schemas']['CreditPackItem'][];
       /** Region */
       region: string;
     };
@@ -4014,6 +4014,17 @@ export interface components {
      * @description Entitlement check forwarded by text-svc / ai-svc before running a tool.
      */
     CheckAccessRequest: {
+      /** Tool Id */
+      tool_id: string;
+      /**
+       * Tool Type
+       * @default local
+       */
+      tool_type: string;
+      /** Principal Type */
+      principal_type: string;
+      /** User Id */
+      user_id?: string | null;
       /** Email */
       email?: string | null;
       /**
@@ -4023,19 +4034,8 @@ export interface components {
       email_verified: boolean;
       /** Ip Address */
       ip_address?: string | null;
-      /** Principal Type */
-      principal_type: string;
-      /** Tool Id */
-      tool_id: string;
-      /**
-       * Tool Type
-       * @default local
-       */
-      tool_type: string;
       /** User Agent */
       user_agent?: string | null;
-      /** User Id */
-      user_id?: string | null;
     };
     /**
      * CheckAccessResponse
@@ -4044,16 +4044,16 @@ export interface components {
     CheckAccessResponse: {
       /** Allowed */
       allowed: boolean;
-      /** Credits Remaining */
-      credits_remaining?: number | null;
-      /** Max Free */
-      max_free?: number | null;
-      /** Message */
-      message?: string | null;
       /** Reason */
       reason: string;
+      /** Message */
+      message?: string | null;
       /** Uses Today */
       uses_today?: number | null;
+      /** Max Free */
+      max_free?: number | null;
+      /** Credits Remaining */
+      credits_remaining?: number | null;
     };
     /**
      * ClaimReferralRequest
@@ -4088,16 +4088,16 @@ export interface components {
      * @description A single credit pack available for purchase in the catalog.
      */
     CreditPackItem: {
-      /** Credits */
-      credits: number;
-      /** Currency */
-      currency: string;
       /** Id */
       id: string;
       /** Name */
       name: string;
+      /** Credits */
+      credits: number;
       /** Price */
       price: number;
+      /** Currency */
+      currency: string;
       /** Symbol */
       symbol: string;
     };
@@ -4106,24 +4106,24 @@ export interface components {
      * @description A single pass available for purchase in the catalog.
      */
     PassCatalogItem: {
-      /** Currency */
-      currency: string;
-      /** Duration Days */
-      duration_days: number;
       /** Id */
       id: string;
       /** Name */
       name: string;
-      /** Price */
-      price: number;
       /** Subtitle */
       subtitle: string;
-      /** Symbol */
-      symbol: string;
       /** Tools */
       tools: number;
       /** Uses Per Day */
       uses_per_day: number;
+      /** Duration Days */
+      duration_days: number;
+      /** Price */
+      price: number;
+      /** Currency */
+      currency: string;
+      /** Symbol */
+      symbol: string;
     };
     /**
      * PassOrderRequest
@@ -4136,30 +4136,30 @@ export interface components {
        */
       pass_id: string;
       /**
+       * Tool Ids
+       * @description Selected tool IDs (exactly pass.tools entries for scoped passes)
+       */
+      tool_ids?: string[];
+      /**
        * Region
        * @description Browser-detected region (IN, US, GB, EU)
        * @default
        */
       region: string;
-      /**
-       * Tool Ids
-       * @description Selected tool IDs (exactly pass.tools entries for scoped passes)
-       */
-      tool_ids?: string[];
     };
     /**
      * RazorpayOrderResponse
      * @description Response after creating a Razorpay order, with details needed by the client.
      */
     RazorpayOrderResponse: {
+      /** Order Id */
+      order_id: string;
       /** Amount */
       amount: number;
       /** Currency */
       currency: string;
       /** Key Id */
       key_id: string;
-      /** Order Id */
-      order_id: string;
       /** User Email */
       user_email: string;
       /** User Name */
@@ -4170,14 +4170,14 @@ export interface components {
      * @description Response after creating a Razorpay order for Pro subscription.
      */
     RazorpayProOrderResponse: {
+      /** Order Id */
+      order_id: string;
       /** Amount */
       amount: number;
       /** Currency */
       currency: string;
       /** Key Id */
       key_id: string;
-      /** Order Id */
-      order_id: string;
       /** User Email */
       user_email: string;
       /** User Name */
@@ -4200,6 +4200,12 @@ export interface components {
      * @description Request to verify a Razorpay payment (pass or credit).
      */
     RazorpayVerifyRequest: {
+      /** Razorpay Order Id */
+      razorpay_order_id: string;
+      /** Razorpay Payment Id */
+      razorpay_payment_id: string;
+      /** Razorpay Signature */
+      razorpay_signature: string;
       /** Item Id */
       item_id: string;
       /**
@@ -4207,12 +4213,6 @@ export interface components {
        * @description Must be 'pass' or 'credit'
        */
       item_type: string;
-      /** Razorpay Order Id */
-      razorpay_order_id: string;
-      /** Razorpay Payment Id */
-      razorpay_payment_id: string;
-      /** Razorpay Signature */
-      razorpay_signature: string;
       /**
        * Tool Ids
        * @description Required tool IDs for pass purchases
@@ -4234,51 +4234,22 @@ export interface components {
      * @description Result of a weekly spin-the-wheel attempt.
      */
     SpinResult: {
+      /** Reward Type */
+      reward_type: string;
       /** Amount */
       amount?: number | null;
-      /** Message */
-      message: string;
       /** Pass Id */
       pass_id?: string | null;
       /** Pass Name */
       pass_name?: string | null;
-      /** Reward Type */
-      reward_type: string;
+      /** Message */
+      message: string;
     };
     /**
      * SubscriptionStatus
      * @description Current subscription status and usage summary for the user.
      */
     SubscriptionStatus: {
-      /**
-       * Active Passes Count
-       * @default 0
-       */
-      active_passes_count: number;
-      /**
-       * Credit Balance
-       * @default 0
-       */
-      credit_balance: number;
-      /**
-       * Daily Login Bonus
-       * @default false
-       */
-      daily_login_bonus: boolean;
-      /**
-       * Free Uses Per Tool
-       * @default 3
-       */
-      free_uses_per_tool: number;
-      /**
-       * Pro Cancelled
-       * @default false
-       */
-      pro_cancelled: boolean;
-      /** Pro Expires At */
-      pro_expires_at?: string | null;
-      /** Region */
-      region?: string | null;
       /** Tier */
       tier: string;
       /**
@@ -4288,6 +4259,35 @@ export interface components {
       tool_uses_today: {
         [key: string]: unknown;
       };
+      /**
+       * Free Uses Per Tool
+       * @default 3
+       */
+      free_uses_per_tool: number;
+      /**
+       * Daily Login Bonus
+       * @default false
+       */
+      daily_login_bonus: boolean;
+      /**
+       * Credit Balance
+       * @default 0
+       */
+      credit_balance: number;
+      /**
+       * Active Passes Count
+       * @default 0
+       */
+      active_passes_count: number;
+      /** Region */
+      region?: string | null;
+      /** Pro Expires At */
+      pro_expires_at?: string | null;
+      /**
+       * Pro Cancelled
+       * @default false
+       */
+      pro_cancelled: boolean;
     };
     /** EnqueueResponse */
     EnqueueResponse: {
@@ -4303,12 +4303,12 @@ export interface components {
     JobStatusResponse: {
       /** Job Id */
       job_id: string;
+      /** Status */
+      status: string;
       /** Result */
       result?: {
         [key: string]: unknown;
       } | null;
-      /** Status */
-      status: string;
     };
   };
   responses: never;
@@ -4319,1426 +4319,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  tool_alternating_case_api_v1_text_alternating_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_ap_title_case_api_v1_text_ap_title_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_ascii85_decode_api_v1_text_ascii85_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_ascii85_encode_api_v1_text_ascii85_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_atbash_api_v1_text_atbash_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_bacon_cipher_api_v1_text_bacon_cipher_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_base32_decode_api_v1_text_base32_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_base32_encode_api_v1_text_base32_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_base64_decode_api_v1_text_base64_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_base64_encode_api_v1_text_base64_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_binary_decode_api_v1_text_binary_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_binary_encode_api_v1_text_binary_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_brainfuck_decode_api_v1_text_brainfuck_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_brainfuck_encode_api_v1_text_brainfuck_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_caesar_brute_force_api_v1_text_caesar_brute_force_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_caesar_cipher_api_v1_text_caesar_cipher_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CaesarRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_capitalize_words_api_v1_text_capitalize_words_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_cobol_case_api_v1_text_cobol_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_columnar_transposition_api_v1_text_columnar_transposition_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['KeyedCipherRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_constant_case_api_v1_text_constant_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_csv_to_json_api_v1_text_csv_to_json_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_csv_to_table_api_v1_text_csv_to_table_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_decimal_decode_api_v1_text_decimal_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_decimal_encode_api_v1_text_decimal_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_dot_case_api_v1_text_dot_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_extract_nth_lines_api_v1_text_extract_nth_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['NthLineRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_filter_lines_api_v1_text_filter_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FilterRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_fix_line_endings_api_v1_text_fix_line_endings_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_flat_case_api_v1_text_flat_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_format_json_api_v1_text_format_json_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_hex_decode_api_v1_text_hex_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_hex_encode_api_v1_text_hex_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_html_escape_api_v1_text_html_escape_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_html_unescape_api_v1_text_html_unescape_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_inverse_word_case_api_v1_text_inverse_word_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_inversecase_api_v1_text_inversecase_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_join_lines_api_v1_text_join_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SplitJoinRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_json_escape_api_v1_text_json_escape_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_json_to_csv_api_v1_text_json_to_csv_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_json_to_yaml_api_v1_text_json_to_yaml_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_json_unescape_api_v1_text_json_unescape_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_kebab_case_api_v1_text_kebab_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_line_frequency_api_v1_text_line_frequency_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_lower_camel_case_api_v1_text_lower_camel_case_post: {
+  tool_uppercase_api_v1_text_uppercase_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -5804,700 +4385,7 @@ export interface operations {
       };
     };
   };
-  tool_morse_decode_api_v1_text_morse_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_morse_encode_api_v1_text_morse_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_nato_phonetic_api_v1_text_nato_phonetic_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_normalize_punctuation_api_v1_text_normalize_punctuation_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_normalize_whitespace_api_v1_text_normalize_whitespace_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_number_lines_api_v1_text_number_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_octal_decode_api_v1_text_octal_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_octal_encode_api_v1_text_octal_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_pad_lines_api_v1_text_pad_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PadRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_path_case_api_v1_text_path_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_playfair_encrypt_api_v1_text_playfair_encrypt_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['KeyedCipherRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_rail_fence_decrypt_api_v1_text_rail_fence_decrypt_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RailFenceRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_rail_fence_encrypt_api_v1_text_rail_fence_encrypt_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RailFenceRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_remove_accents_api_v1_text_remove_accents_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_remove_all_spaces_api_v1_text_remove_all_spaces_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_remove_duplicate_lines_api_v1_text_remove_duplicate_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_remove_extra_spaces_api_v1_text_remove_extra_spaces_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_remove_line_breaks_api_v1_text_remove_line_breaks_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_remove_lines_api_v1_text_remove_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FilterRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_reverse_api_v1_text_reverse_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_reverse_lines_api_v1_text_reverse_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_rot13_api_v1_text_rot13_post: {
+  tool_inversecase_api_v1_text_inversecase_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -6563,7 +4451,7 @@ export interface operations {
       };
     };
   };
-  tool_shuffle_lines_api_v1_text_shuffle_lines_post: {
+  tool_titlecase_api_v1_text_titlecase_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -6596,7 +4484,40 @@ export interface operations {
       };
     };
   };
-  tool_small_caps_api_v1_text_small_caps_post: {
+  tool_upper_camel_case_api_v1_text_upper_camel_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_lower_camel_case_api_v1_text_lower_camel_case_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -6662,7 +4583,2350 @@ export interface operations {
       };
     };
   };
-  tool_sort_by_length_api_v1_text_sort_by_length_post: {
+  tool_kebab_case_api_v1_text_kebab_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_capitalize_words_api_v1_text_capitalize_words_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_alternating_case_api_v1_text_alternating_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_inverse_word_case_api_v1_text_inverse_word_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_wide_text_api_v1_text_wide_text_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_small_caps_api_v1_text_small_caps_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_upside_down_api_v1_text_upside_down_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strikethrough_api_v1_text_strikethrough_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_ap_title_case_api_v1_text_ap_title_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_swap_word_case_api_v1_text_swap_word_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_dot_case_api_v1_text_dot_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_constant_case_api_v1_text_constant_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_train_case_api_v1_text_train_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_path_case_api_v1_text_path_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_flat_case_api_v1_text_flat_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_cobol_case_api_v1_text_cobol_case_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_remove_extra_spaces_api_v1_text_remove_extra_spaces_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_remove_all_spaces_api_v1_text_remove_all_spaces_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_remove_line_breaks_api_v1_text_remove_line_breaks_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_html_api_v1_text_strip_html_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_remove_accents_api_v1_text_remove_accents_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_toggle_smart_quotes_api_v1_text_toggle_smart_quotes_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_invisible_api_v1_text_strip_invisible_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_emoji_api_v1_text_strip_emoji_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_normalize_whitespace_api_v1_text_normalize_whitespace_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_non_ascii_api_v1_text_strip_non_ascii_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_fix_line_endings_api_v1_text_fix_line_endings_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_markdown_api_v1_text_strip_markdown_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_trim_lines_api_v1_text_trim_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_empty_lines_api_v1_text_strip_empty_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_urls_api_v1_text_strip_urls_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_emails_api_v1_text_strip_emails_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_normalize_punctuation_api_v1_text_normalize_punctuation_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_strip_numbers_api_v1_text_strip_numbers_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_base64_encode_api_v1_text_base64_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_base64_decode_api_v1_text_base64_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_url_encode_api_v1_text_url_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_url_decode_api_v1_text_url_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_hex_encode_api_v1_text_hex_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_hex_decode_api_v1_text_hex_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_morse_encode_api_v1_text_morse_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_morse_decode_api_v1_text_morse_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_binary_encode_api_v1_text_binary_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_binary_decode_api_v1_text_binary_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_octal_encode_api_v1_text_octal_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_octal_decode_api_v1_text_octal_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_decimal_encode_api_v1_text_decimal_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_decimal_decode_api_v1_text_decimal_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_unicode_escape_api_v1_text_unicode_escape_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_unicode_unescape_api_v1_text_unicode_unescape_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_brainfuck_encode_api_v1_text_brainfuck_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_brainfuck_decode_api_v1_text_brainfuck_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_atbash_api_v1_text_atbash_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_caesar_cipher_api_v1_text_caesar_cipher_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CaesarRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_caesar_brute_force_api_v1_text_caesar_brute_force_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_vigenere_encrypt_api_v1_text_vigenere_encrypt_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['KeyedCipherRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_vigenere_decrypt_api_v1_text_vigenere_decrypt_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['KeyedCipherRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_rail_fence_encrypt_api_v1_text_rail_fence_encrypt_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RailFenceRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_rail_fence_decrypt_api_v1_text_rail_fence_decrypt_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RailFenceRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_playfair_encrypt_api_v1_text_playfair_encrypt_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['KeyedCipherRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_substitution_cipher_api_v1_text_substitution_cipher_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubstitutionRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_columnar_transposition_api_v1_text_columnar_transposition_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['KeyedCipherRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_nato_phonetic_api_v1_text_nato_phonetic_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_bacon_cipher_api_v1_text_bacon_cipher_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_base32_encode_api_v1_text_base32_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_base32_decode_api_v1_text_base32_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_ascii85_encode_api_v1_text_ascii85_encode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_ascii85_decode_api_v1_text_ascii85_decode_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_xml_to_json_api_v1_text_xml_to_json_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_csv_to_table_api_v1_text_csv_to_table_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_sql_insert_gen_api_v1_text_sql_insert_gen_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_reverse_api_v1_text_reverse_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -6761,7 +7025,205 @@ export interface operations {
       };
     };
   };
+  tool_remove_duplicate_lines_api_v1_text_remove_duplicate_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_reverse_lines_api_v1_text_reverse_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_number_lines_api_v1_text_number_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_shuffle_lines_api_v1_text_shuffle_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_sort_by_length_api_v1_text_sort_by_length_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
   tool_sort_numeric_api_v1_text_sort_numeric_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_line_frequency_api_v1_text_line_frequency_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -6827,7 +7289,7 @@ export interface operations {
       };
     };
   };
-  tool_sql_insert_gen_api_v1_text_sql_insert_gen_post: {
+  tool_join_lines_api_v1_text_join_lines_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -6836,7 +7298,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['TextRequest'];
+        'application/json': components['schemas']['SplitJoinRequest'];
       };
     };
     responses: {
@@ -6860,7 +7322,7 @@ export interface operations {
       };
     };
   };
-  tool_strikethrough_api_v1_text_strikethrough_post: {
+  tool_pad_lines_api_v1_text_pad_lines_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -6869,865 +7331,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_emails_api_v1_text_strip_emails_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_emoji_api_v1_text_strip_emoji_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_empty_lines_api_v1_text_strip_empty_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_html_api_v1_text_strip_html_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_invisible_api_v1_text_strip_invisible_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_markdown_api_v1_text_strip_markdown_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_non_ascii_api_v1_text_strip_non_ascii_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_numbers_api_v1_text_strip_numbers_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_strip_urls_api_v1_text_strip_urls_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_substitution_cipher_api_v1_text_substitution_cipher_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SubstitutionRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_swap_word_case_api_v1_text_swap_word_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_titlecase_api_v1_text_titlecase_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_toggle_smart_quotes_api_v1_text_toggle_smart_quotes_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_train_case_api_v1_text_train_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_trim_lines_api_v1_text_trim_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_truncate_lines_api_v1_text_truncate_lines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TruncateRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_unicode_escape_api_v1_text_unicode_escape_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_unicode_unescape_api_v1_text_unicode_unescape_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_upper_camel_case_api_v1_text_upper_camel_case_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_uppercase_api_v1_text_uppercase_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_upside_down_api_v1_text_upside_down_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_url_decode_api_v1_text_url_decode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_url_encode_api_v1_text_url_encode_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_vigenere_decrypt_api_v1_text_vigenere_decrypt_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['KeyedCipherRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_vigenere_encrypt_api_v1_text_vigenere_encrypt_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['KeyedCipherRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_wide_text_api_v1_text_wide_text_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
+        'application/json': components['schemas']['PadRequest'];
       };
     };
     responses: {
@@ -7784,7 +7388,403 @@ export interface operations {
       };
     };
   };
-  tool_xml_to_json_api_v1_text_xml_to_json_post: {
+  tool_filter_lines_api_v1_text_filter_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FilterRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_remove_lines_api_v1_text_remove_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FilterRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_truncate_lines_api_v1_text_truncate_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TruncateRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_extract_nth_lines_api_v1_text_extract_nth_lines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NthLineRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_rot13_api_v1_text_rot13_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_format_json_api_v1_text_format_json_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_json_to_yaml_api_v1_text_json_to_yaml_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_json_escape_api_v1_text_json_escape_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_json_unescape_api_v1_text_json_unescape_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_html_escape_api_v1_text_html_escape_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_html_unescape_api_v1_text_html_unescape_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_csv_to_json_api_v1_text_csv_to_json_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  tool_json_to_csv_api_v1_text_json_to_csv_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -7870,6 +7870,817 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  get_preferences_api_v1_user_preferences_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PreferencesResponse'];
+        };
+      };
+    };
+  };
+  update_preferences_api_v1_user_preferences_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PreferencesUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PreferencesResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_gamification_api_v1_user_gamification_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+  };
+  update_gamification_api_v1_user_gamification_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+  };
+  list_templates_api_v1_user_templates_get: {
+    parameters: {
+      query?: {
+        /** @description Page number */
+        page?: number;
+        /** @description Items per page */
+        page_size?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TemplateResponse'][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  create_template_api_v1_user_templates_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TemplateCreate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TemplateResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  update_template_api_v1_user_templates__template_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        template_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TemplateUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TemplateResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  delete_template_api_v1_user_templates__template_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        template_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_ui_settings_api_v1_user_ui_settings_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UiSettingsResponse'];
+        };
+      };
+    };
+  };
+  update_ui_settings_api_v1_user_ui_settings_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UiSettingsUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UiSettingsResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_favorites_api_v1_user_favorites_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FavoritesResponse'];
+        };
+      };
+    };
+  };
+  add_favorite_api_v1_user_favorites__tool_id__post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  remove_favorite_api_v1_user_favorites__tool_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_tool_groups_api_v1_user_tool_groups_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupsResponse'];
+        };
+      };
+    };
+  };
+  create_tool_group_api_v1_user_tool_groups_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupCreate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  reorder_tool_groups_api_v1_user_tool_groups_order_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupOrderUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupsResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  rename_tool_group_api_v1_user_tool_groups__group_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  delete_tool_group_api_v1_user_tool_groups__group_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  add_tool_to_group_api_v1_user_tool_groups__group_id__tools__tool_id__post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  remove_tool_from_group_api_v1_user_tool_groups__group_id__tools__tool_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  set_tool_group_tools_api_v1_user_tool_groups__group_id__tools_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupItemsUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_tool_stats_api_v1_user_tool_stats_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolStatsResponse'];
+        };
+      };
+    };
+  };
+  list_pipelines_api_v1_user_pipelines_get: {
+    parameters: {
+      query?: {
+        /** @description Page number */
+        page?: number;
+        /** @description Items per page */
+        page_size?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PipelineResponse'][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  create_pipeline_api_v1_user_pipelines_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PipelineCreate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PipelineResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  update_pipeline_api_v1_user_pipelines__pipeline_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        pipeline_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PipelineUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PipelineResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  delete_pipeline_api_v1_user_pipelines__pipeline_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        pipeline_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_discovered_tools_api_v1_user_discovered_tools_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DiscoveredToolsResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_spin_history_api_v1_user_spin_history_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SpinHistoryResponse'];
+        };
       };
     };
   };
@@ -8101,11 +8912,10 @@ export interface operations {
       };
     };
   };
-  get_discovered_tools_api_v1_user_discovered_tools_get: {
+  get_catalog_api_v1_passes_catalog_get: {
     parameters: {
       query?: {
-        limit?: number;
-        offset?: number;
+        region?: string;
       };
       header?: never;
       path?: never;
@@ -8119,786 +8929,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['DiscoveredToolsResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_favorites_api_v1_user_favorites_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['FavoritesResponse'];
-        };
-      };
-    };
-  };
-  add_favorite_api_v1_user_favorites__tool_id__post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        tool_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  remove_favorite_api_v1_user_favorites__tool_id__delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        tool_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_gamification_api_v1_user_gamification_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          };
-        };
-      };
-    };
-  };
-  update_gamification_api_v1_user_gamification_put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          };
-        };
-      };
-    };
-  };
-  list_pipelines_api_v1_user_pipelines_get: {
-    parameters: {
-      query?: {
-        /** @description Page number */
-        page?: number;
-        /** @description Items per page */
-        page_size?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PipelineResponse'][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  create_pipeline_api_v1_user_pipelines_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PipelineCreate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PipelineResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  update_pipeline_api_v1_user_pipelines__pipeline_id__put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        pipeline_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PipelineUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PipelineResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  delete_pipeline_api_v1_user_pipelines__pipeline_id__delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        pipeline_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_preferences_api_v1_user_preferences_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PreferencesResponse'];
-        };
-      };
-    };
-  };
-  update_preferences_api_v1_user_preferences_put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PreferencesUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PreferencesResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_spin_history_api_v1_user_spin_history_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SpinHistoryResponse'];
-        };
-      };
-    };
-  };
-  list_templates_api_v1_user_templates_get: {
-    parameters: {
-      query?: {
-        /** @description Page number */
-        page?: number;
-        /** @description Items per page */
-        page_size?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TemplateResponse'][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  create_template_api_v1_user_templates_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TemplateCreate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TemplateResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  update_template_api_v1_user_templates__template_id__put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        template_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TemplateUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TemplateResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  delete_template_api_v1_user_templates__template_id__delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        template_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  list_tool_groups_api_v1_user_tool_groups_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ToolGroupsResponse'];
-        };
-      };
-    };
-  };
-  create_tool_group_api_v1_user_tool_groups_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ToolGroupCreate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ToolGroupResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  reorder_tool_groups_api_v1_user_tool_groups_order_put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ToolGroupOrderUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ToolGroupsResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  rename_tool_group_api_v1_user_tool_groups__group_id__put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        group_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ToolGroupUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ToolGroupResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  delete_tool_group_api_v1_user_tool_groups__group_id__delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        group_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  set_tool_group_tools_api_v1_user_tool_groups__group_id__tools_put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        group_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ToolGroupItemsUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ToolGroupResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  add_tool_to_group_api_v1_user_tool_groups__group_id__tools__tool_id__post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        group_id: string;
-        tool_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  remove_tool_from_group_api_v1_user_tool_groups__group_id__tools__tool_id__delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        group_id: string;
-        tool_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_tool_stats_api_v1_user_tool_stats_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ToolStatsResponse'];
-        };
-      };
-    };
-  };
-  get_ui_settings_api_v1_user_ui_settings_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UiSettingsResponse'];
-        };
-      };
-    };
-  };
-  update_ui_settings_api_v1_user_ui_settings_put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UiSettingsUpdate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UiSettingsResponse'];
+          'application/json': components['schemas']['CatalogResponse'];
         };
       };
       /** @description Validation Error */
@@ -8932,38 +8963,7 @@ export interface operations {
       };
     };
   };
-  get_catalog_api_v1_passes_catalog_get: {
-    parameters: {
-      query?: {
-        region?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CatalogResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  do_claim_referral_api_v1_passes_claim_referral_post: {
+  create_pass_order_api_v1_passes_order_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -8972,7 +8972,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['ClaimReferralRequest'];
+        'application/json': components['schemas']['PassOrderRequest'];
       };
     };
     responses: {
@@ -8982,7 +8982,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': unknown;
+          'application/json': components['schemas']['RazorpayOrderResponse'];
         };
       };
       /** @description Validation Error */
@@ -9029,7 +9029,7 @@ export interface operations {
       };
     };
   };
-  create_pass_order_api_v1_passes_order_post: {
+  verify_pass_payment_api_v1_passes_verify_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -9038,7 +9038,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['PassOrderRequest'];
+        'application/json': components['schemas']['RazorpayVerifyRequest'];
       };
     };
     responses: {
@@ -9048,7 +9048,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['RazorpayOrderResponse'];
+          'application/json': unknown;
         };
       };
       /** @description Validation Error */
@@ -9058,26 +9058,6 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_referral_code_api_v1_passes_referral_code_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ReferralCodeResponse'];
         };
       };
     };
@@ -9102,7 +9082,27 @@ export interface operations {
       };
     };
   };
-  verify_pass_payment_api_v1_passes_verify_post: {
+  get_referral_code_api_v1_passes_referral_code_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReferralCodeResponse'];
+        };
+      };
+    };
+  };
+  do_claim_referral_api_v1_passes_claim_referral_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -9111,7 +9111,80 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['RazorpayVerifyRequest'];
+        'application/json': components['schemas']['ClaimReferralRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  subscription_status_api_v1_subscription_status_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SubscriptionStatus'];
+        };
+      };
+    };
+  };
+  create_pro_checkout_api_v1_subscription_checkout_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['RazorpayProOrderResponse'];
+        };
+      };
+    };
+  };
+  verify_pro_payment_api_v1_subscription_verify_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RazorpayProVerifyRequest'];
       };
     };
     responses: {
@@ -9151,79 +9224,6 @@ export interface operations {
         };
         content: {
           'application/json': unknown;
-        };
-      };
-    };
-  };
-  create_pro_checkout_api_v1_subscription_checkout_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['RazorpayProOrderResponse'];
-        };
-      };
-    };
-  };
-  subscription_status_api_v1_subscription_status_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubscriptionStatus'];
-        };
-      };
-    };
-  };
-  verify_pro_payment_api_v1_subscription_verify_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RazorpayProVerifyRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
         };
       };
     };
@@ -9283,37 +9283,6 @@ export interface operations {
       };
     };
   };
-  get_job_status_api_v1_ai_jobs__job_id__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        job_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['JobStatusResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
   run_ai_tool_api_v1_ai__tool_id__post: {
     parameters: {
       query?: never;
@@ -9332,6 +9301,41 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  stream_ai_tool_api_v1_ai__tool_id__stream_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
         };
       };
       /** @description Validation Error */
@@ -9376,20 +9380,16 @@ export interface operations {
       };
     };
   };
-  stream_ai_tool_api_v1_ai__tool_id__stream_post: {
+  get_job_status_api_v1_ai_jobs__job_id__get: {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        tool_id: string;
+        job_id: string;
       };
       cookie?: never;
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
+    requestBody?: never;
     responses: {
       /** @description Successful Response */
       200: {
@@ -9397,7 +9397,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': unknown;
+          'application/json': components['schemas']['JobStatusResponse'];
         };
       };
       /** @description Validation Error */
