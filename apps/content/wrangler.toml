@@ -5,3 +5,14 @@ compatibility_flags = ["nodejs_compat"]
 
 [assets]
 directory = ".open-next/assets"
+
+# ── Develop environment ──────────────────────────────────────────────────────
+# Deployed by CI from the `develop` branch (wrangler deploy --env develop).
+# Runtime secrets (AUTH_SECRET, COOKIE_SECRET) are per-worker — set them on
+# BOTH workers via the dashboard (Secrets survive deploys; plaintext vars don't).
+[env.develop]
+name = "develop-fixmytext-content"
+
+# Assets are not inherited into env blocks — redeclare.
+[env.develop.assets]
+directory = ".open-next/assets"
