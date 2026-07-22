@@ -99,10 +99,25 @@ export default {
     ) {
       // content app (Next.js SSR — SEO pages + share OG cards). Must go through
       // the service binding: a plain fetch to a same-account workers.dev URL is
-      // blocked by Cloudflare and returns the edge's placeholder 404. Plain
-      // fetch kept as a local-dev fallback only.
-      const target = new Request(`${env.CONTENT_URL}${pathname}${search}`, request);
-      res = env.CONTENT ? await env.CONTENT.fetch(target) : await fetch(target);
+      // blocked by Cloudflare and returns the edge's placeholder 404.
+      if (env.CONTENT) {
+        // Bindings ignore the URL's hostname — forward the request as-is so the
+        // content app sees the public origin (its redirects and derived URLs
+        // stay on it, never on the internal workers.dev host).
+        res = await env.CONTENT.fetch(request);
+      } else if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+        // Local-dev fallback (wrangler dev without the content worker bound).
+        res = await fetch(`${env.CONTENT_URL}${pathname}${search}`, request);
+      } else {
+        // Fail loudly: without the binding a plain fetch degrades into the
+        // edge's placeholder 404, which masquerades as a content-app 404.
+        return withSecurityHeaders(
+          new Response('Router misconfigured: CONTENT service binding is missing', {
+            status: 500,
+          }),
+          env
+        );
+      }
     } else {
       // everything else → shell SPA (owns the origin root; built with base '/',
       // Pages' index.html fallback handles client-side routes)

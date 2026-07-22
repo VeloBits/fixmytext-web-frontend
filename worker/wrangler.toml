@@ -15,8 +15,8 @@ CONTENT_URL         = "https://fixmytext-content.velobits.workers.dev"
 
 # Same-account worker→worker fetches over workers.dev never reach the target
 # (Cloudflare serves its placeholder 404 instead) — the content app must be
-# reached via a service binding. CONTENT_URL above is only used to build the
-# request URL (and as a plain-fetch fallback in local dev).
+# reached via a service binding. CONTENT_URL is only used by the local-dev
+# plain-fetch fallback (the binding forwards the original request untouched).
 [[services]]
 binding = "CONTENT"
 service = "fixmytext-content"
