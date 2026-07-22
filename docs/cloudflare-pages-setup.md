@@ -97,12 +97,13 @@ need `NEXT_PUBLIC_SITE_URL` per environment (content OG/canonical URLs).
 
 ## Deploying
 
-- Merge to `develop` / `main` → Frontend CI → on success, Deploy runs for that branch's
-  environment, in dependency order, deploying **only apps whose inputs changed** since
-  their `deployed/<env>/<app>` tag (own `apps/<app>/` dir + `packages/` + root manifests;
-  `worker/` for the router).
-- Manual: Actions → "Deploy (Cloudflare)" → Run workflow from the branch — deploys
-  everything unless `only_changed` is ticked.
+- **develop (auto):** merge to `develop` → Frontend CI → on success, Deploy runs for the
+  develop environment, in dependency order, deploying **only apps whose inputs changed**
+  since their `deployed/develop/<app>` tag (own `apps/<app>/` dir + `packages/` + root
+  manifests; `worker/` for the router).
+- **production (manual-only):** merging to `main` deploys nothing. Release via Actions →
+  "Deploy (Cloudflare)" → Run workflow from `main` — deploys everything unless
+  `only_changed` is ticked. Branch protection keeps main CI-green.
 - Rollback: dashboard → the project/worker for that environment → Deployments →
   *Rollback* (pick the right track: production vs `develop` branch deployments); or
   re-run the workflow on a known-good SHA. `@velobits/app-core` is a pinned singleton —
