@@ -8,18 +8,20 @@
 
 import type {
   FavoritesContextValue,
+  SidebarChipsContextValue,
   SubscriptionContextValue,
   ToolGroupsContextValue,
   User,
 } from './types/context';
-import type { AlertLevel } from './types/alert';
+import type { AlertLevel, ShowAlertFn } from './types/alert';
 
 export interface EditorPageProps {
   mode: string;
   setMode: (mode: string) => void;
-  showAlert: (message: string, type: string) => void;
+  showAlert: ShowAlertFn;
   toolGroups: ToolGroupsContextValue;
   favorites: FavoritesContextValue;
+  sidebarChips: SidebarChipsContextValue;
   user: User | null;
   isAuthenticated: boolean;
   subscription: SubscriptionContextValue;

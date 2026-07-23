@@ -113,6 +113,32 @@
   border-left-color: var(--activitybar-fg);
 }
 
+/* Group-chip monogram (group / custom-group chips have no glyph icon) */
+.tu-activity-chip-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid currentColor;
+  border-radius: var(--r-sm);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ⋯ overflow + customize triggers sit visually lighter than view chips */
+.tu-activity-btn--more,
+.tu-activity-btn--edit {
+  height: 30px;
+  opacity: 0.75;
+}
+.tu-activity-btn--more:hover,
+.tu-activity-btn--edit:hover {
+  opacity: 1;
+}
+
 /* VSCode-style tooltip (appears right of button) */
 .tu-activity-btn[data-tooltip]::after {
   content: attr(data-tooltip);

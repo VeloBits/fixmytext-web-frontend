@@ -133,6 +133,19 @@ export default function useToolGroups(): ToolGroupsContextValue {
     if (!isAuthenticated || !dbGroups) return;
     const serverGroups = serverToView(dbGroups as ServerGroups);
     if (serverGroups.length > 0) {
+      // Adoption just swapped local- ids for server UUIDs (create is by-name,
+      // so name is the join key). Broadcast the mapping before overwriting the
+      // mirror — sidebar chips referencing these groups remap instead of
+      // dangling (useSidebarChips listens).
+      const idMap: Record<string, string> = {};
+      for (const local of loadGuestGroups()) {
+        if (!isLocalId(local.id)) continue;
+        const adopted = serverGroups.find((g) => g.name === local.name);
+        if (adopted) idMap[local.id] = adopted.id;
+      }
+      if (Object.keys(idMap).length > 0) {
+        window.dispatchEvent(new CustomEvent('fmx:tool-groups-adopted', { detail: { idMap } }));
+      }
       setGroups(serverGroups);
       // Mirror into the local copy: after logout this browser falls back to
       // guest state, and the mirror keeps groups visible (and the onboarding
@@ -187,13 +200,18 @@ export default function useToolGroups(): ToolGroupsContextValue {
     (name: string, toolIds: string[] = []): void => {
       const trimmed = name.trim();
       if (!trimmed) return;
+      // Generated OUTSIDE the updater: StrictMode re-invokes updaters, and an
+      // id minted inside produced two different ids — state kept one while the
+      // localStorage mirror kept the other, so anything referencing the group
+      // by id (sidebar chips) dangled after reload.
+      const newId = newLocalId();
       setGroups((prev) => {
         // Idempotent by name, same as the server
         if (prev.length >= MAX_TOOL_GROUPS || prev.some((g) => g.name === trimmed)) {
           return prev;
         }
         const seeded = dedupe(toolIds).slice(0, MAX_TOOLS_PER_GROUP);
-        const next = [...prev, { id: newLocalId(), name: trimmed, toolIds: seeded }];
+        const next = [...prev, { id: newId, name: trimmed, toolIds: seeded }];
         persist(next);
         if (isAuthenticated) {
           apiCreateGroup({ name: trimmed, tool_ids: seeded })

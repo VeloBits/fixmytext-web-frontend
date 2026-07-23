@@ -1,5 +1,12 @@
 import { ENDPOINTS } from '@velobits/api-client';
-import type { ToolDefinition, StarterKit, UseCaseTab, SmartSuggestionRule } from './types';
+import type {
+  ToolDefinition,
+  StarterKit,
+  UseCaseTab,
+  SmartSuggestionRule,
+  SidebarChip,
+  SidebarView,
+} from './types';
 
 /* ═══════════════════════════════════════════════════════
    Tool & Category Configuration — Data-driven tool system
@@ -16,7 +23,6 @@ export const STARTER_KITS: StarterKit[] = [
     label: 'Writer / Blogger',
     icon: 'Wr',
     groupName: 'Writing essentials',
-    defaultTab: 'writing',
     toolIds: ['fix_grammar', 'paraphrase', 'change_tone', 'proofread'],
   },
   {
@@ -24,7 +30,6 @@ export const STARTER_KITS: StarterKit[] = [
     label: 'Student',
     icon: 'St',
     groupName: 'Study essentials',
-    defaultTab: 'writing',
     toolIds: ['summarize', 'eli5', 'translate'],
   },
   {
@@ -32,7 +37,6 @@ export const STARTER_KITS: StarterKit[] = [
     label: 'Developer',
     icon: '</>',
     groupName: 'Developer toolkit',
-    defaultTab: 'code',
     toolIds: ['json_fmt', 'regex_test', 'base64_enc', 'jwt_decode'],
   },
   {
@@ -40,7 +44,6 @@ export const STARTER_KITS: StarterKit[] = [
     label: 'Social Media',
     icon: '@s',
     groupName: 'Social media kit',
-    defaultTab: 'ai',
     toolIds: ['hashtags', 'seo_titles', 'tweet_shorten', 'meta_desc'],
   },
   {
@@ -49,11 +52,13 @@ export const STARTER_KITS: StarterKit[] = [
     label: 'Just Exploring',
     icon: '?>',
     groupName: '',
-    defaultTab: 'all',
     toolIds: [],
   },
 ];
 
+// No longer the sidebar navigation (replaced by SIDEBAR_VIEWS chips,
+// 2026-07-22). Still the category vocabulary for the dashboard/landing
+// category cards, the About pages, and the command-palette tag.
 export const USE_CASE_TABS: UseCaseTab[] = [
   { id: 'all', label: 'All Tools', icon: '*', color: 'gray' },
   { id: 'writing', label: 'Writing', icon: 'Wr', color: 'pink' },
@@ -63,6 +68,40 @@ export const USE_CASE_TABS: UseCaseTab[] = [
   { id: 'language', label: 'Language', icon: 'Lg', color: 'indigo' },
   { id: 'encode', label: 'Encode & Hash', icon: '#e', color: 'indigo' },
 ];
+
+// ── Sidebar chips ─────────────────────────────────────────
+// The editor sidebar's navigation row. Smart views answer "which slice of my
+// tools" (orthogonal to the group taxonomy below); group/custom_group chips
+// are one-click filters whose labels are identical to the section headers.
+
+export const SIDEBAR_VIEWS: SidebarView[] = [
+  { id: 'all', label: 'All Tools' },
+  { id: 'pinned', label: 'Pinned' },
+  { id: 'recent', label: 'Recent' },
+  { id: 'suggested', label: 'Suggested' },
+];
+
+/** The uncustomized chip row. 'view:all' is never removable. */
+export const DEFAULT_SIDEBAR_CHIPS: SidebarChip[] = SIDEBAR_VIEWS.map((v) => ({
+  type: 'view',
+  id: v.id,
+}));
+
+/** Serialize a chip to the string key used as activeTab state ('view:all'). */
+export function chipKey(chip: SidebarChip): string {
+  return `${chip.type}:${chip.id}`;
+}
+
+/** Parse a chip key back into a chip; null for non-chip keys ('_templates'). */
+export function parseChipKey(key: string | null): SidebarChip | null {
+  if (!key) return null;
+  const sep = key.indexOf(':');
+  if (sep === -1) return null;
+  const type = key.slice(0, sep);
+  const id = key.slice(sep + 1);
+  if ((type !== 'view' && type !== 'group' && type !== 'custom_group') || !id) return null;
+  return { type, id };
+}
 
 /*
   Tool type:

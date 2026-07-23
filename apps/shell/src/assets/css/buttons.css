@@ -82,6 +82,25 @@
   color: var(--text);
 }
 
+/* Inline action (e.g. Undo) — always visible, unlike the hover-only close */
+.tu-toast-action {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.tu-toast-action:hover {
+  background: var(--list-hover);
+}
+
 /* Left accent stripe */
 .tu-toast--success {
   border-left: 3px solid var(--emerald);

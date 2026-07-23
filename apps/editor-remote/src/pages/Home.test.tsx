@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import Home from './Home';
 import type {
   FavoritesContextValue,
+  SidebarChipsContextValue,
   SubscriptionContextValue,
   ToolGroupsContextValue,
 } from '@velobits/app-core/types/context';
@@ -28,6 +29,16 @@ const baseProps = {
     removeToolFromGroup: vi.fn(),
   } as ToolGroupsContextValue,
   favorites: { favorites: [], toggleFavorite: vi.fn() } as FavoritesContextValue,
+  sidebarChips: {
+    chips: [{ type: 'view', id: 'all' }],
+    ready: true,
+    isCustomized: false,
+    addChip: vi.fn(),
+    removeChip: vi.fn(),
+    moveChip: vi.fn(),
+    setChips: vi.fn(),
+    resetChips: vi.fn(),
+  } as SidebarChipsContextValue,
   user: null,
   isAuthenticated: false,
   subscription: {} as unknown as SubscriptionContextValue,
@@ -43,6 +54,7 @@ describe('Home', () => {
     expect(content).toContain('showAlert');
     expect(content).toContain('toolGroups');
     expect(content).toContain('favorites');
+    expect(content).toContain('sidebarChips');
     expect(content).toContain('subscription');
   });
 });

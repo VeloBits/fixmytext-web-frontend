@@ -86,6 +86,17 @@ function Toast({ alert, onDismiss }: ToastProps) {
     >
       <span className="tu-toast-icon">{ICONS[alert.type] ?? ICONS.info}</span>
       <span className="tu-toast-msg">{alert.msg}</span>
+      {alert.action && (
+        <button
+          className="tu-toast-action"
+          onClick={() => {
+            alert.action?.onClick();
+            handleDismiss();
+          }}
+        >
+          {alert.action.label}
+        </button>
+      )}
       <button className="tu-toast-close" onClick={handleDismiss} aria-label="Dismiss">
         <svg
           width="12"

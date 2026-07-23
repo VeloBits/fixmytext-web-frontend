@@ -131,6 +131,15 @@ export const DropletIcon = createIcon(
   <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
 );
 
+export const EllipsisIcon = createIcon(
+  'EllipsisIcon',
+  <>
+    <circle cx="12" cy="12" r="1" />
+    <circle cx="19" cy="12" r="1" />
+    <circle cx="5" cy="12" r="1" />
+  </>
+);
+
 export const FileTextIcon = createIcon(
   'FileTextIcon',
   <>
@@ -183,6 +192,18 @@ export const GraduationCapIcon = createIcon(
     <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
     <path d="M22 10v6" />
     <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
+  </>
+);
+
+export const GripVerticalIcon = createIcon(
+  'GripVerticalIcon',
+  <>
+    <circle cx="9" cy="12" r="1" />
+    <circle cx="9" cy="5" r="1" />
+    <circle cx="9" cy="19" r="1" />
+    <circle cx="15" cy="12" r="1" />
+    <circle cx="15" cy="5" r="1" />
+    <circle cx="15" cy="19" r="1" />
   </>
 );
 
@@ -321,6 +342,14 @@ export const RotateCcwIcon = createIcon(
   <>
     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
     <path d="M3 3v5h5" />
+  </>
+);
+
+export const SearchIcon = createIcon(
+  'SearchIcon',
+  <>
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.3-4.3" />
   </>
 );
 

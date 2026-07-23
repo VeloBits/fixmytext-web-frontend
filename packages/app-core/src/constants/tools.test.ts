@@ -10,12 +10,11 @@ describe('STARTER_KITS', () => {
     expect(ids).toEqual(['writer', 'student', 'developer', 'social', 'explorer']);
   });
 
-  it('each kit has label, icon, groupName, defaultTab, and toolIds', () => {
+  it('each kit has label, icon, groupName, and toolIds', () => {
     for (const kit of STARTER_KITS) {
       expect(typeof kit.label).toBe('string');
       expect(typeof kit.icon).toBe('string');
       expect(typeof kit.groupName).toBe('string');
-      expect(typeof kit.defaultTab).toBe('string');
       expect(Array.isArray(kit.toolIds)).toBe(true);
     }
   });
