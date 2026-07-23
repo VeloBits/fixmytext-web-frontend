@@ -127,6 +127,18 @@ vi.mock('@velobits/app-core/hooks/useFavorites', () => ({
     toggleFavorite: vi.fn(),
   }),
 }));
+vi.mock('@velobits/app-core/hooks/useSidebarChips', () => ({
+  default: () => ({
+    chips: [{ type: 'view', id: 'all' }],
+    ready: true,
+    isCustomized: false,
+    addChip: vi.fn(),
+    removeChip: vi.fn(),
+    moveChip: vi.fn(),
+    setChips: vi.fn(),
+    resetChips: vi.fn(),
+  }),
+}));
 vi.mock('@velobits/app-core/hooks/useSubscription', () => ({
   default: () => ({
     showUpgradeModal: false,

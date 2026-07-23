@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { TOOLS, TOOL_GROUPS, USE_CASE_TABS, STARTER_KITS } from '../src/tools';
+import {
+  TOOLS,
+  TOOL_GROUPS,
+  USE_CASE_TABS,
+  STARTER_KITS,
+  SIDEBAR_VIEWS,
+  DEFAULT_SIDEBAR_CHIPS,
+  chipKey,
+  parseChipKey,
+} from '../src/tools';
 import { getToolBySlug, getAllSlugs, getToolsByGroup, getAllGroups } from '../src/slugs';
 
 describe('TOOLS registry', () => {
@@ -51,6 +60,35 @@ describe('USE_CASE_TABS', () => {
   });
 });
 
+describe('SIDEBAR_VIEWS / chips', () => {
+  it('defines the four smart views, all-first', () => {
+    expect(SIDEBAR_VIEWS.map((v) => v.id)).toEqual(['all', 'pinned', 'recent', 'suggested']);
+  });
+
+  it('default chip row mirrors the smart views', () => {
+    expect(DEFAULT_SIDEBAR_CHIPS).toEqual(
+      SIDEBAR_VIEWS.map((v) => ({ type: 'view', id: v.id }))
+    );
+  });
+
+  it('chipKey/parseChipKey round-trip', () => {
+    for (const chip of [
+      { type: 'view' as const, id: 'all' },
+      { type: 'group' as const, id: 'hashing' },
+      { type: 'custom_group' as const, id: 'b3d2f8aa-1111-4444-8888-000000000000' },
+    ]) {
+      expect(parseChipKey(chipKey(chip))).toEqual(chip);
+    }
+  });
+
+  it('parseChipKey rejects special panel ids and garbage', () => {
+    expect(parseChipKey('_templates')).toBeNull();
+    expect(parseChipKey('persona:writer')).toBeNull();
+    expect(parseChipKey('view:')).toBeNull();
+    expect(parseChipKey(null)).toBeNull();
+  });
+});
+
 describe('STARTER_KITS', () => {
   it('every toolIds entry references a known tool', () => {
     const toolIds = new Set(TOOLS.map((t) => t.id));
@@ -61,12 +99,6 @@ describe('STARTER_KITS', () => {
     }
   });
 
-  it('every defaultTab is a valid use-case tab', () => {
-    const tabIds = new Set<string>(USE_CASE_TABS.map((t) => t.id));
-    for (const kit of STARTER_KITS) {
-      expect(tabIds.has(kit.defaultTab), `${kit.id}: unknown tab '${kit.defaultTab}'`).toBe(true);
-    }
-  });
 
   it('every kit except explorer seeds a named, non-empty group', () => {
     for (const kit of STARTER_KITS) {

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ToolPanel from './ToolPanel';
+import { DEFAULT_SIDEBAR_CHIPS } from '@velobits/app-core/constants/tools';
 import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 // Mock framer-motion
@@ -32,6 +33,16 @@ vi.mock('framer-motion', () => {
     motion: new Proxy({}, { get: (_, t: string) => (cache[t] ??= m(t)) }),
     AnimatePresence: ({ children }: { children?: ReactNode }) => children,
     useReducedMotion: () => false,
+    // ChipEditor uses Reorder.Group/Item with an `as` prop
+    Reorder: {
+      Group: ({ children, as = 'div' }: { children?: ReactNode; as?: string; [k: string]: unknown }) =>
+        React.createElement(as, {}, children),
+      Item: ({ children, as = 'div', ...props }: { children?: ReactNode; as?: string; [k: string]: unknown }) => {
+        const p = { ...props };
+        ['value', 'onDragEnd', 'drag', 'dragListener', 'dragControls'].forEach((k) => delete p[k]);
+        return React.createElement(as, p as Record<string, unknown>, children);
+      },
+    },
   };
 });
 
@@ -102,17 +113,31 @@ const makeToolGroups = (groups: { id: string; name: string; toolIds: string[] }[
   groups,
 });
 
+const makeSidebarChips = (chips = DEFAULT_SIDEBAR_CHIPS) => ({
+  chips,
+  ready: true,
+  isCustomized: false,
+  addChip: vi.fn(),
+  removeChip: vi.fn(),
+  moveChip: vi.fn(),
+  setChips: vi.fn(),
+  resetChips: vi.fn(),
+});
+
 const defaultProps = {
   tools: sampleTools,
-  activeTab: 'all',
-  onTabChange: vi.fn(),
+  activeChipKey: 'view:all',
+  onChipChange: vi.fn(),
   onToolClick: vi.fn(),
   disabled: false,
   // Favorites are their own standalone context.
   favorites: { favorites: [] as string[], toggleFavorite: vi.fn() },
   toolGroups: emptyToolGroups,
+  sidebarChips: makeSidebarChips(),
+  recentToolIds: [] as string[],
+  showAlert: vi.fn(),
   activeToolId: null,
-  hideTabs: false,
+  hideChips: false,
   viewMode: 'list',
   suggestedToolIds: [],
 };
@@ -127,56 +152,91 @@ describe('ToolPanel', () => {
     expect(document.querySelector('.tu-tpanel')).toBeInTheDocument();
   });
 
-  it('renders tab buttons when hideTabs=false', () => {
+  it('renders chip buttons when hideChips=false', () => {
     render(<ToolPanel {...defaultProps} />);
-    // USE_CASE_TABS includes 'All Tools' tab
+    // Default row: All Tools · Pinned · Recent (Suggested hides at 0)
     expect(screen.getByText('All Tools')).toBeInTheDocument();
+    expect(screen.getByText('Pinned')).toBeInTheDocument();
+    expect(screen.getByText('Recent')).toBeInTheDocument();
   });
 
-  it('does not render tabs when hideTabs=true', () => {
-    render(<ToolPanel {...defaultProps} hideTabs={true} />);
+  it('does not render chips when hideChips=true', () => {
+    render(<ToolPanel {...defaultProps} hideChips={true} />);
     expect(document.querySelector('.tu-tpanel-tabs')).not.toBeInTheDocument();
   });
 
-  it('renders all tools when activeTab=all', () => {
-    render(<ToolPanel {...defaultProps} activeTab="all" />);
+  it('hides the Suggested chip when there are no suggestions', () => {
+    render(<ToolPanel {...defaultProps} suggestedToolIds={[]} />);
+    expect(screen.queryByText('Suggested')).not.toBeInTheDocument();
+  });
+
+  it('shows the Suggested chip when suggestions exist', () => {
+    render(<ToolPanel {...defaultProps} suggestedToolIds={['uppercase']} />);
+    expect(screen.getByText('Suggested')).toBeInTheDocument();
+  });
+
+  it('renders all tools when the All view is active', () => {
+    render(<ToolPanel {...defaultProps} activeChipKey="view:all" />);
     expect(screen.getByText('UPPERCASE')).toBeInTheDocument();
     expect(screen.getByText('lowercase')).toBeInTheDocument();
     expect(screen.getByText('Fix Grammar')).toBeInTheDocument();
     expect(screen.getByText('Base64 Encode')).toBeInTheDocument();
   });
 
-  it('filters tools by activeTab', () => {
-    const writingTools = [
-      {
-        id: 'fix_grammar',
-        label: 'Fix Grammar',
-        icon: 'FG',
-        color: 'pink',
-        group: 'ai_writing',
-        tabs: ['writing', 'ai'],
-        type: 'ai',
-      },
-      {
-        id: 'uppercase',
-        label: 'UPPERCASE',
-        icon: 'UC',
-        color: 'violet',
-        group: 'case',
-        tabs: ['transform'],
-        type: 'api',
-      },
-    ] as unknown as ToolDefinition[];
-    render(<ToolPanel {...defaultProps} tools={writingTools} activeTab="writing" />);
+  it('filters tools by a group chip', () => {
+    render(<ToolPanel {...defaultProps} activeChipKey="group:ai_writing" />);
     expect(screen.getByText('Fix Grammar')).toBeInTheDocument();
     expect(screen.queryByText('UPPERCASE')).not.toBeInTheDocument();
   });
 
-  it('calls onTabChange when a tab is clicked', () => {
-    const onTabChange = vi.fn();
-    render(<ToolPanel {...defaultProps} onTabChange={onTabChange} />);
-    fireEvent.click(screen.getByText('Writing'));
-    expect(onTabChange).toHaveBeenCalledWith('writing');
+  it('shows only favorited tools in the Pinned view', () => {
+    render(
+      <ToolPanel
+        {...defaultProps}
+        activeChipKey="view:pinned"
+        favorites={{ favorites: ['base64'], toggleFavorite: vi.fn() }}
+      />
+    );
+    expect(screen.getByText('Base64 Encode')).toBeInTheDocument();
+    expect(screen.queryByText('UPPERCASE')).not.toBeInTheDocument();
+  });
+
+  it('shows recents in recency order in the Recent view', () => {
+    render(
+      <ToolPanel {...defaultProps} activeChipKey="view:recent" recentToolIds={['base64', 'uppercase']} />
+    );
+    const names = Array.from(document.querySelectorAll('.tu-titem-name')).map(
+      (n) => n.textContent
+    );
+    expect(names).toEqual(['Base64 Encode', 'UPPERCASE']);
+  });
+
+  it('shows an empty hint in the Pinned view with no favorites', () => {
+    render(<ToolPanel {...defaultProps} activeChipKey="view:pinned" />);
+    expect(screen.getByText(/No pinned tools yet/)).toBeInTheDocument();
+  });
+
+  it('calls onChipChange when a chip is clicked', () => {
+    const onChipChange = vi.fn();
+    render(<ToolPanel {...defaultProps} onChipChange={onChipChange} />);
+    fireEvent.click(screen.getByText('Pinned'));
+    expect(onChipChange).toHaveBeenCalledWith('view:pinned');
+  });
+
+  it('filters the whole catalog from the search box regardless of active chip', () => {
+    render(<ToolPanel {...defaultProps} activeChipKey="group:case" />);
+    expect(screen.queryByText('Base64 Encode')).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Filter tools'), { target: { value: 'base64' } });
+    expect(screen.getByText('Base64 Encode')).toBeInTheDocument();
+    expect(screen.queryByText('UPPERCASE')).not.toBeInTheDocument();
+  });
+
+  it('opens the chip editor from the + chip', () => {
+    render(<ToolPanel {...defaultProps} />);
+    fireEvent.click(screen.getByLabelText('Customize sidebar'));
+    expect(screen.getByRole('dialog', { name: 'Customize sidebar' })).toBeInTheDocument();
+    // Catalog groups are addable
+    expect(screen.getByText('Catalog')).toBeInTheDocument();
   });
 
   it('calls onToolClick when a tool is clicked', () => {
@@ -187,13 +247,13 @@ describe('ToolPanel', () => {
   });
 
   it('renders group headers for grouped tools', () => {
-    render(<ToolPanel {...defaultProps} activeTab="all" />);
+    render(<ToolPanel {...defaultProps} activeChipKey="view:all" />);
     // Group labels come from TOOL_GROUPS - 'case' maps to 'Case Transform'
     expect(screen.getByText('Case Transform')).toBeInTheDocument();
   });
 
   it('renders tool count in group header', () => {
-    render(<ToolPanel {...defaultProps} activeTab="all" />);
+    render(<ToolPanel {...defaultProps} activeChipKey="view:all" />);
     // 'case' group has 2 tools
     // The count should appear next to the group header
     const caseGroupCounts = screen.getAllByText('2');
@@ -220,7 +280,11 @@ describe('ToolPanel', () => {
   it('renders pinned favorites group when favorites are set', () => {
     const favorites = { favorites: ['uppercase'], toggleFavorite: vi.fn() };
     render(<ToolPanel {...defaultProps} favorites={favorites} />);
-    expect(screen.getByText('Pinned')).toBeInTheDocument();
+    // 'Pinned' also exists as a view chip — assert on the group header
+    const headers = Array.from(document.querySelectorAll('.tu-group-label')).map(
+      (n) => n.textContent
+    );
+    expect(headers).toContain('Pinned');
   });
 
   it('shows filled heart for favorite tools', () => {
@@ -263,12 +327,12 @@ describe('ToolPanel', () => {
       expect(headers[0]).toContain('My Kit');
     });
 
-    it('renders custom group tools even when their tabs exclude the active tab', () => {
-      // base64 only has tabs ['all','encode'] — must still show on 'writing'
+    it('shows only the group section when its custom-group chip is active', () => {
       const toolGroups = makeToolGroups([{ id: 'g1', name: 'My Kit', toolIds: ['base64'] }]);
-      render(<ToolPanel {...defaultProps} activeTab="writing" toolGroups={toolGroups} />);
+      render(<ToolPanel {...defaultProps} activeChipKey="custom_group:g1" toolGroups={toolGroups} />);
       expect(screen.getByText('My Kit')).toBeInTheDocument();
       expect(screen.getByText('Base64 Encode')).toBeInTheDocument();
+      expect(screen.queryByText('UPPERCASE')).not.toBeInTheDocument();
     });
 
     it('renders an empty custom group with a hint row', () => {
@@ -293,7 +357,7 @@ describe('ToolPanel', () => {
       render(
         <ToolPanel
           {...defaultProps}
-          activeTab="writing"
+          activeChipKey="custom_group:g1"
           toolGroups={toolGroups}
           onToolClick={onToolClick}
         />
@@ -492,7 +556,10 @@ describe('ToolPanel', () => {
         { id: 'g1', name: 'My Kit', toolIds: ['fix_grammar', 'base64'] },
       ]);
       render(<ToolPanel {...defaultProps} favorites={favorites} toolGroups={toolGroups} />);
-      expect(screen.getByText('Pinned')).toBeInTheDocument();
+      const headers = Array.from(document.querySelectorAll('.tu-group-label')).map(
+        (n) => n.textContent
+      );
+      expect(headers).toContain('Pinned');
       // a favorited tool STAYS in the custom group (user curated it there)
       const kitGroup = screen.getByText('My Kit').closest('.tu-group')!;
       expect(kitGroup.textContent).toContain('Fix Grammar');
@@ -503,7 +570,7 @@ describe('ToolPanel', () => {
   });
 
   it('collapses group when group header is clicked', () => {
-    render(<ToolPanel {...defaultProps} activeTab="all" />);
+    render(<ToolPanel {...defaultProps} activeChipKey="view:all" />);
     // Click on Case Transform header to collapse
     const header = screen.getByText('Case Transform');
     fireEvent.click(header.closest('button')!);
@@ -522,20 +589,20 @@ describe('ToolPanel', () => {
     expect(document.querySelector('.tu-titem')).toBeInTheDocument();
   });
 
-  it('shows tab count badges', () => {
+  it('shows chip count badges', () => {
     render(<ToolPanel {...defaultProps} />);
     const countSpans = document.querySelectorAll('.tu-tpanel-tab-count');
     expect(countSpans.length).toBeGreaterThan(0);
   });
 
-  it('marks active tab button with active class', () => {
-    render(<ToolPanel {...defaultProps} activeTab="all" />);
+  it('marks active chip button with active class', () => {
+    render(<ToolPanel {...defaultProps} activeChipKey="view:all" />);
     const activeTab = document.querySelector('.tu-tpanel-tab--active');
     expect(activeTab).toBeInTheDocument();
   });
 
   it('renders empty group list when no tools match filter', () => {
-    render(<ToolPanel {...defaultProps} tools={[]} activeTab="all" />);
+    render(<ToolPanel {...defaultProps} tools={[]} activeChipKey="view:all" />);
     // No tool items should be rendered
     expect(document.querySelectorAll('.tu-titem').length).toBe(0);
   });

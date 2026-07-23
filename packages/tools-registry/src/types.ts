@@ -36,6 +36,33 @@ export type ToolType = 'api' | 'ai' | 'local' | 'drawer' | 'select';
 /** Valid USE_CASE_TABS identifiers that tools can belong to. */
 export type ToolTab = 'all' | 'writing' | 'transform' | 'code' | 'ai' | 'language' | 'encode';
 
+// ── Sidebar chips ─────────────────────────────────────────
+// The editor's sidebar navigation (2026-07-22): a user-editable ordered row of
+// chips replacing the USE_CASE_TABS category tabs. A chip is either a smart
+// view or a filter on one group. Persisted per-account as
+// ui-settings.sidebar_chips; [] there means "never customized".
+
+/** Smart-view identifiers — the default chip row. */
+export type SidebarViewId = 'all' | 'pinned' | 'recent' | 'suggested';
+
+export type SidebarChipType = 'view' | 'group' | 'custom_group';
+
+/**
+ * One sidebar chip. `id` is a SidebarViewId for 'view', a ToolGroup id for
+ * 'group', and a user_tool_groups UUID (or local- id pre-adoption) for
+ * 'custom_group'. Shape mirrors the backend SidebarChipItem schema.
+ */
+export interface SidebarChip {
+  type: SidebarChipType;
+  id: string;
+}
+
+/** A smart-view entry from SIDEBAR_VIEWS. */
+export interface SidebarView {
+  id: SidebarViewId;
+  label: string;
+}
+
 // ── Color tokens ─────────────────────────────────────────
 /** Color strings observed across the full tool catalog. */
 export type ToolColor =
@@ -156,8 +183,6 @@ export interface StarterKit {
   /** Name of the custom group the kit creates. Empty string = the kit creates
    * nothing (explorer). Must stay in sync with backend migration 0004 seeds. */
   groupName: string;
-  /** Tab activated once right after the pick; not persisted anywhere. */
-  defaultTab: string;
   /** Tool ids seeded into the created group. */
   toolIds: string[];
 }

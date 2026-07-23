@@ -6,7 +6,7 @@
 // remotes depend on a single shared definition rather than on each other's source.
 
 import type { components } from './openapi';
-import type { ToolDefinition } from './tools';
+import type { SidebarChip, ToolDefinition } from './tools';
 
 // ── User ─────────────────────────────────────────────────────────────────────
 
@@ -38,6 +38,29 @@ export interface ToolGroupsContextValue {
   setGroupTools: (groupId: string, toolIds: string[]) => void;
   /** Reorder the groups themselves; array position becomes display order. */
   reorderGroups: (groupIds: string[]) => void;
+}
+
+// ── Sidebar chips ─────────────────────────────────────────────────────────────
+// The editor sidebar's user-editable navigation row (replaced the
+// USE_CASE_TABS category tabs, 2026-07-22). Produced by useSidebarChips in the
+// shell's AppProvider and threaded into the editor remote.
+
+export interface SidebarChipsContextValue {
+  /** The resolved row: the user's customized list, or the default four views. */
+  chips: SidebarChip[];
+  /** True once persistence has settled (guests immediately, signed-in after
+   * the ui-settings fetch) — chip-editing UI should wait for it. */
+  ready: boolean;
+  /** True when the user has customized the row (a reset target exists). */
+  isCustomized: boolean;
+  addChip: (chip: SidebarChip) => void;
+  /** No-op for view:all — the escape-hatch chip is not removable. */
+  removeChip: (chip: SidebarChip) => void;
+  moveChip: (from: number, to: number) => void;
+  /** Full replace (reorder / undo-restore). Must keep view:all present. */
+  setChips: (chips: SidebarChip[]) => void;
+  /** Back to the default row (clears the customization). */
+  resetChips: () => void;
 }
 
 // ── Favorites ─────────────────────────────────────────────────────────────────
@@ -106,5 +129,6 @@ export interface AppContextValue {
   userResolving?: boolean;
   toolGroups: ToolGroupsContextValue;
   favorites: FavoritesContextValue;
+  sidebarChips: SidebarChipsContextValue;
   subscription: SubscriptionContextValue;
 }

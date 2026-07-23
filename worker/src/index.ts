@@ -2,6 +2,10 @@ interface Env {
   SHELL_PAGES_URL: string;
   EDITOR_PAGES_URL: string;
   ANALYTICS_PAGES_URL: string;
+  CONTENT_URL: string; // Cloudflare Worker (OpenNext), not a Pages project
+  // Service binding to the content worker — required in production: same-account
+  // worker→worker fetches over workers.dev never reach the target worker.
+  CONTENT?: Fetcher;
   // Optional override of the Content-Security-Policy (otherwise DEFAULT_CSP).
   CSP?: string;
 }
@@ -42,6 +46,29 @@ function withSecurityHeaders(res: Response, env: Env): Response {
   return out;
 }
 
+// Search crawlers and link-preview scrapers that need server-rendered HTML with
+// OG meta. Human browsers get the shell SPA on the same paths ("dynamic
+// rendering") — the in-app About/Pricing/Share pages remain the human experience.
+const BOT_UA =
+  /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandex(bot)?|applebot|petalbot|facebookexternalhit|facebookcatalog|twitterbot|linkedinbot|slackbot|discordbot|telegrambot|whatsapp|pinterestbot|redditbot|embedly|quora link preview|outbrain|vkshare|w3c_validator/i;
+
+// Paths the content app serves for EVERYONE — the shell has no equivalent.
+function isContentAlwaysPath(pathname: string): boolean {
+  return (
+    pathname === '/tools' ||
+    pathname.startsWith('/tools/') ||
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt'
+  );
+}
+
+// Paths where the shell has an in-app page but bots need the SSR/OG version.
+// '/' is deliberately excluded: apps/content's root page redirects to /app,
+// which this router 301s back to / — a bot would loop between the two.
+function isContentBotPath(pathname: string): boolean {
+  return pathname === '/about' || pathname === '/pricing' || pathname.startsWith('/share/');
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -66,6 +93,31 @@ export default {
         Response.redirect(new URL(`${stripped}${search}`, url.origin).toString(), 301),
         env
       );
+    } else if (
+      isContentAlwaysPath(pathname) ||
+      (isContentBotPath(pathname) && BOT_UA.test(request.headers.get('user-agent') ?? ''))
+    ) {
+      // content app (Next.js SSR — SEO pages + share OG cards). Must go through
+      // the service binding: a plain fetch to a same-account workers.dev URL is
+      // blocked by Cloudflare and returns the edge's placeholder 404.
+      if (env.CONTENT) {
+        // Bindings ignore the URL's hostname — forward the request as-is so the
+        // content app sees the public origin (its redirects and derived URLs
+        // stay on it, never on the internal workers.dev host).
+        res = await env.CONTENT.fetch(request);
+      } else if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+        // Local-dev fallback (wrangler dev without the content worker bound).
+        res = await fetch(`${env.CONTENT_URL}${pathname}${search}`, request);
+      } else {
+        // Fail loudly: without the binding a plain fetch degrades into the
+        // edge's placeholder 404, which masquerades as a content-app 404.
+        return withSecurityHeaders(
+          new Response('Router misconfigured: CONTENT service binding is missing', {
+            status: 500,
+          }),
+          env
+        );
+      }
     } else {
       // everything else → shell SPA (owns the origin root; built with base '/',
       // Pages' index.html fallback handles client-side routes)

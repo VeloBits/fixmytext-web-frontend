@@ -14,6 +14,7 @@ import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import { attemptSilentRestore, hasAuthHint } from '@velobits/app-core/auth/userManager';
 import { AlertProvider, useAlertContext } from './contexts/AlertContext';
 import type { AlertLevel } from './contexts/AlertContext';
+import type { ShowAlertFn, ShowAlertOptions } from '@velobits/app-core/types/alert';
 import { AppProvider, useAppContext } from './contexts/AppContext';
 import type { StarterKit } from '@velobits/app-core/types/tools';
 import useOnboardingGate from './hooks/useOnboardingGate';
@@ -87,11 +88,15 @@ function AppInner() {
   const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
   const { alerts, showAlert: showAlertCtx, dismissAlert } = useAlertContext();
   const { mode, setMode } = useThemeContext();
-  const { user, isAuthenticated, userResolving, toolGroups, favorites, subscription } =
+  const { user, isAuthenticated, userResolving, toolGroups, favorites, sidebarChips, subscription } =
     useAppContext();
   const onboarding = useOnboardingGate(toolGroups);
   const { isLoading: authLoading, wasAuthenticated } = useOidcAuth();
-  const showAlert = showAlertCtx as (message: string, type: AlertLevel) => void;
+  const showAlert = showAlertCtx as (
+    message: string,
+    type: AlertLevel,
+    options?: ShowAlertOptions
+  ) => void;
 
   useEffect(() => {
     const handler = (e: CustomEvent<{ message: string; type: string }>) => {
@@ -106,11 +111,11 @@ function AppInner() {
       toolGroups.createGroup(kit.groupName, kit.toolIds);
     }
     if (kit) {
-      // One-shot: the editor listens and lands on the kit's tab (transient,
-      // nothing persisted).
-      window.dispatchEvent(
-        new CustomEvent('fmx:onboarding-tab', { detail: { tab: kit.defaultTab } })
-      );
+      // One-shot: the editor listens and lands on the All view, where the
+      // kit's freshly seeded custom group sits pinned at the top of the panel
+      // (transient, nothing persisted). Kits stopped carrying a defaultTab
+      // when the category tabs became sidebar chips (2026-07-22).
+      window.dispatchEvent(new CustomEvent('fmx:onboarding-tab', { detail: { tab: 'view:all' } }));
     }
     onboarding.markSeen();
   };
@@ -168,9 +173,10 @@ function AppInner() {
                 <EditorPage
                   mode={mode}
                   setMode={setMode as (mode: string) => void}
-                  showAlert={showAlert as (message: string, type: string) => void}
+                  showAlert={showAlert as ShowAlertFn}
                   toolGroups={toolGroups}
                   favorites={favorites}
+                  sidebarChips={sidebarChips}
                   user={user}
                   isAuthenticated={isAuthenticated}
                   subscription={subscription}
