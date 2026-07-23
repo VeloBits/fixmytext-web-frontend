@@ -1,19 +1,32 @@
 import { useState, useRef, useCallback, useMemo, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { USE_CASE_TABS, TOOL_GROUPS } from '@velobits/app-core/constants/tools';
+import { TOOL_GROUPS, chipKey, parseChipKey } from '@velobits/app-core/constants/tools';
 import { MAX_TOOL_GROUPS } from '@velobits/app-core/hooks/useToolGroups';
 import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
-import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
-import type { ToolGroupsContextValue } from '@velobits/app-core/types/context';
+import type { SidebarChip, ToolDefinition } from '@velobits/app-core/types/tools';
+import type {
+  SidebarChipsContextValue,
+  ToolGroupsContextValue,
+  ToolGroupView,
+} from '@velobits/app-core/types/context';
+import type { ShowAlertFn } from '@velobits/app-core/types/alert';
 import {
   CheckIcon,
+  EllipsisIcon,
   HeartIcon,
   MinusIcon,
   PenLineIcon,
   PlusIcon,
+  SearchIcon,
   Trash2Icon,
+  XIcon,
 } from '@velobits/design-system';
+import ChipEditor from './ChipEditor';
+import { chipLabel } from './chipUtils';
+
+/** Mobile chip row: chips visible before the ⋯ +N overflow menu. */
+const MOBILE_MAX_VISIBLE_CHIPS = 8;
 
 interface TooltipState {
   text: string;
@@ -68,14 +81,19 @@ interface CustomGroupHeaderProps {
 
 interface ToolPanelProps {
   tools: ToolDefinition[];
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
+  /** Serialized active chip ('view:all', 'group:hashing', 'custom_group:<id>'). */
+  activeChipKey: string;
+  onChipChange: (key: string) => void;
   onToolClick: (tool: ToolDefinition) => void;
   disabled: boolean;
   favorites: FavoritesState;
   toolGroups: ToolGroupsContextValue;
+  sidebarChips: SidebarChipsContextValue;
+  recentToolIds: string[];
+  showAlert: ShowAlertFn;
   activeToolId?: string | null;
-  hideTabs?: boolean;
+  /** Desktop hides the in-panel chip row — the activity bar renders the chips. */
+  hideChips?: boolean;
   viewMode?: string;
   suggestedToolIds?: string[];
 }
@@ -424,14 +442,17 @@ interface PanelGroup {
 
 export default memo(function ToolPanel({
   tools,
-  activeTab,
-  onTabChange,
+  activeChipKey,
+  onChipChange,
   onToolClick,
   disabled,
   favorites,
   toolGroups,
+  sidebarChips,
+  recentToolIds,
+  showAlert,
   activeToolId,
-  hideTabs,
+  hideChips,
   viewMode = 'list',
   suggestedToolIds = [],
 }: ToolPanelProps) {
@@ -441,6 +462,10 @@ export default memo(function ToolPanel({
   // null = the "New group…" row is a button; a string = its inline input value
   const [menuNewName, setMenuNewName] = useState<string | null>(null);
   const [newGroupName, setNewGroupName] = useState<string | null>(null);
+  const [filterQuery, setFilterQuery] = useState('');
+  const [chipEditorAnchor, setChipEditorAnchor] = useState<DOMRect | null>(null);
+  const [overflowOpen, setOverflowOpen] = useState(false);
+  const overflowBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const toggleGroup = useCallback((groupId: string) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -478,98 +503,212 @@ export default memo(function ToolPanel({
     setGroupMenu({ toolId, top, left });
   }, []);
 
-  // Count tools per tab
-  const tabCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: tools.length };
-    for (const tab of USE_CASE_TABS) {
-      if (!counts[tab.id]) {
-        counts[tab.id] = tools.filter((t) => t.tabs?.includes(tab.id as ToolTab)).length;
+  const activeChip = useMemo<SidebarChip>(
+    () => parseChipKey(activeChipKey) ?? { type: 'view', id: 'all' },
+    [activeChipKey]
+  );
+
+  const favoriteIds = useMemo(() => favorites.favorites || [], [favorites]);
+  const customGroups = toolGroups.groups;
+
+  // Count per chip (shown on the mobile row and in tooltips)
+  const chipCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const chip of sidebarChips.chips) {
+      const key = chipKey(chip);
+      if (chip.type === 'view') {
+        counts[key] =
+          chip.id === 'all'
+            ? tools.length
+            : chip.id === 'pinned'
+              ? favoriteIds.length
+              : chip.id === 'recent'
+                ? recentToolIds.length
+                : suggestedToolIds.length;
+      } else if (chip.type === 'group') {
+        counts[key] = tools.filter((t) => t.group === chip.id).length;
+      } else {
+        counts[key] = customGroups.find((g) => g.id === chip.id)?.toolIds.length ?? 0;
       }
     }
     return counts;
-  }, [tools]);
+  }, [sidebarChips.chips, tools, favoriteIds, recentToolIds, suggestedToolIds, customGroups]);
 
-  // Filter tools by active tab
-  const filteredTools = useMemo(() => {
-    if (activeTab === 'all') return [...tools].sort((a, b) => a.label.localeCompare(b.label));
-    return tools.filter((t) => t.tabs?.includes(activeTab as ToolTab));
-  }, [tools, activeTab]);
+  // The search box filters the whole catalog regardless of the active chip
+  // (VSCode Explorer-filter style); clearing it returns to the chip's view.
+  const query = filterQuery.trim().toLowerCase();
 
-  // Group tools — pinned favorites and the user's custom groups sit above the
-  // canonical catalog groups, which keep TOOL_GROUPS order.
-  const favoriteIds = useMemo(() => favorites.favorites || [], [favorites]);
-  const customGroups = toolGroups.groups;
   const { topGroups, catalogGroups } = useMemo(() => {
-    const top: PanelGroup[] = [];
+    const alpha = (a: ToolDefinition, b: ToolDefinition) => a.label.localeCompare(b.label);
+    const matchesQuery = (t: ToolDefinition) =>
+      !query ||
+      t.label.toLowerCase().includes(query) ||
+      (t.description ?? '').toLowerCase().includes(query) ||
+      (t.keywords ?? []).some((k) => k.toLowerCase().includes(query));
 
-    // Collect pinned favorites from the filtered set
+    // Distribute a tool list into the canonical TOOL_GROUPS sections.
+    const catalogOf = (list: ToolDefinition[]): PanelGroup[] => {
+      const groupMap: Record<string, ToolDefinition[]> = {};
+      for (const tool of list) {
+        const gid = tool.group || 'other';
+        (groupMap[gid] ??= []).push(tool);
+      }
+      for (const gid of Object.keys(groupMap)) groupMap[gid]!.sort(alpha);
+      const catalog: PanelGroup[] = [];
+      for (const g of TOOL_GROUPS) {
+        if ((groupMap[g.id]?.length ?? 0) > 0) {
+          catalog.push({ id: g.id, label: g.label, tools: groupMap[g.id]! });
+          delete groupMap[g.id];
+        }
+      }
+      for (const [gid, gTools] of Object.entries(groupMap)) {
+        if (gTools.length > 0) {
+          catalog.push({
+            id: gid,
+            label: gid.charAt(0).toUpperCase() + gid.slice(1),
+            tools: gTools,
+          });
+        }
+      }
+      return catalog;
+    };
+
+    // Custom groups keep user-curated order; favorites NOT excluded (the user
+    // put them there). Empty groups still render — a just-created group needs
+    // a visible home for its + affordance.
+    const customPanelGroup = (
+      g: ToolGroupView,
+      keep: (t: ToolDefinition) => boolean = () => true
+    ): PanelGroup => ({
+      id: `custom:${g.id}`,
+      label: g.name,
+      customGroupId: g.id,
+      tools: g.toolIds
+        .map((id) => tools.find((t) => t.id === id))
+        .filter((t): t is ToolDefinition => !!t)
+        .filter(keep),
+    });
+
+    if (query) {
+      const top = customGroups
+        .map((g) => customPanelGroup(g, matchesQuery))
+        .filter((g) => g.tools.length > 0);
+      return { topGroups: top, catalogGroups: catalogOf(tools.filter(matchesQuery)) };
+    }
+
+    if (activeChip.type === 'group') {
+      const list = tools.filter((t) => t.group === activeChip.id).sort(alpha);
+      const label = TOOL_GROUPS.find((g) => g.id === activeChip.id)?.label ?? activeChip.id;
+      return {
+        topGroups: [],
+        catalogGroups: list.length > 0 ? [{ id: activeChip.id, label, tools: list }] : [],
+      };
+    }
+
+    if (activeChip.type === 'custom_group') {
+      const g = customGroups.find((x) => x.id === activeChip.id);
+      return { topGroups: g ? [customPanelGroup(g)] : [], catalogGroups: [] };
+    }
+
+    if (activeChip.id === 'pinned') {
+      const favs = tools.filter((t) => favoriteIds.includes(t.id));
+      return { topGroups: [], catalogGroups: catalogOf(favs) };
+    }
+
+    if (activeChip.id === 'recent') {
+      // Recency order is the point — one flat section, most recent first.
+      const list = recentToolIds
+        .map((id) => tools.find((t) => t.id === id))
+        .filter((t): t is ToolDefinition => !!t);
+      return {
+        topGroups: list.length > 0 ? [{ id: '_recent', label: 'Recent', tools: list }] : [],
+        catalogGroups: [],
+      };
+    }
+
+    if (activeChip.id === 'suggested') {
+      const list = suggestedToolIds
+        .map((id) => tools.find((t) => t.id === id))
+        .filter((t): t is ToolDefinition => !!t);
+      return {
+        topGroups: list.length > 0 ? [{ id: '_suggested', label: 'Suggested', tools: list }] : [],
+        catalogGroups: [],
+      };
+    }
+
+    // view:all — pinned favorites and custom groups above the full catalog
+    const top: PanelGroup[] = [];
     const pinnedTools =
       favoriteIds.length > 0
-        ? filteredTools
-            .filter((t) => favoriteIds.includes(t.id))
-            .sort((a, b) => a.label.localeCompare(b.label))
+        ? tools.filter((t) => favoriteIds.includes(t.id)).sort(alpha)
         : [];
-
     if (pinnedTools.length > 0) {
       top.push({ id: '_pinned', label: 'Pinned', tools: pinnedTools });
     }
-
-    // Custom groups resolve from the full catalog, not filteredTools, so they
-    // stay visible whatever tab is active; user-curated order, favorites NOT
-    // excluded (the user put them there). Empty groups still render — a
-    // just-created group needs a visible home for its + affordance.
     for (const g of customGroups) {
-      top.push({
-        id: `custom:${g.id}`,
-        label: g.name,
-        customGroupId: g.id,
-        tools: g.toolIds
-          .map((id) => tools.find((t) => t.id === id))
-          .filter((t): t is ToolDefinition => !!t),
-      });
+      top.push(customPanelGroup(g));
     }
-
-    const catalog: PanelGroup[] = [];
-    const groupMap: Record<string, ToolDefinition[]> = {};
-    for (const tool of filteredTools) {
-      const gid = tool.group || 'other';
-      if (!groupMap[gid]) {
-        groupMap[gid] = [];
-      }
-      groupMap[gid].push(tool);
-    }
-
-    // Sort each group's tools alphabetically
-    for (const gid of Object.keys(groupMap)) {
-      groupMap[gid]!.sort((a, b) => a.label.localeCompare(b.label));
-    }
-
-    // Maintain TOOL_GROUPS order, then add any ungrouped
-    for (const g of TOOL_GROUPS) {
-      if ((groupMap[g.id]?.length ?? 0) > 0) {
-        catalog.push({ id: g.id, label: g.label, tools: groupMap[g.id]! });
-        delete groupMap[g.id];
-      }
-    }
-    // Any remaining groups not in TOOL_GROUPS
-    for (const [gid, gTools] of Object.entries(groupMap)) {
-      if (gTools.length > 0) {
-        catalog.push({
-          id: gid,
-          label: gid.charAt(0).toUpperCase() + gid.slice(1),
-          tools: gTools,
-        });
-      }
-    }
-
-    return { topGroups: top, catalogGroups: catalog };
-  }, [filteredTools, favoriteIds, customGroups, tools]);
+    return { topGroups: top, catalogGroups: catalogOf(tools) };
+  }, [query, activeChip, tools, favoriteIds, customGroups, recentToolIds, suggestedToolIds]);
 
   const commitNewGroup = () => {
     const name = (newGroupName ?? '').trim();
     if (name) toolGroups.createGroup(name);
     setNewGroupName(null);
   };
+
+  // Mobile chip row: hide an empty Suggested chip (it teaches nothing at 0)
+  // and dangling custom-group chips (their group is gone / not hydrated yet).
+  const rowChips = useMemo(
+    () =>
+      sidebarChips.chips.filter((chip) => {
+        if (
+          chip.type === 'view' &&
+          chip.id === 'suggested' &&
+          suggestedToolIds.length === 0 &&
+          activeChipKey !== 'view:suggested'
+        ) {
+          return false;
+        }
+        return chipLabel(chip, customGroups) !== null;
+      }),
+    [sidebarChips.chips, suggestedToolIds.length, activeChipKey, customGroups]
+  );
+
+  // The active chip is never hidden in the ⋯ +N overflow — it swaps into the
+  // last visible slot (the VSCode active-editor-tab rule).
+  const { visibleRowChips, overflowRowChips } = useMemo(() => {
+    if (rowChips.length <= MOBILE_MAX_VISIBLE_CHIPS) {
+      return { visibleRowChips: rowChips, overflowRowChips: [] as SidebarChip[] };
+    }
+    const visible = rowChips.slice(0, MOBILE_MAX_VISIBLE_CHIPS);
+    const overflow = rowChips.slice(MOBILE_MAX_VISIBLE_CHIPS);
+    const activeIdx = rowChips.findIndex((c) => chipKey(c) === activeChipKey);
+    if (activeIdx >= MOBILE_MAX_VISIBLE_CHIPS) {
+      const displaced = visible[MOBILE_MAX_VISIBLE_CHIPS - 1]!;
+      visible[MOBILE_MAX_VISIBLE_CHIPS - 1] = rowChips[activeIdx]!;
+      overflow[activeIdx - MOBILE_MAX_VISIBLE_CHIPS] = displaced;
+    }
+    return { visibleRowChips: visible, overflowRowChips: overflow };
+  }, [rowChips, activeChipKey]);
+
+  const emptyHint = (() => {
+    if (topGroups.length > 0 || catalogGroups.length > 0) return null;
+    if (query) return `No tools match "${filterQuery.trim()}"`;
+    if (activeChip.type === 'view' && activeChip.id === 'pinned') {
+      return 'No pinned tools yet — click the ♥ on any tool.';
+    }
+    if (activeChip.type === 'view' && activeChip.id === 'recent') {
+      return 'Tools you run will appear here.';
+    }
+    if (activeChip.type === 'view' && activeChip.id === 'suggested') {
+      return 'Suggestions appear when your text matches a tool.';
+    }
+    if (activeChip.type === 'custom_group') return 'This group no longer exists.';
+    return 'No tools here yet.';
+  })();
+
+  const showNewGroupRow = !query && activeChip.type === 'view' && activeChip.id === 'all';
 
   const renderGroup = (group: PanelGroup) => (
     <div key={group.id} className="tu-group">
@@ -641,69 +780,166 @@ export default memo(function ToolPanel({
 
   return (
     <div className="tu-tpanel">
-      {!hideTabs && (
+      <div className="tu-tpanel-search">
+        <SearchIcon size={13} />
+        <input
+          value={filterQuery}
+          placeholder="Filter tools…"
+          onChange={(e) => setFilterQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setFilterQuery('');
+          }}
+          aria-label="Filter tools"
+        />
+        {filterQuery && (
+          <button
+            className="tu-tpanel-search-clear"
+            onClick={() => setFilterQuery('')}
+            aria-label="Clear filter"
+          >
+            <XIcon size={12} />
+          </button>
+        )}
+      </div>
+
+      {!hideChips && (
         <div className="tu-tpanel-tabs">
-          {USE_CASE_TABS.map((tab) => (
+          {visibleRowChips.map((chip) => {
+            const key = chipKey(chip);
+            const label = chipLabel(chip, customGroups)!;
+            return (
+              <button
+                key={key}
+                className={`tu-tpanel-tab${activeChipKey === key ? ' tu-tpanel-tab--active' : ''}`}
+                onClick={() => onChipChange(key)}
+                title={label}
+              >
+                <span className="tu-tpanel-tab-label">{label}</span>
+                <span className="tu-tpanel-tab-count">{chipCounts[key] || 0}</span>
+              </button>
+            );
+          })}
+          {overflowRowChips.length > 0 && (
             <button
-              key={tab.id}
-              className={`tu-tpanel-tab${activeTab === tab.id ? ' tu-tpanel-tab--active' : ''}`}
-              onClick={() => onTabChange(tab.id)}
-              title={tab.label}
+              ref={overflowBtnRef}
+              className="tu-tpanel-tab tu-tpanel-tab--more"
+              onClick={() => setOverflowOpen(true)}
+              aria-label={`${overflowRowChips.length} more views`}
+              aria-haspopup="menu"
             >
-              <span className="tu-tpanel-tab-icon">{tab.icon}</span>
-              <span className="tu-tpanel-tab-label">{tab.label}</span>
-              <span className="tu-tpanel-tab-count">{tabCounts[tab.id] || 0}</span>
+              <EllipsisIcon size={12} />
+              <span className="tu-tpanel-tab-count">+{overflowRowChips.length}</span>
             </button>
-          ))}
+          )}
+          <button
+            className="tu-tpanel-tab tu-tpanel-tab--edit"
+            onClick={(e) => setChipEditorAnchor(e.currentTarget.getBoundingClientRect())}
+            aria-label="Customize sidebar"
+            title="Customize sidebar"
+          >
+            <PlusIcon size={12} />
+          </button>
         </div>
       )}
 
       <div className="tu-tpanel-list">
         <AnimatePresence mode="wait">
           <motion.div
-            key={`${activeTab}-${viewMode}`}
+            key={`${query ? '_search' : activeChipKey}-${viewMode}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.12 }}
           >
             {topGroups.map(renderGroup)}
-            {newGroupName !== null ? (
-              <div className="tu-group-new tu-group-new--editing">
-                <input
-                  className="tu-group-rename-input"
-                  value={newGroupName}
-                  autoFocus
-                  maxLength={100}
-                  placeholder="Group name"
-                  onChange={(e) => setNewGroupName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') commitNewGroup();
-                    if (e.key === 'Escape') setNewGroupName(null);
-                  }}
-                  onBlur={commitNewGroup}
-                  aria-label="New group name"
-                />
-              </div>
-            ) : (
-              <button
-                className="tu-group-new"
-                onClick={() => setNewGroupName('')}
-                disabled={customGroups.length >= MAX_TOOL_GROUPS}
-                title={
-                  customGroups.length >= MAX_TOOL_GROUPS
-                    ? `Group limit reached (${MAX_TOOL_GROUPS})`
-                    : 'Create a custom tool group'
-                }
-              >
-                <PlusIcon size={12} />
-                <span>New Group</span>
-              </button>
-            )}
+            {showNewGroupRow &&
+              (newGroupName !== null ? (
+                <div className="tu-group-new tu-group-new--editing">
+                  <input
+                    className="tu-group-rename-input"
+                    value={newGroupName}
+                    autoFocus
+                    maxLength={100}
+                    placeholder="Group name"
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') commitNewGroup();
+                      if (e.key === 'Escape') setNewGroupName(null);
+                    }}
+                    onBlur={commitNewGroup}
+                    aria-label="New group name"
+                  />
+                </div>
+              ) : (
+                <button
+                  className="tu-group-new"
+                  onClick={() => setNewGroupName('')}
+                  disabled={customGroups.length >= MAX_TOOL_GROUPS}
+                  title={
+                    customGroups.length >= MAX_TOOL_GROUPS
+                      ? `Group limit reached (${MAX_TOOL_GROUPS})`
+                      : 'Create a custom tool group'
+                  }
+                >
+                  <PlusIcon size={12} />
+                  <span>New Group</span>
+                </button>
+              ))}
             {catalogGroups.map(renderGroup)}
+            {emptyHint && <div className="tu-sidebar-panel-empty">{emptyHint}</div>}
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Portal ⋯ +N overflow menu (mobile chip row) */}
+      {overflowOpen &&
+        createPortal(
+          <>
+            <div className="tu-group-menu-backdrop" onClick={() => setOverflowOpen(false)} />
+            <div
+              className="tu-group-menu"
+              style={(() => {
+                const rect = overflowBtnRef.current?.getBoundingClientRect();
+                const top = Math.min((rect?.bottom ?? 0) + 4, window.innerHeight - 320);
+                const left = Math.min(rect?.left ?? 0, window.innerWidth - 228);
+                return { top: Math.max(4, top), left: Math.max(4, left) };
+              })()}
+              role="menu"
+              aria-label="More views"
+            >
+              {overflowRowChips.map((chip) => {
+                const key = chipKey(chip);
+                const label = chipLabel(chip, customGroups)!;
+                return (
+                  <button
+                    key={key}
+                    className="tu-group-menu-item"
+                    role="menuitem"
+                    onClick={() => {
+                      onChipChange(key);
+                      setOverflowOpen(false);
+                    }}
+                  >
+                    <span className="tu-group-menu-name">{label}</span>
+                    <span className="tu-tpanel-tab-count">{chipCounts[key] || 0}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </>,
+          document.body
+        )}
+
+      {/* Chip-row editor popover */}
+      {chipEditorAnchor && (
+        <ChipEditor
+          anchor={chipEditorAnchor}
+          onClose={() => setChipEditorAnchor(null)}
+          sidebarChips={sidebarChips}
+          toolGroups={toolGroups}
+          showAlert={showAlert}
+        />
+      )}
 
       {/* Portal tooltip */}
       {tooltip &&

@@ -10,6 +10,7 @@ import {
   type Ref,
   type RefObject,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTransformTextMutation } from '@velobits/app-core/store/api/textApi';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
@@ -22,18 +23,22 @@ import {
   useGetUiSettingsQuery,
   useUpdateUiSettingsMutation,
 } from '@velobits/app-core/store/api/userDataApi';
-import { TOOLS, USE_CASE_TABS } from '@velobits/app-core/constants/tools';
-import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
+import { TOOLS, TOOL_GROUPS, chipKey, parseChipKey } from '@velobits/app-core/constants/tools';
+import useRecentTools from '@velobits/app-core/hooks/useRecentTools';
+import type { SidebarChip, ToolDefinition } from '@velobits/app-core/types/tools';
 import type {
   FavoritesContextValue,
+  SidebarChipsContextValue,
   ToolGroupsContextValue,
 } from '@velobits/app-core/types/context';
+import type { ShowAlertFn } from '@velobits/app-core/types/alert';
 import { ENDPOINTS } from '@velobits/app-core/constants/endpoints';
 import { ROUTES } from '@velobits/app-core/constants';
 import {
   BarChart3Icon,
   CornerUpLeftIcon,
   CornerUpRightIcon,
+  EllipsisIcon,
   FileTextIcon,
   HeartIcon,
   HistoryIcon,
@@ -43,6 +48,8 @@ import {
   LogInIcon,
   LogOutIcon,
   MoonIcon,
+  PlusIcon,
+  SparklesIcon,
   SunIcon,
   XIcon,
   ZapIcon,
@@ -73,7 +80,6 @@ import useClientTools from '@/hooks/useClientTools';
 
 // Components
 import ToolPanel from './ToolPanel';
-import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
 import OutputPanel from './OutputPanel';
 import ParagraphGutter from './ParagraphGutter';
 
@@ -141,6 +147,8 @@ function LazyDrawer({ children }: { children: ReactNode }) {
 import SmartSuggestions from './SmartSuggestions';
 import BottomPanel from './BottomPanel';
 import { noopNotice } from './noopNotice';
+import ChipEditor from './ChipEditor';
+import { chipLabel, chipInitials } from './chipUtils';
 import CommandPalette from '@/components/layout/CommandPalette';
 import KeyboardShortcuts from '@/components/layout/KeyboardShortcuts';
 
@@ -309,9 +317,10 @@ interface WorkspaceTab {
 type AnyRecord = Record<string, any>;
 
 interface TextFormProps {
-  showAlert: (msg: string, type: string) => void;
+  showAlert: ShowAlertFn;
   toolGroups: ToolGroupsContextValue;
   favorites: FavoritesContextValue;
+  sidebarChips: SidebarChipsContextValue;
   user: AnyRecord | null;
   isAuthenticated: boolean;
   mode: string;
@@ -341,7 +350,13 @@ export default function TextForm(props: TextFormProps) {
   const [markdownMode, setMarkdownMode] = useState(false);
   const { activePanel, setActivePanel, togglePanel } = useDrawerState();
   const [previewMode, setPreviewMode] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string | null>('all');
+  // Chip key ('view:all', 'group:hashing', 'custom_group:<id>') or a special
+  // '_templates' / '_history' panel id.
+  const [activeTab, setActiveTab] = useState<string | null>('view:all');
+  const recents = useRecentTools();
+  const [chipEditorAnchor, setChipEditorAnchor] = useState<DOMRect | null>(null);
+  const [chipOverflowOpen, setChipOverflowOpen] = useState(false);
+  const chipOverflowBtnRef = useRef<HTMLButtonElement | null>(null);
   // Must match the mobile breakpoint in editor.css — inline resize sizes would
   // otherwise override the media query and collapse the layout on small screens
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -468,6 +483,7 @@ export default function TextForm(props: TextFormProps) {
   );
   const toolGroups = props.toolGroups;
   const favorites = props.favorites;
+  const sidebarChips = props.sidebarChips;
   const pipeline = usePipeline();
   const suggestions = useSmartSuggestions(text);
   const search = useToolSearch();
@@ -1275,6 +1291,8 @@ export default function TextForm(props: TextFormProps) {
   const handleToolClick = useCallback(
     (tool: ToolDefinition) => {
       if (!tool) return;
+      // Feeds the sidebar's Recent view (device-local by design)
+      recents.recordToolUse(tool.id);
       if (tool.type === 'drawer') {
         // Panels that host multiple distinct tools get a per-tool tab so each tool
         // keeps its own state and shows up independently in the tab strip.
@@ -1326,7 +1344,7 @@ export default function TextForm(props: TextFormProps) {
         }
       }
     },
-    [openToolTab, executeToolAction, compare, setActivePanel]
+    [openToolTab, executeToolAction, compare, setActivePanel, recents]
   );
 
   // ── Auto-run tool on first open (when text was seeded) ──
@@ -1585,6 +1603,70 @@ export default function TextForm(props: TextFormProps) {
     }
   };
 
+  // ── Sidebar chips (desktop activity bar) ────────────────
+  // Hide an empty Suggested chip (nothing to teach at 0) and dangling
+  // custom-group chips (group deleted / not hydrated yet).
+  const barChips = useMemo(
+    () =>
+      sidebarChips.chips.filter((chip) => {
+        if (
+          chip.type === 'view' &&
+          chip.id === 'suggested' &&
+          suggestions.suggestions.length === 0 &&
+          activeTab !== 'view:suggested'
+        ) {
+          return false;
+        }
+        return chipLabel(chip, toolGroups.groups) !== null;
+      }),
+    [sidebarChips.chips, suggestions.suggestions.length, activeTab, toolGroups.groups]
+  );
+
+  // Cap the vertical bar; the active chip is never hidden in the ⋯ overflow —
+  // it swaps into the last visible slot (VSCode active-editor-tab rule).
+  const MAX_BAR_CHIPS = 8;
+  const { visibleBarChips, overflowBarChips } = useMemo(() => {
+    if (barChips.length <= MAX_BAR_CHIPS) {
+      return { visibleBarChips: barChips, overflowBarChips: [] as SidebarChip[] };
+    }
+    const visible = barChips.slice(0, MAX_BAR_CHIPS);
+    const overflow = barChips.slice(MAX_BAR_CHIPS);
+    const activeIdx = barChips.findIndex((c) => chipKey(c) === activeTab);
+    if (activeIdx >= MAX_BAR_CHIPS) {
+      const displaced = visible[MAX_BAR_CHIPS - 1]!;
+      visible[MAX_BAR_CHIPS - 1] = barChips[activeIdx]!;
+      overflow[activeIdx - MAX_BAR_CHIPS] = displaced;
+    }
+    return { visibleBarChips: visible, overflowBarChips: overflow };
+  }, [barChips, activeTab]);
+
+  const chipIcon = (chip: SidebarChip, label: string) => {
+    if (chip.type === 'view') {
+      if (chip.id === 'all') return ACTIVITY_ICONS.all;
+      if (chip.id === 'pinned') return <HeartIcon size={22} strokeWidth={1.8} />;
+      if (chip.id === 'recent') return <HistoryIcon size={22} strokeWidth={1.8} />;
+      return <SparklesIcon size={22} strokeWidth={1.8} />;
+    }
+    return <span className="tu-activity-chip-initials">{chipInitials(label)}</span>;
+  };
+
+  // Header label + count for the active sidebar view
+  const activeChip = parseChipKey(activeTab);
+  const activeChipTitle = activeChip ? chipLabel(activeChip, toolGroups.groups) : null;
+  const activeChipCount = useMemo(() => {
+    if (!activeChip) return null;
+    if (activeChip.type === 'view') {
+      if (activeChip.id === 'all') return TOOLS.length;
+      if (activeChip.id === 'pinned') return favorites.favorites.length;
+      if (activeChip.id === 'recent') return recents.recentToolIds.length;
+      return suggestions.suggestions.length;
+    }
+    if (activeChip.type === 'group') {
+      return TOOLS.filter((t) => t.group === activeChip.id).length;
+    }
+    return toolGroups.groups.find((g) => g.id === activeChip.id)?.toolIds.length ?? 0;
+  }, [activeChip, favorites.favorites.length, recents.recentToolIds.length, suggestions.suggestions.length, toolGroups.groups]);
+
   return (
     <>
       <main
@@ -1598,42 +1680,43 @@ export default function TextForm(props: TextFormProps) {
       >
         {/* ─── Activity Bar (far left icons) ─── */}
         <div className="tu-activity-bar">
-          {USE_CASE_TABS.map((tab) => (
+          {visibleBarChips.map((chip) => {
+            const key = chipKey(chip);
+            const label = chipLabel(chip, toolGroups.groups)!;
+            return (
+              <button
+                key={key}
+                className={`tu-activity-btn${
+                  activeTab === key && sidebarOpen ? ' tu-activity-btn--active' : ''
+                }`}
+                onClick={() => handleActivityClick(key)}
+                data-tooltip={label}
+                aria-label={label}
+                aria-pressed={activeTab === key && sidebarOpen}
+              >
+                {chipIcon(chip, label)}
+              </button>
+            );
+          })}
+          {overflowBarChips.length > 0 && (
             <button
-              key={tab.id}
-              className={`tu-activity-btn${
-                activeTab === tab.id && sidebarOpen ? ' tu-activity-btn--active' : ''
-              }`}
-              onClick={() => handleActivityClick(tab.id)}
-              data-tooltip={tab.label}
-              aria-label={tab.label}
-              aria-pressed={activeTab === tab.id && sidebarOpen}
+              ref={chipOverflowBtnRef}
+              className="tu-activity-btn tu-activity-btn--more"
+              onClick={() => setChipOverflowOpen(true)}
+              data-tooltip={`${overflowBarChips.length} more views`}
+              aria-label={`${overflowBarChips.length} more views`}
+              aria-haspopup="menu"
             >
-              {ACTIVITY_ICONS[tab.id] || <span>{tab.icon}</span>}
+              <EllipsisIcon size={20} strokeWidth={1.8} />
             </button>
-          ))}
-          {/* Favourites */}
+          )}
           <button
-            className={`tu-activity-btn${
-              activeTab === '_favourites' && sidebarOpen ? ' tu-activity-btn--active' : ''
-            }`}
-            onClick={() => handleActivityClick('_favourites')}
-            data-tooltip="Favourites"
-            aria-label="Favourites"
-            aria-pressed={activeTab === '_favourites' && sidebarOpen}
+            className="tu-activity-btn tu-activity-btn--edit"
+            onClick={(e) => setChipEditorAnchor(e.currentTarget.getBoundingClientRect())}
+            data-tooltip="Customize sidebar"
+            aria-label="Customize sidebar"
           >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
+            <PlusIcon size={20} strokeWidth={1.8} />
           </button>
           <div className="tu-activity-spacer" />
           {/* Templates */}
@@ -1698,6 +1781,57 @@ export default function TextForm(props: TextFormProps) {
           </button>
         </div>
 
+        {/* Desktop ⋯ overflow menu for the activity-bar chips */}
+        {chipOverflowOpen &&
+          createPortal(
+            <>
+              <div className="tu-group-menu-backdrop" onClick={() => setChipOverflowOpen(false)} />
+              <div
+                className="tu-group-menu"
+                style={(() => {
+                  const rect = chipOverflowBtnRef.current?.getBoundingClientRect();
+                  const top = Math.max(
+                    4,
+                    Math.min(rect?.top ?? 0, window.innerHeight - 320)
+                  );
+                  return { top, left: (rect?.right ?? 48) + 8 };
+                })()}
+                role="menu"
+                aria-label="More views"
+              >
+                {overflowBarChips.map((chip) => {
+                  const key = chipKey(chip);
+                  const label = chipLabel(chip, toolGroups.groups)!;
+                  return (
+                    <button
+                      key={key}
+                      className="tu-group-menu-item"
+                      role="menuitem"
+                      onClick={() => {
+                        handleActivityClick(key);
+                        setChipOverflowOpen(false);
+                      }}
+                    >
+                      <span className="tu-group-menu-name">{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>,
+            document.body
+          )}
+
+        {/* Chip-row editor popover (desktop trigger) */}
+        {chipEditorAnchor && (
+          <ChipEditor
+            anchor={chipEditorAnchor}
+            onClose={() => setChipEditorAnchor(null)}
+            sidebarChips={sidebarChips}
+            toolGroups={toolGroups}
+            showAlert={showAlert}
+          />
+        )}
+
         {/* ─── Sidebar (tool explorer / templates / history) ─── */}
         <div className="tu-forge-sidebar">
           <div className="tu-sidebar-header">
@@ -1706,19 +1840,13 @@ export default function TextForm(props: TextFormProps) {
                 ? 'Templates'
                 : activeTab === '_history'
                   ? 'History'
-                  : activeTab === '_favourites'
-                    ? 'Favourites'
-                    : USE_CASE_TABS.find((t) => t.id === activeTab)?.label || 'Explorer'}
-              {activeTab && !activeTab.startsWith('_') && (
-                <span className="tu-sidebar-header-count">
-                  {activeTab === 'all'
-                    ? TOOLS.length
-                    : TOOLS.filter((t) => t.tabs?.includes(activeTab as ToolTab)).length}
-                </span>
+                  : activeChipTitle || 'Explorer'}
+              {activeTab && !activeTab.startsWith('_') && activeChipCount !== null && (
+                <span className="tu-sidebar-header-count">{activeChipCount}</span>
               )}
             </span>
             <div className="tu-sidebar-header-actions">
-              {((activeTab && !activeTab.startsWith('_')) || activeTab === '_favourites') && (
+              {activeTab && !activeTab.startsWith('_') && (
                 <>
                   <button
                     className={`tu-sidebar-header-btn${
@@ -1799,14 +1927,13 @@ export default function TextForm(props: TextFormProps) {
           {isMobile && (
             <div className="tu-sheet-tabs">
               {[
-                { id: '_favourites', label: 'Favourites', icon: HeartIcon },
                 { id: '_templates', label: 'Templates', icon: LayoutTemplateIcon },
                 { id: '_history', label: 'History', icon: HistoryIcon },
               ].map((t) => (
                 <button
                   key={t.id}
                   className={`tu-sheet-tab${activeTab === t.id ? ' tu-sheet-tab--active' : ''}`}
-                  onClick={() => setActiveTab(activeTab === t.id ? 'all' : t.id)}
+                  onClick={() => setActiveTab(activeTab === t.id ? 'view:all' : t.id)}
                   aria-pressed={activeTab === t.id}
                 >
                   <span aria-hidden="true">
@@ -1818,12 +1945,12 @@ export default function TextForm(props: TextFormProps) {
             </div>
           )}
 
-          {/* Tool panel — when a tool category is active */}
+          {/* Tool panel — when a chip view is active */}
           {activeTab && !activeTab.startsWith('_') && (
             <ToolPanel
               tools={TOOLS}
-              activeTab={activeTab}
-              onTabChange={(tabId) => setActiveTab(tabId)}
+              activeChipKey={activeTab}
+              onChipChange={(key) => setActiveTab(key)}
               onToolClick={handleToolClick}
               disabled={loading}
               favorites={favorites}
@@ -1836,79 +1963,15 @@ export default function TextForm(props: TextFormProps) {
                 }
                 return null;
               })()}
-              hideTabs={!isMobile}
+              hideChips={!isMobile}
               viewMode={toolViewMode}
               suggestedToolIds={suggestions.suggestions.map((t) => t.id)}
               toolGroups={toolGroups}
+              sidebarChips={sidebarChips}
+              recentToolIds={recents.recentToolIds}
+              showAlert={showAlert}
             />
           )}
-
-          {/* Favourites panel */}
-          {activeTab === '_favourites' &&
-            (() => {
-              const favTools = favorites.favorites
-                .map((id: string) => TOOLS.find((t) => t.id === id))
-                .filter(Boolean) as ToolDefinition[];
-              return (
-                <div className="tu-tpanel">
-                  {favTools.length === 0 ? (
-                    <div className="tu-sidebar-panel-empty">
-                      No favourite tools yet.
-                      <br />
-                      Click <HeartIcon size={11} /> on any tool to add it here.
-                    </div>
-                  ) : toolViewMode === 'grid' ? (
-                    <div className="tu-tpanel-list">
-                      <div className="tu-group-grid">
-                        {favTools.map((tool) => (
-                          <div
-                            key={tool.id}
-                            className="tu-tgrid-card"
-                            onClick={() => handleToolClick(tool)}
-                          >
-                            <div className="tu-tgrid-card-icon">
-                              <ToolIcon icon={tool.icon} color={tool.color} toolId={tool.id} />
-                            </div>
-                            <span className="tu-tgrid-card-name">{tool.label}</span>
-                            <button
-                              className="tu-titem-fav tu-tgrid-card-fav tu-titem-fav--active"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                favorites.toggleFavorite(tool.id);
-                              }}
-                              title="Remove from favourites"
-                            >
-                              <HeartIcon size={13} fill="currentColor" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="tu-tpanel-list">
-                      {favTools.map((tool) => (
-                        <div key={tool.id} className="tu-titem-wrap">
-                          <div className="tu-titem" onClick={() => handleToolClick(tool)}>
-                            <ToolIcon icon={tool.icon} color={tool.color} toolId={tool.id} />
-                            <span className="tu-titem-name">{tool.label}</span>
-                            <button
-                              className="tu-titem-fav tu-titem-fav--active"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                favorites.toggleFavorite(tool.id);
-                              }}
-                              title="Remove from favourites"
-                            >
-                              <HeartIcon size={13} fill="currentColor" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
 
           {/* Templates panel */}
           {activeTab === '_templates' && (
@@ -2291,23 +2354,23 @@ export default function TextForm(props: TextFormProps) {
                   {/* Category grid + Shortcuts */}
                   <div className="tu-landing-bottom">
                     <div className="tu-landing-categories">
-                      <h2 className="tu-landing-heading">Explore categories</h2>
+                      <h2 className="tu-landing-heading">Explore groups</h2>
                       <div className="tu-landing-cat-grid">
-                        {USE_CASE_TABS.filter((t) => t.id !== 'all').map((tab) => {
-                          const count = TOOLS.filter((t) => t.tabs?.includes(tab.id)).length;
+                        {TOOL_GROUPS.map((group) => {
+                          const count = TOOLS.filter((t) => t.group === group.id).length;
                           return (
                             <button
-                              key={tab.id}
+                              key={group.id}
                               className="tu-landing-cat-card"
                               onClick={() => {
-                                setActiveTab(tab.id);
+                                setActiveTab(`group:${group.id}`);
                                 setSidebarOpen(true);
                               }}
                             >
                               <span className="tu-landing-cat-icon">
-                                {ACTIVITY_ICONS[tab.id] || <span>{tab.icon}</span>}
+                                <span>{chipInitials(group.label)}</span>
                               </span>
-                              <span className="tu-landing-cat-name">{tab.label}</span>
+                              <span className="tu-landing-cat-name">{group.label}</span>
                               <span className="tu-landing-cat-count">{count} tools</span>
                             </button>
                           );
@@ -2536,23 +2599,23 @@ export default function TextForm(props: TextFormProps) {
 
                   {/* Category grid */}
                   <div className="tu-landing-categories">
-                    <h2 className="tu-landing-section-title">Explore categories</h2>
+                    <h2 className="tu-landing-section-title">Explore groups</h2>
                     <div className="tu-landing-cat-grid">
-                      {USE_CASE_TABS.filter((t) => t.id !== 'all').map((tab) => {
-                        const count = TOOLS.filter((t) => t.tabs?.includes(tab.id)).length;
+                      {TOOL_GROUPS.map((group) => {
+                        const count = TOOLS.filter((t) => t.group === group.id).length;
                         return (
                           <button
-                            key={tab.id}
+                            key={group.id}
                             className="tu-landing-cat-card"
                             onClick={() => {
-                              setActiveTab(tab.id);
+                              setActiveTab(`group:${group.id}`);
                               setSidebarOpen(true);
                             }}
                           >
                             <span className="tu-landing-cat-icon">
-                              {ACTIVITY_ICONS[tab.id] || <span>{tab.icon}</span>}
+                              <span>{chipInitials(group.label)}</span>
                             </span>
-                            <span className="tu-landing-cat-name">{tab.label}</span>
+                            <span className="tu-landing-cat-name">{group.label}</span>
                             <span className="tu-landing-cat-count">{count} tools</span>
                           </button>
                         );
@@ -2568,9 +2631,9 @@ export default function TextForm(props: TextFormProps) {
                     </div>
                     <div className="tu-landing-highlight">
                       <span className="tu-landing-highlight-val">
-                        {USE_CASE_TABS.filter((t) => t.id !== 'all').length}
+                        {TOOL_GROUPS.length}
                       </span>
-                      <span className="tu-landing-highlight-label">Categories</span>
+                      <span className="tu-landing-highlight-label">Tool groups</span>
                     </div>
                     <div className="tu-landing-highlight">
                       <span className="tu-landing-highlight-val">
@@ -3360,7 +3423,7 @@ export default function TextForm(props: TextFormProps) {
           <button
             className="tu-tools-fab"
             onClick={() => {
-              if (!sidebarOpen && !activeTab) setActiveTab('all');
+              if (!sidebarOpen && !activeTab) setActiveTab('view:all');
               setSidebarOpen((o) => !o);
             }}
             aria-expanded={sidebarOpen}

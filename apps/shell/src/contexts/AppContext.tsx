@@ -11,6 +11,7 @@ import { logout as clearAuthUser } from '@velobits/app-core/store/slices/authSli
 import type { AppDispatch, RootState } from '@velobits/app-core/store/store';
 import useToolGroups from '@velobits/app-core/hooks/useToolGroups';
 import useFavorites from '@velobits/app-core/hooks/useFavorites';
+import useSidebarChips from '@velobits/app-core/hooks/useSidebarChips';
 import useSubscription from '@velobits/app-core/hooks/useSubscription';
 import { useAlertContext } from './AlertContext';
 import type {
@@ -28,6 +29,7 @@ export type {
   ToolGroupsContextValue,
   ToolGroupView,
   FavoritesContextValue,
+  SidebarChipsContextValue,
   ToolUsage,
   SubscriptionContextValue,
   AppContextValue,
@@ -80,11 +82,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated, user, meFailed, meAuthRejected, refetchMe]);
   const toolGroups = useToolGroups();
   const favorites = useFavorites();
+  // Same instance as `toolGroups` on purpose: the chips hook prunes
+  // custom_group chips against this exact groups list (delete cascade).
+  const sidebarChips = useSidebarChips(toolGroups);
   const subscription = useSubscription({ showAlert }) as unknown as SubscriptionContextValue;
 
   const value = useMemo(
-    () => ({ user, isAuthenticated, userResolving, toolGroups, favorites, subscription }),
-    [user, isAuthenticated, userResolving, toolGroups, favorites, subscription]
+    () => ({
+      user,
+      isAuthenticated,
+      userResolving,
+      toolGroups,
+      favorites,
+      sidebarChips,
+      subscription,
+    }),
+    [user, isAuthenticated, userResolving, toolGroups, favorites, sidebarChips, subscription]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
