@@ -470,6 +470,8 @@ const defaultToolGroups: ToolGroupsContextValue = {
   deleteGroup: vi.fn(),
   addToolToGroup: vi.fn(),
   removeToolFromGroup: vi.fn(),
+  setGroupTools: vi.fn(),
+  reorderGroups: vi.fn(),
 };
 
 const defaultFavorites: FavoritesContextValue = {
