@@ -2124,1474 +2124,25 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/text/generate-hashtags': {
+  '/api/v1/auth/me': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
-    put?: never;
     /**
-     * Generate Hashtags
-     * @description Apply the 'generate-hashtags' transformation to the input text.
-     */
-    post: operations['tool_generate_hashtags_api_v1_text_generate_hashtags_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/generate-seo-titles': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Generate SEO Titles
-     * @description Apply the 'generate-seo-titles' transformation to the input text.
-     */
-    post: operations['tool_generate_seo_titles_api_v1_text_generate_seo_titles_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/generate-meta-descriptions': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Generate Meta Descriptions
-     * @description Apply the 'generate-meta-descriptions' transformation to the input text.
-     */
-    post: operations['tool_generate_meta_descriptions_api_v1_text_generate_meta_descriptions_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/generate-blog-outline': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Generate Blog Outline
-     * @description Apply the 'generate-blog-outline' transformation to the input text.
-     */
-    post: operations['tool_generate_blog_outline_api_v1_text_generate_blog_outline_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/shorten-for-tweet': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Shorten for Tweet
-     * @description Apply the 'shorten-for-tweet' transformation to the input text.
-     */
-    post: operations['tool_shorten_for_tweet_api_v1_text_shorten_for_tweet_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/rewrite-email': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Rewrite Email
-     * @description Apply the 'rewrite-email' transformation to the input text.
-     */
-    post: operations['tool_rewrite_email_api_v1_text_rewrite_email_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/extract-keywords': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Extract Keywords
-     * @description Apply the 'extract-keywords' transformation to the input text.
-     */
-    post: operations['tool_extract_keywords_api_v1_text_extract_keywords_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/translate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Translate
-     * @description Apply the 'translate' transformation to the input text.
-     */
-    post: operations['tool_translate_api_v1_text_translate_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/transliterate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Transliterate
-     * @description Apply the 'transliterate' transformation to the input text.
-     */
-    post: operations['tool_transliterate_api_v1_text_transliterate_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/emojify': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Emojify
-     * @description Apply the 'emojify' transformation to the input text.
-     */
-    post: operations['tool_emojify_api_v1_text_emojify_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/detect-language': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Detect Language
-     * @description Apply the 'detect-language' transformation to the input text.
-     */
-    post: operations['tool_detect_language_api_v1_text_detect_language_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/summarize': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Summarize
-     * @description Apply the 'summarize' transformation to the input text.
-     */
-    post: operations['tool_summarize_api_v1_text_summarize_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/fix-grammar': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Fix Grammar
-     * @description Apply the 'fix-grammar' transformation to the input text.
-     */
-    post: operations['tool_fix_grammar_api_v1_text_fix_grammar_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/paraphrase': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Paraphrase
-     * @description Apply the 'paraphrase' transformation to the input text.
-     */
-    post: operations['tool_paraphrase_api_v1_text_paraphrase_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/change-tone': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Change Tone
-     * @description Apply the 'change-tone' transformation to the input text.
-     */
-    post: operations['tool_change_tone_api_v1_text_change_tone_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/analyze-sentiment': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Analyze Sentiment
-     * @description Apply the 'analyze-sentiment' transformation to the input text.
-     */
-    post: operations['tool_analyze_sentiment_api_v1_text_analyze_sentiment_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/lengthen-text': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Lengthen Text
-     * @description Apply the 'lengthen-text' transformation to the input text.
-     */
-    post: operations['tool_lengthen_text_api_v1_text_lengthen_text_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/eli5': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * ELI5
-     * @description Apply the 'eli5' transformation to the input text.
-     */
-    post: operations['tool_eli5_api_v1_text_eli5_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/proofread': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Proofread
-     * @description Apply the 'proofread' transformation to the input text.
-     */
-    post: operations['tool_proofread_api_v1_text_proofread_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/generate-title': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Generate Title
-     * @description Apply the 'generate-title' transformation to the input text.
-     */
-    post: operations['tool_generate_title_api_v1_text_generate_title_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/refactor-prompt': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Refactor Prompt
-     * @description Apply the 'refactor-prompt' transformation to the input text.
-     */
-    post: operations['tool_refactor_prompt_api_v1_text_refactor_prompt_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/change-format': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Change Format
-     * @description Apply the 'change-format' transformation to the input text.
-     */
-    post: operations['tool_change_format_api_v1_text_change_format_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/academic-style': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Academic Style
-     * @description Apply the 'academic-style' transformation to the input text.
-     */
-    post: operations['tool_academic_style_api_v1_text_academic_style_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/creative-style': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Creative Style
-     * @description Apply the 'creative-style' transformation to the input text.
-     */
-    post: operations['tool_creative_style_api_v1_text_creative_style_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/technical-style': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Technical Style
-     * @description Apply the 'technical-style' transformation to the input text.
-     */
-    post: operations['tool_technical_style_api_v1_text_technical_style_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/active-voice': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Active Voice
-     * @description Apply the 'active-voice' transformation to the input text.
-     */
-    post: operations['tool_active_voice_api_v1_text_active_voice_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/redundancy-remover': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Redundancy Remover
-     * @description Apply the 'redundancy-remover' transformation to the input text.
-     */
-    post: operations['tool_redundancy_remover_api_v1_text_redundancy_remover_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/sentence-splitter': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Sentence Splitter
-     * @description Apply the 'sentence-splitter' transformation to the input text.
-     */
-    post: operations['tool_sentence_splitter_api_v1_text_sentence_splitter_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/conciseness': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Conciseness
-     * @description Apply the 'conciseness' transformation to the input text.
-     */
-    post: operations['tool_conciseness_api_v1_text_conciseness_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/resume-bullets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Resume Bullets
-     * @description Apply the 'resume-bullets' transformation to the input text.
-     */
-    post: operations['tool_resume_bullets_api_v1_text_resume_bullets_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/meeting-notes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Meeting Notes
-     * @description Apply the 'meeting-notes' transformation to the input text.
-     */
-    post: operations['tool_meeting_notes_api_v1_text_meeting_notes_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/cover-letter': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Cover Letter
-     * @description Apply the 'cover-letter' transformation to the input text.
-     */
-    post: operations['tool_cover_letter_api_v1_text_cover_letter_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/outline-to-draft': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Outline to Draft
-     * @description Apply the 'outline-to-draft' transformation to the input text.
-     */
-    post: operations['tool_outline_to_draft_api_v1_text_outline_to_draft_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/continue-writing': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Continue Writing
-     * @description Apply the 'continue-writing' transformation to the input text.
-     */
-    post: operations['tool_continue_writing_api_v1_text_continue_writing_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/rewrite-unique': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Rewrite Unique
-     * @description Apply the 'rewrite-unique' transformation to the input text.
-     */
-    post: operations['tool_rewrite_unique_api_v1_text_rewrite_unique_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/tone-analyzer': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Tone Analyzer
-     * @description Apply the 'tone-analyzer' transformation to the input text.
-     */
-    post: operations['tool_tone_analyzer_api_v1_text_tone_analyzer_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/linkedin-post': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * LinkedIn Post
-     * @description Apply the 'linkedin-post' transformation to the input text.
-     */
-    post: operations['tool_linkedin_post_api_v1_text_linkedin_post_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/twitter-thread': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Twitter Thread
-     * @description Apply the 'twitter-thread' transformation to the input text.
-     */
-    post: operations['tool_twitter_thread_api_v1_text_twitter_thread_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/instagram-caption': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Instagram Caption
-     * @description Apply the 'instagram-caption' transformation to the input text.
-     */
-    post: operations['tool_instagram_caption_api_v1_text_instagram_caption_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/youtube-description': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * YouTube Description
-     * @description Apply the 'youtube-description' transformation to the input text.
-     */
-    post: operations['tool_youtube_description_api_v1_text_youtube_description_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/social-bio': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Social Bio
-     * @description Apply the 'social-bio' transformation to the input text.
-     */
-    post: operations['tool_social_bio_api_v1_text_social_bio_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/product-description': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Product Description
-     * @description Apply the 'product-description' transformation to the input text.
-     */
-    post: operations['tool_product_description_api_v1_text_product_description_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/cta-generator': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * CTA Generator
-     * @description Apply the 'cta-generator' transformation to the input text.
-     */
-    post: operations['tool_cta_generator_api_v1_text_cta_generator_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/ad-copy': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Ad Copy
-     * @description Apply the 'ad-copy' transformation to the input text.
-     */
-    post: operations['tool_ad_copy_api_v1_text_ad_copy_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/landing-headline': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Landing Headline
-     * @description Apply the 'landing-headline' transformation to the input text.
-     */
-    post: operations['tool_landing_headline_api_v1_text_landing_headline_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/email-subject': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Email Subject
-     * @description Apply the 'email-subject' transformation to the input text.
-     */
-    post: operations['tool_email_subject_api_v1_text_email_subject_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/content-ideas': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Content Ideas
-     * @description Apply the 'content-ideas' transformation to the input text.
-     */
-    post: operations['tool_content_ideas_api_v1_text_content_ideas_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/hook-generator': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Hook Generator
-     * @description Apply the 'hook-generator' transformation to the input text.
-     */
-    post: operations['tool_hook_generator_api_v1_text_hook_generator_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/angle-generator': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Angle Generator
-     * @description Apply the 'angle-generator' transformation to the input text.
-     */
-    post: operations['tool_angle_generator_api_v1_text_angle_generator_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/faq-schema': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * FAQ Schema
-     * @description Apply the 'faq-schema' transformation to the input text.
-     */
-    post: operations['tool_faq_schema_api_v1_text_faq_schema_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/pos-tagger': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * POS Tagger
-     * @description Apply the 'pos-tagger' transformation to the input text.
-     */
-    post: operations['tool_pos_tagger_api_v1_text_pos_tagger_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/sentence-type': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Sentence Type
-     * @description Apply the 'sentence-type' transformation to the input text.
-     */
-    post: operations['tool_sentence_type_api_v1_text_sentence_type_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/grammar-explain': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Grammar Explain
-     * @description Apply the 'grammar-explain' transformation to the input text.
-     */
-    post: operations['tool_grammar_explain_api_v1_text_grammar_explain_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/synonym-finder': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Synonym Finder
-     * @description Apply the 'synonym-finder' transformation to the input text.
-     */
-    post: operations['tool_synonym_finder_api_v1_text_synonym_finder_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/antonym-finder': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Antonym Finder
-     * @description Apply the 'antonym-finder' transformation to the input text.
-     */
-    post: operations['tool_antonym_finder_api_v1_text_antonym_finder_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/define-words': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Define Words
-     * @description Apply the 'define-words' transformation to the input text.
-     */
-    post: operations['tool_define_words_api_v1_text_define_words_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/word-power': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Word Power
-     * @description Apply the 'word-power' transformation to the input text.
-     */
-    post: operations['tool_word_power_api_v1_text_word_power_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/vocab-complexity': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Vocab Complexity
-     * @description Apply the 'vocab-complexity' transformation to the input text.
-     */
-    post: operations['tool_vocab_complexity_api_v1_text_vocab_complexity_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/jargon-simplifier': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Jargon Simplifier
-     * @description Apply the 'jargon-simplifier' transformation to the input text.
-     */
-    post: operations['tool_jargon_simplifier_api_v1_text_jargon_simplifier_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/formality-detector': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Formality Detector
-     * @description Apply the 'formality-detector' transformation to the input text.
-     */
-    post: operations['tool_formality_detector_api_v1_text_formality_detector_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/cliche-detector': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Cliche Detector
-     * @description Apply the 'cliche-detector' transformation to the input text.
-     */
-    post: operations['tool_cliche_detector_api_v1_text_cliche_detector_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/regex-generator': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Regex Generator
-     * @description Apply the 'regex-generator' transformation to the input text.
-     */
-    post: operations['tool_regex_generator_api_v1_text_regex_generator_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/writing-prompt': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Writing Prompt
-     * @description Apply the 'writing-prompt' transformation to the input text.
-     */
-    post: operations['tool_writing_prompt_api_v1_text_writing_prompt_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/team-name-generator': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Team Name Generator
-     * @description Apply the 'team-name-generator' transformation to the input text.
-     */
-    post: operations['tool_team_name_generator_api_v1_text_team_name_generator_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/mock-api-response': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Mock API Response
-     * @description Apply the 'mock-api-response' transformation to the input text.
-     */
-    post: operations['tool_mock_api_response_api_v1_text_mock_api_response_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/text/{tool_id}/stream': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Stream Tool
-     * @description Stream AI tool output via Server-Sent Events (token-by-token).
+     * Me
+     * @description Return the current authenticated user's profile and subscription tier.
      *
-     *     Only available for AI-type tools. Returns a ``text/event-stream`` response.
+     *     Side effect: issues the ``fixmytext_session`` cookie. The browser stores it
+     *     HttpOnly + host-only, and from this request onward the cookie is sufficient
+     *     for authentication on subsequent requests (Bearer JWT is still accepted in
+     *     parallel for the transition window — see ``get_current_user``).
      */
-    post: operations['stream_tool_api_v1_text__tool_id__stream_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/register': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
+    get: operations['me_api_v1_auth_me_get'];
     put?: never;
-    /**
-     * Register
-     * @description Create a new user account and return an access token pair.
-     *
-     *     The refresh token is set as an HTTP-only cookie; only the access token
-     *     is returned in the response body.
-     */
-    post: operations['register_api_v1_auth_register_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/login': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Login
-     * @description Authenticate with email and password and return an access token.
-     *
-     *     On success the refresh token is stored as an HTTP-only cookie. If
-     *     ``remember_me`` is false the cookie is a session cookie (no max_age).
-     */
-    post: operations['login_api_v1_auth_login_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/refresh': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Refresh
-     * @description Exchange a valid refresh token (from cookie) for a new access/refresh pair.
-     *
-     *     Implements token rotation: a new refresh token replaces the old one on
-     *     every successful refresh.
-     */
-    post: operations['refresh_api_v1_auth_refresh_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Logout
-     * @description Log out by clearing the refresh token cookie.
-     */
-    post: operations['logout_api_v1_auth_logout_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/forgot-password': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Forgot Password
-     * @description Issue a time-limited password reset token for the given email.
-     *
-     *     Always returns a success response — never reveals whether the email
-     *     is registered. Rate limited to 3 requests/minute per client IP.
-     */
-    post: operations['forgot_password_api_v1_auth_forgot_password_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/reset-password': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Reset Password
-     * @description Consume a password reset token and set the user's new password.
-     */
-    post: operations['reset_password_api_v1_auth_reset_password_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/verify-email': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Verify Email Endpoint
-     * @description Consume an email verification token and mark the account verified.
-     */
-    post: operations['verify_email_endpoint_api_v1_auth_verify_email_post'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -3608,33 +2159,40 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Resend Verification Endpoint
-     * @description Issue a fresh verification email.
+     * Resend Verification
+     * @description Re-send the Keycloak email-verification email to the current user.
      *
-     *     Per-user cooldown (1 request / 2 minutes) is enforced via Redis-backed
-     *     rate limiter keyed on the user's ID, so it survives across IPs/clients.
+     *     Backs the in-app "Verify your email" banner. With the realm's blocking
+     *     verify-email requirement disabled, Keycloak no longer emails at signup or
+     *     on login — this endpoint (and the first-login send in ``deps.py``) is how
+     *     verification links reach the user. No-op for already-verified users.
      */
-    post: operations['resend_verification_endpoint_api_v1_auth_resend_verification_post'];
+    post: operations['resend_verification_api_v1_auth_resend_verification_post'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/v1/auth/me': {
+  '/api/v1/auth/session/clear': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /**
-     * Me
-     * @description Return the current authenticated user's profile and subscription tier.
-     */
-    get: operations['me_api_v1_auth_me_get'];
+    get?: never;
     put?: never;
-    post?: never;
+    /**
+     * Clear Session
+     * @description Clear the per-app session cookie. Called by the frontend on logout
+     *     BEFORE redirecting to Keycloak's end-session endpoint.
+     *
+     *     No auth required — clearing is idempotent. As a side effect the current
+     *     session is added to the Redis revocation set so it cannot be replayed
+     *     even if the browser ignores the Max-Age=0 instruction.
+     */
+    post: operations['clear_session_api_v1_auth_session_clear_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -3658,6 +2216,30 @@ export interface paths {
      * @description Update the authenticated user's preferences (partial update).
      */
     put: operations['update_preferences_api_v1_user_preferences_put'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/gamification': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Gamification
+     * @description Transitional stub — gamification removed; returns a static zero-state.
+     */
+    get: operations['get_gamification_api_v1_user_gamification_get'];
+    /**
+     * Update Gamification
+     * @description Transitional stub — accepts any body, persists nothing, returns zero-state.
+     */
+    put: operations['update_gamification_api_v1_user_gamification_put'];
     post?: never;
     delete?: never;
     options?: never;
@@ -3805,8 +2387,35 @@ export interface paths {
      *
      *     Idempotent by name: if the user already has a group with this name, the
      *     existing group is returned unchanged (200) — tool_ids are NOT merged in.
+     *     This keeps guest-adoption retries and double-clicked starter-kit cards
+     *     from erroring or duplicating.
      */
     post: operations['create_tool_group_api_v1_user_tool_groups_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/order': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Reorder Tool Groups
+     * @description Reorder the authenticated user's tool groups.
+     *
+     *     Groups listed in `group_ids` get sort_order = array position; the user's
+     *     remaining groups keep their relative order after the listed ones. Unknown
+     *     and foreign ids are ignored. Idempotent — resending the same list is a
+     *     no-op. Returns all groups in the new display order.
+     */
+    put: operations['reorder_tool_groups_api_v1_user_tool_groups_order_put'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -3858,6 +2467,30 @@ export interface paths {
      * @description Remove a tool from one of the authenticated user's groups.
      */
     delete: operations['remove_tool_from_group_api_v1_user_tool_groups__group_id__tools__tool_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/tool-groups/{group_id}/tools': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Set Tool Group Tools
+     * @description Replace a group's tools with an explicit ordered list.
+     *
+     *     Array position becomes sort_order, so a single call covers drag-reorder,
+     *     bulk add, and bulk remove. Duplicates keep their first position.
+     *     Idempotent — resending the current list is a no-op.
+     */
+    put: operations['set_tool_group_tools_api_v1_user_tool_groups__group_id__tools_put'];
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -3968,292 +2601,6 @@ export interface paths {
     get: operations['get_spin_history_api_v1_user_spin_history_get'];
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/subscription/status': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Subscription Status
-     * @description Return the current user's subscription status, usage, and pass/credit info.
-     */
-    get: operations['subscription_status_api_v1_subscription_status_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/subscription/checkout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Create Pro Checkout
-     * @description Create a Razorpay order for upgrading to Pro (one-time monthly payment).
-     */
-    post: operations['create_pro_checkout_api_v1_subscription_checkout_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/subscription/verify': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Verify Pro Payment
-     * @description Verify Razorpay payment and activate Pro.
-     *
-     *     Trust model:
-     *       1. The client-supplied signature is verified against Razorpay's servers.
-     *       2. The order is re-fetched from Razorpay's API (server-to-server) and the
-     *          ``notes.user_id`` embedded at order-creation time is compared to the
-     *          authenticated user.  These notes originate from *our* backend (set in
-     *          ``create_pro_checkout``), not from the client request, so they are
-     *          trustworthy once the order ID is confirmed authentic.
-     */
-    post: operations['verify_pro_payment_api_v1_subscription_verify_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/subscription/cancel': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Cancel Pro
-     * @description Cancel Pro subscription (immediate downgrade).
-     */
-    post: operations['cancel_pro_api_v1_subscription_cancel_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/subscription/webhook': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Razorpay Webhook
-     * @description Handle Razorpay webhook events for payments.
-     *
-     *     Supports: payment.captured, payment.authorized, payment.failed,
-     *     subscription.cancelled, subscription.halted.
-     *
-     *     Idempotent — duplicate events (same razorpay_event_id) are acknowledged
-     *     but not reprocessed.
-     */
-    post: operations['razorpay_webhook_api_v1_subscription_webhook_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/catalog': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Catalog
-     * @description Return all available passes and credit packs with regional pricing.
-     *
-     *     Auto-detects region from the client's IP address if not provided or invalid.
-     */
-    get: operations['get_catalog_api_v1_passes_catalog_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/active': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Active
-     * @description Return the authenticated user's active passes and total credit balance.
-     */
-    get: operations['get_active_api_v1_passes_active_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Create Pass Order
-     * @description Create a Razorpay order for purchasing a pass.
-     *
-     *     Resolves the user's region (from explicit param, stored value, or IP),
-     *     then creates a Razorpay order with the correct regional pricing.
-     */
-    post: operations['create_pass_order_api_v1_passes_order_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/credit-order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Create Credit Order
-     * @description Create a Razorpay order for purchasing a credit pack.
-     *
-     *     Resolves the user's region and returns a Razorpay order with pricing
-     *     in the correct currency.
-     */
-    post: operations['create_credit_order_api_v1_passes_credit_order_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/verify': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Verify Pass Payment
-     * @description Verify a Razorpay payment signature, then grant the purchased pass or credits.
-     *
-     *     Delegates signature and ownership checks to the payment service. On success,
-     *     grants the purchased item and a one-time welcome gift (10 credits) for
-     *     first-time purchasers. All grants are wrapped in a single transaction.
-     */
-    post: operations['verify_pass_payment_api_v1_passes_verify_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/spin': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Do Spin
-     * @description Spin the weekly reward wheel for a random prize (pass or credits).
-     */
-    post: operations['do_spin_api_v1_passes_spin_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/referral-code': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Referral Code
-     * @description Get or generate the authenticated user's unique referral code and URL.
-     */
-    get: operations['get_referral_code_api_v1_passes_referral_code_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/passes/claim-referral': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Do Claim Referral
-     * @description Claim a referral code, granting rewards to both the referrer and the new user.
-     */
-    post: operations['do_claim_referral_api_v1_passes_claim_referral_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -4397,6 +2744,414 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/passes/catalog': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Catalog
+     * @description Return all available passes and credit packs with regional pricing.
+     *
+     *     Auto-detects region from the client's IP address if not provided or invalid.
+     */
+    get: operations['get_catalog_api_v1_passes_catalog_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/active': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Active
+     * @description Return the authenticated user's active passes and total credit balance.
+     */
+    get: operations['get_active_api_v1_passes_active_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/order': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create Pass Order
+     * @description Create a Razorpay order for purchasing a pass.
+     *
+     *     Resolves the user's region (from explicit param, stored value, or IP),
+     *     then creates a Razorpay order with the correct regional pricing.
+     */
+    post: operations['create_pass_order_api_v1_passes_order_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/credit-order': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create Credit Order
+     * @description Create a Razorpay order for purchasing a credit pack.
+     *
+     *     Resolves the user's region and returns a Razorpay order with pricing
+     *     in the correct currency.
+     */
+    post: operations['create_credit_order_api_v1_passes_credit_order_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/verify': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Verify Pass Payment
+     * @description Verify a Razorpay payment signature, then grant the purchased pass or credits.
+     *
+     *     Fulfillment is idempotent and exactly-once: this verify callback and the
+     *     Razorpay webhook converge on a single ledger keyed by the payment id, so a
+     *     replayed body or a verify/webhook race grants the entitlement only once.
+     *     Tool scope and the paid amount are validated server-side against the order
+     *     notes and the catalog — the client-supplied ``tool_ids`` are ignored.
+     */
+    post: operations['verify_pass_payment_api_v1_passes_verify_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/spin': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Do Spin
+     * @description Spin the weekly reward wheel for a random prize (pass or credits).
+     */
+    post: operations['do_spin_api_v1_passes_spin_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/referral-code': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Referral Code
+     * @description Get or generate the authenticated user's unique referral code and URL.
+     */
+    get: operations['get_referral_code_api_v1_passes_referral_code_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/passes/claim-referral': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Do Claim Referral
+     * @description Claim a referral code, granting rewards to both the referrer and the new user.
+     */
+    post: operations['do_claim_referral_api_v1_passes_claim_referral_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/subscription/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Subscription Status
+     * @description Return the current user's subscription status, usage, and pass/credit info.
+     */
+    get: operations['subscription_status_api_v1_subscription_status_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/subscription/checkout': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create Pro Checkout
+     * @description Create a Razorpay order for upgrading to Pro (one-time monthly payment).
+     */
+    post: operations['create_pro_checkout_api_v1_subscription_checkout_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/subscription/verify': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Verify Pro Payment
+     * @description Verify Razorpay payment and activate Pro.
+     *
+     *     Trust model:
+     *       1. The client-supplied signature is verified against Razorpay's servers.
+     *       2. The order is re-fetched from Razorpay's API (server-to-server) and the
+     *          ``notes.user_id`` embedded at order-creation time is compared to the
+     *          authenticated user.  These notes originate from *our* backend (set in
+     *          ``create_pro_checkout``), not from the client request, so they are
+     *          trustworthy once the order ID is confirmed authentic.
+     */
+    post: operations['verify_pro_payment_api_v1_subscription_verify_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/subscription/cancel': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Cancel Pro
+     * @description Cancel Pro. Access continues until the paid period ends (expires_at).
+     *
+     *     Idempotent: cancelling an already-cancelled in-period plan returns the
+     *     same response without changing anything.
+     */
+    post: operations['cancel_pro_api_v1_subscription_cancel_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/subscription/webhook': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Razorpay Webhook
+     * @description Handle Razorpay webhook events for payments.
+     *
+     *     Supports: payment.captured, payment.authorized, payment.failed,
+     *     subscription.cancelled, subscription.halted.
+     *
+     *     Idempotent — duplicate events (same razorpay_event_id) are acknowledged
+     *     but not reprocessed.
+     */
+    post: operations['razorpay_webhook_api_v1_subscription_webhook_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/internal/v1/check-access': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Check Access
+     * @description Check (and consume) a tool entitlement for a user or anonymous visitor.
+     *
+     *     Returns 200 with ``allowed=false`` for quota-exhausted (the caller decides
+     *     UX), 422 for malformed input, 401 for a bad internal secret, and 503 if the
+     *     database is unavailable (callers fail closed for paid tools on 503).
+     */
+    post: operations['check_access_internal_v1_check_access_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ai/{tool_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Run Ai Tool
+     * @description Execute an AI text transformation tool.
+     *
+     *     All registered AI tools are available here.  Parameterised tools
+     *     (translate, change-tone, change-format) expect additional fields in
+     *     the request body.
+     */
+    post: operations['run_ai_tool_api_v1_ai__tool_id__post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ai/{tool_id}/stream': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Stream Ai Tool
+     * @description Stream AI tool output via Server-Sent Events (token-by-token).
+     *
+     *     Returns a ``text/event-stream`` response. Only available for registered
+     *     AI tools.
+     */
+    post: operations['stream_ai_tool_api_v1_ai__tool_id__stream_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ai/{tool_id}/enqueue': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Enqueue Ai Tool
+     * @description Enqueue an AI tool job for async execution via arq worker.
+     *
+     *     Returns immediately with a ``job_id``. Poll ``GET /jobs/{job_id}`` for the result.
+     *     Useful for tools where Groq latency would block the ASGI worker.
+     */
+    post: operations['enqueue_ai_tool_api_v1_ai__tool_id__enqueue_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ai/jobs/{job_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Job Status
+     * @description Poll the status of an enqueued AI job.
+     *
+     *     Status values: ``queued``, ``in_progress``, ``complete``, ``failed``, ``not_found``.
+     *     ``result`` is populated (with ``original``, ``result``, ``operation``) when status is ``complete``.
+     */
+    get: operations['get_job_status_api_v1_ai_jobs__job_id__get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/health': {
     parameters: {
       query?: never;
@@ -4406,7 +3161,7 @@ export interface paths {
     };
     /**
      * Health Check
-     * @description Quick liveness probe used by Docker / k8s health checks.
+     * @description Liveness probe used by Docker / k8s health checks.
      */
     get: operations['health_check_health_get'];
     put?: never;
@@ -4426,7 +3181,7 @@ export interface paths {
     };
     /**
      * Readiness Check
-     * @description Readiness check - verifies database connectivity.
+     * @description Readiness probe — verifies Groq client is initialised.
      */
     get: operations['readiness_check_health_ready_get'];
     put?: never;
@@ -4441,59 +3196,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
-    /**
-     * ActiveCredit
-     * @description A credit pack with remaining balance belonging to the user.
-     */
-    ActiveCredit: {
-      /** Id */
-      id: string;
-      /** Credits Remaining */
-      credits_remaining: number;
-      /** Credits Total */
-      credits_total: number;
-      /** Source */
-      source: string;
-    };
-    /**
-     * ActivePass
-     * @description An active (non-expired) pass belonging to the user.
-     */
-    ActivePass: {
-      /** Id */
-      id: string;
-      /** Pass Id */
-      pass_id: string;
-      /** Name */
-      name: string;
-      /** Tool Ids */
-      tool_ids: string[];
-      /** Tools Count */
-      tools_count: number;
-      /** Uses Per Day */
-      uses_per_day: number;
-      /** Uses Today */
-      uses_today: number;
-      /**
-       * Expires At
-       * Format: date-time
-       */
-      expires_at: string;
-      /** Source */
-      source: string;
-    };
-    /**
-     * ActiveResponse
-     * @description Response containing active passes, credits, and total credit balance.
-     */
-    ActiveResponse: {
-      /** Passes */
-      passes: components['schemas']['ActivePass'][];
-      /** Credits */
-      credits: components['schemas']['ActiveCredit'][];
-      /** Total Credits */
-      total_credits: number;
-    };
     /**
      * CaesarRequest
      * @description Payload for Caesar cipher requests.
@@ -4512,62 +3214,232 @@ export interface components {
       shift: number;
     };
     /**
-     * CatalogResponse
-     * @description Full catalog of available passes and credit packs.
+     * FilterRequest
+     * @description Payload for filter-lines and remove-lines requests.
      */
-    CatalogResponse: {
-      /** Passes */
-      passes: components['schemas']['PassCatalogItem'][];
-      /** Credit Packs */
-      credit_packs: components['schemas']['CreditPackItem'][];
-      /** Region */
-      region: string;
+    FilterRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
+       * Pattern
+       * @description Word or phrase (or regex pattern) to match against each line.
+       */
+      pattern: string;
+      /**
+       * Case Sensitive
+       * @description If true, match is case-sensitive.
+       * @default false
+       */
+      case_sensitive: boolean;
+      /**
+       * Use Regex
+       * @description If true, treat pattern as a regular expression.
+       * @default false
+       */
+      use_regex: boolean;
+      /** Compiled Pattern */
+      compiled_pattern?: unknown;
+    };
+    /** HTTPValidationError */
+    HTTPValidationError: {
+      /** Detail */
+      detail?: components['schemas']['ValidationError'][];
     };
     /**
-     * ClaimReferralRequest
-     * @description Request to claim a referral code.
+     * KeyedCipherRequest
+     * @description Payload for cipher requests that require a key (Vigenere, Playfair, etc.).
      */
-    ClaimReferralRequest: {
+    KeyedCipherRequest: {
       /**
-       * Code
-       * @description Referral code to claim
+       * Text
+       * @description The input text to be processed.
        */
-      code: string;
+      text: string;
+      /**
+       * Key
+       * @description The cipher key or passphrase.
+       */
+      key: string;
     };
     /**
-     * CreditOrderRequest
-     * @description Request to create a Razorpay order for a credit pack purchase.
+     * NthLineRequest
+     * @description Payload for extract-nth-lines requests.
      */
-    CreditOrderRequest: {
+    NthLineRequest: {
       /**
-       * Pack Id
-       * @description Credit pack ID e.g. 'credits_15'
+       * Text
+       * @description The input text to be processed.
        */
-      pack_id: string;
+      text: string;
       /**
-       * Region
-       * @description Browser-detected region
+       * N
+       * @description Extract every Nth line.
+       * @default 2
+       */
+      n: number;
+      /**
+       * Offset
+       * @description Starting line offset (0-indexed).
+       * @default 0
+       */
+      offset: number;
+    };
+    /**
+     * PadRequest
+     * @description Payload for pad-lines requests.
+     */
+    PadRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
+       * Align
+       * @description Alignment direction: left, right, or center.
+       * @default left
+       * @enum {string}
+       */
+      align: 'left' | 'right' | 'center';
+    };
+    /**
+     * RailFenceRequest
+     * @description Payload for Rail Fence cipher requests.
+     */
+    RailFenceRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
+       * Rails
+       * @description Number of rails for the cipher.
+       * @default 3
+       */
+      rails: number;
+    };
+    /**
+     * SplitJoinRequest
+     * @description Payload for split-to-lines and join-lines requests.
+     */
+    SplitJoinRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
+       * Delimiter
+       * @description Delimiter or separator character(s).
+       * @default ,
+       */
+      delimiter: string;
+    };
+    /**
+     * SubstitutionRequest
+     * @description Payload for substitution cipher requests.
+     */
+    SubstitutionRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
+       * Mapping
+       * @description 26-character substitution alphabet (A-Z mapping).
+       */
+      mapping: string;
+    };
+    /**
+     * TextRequest
+     * @description Payload sent by the client for any text transformation.
+     */
+    TextRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       * @example Hello World
+       */
+      text: string;
+    };
+    /**
+     * TextResponse
+     * @description Transformed text returned by the API.
+     */
+    TextResponse: {
+      /**
+       * Original
+       * @description The original input text.
+       */
+      original: string;
+      /**
+       * Result
+       * @description The transformed output text.
+       */
+      result: string;
+      /**
+       * Operation
+       * @description Name of the operation performed.
+       */
+      operation: string;
+    };
+    /**
+     * TruncateRequest
+     * @description Payload for truncate-lines requests.
+     */
+    TruncateRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
+       * Max Length
+       * @description Maximum character length per line.
+       * @default 80
+       */
+      max_length: number;
+    };
+    /** ValidationError */
+    ValidationError: {
+      /** Location */
+      loc: (string | number)[];
+      /** Message */
+      msg: string;
+      /** Error Type */
+      type: string;
+      /** Input */
+      input?: unknown;
+      /** Context */
+      ctx?: Record<string, never>;
+    };
+    /**
+     * WrapRequest
+     * @description Payload for wrap-lines requests.
+     */
+    WrapRequest: {
+      /**
+       * Text
+       * @description The input text to be processed.
+       */
+      text: string;
+      /**
+       * Prefix
+       * @description Text to prepend to each line.
        * @default
        */
-      region: string;
-    };
-    /**
-     * CreditPackItem
-     * @description A single credit pack available for purchase in the catalog.
-     */
-    CreditPackItem: {
-      /** Id */
-      id: string;
-      /** Name */
-      name: string;
-      /** Credits */
-      credits: number;
-      /** Price */
-      price: number;
-      /** Currency */
-      currency: string;
-      /** Symbol */
-      symbol: string;
+      prefix: string;
+      /**
+       * Suffix
+       * @description Text to append to each line.
+       * @default
+       */
+      suffix: string;
     };
     /**
      * DiscoveredToolItem
@@ -4606,96 +3478,6 @@ export interface components {
     FavoritesResponse: {
       /** Favorites */
       favorites: components['schemas']['FavoriteToolItem'][];
-    };
-    /**
-     * FilterRequest
-     * @description Payload for filter-lines and remove-lines requests.
-     */
-    FilterRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
-      /**
-       * Pattern
-       * @description Word or phrase (or regex pattern) to match against each line.
-       */
-      pattern: string;
-      /**
-       * Case Sensitive
-       * @description If true, match is case-sensitive.
-       * @default false
-       */
-      case_sensitive: boolean;
-      /**
-       * Use Regex
-       * @description If true, treat pattern as a regular expression.
-       * @default false
-       */
-      use_regex: boolean;
-      /** Compiled Pattern */
-      compiled_pattern?: unknown;
-    };
-    /**
-     * ForgotPasswordRequest
-     * @description Request schema for initiating a password reset.
-     */
-    ForgotPasswordRequest: {
-      /**
-       * Email
-       * Format: email
-       * @description Email address to send a reset link to
-       */
-      email: string;
-    };
-    /**
-     * ForgotPasswordResponse
-     * @description Opaque response — identical shape whether or not the email exists.
-     *
-     *     ``reset_token`` is echoed back **only** when the console email backend
-     *     is active (dev convenience). It is ``None`` whenever a real SMTP relay
-     *     is configured, so production responses never leak the raw token.
-     */
-    ForgotPasswordResponse: {
-      /**
-       * Detail
-       * @default If that email is registered, a reset link has been sent.
-       */
-      detail: string;
-      /** Reset Token */
-      reset_token?: string | null;
-    };
-    /**
-     * FormatRequest
-     * @description Payload for format change requests.
-     */
-    FormatRequest: {
-      /**
-       * Text
-       * @description The input text to reformat.
-       */
-      text: string;
-      /**
-       * Format
-       * @description Target format: paragraph, bullets, paragraph-bullets, numbered, qna, table, tldr, headings.
-       * @default paragraph
-       * @enum {string}
-       */
-      format:
-        | 'paragraph'
-        | 'bullets'
-        | 'paragraph-bullets'
-        | 'numbered'
-        | 'qna'
-        | 'table'
-        | 'tldr'
-        | 'headings';
-    };
-    /** HTTPValidationError */
-    HTTPValidationError: {
-      /** Detail */
-      detail?: components['schemas']['ValidationError'][];
     };
     /**
      * HistoryCreate
@@ -4779,133 +3561,6 @@ export interface components {
       recent_tools: string[];
     };
     /**
-     * KeyedCipherRequest
-     * @description Payload for cipher requests that require a key (Vigenere, Playfair, etc.).
-     */
-    KeyedCipherRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
-      /**
-       * Key
-       * @description The cipher key or passphrase.
-       */
-      key: string;
-    };
-    /**
-     * LoginRequest
-     * @description Request schema for user login.
-     */
-    LoginRequest: {
-      /**
-       * Email
-       * Format: email
-       * @description User email address
-       */
-      email: string;
-      /**
-       * Password
-       * @description User password
-       */
-      password: string;
-      /**
-       * Remember Me
-       * @description Persist session across browser restarts
-       * @default false
-       */
-      remember_me: boolean;
-    };
-    /**
-     * NthLineRequest
-     * @description Payload for extract-nth-lines requests.
-     */
-    NthLineRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
-      /**
-       * N
-       * @description Extract every Nth line.
-       * @default 2
-       */
-      n: number;
-      /**
-       * Offset
-       * @description Starting line offset (0-indexed).
-       * @default 0
-       */
-      offset: number;
-    };
-    /**
-     * PadRequest
-     * @description Payload for pad-lines requests.
-     */
-    PadRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
-      /**
-       * Align
-       * @description Alignment direction: left, right, or center.
-       * @default left
-       * @enum {string}
-       */
-      align: 'left' | 'right' | 'center';
-    };
-    /**
-     * PassCatalogItem
-     * @description A single pass available for purchase in the catalog.
-     */
-    PassCatalogItem: {
-      /** Id */
-      id: string;
-      /** Name */
-      name: string;
-      /** Subtitle */
-      subtitle: string;
-      /** Tools */
-      tools: number;
-      /** Uses Per Day */
-      uses_per_day: number;
-      /** Duration Days */
-      duration_days: number;
-      /** Price */
-      price: number;
-      /** Currency */
-      currency: string;
-      /** Symbol */
-      symbol: string;
-    };
-    /**
-     * PassOrderRequest
-     * @description Request to create a Razorpay order for a pass purchase.
-     */
-    PassOrderRequest: {
-      /**
-       * Pass Id
-       * @description Catalog pass ID e.g. 'day_triple'
-       */
-      pass_id: string;
-      /**
-       * Tool Ids
-       * @description Selected tool IDs
-       * @default []
-       */
-      tool_ids: string[];
-      /**
-       * Region
-       * @description Browser-detected region (IN, US, GB, EU)
-       * @default
-       */
-      region: string;
-    };
-    /**
      * PipelineCreate
      * @description Schema for creating a new pipeline.
      */
@@ -4987,6 +3642,11 @@ export interface components {
     /**
      * PreferencesResponse
      * @description Current user preference values.
+     *
+     *     `persona` is transitional read-only legacy state (feature replaced by
+     *     custom tool groups 2026-07-14): stale deployed bundles still read it, and
+     *     PreferencesUpdate no longer accepts it. Remove the field together with the
+     *     column drop migration.
      */
     PreferencesResponse: {
       /**
@@ -5002,6 +3662,9 @@ export interface components {
     /**
      * PreferencesUpdate
      * @description Partial update for user preferences. All fields optional.
+     *
+     *     A `persona` key sent by a stale bundle is silently ignored (pydantic
+     *     drops unknown fields) — deliberate transitional behavior.
      */
     PreferencesUpdate: {
       /** Theme */
@@ -5010,21 +3673,479 @@ export interface components {
       theme_skin?: string | null;
     };
     /**
-     * RailFenceRequest
-     * @description Payload for Rail Fence cipher requests.
+     * ShareCreate
+     * @description Schema for creating a shareable link from a tool's output.
      */
-    RailFenceRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
+    ShareCreate: {
+      /** Tool Id */
+      tool_id: string;
+      /** Tool Label */
+      tool_label: string;
+      /** Output Text */
+      output_text: string;
+    };
+    /**
+     * ShareResponse
+     * @description Response after successfully creating a shareable link.
+     */
+    ShareResponse: {
+      /** Id */
+      id: string;
+      /** Share Url */
+      share_url: string;
+    };
+    /**
+     * SharedResultView
+     * @description Public view of a shared result (no auth required).
+     */
+    SharedResultView: {
+      /** Id */
+      id: string;
+      /** Tool Id */
+      tool_id: string;
+      /** Tool Label */
+      tool_label: string;
+      /** Output Text */
+      output_text: string;
+      /** Created At */
+      created_at: string;
+    };
+    /**
+     * SpinHistoryItem
+     * @description A single spin-the-wheel result entry.
+     */
+    SpinHistoryItem: {
+      /** Spin Date */
+      spin_date: string;
+      /** Reward Type */
+      reward_type: string;
+      /** Reward Ref */
+      reward_ref?: string | null;
+      /** Iso Week */
+      iso_week: number;
+    };
+    /**
+     * SpinHistoryResponse
+     * @description List of the user's spin history entries.
+     */
+    SpinHistoryResponse: {
+      /** Spins */
+      spins: components['schemas']['SpinHistoryItem'][];
+    };
+    /**
+     * TemplateCreate
+     * @description Schema for creating a new template.
+     */
+    TemplateCreate: {
+      /** Name */
+      name: string;
+      /** Text */
       text: string;
+      /** Tool Id */
+      tool_id?: string | null;
+    };
+    /**
+     * TemplateResponse
+     * @description Template as returned by the API.
+     */
+    TemplateResponse: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Text */
+      text: string;
+      /** Tool Id */
+      tool_id?: string | null;
+      /** Created At */
+      created_at: string;
+      /** Updated At */
+      updated_at: string;
+    };
+    /**
+     * TemplateUpdate
+     * @description Schema for updating a template. All fields optional.
+     */
+    TemplateUpdate: {
+      /** Name */
+      name?: string | null;
+      /** Text */
+      text?: string | null;
+      /** Tool Id */
+      tool_id?: string | null;
+    };
+    /**
+     * ToolGroupCreate
+     * @description Schema for creating a tool group, optionally pre-filled with tools.
+     */
+    ToolGroupCreate: {
+      /** Name */
+      name: string;
       /**
-       * Rails
-       * @description Number of rails for the cipher.
-       * @default 3
+       * Tool Ids
+       * @default []
        */
-      rails: number;
+      tool_ids: string[];
+    };
+    /**
+     * ToolGroupItemOut
+     * @description A single tool within a group, with its sort position.
+     */
+    ToolGroupItemOut: {
+      /** Tool Id */
+      tool_id: string;
+      /** Sort Order */
+      sort_order: number;
+    };
+    /**
+     * ToolGroupItemsUpdate
+     * @description Schema for replacing a group's tools with an explicit ordered list.
+     *
+     *     The array position IS the sort order — one call covers reorder, bulk add,
+     *     and bulk remove (drag-and-drop sends the full list after every move).
+     */
+    ToolGroupItemsUpdate: {
+      /** Tool Ids */
+      tool_ids: string[];
+    };
+    /**
+     * ToolGroupOrderUpdate
+     * @description Schema for reordering the user's tool groups by id.
+     *
+     *     Groups listed get sort_order = array position; any of the user's groups
+     *     not listed keep their relative order after the listed ones. Unknown or
+     *     foreign ids are ignored (optimistic clients may hold stale ids).
+     */
+    ToolGroupOrderUpdate: {
+      /** Group Ids */
+      group_ids: string[];
+    };
+    /**
+     * ToolGroupResponse
+     * @description A named tool group with its tools, as returned by the API.
+     */
+    ToolGroupResponse: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Sort Order */
+      sort_order: number;
+      /** Tools */
+      tools: components['schemas']['ToolGroupItemOut'][];
+      /** Created At */
+      created_at: string;
+      /** Updated At */
+      updated_at: string;
+    };
+    /**
+     * ToolGroupUpdate
+     * @description Schema for renaming a tool group.
+     */
+    ToolGroupUpdate: {
+      /** Name */
+      name?: string | null;
+    };
+    /**
+     * ToolGroupsResponse
+     * @description All of the user's tool groups in display order.
+     */
+    ToolGroupsResponse: {
+      /** Groups */
+      groups: components['schemas']['ToolGroupResponse'][];
+    };
+    /**
+     * ToolStatItem
+     * @description Usage statistics for a single tool.
+     */
+    ToolStatItem: {
+      /** Tool Id */
+      tool_id: string;
+      /** Total Uses */
+      total_uses: number;
+      /** Last Used At */
+      last_used_at: string;
+    };
+    /**
+     * ToolStatsResponse
+     * @description Aggregated tool usage statistics for the user.
+     */
+    ToolStatsResponse: {
+      /** Stats */
+      stats: components['schemas']['ToolStatItem'][];
+    };
+    /**
+     * UiSettingsResponse
+     * @description Current UI settings for the user.
+     */
+    UiSettingsResponse: {
+      /**
+       * Tool View
+       * @default grid
+       */
+      tool_view: string;
+      /**
+       * Keybindings
+       * @default {}
+       */
+      keybindings: {
+        [key: string]: unknown;
+      };
+      /**
+       * Panel Sizes
+       * @default {}
+       */
+      panel_sizes: {
+        [key: string]: unknown;
+      };
+      /**
+       * Onboarding Seen
+       * @default false
+       */
+      onboarding_seen: boolean;
+    };
+    /**
+     * UiSettingsUpdate
+     * @description Partial update for UI settings. All fields optional.
+     */
+    UiSettingsUpdate: {
+      /** Tool View */
+      tool_view?: string | null;
+      /** Keybindings */
+      keybindings?: {
+        [key: string]: unknown;
+      } | null;
+      /** Panel Sizes */
+      panel_sizes?: {
+        [key: string]: unknown;
+      } | null;
+      /** Onboarding Seen */
+      onboarding_seen?: boolean | null;
+    };
+    /**
+     * UserResponse
+     * @description Response containing the authenticated user's profile.
+     */
+    UserResponse: {
+      /** Id */
+      id: string;
+      /** Email */
+      email: string;
+      /** Display Name */
+      display_name: string;
+      /**
+       * Subscription Tier
+       * @default free
+       */
+      subscription_tier: string;
+      /**
+       * Is Email Verified
+       * @default false
+       */
+      is_email_verified: boolean;
+    };
+    /**
+     * ActiveCredit
+     * @description A credit pack with remaining balance belonging to the user.
+     */
+    ActiveCredit: {
+      /** Id */
+      id: string;
+      /** Credits Remaining */
+      credits_remaining: number;
+      /** Credits Total */
+      credits_total: number;
+      /** Source */
+      source: string;
+    };
+    /**
+     * ActivePass
+     * @description An active (non-expired) pass belonging to the user.
+     */
+    ActivePass: {
+      /** Id */
+      id: string;
+      /** Pass Id */
+      pass_id: string;
+      /** Name */
+      name: string;
+      /** Tool Ids */
+      tool_ids: string[];
+      /** Tools Count */
+      tools_count: number;
+      /** Uses Per Day */
+      uses_per_day: number;
+      /** Uses Today */
+      uses_today: number;
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string;
+      /** Source */
+      source: string;
+    };
+    /**
+     * ActiveResponse
+     * @description Response containing active passes, credits, and total credit balance.
+     */
+    ActiveResponse: {
+      /** Passes */
+      passes: components['schemas']['ActivePass'][];
+      /** Credits */
+      credits: components['schemas']['ActiveCredit'][];
+      /** Total Credits */
+      total_credits: number;
+    };
+    /**
+     * CatalogResponse
+     * @description Full catalog of available passes and credit packs.
+     */
+    CatalogResponse: {
+      /** Passes */
+      passes: components['schemas']['PassCatalogItem'][];
+      /** Credit Packs */
+      credit_packs: components['schemas']['CreditPackItem'][];
+      /** Region */
+      region: string;
+    };
+    /**
+     * CheckAccessRequest
+     * @description Entitlement check forwarded by text-svc / ai-svc before running a tool.
+     */
+    CheckAccessRequest: {
+      /** Tool Id */
+      tool_id: string;
+      /**
+       * Tool Type
+       * @default local
+       */
+      tool_type: string;
+      /** Principal Type */
+      principal_type: string;
+      /** User Id */
+      user_id?: string | null;
+      /** Email */
+      email?: string | null;
+      /**
+       * Email Verified
+       * @default false
+       */
+      email_verified: boolean;
+      /** Ip Address */
+      ip_address?: string | null;
+      /** User Agent */
+      user_agent?: string | null;
+    };
+    /**
+     * CheckAccessResponse
+     * @description Entitlement decision. allowed=False is a normal 200 (quota exhausted).
+     */
+    CheckAccessResponse: {
+      /** Allowed */
+      allowed: boolean;
+      /** Reason */
+      reason: string;
+      /** Message */
+      message?: string | null;
+      /** Uses Today */
+      uses_today?: number | null;
+      /** Max Free */
+      max_free?: number | null;
+      /** Credits Remaining */
+      credits_remaining?: number | null;
+    };
+    /**
+     * ClaimReferralRequest
+     * @description Request to claim a referral code.
+     */
+    ClaimReferralRequest: {
+      /**
+       * Code
+       * @description Referral code to claim
+       */
+      code: string;
+    };
+    /**
+     * CreditOrderRequest
+     * @description Request to create a Razorpay order for a credit pack purchase.
+     */
+    CreditOrderRequest: {
+      /**
+       * Pack Id
+       * @description Credit pack ID e.g. 'credits_15'
+       */
+      pack_id: string;
+      /**
+       * Region
+       * @description Browser-detected region
+       * @default
+       */
+      region: string;
+    };
+    /**
+     * CreditPackItem
+     * @description A single credit pack available for purchase in the catalog.
+     */
+    CreditPackItem: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Credits */
+      credits: number;
+      /** Price */
+      price: number;
+      /** Currency */
+      currency: string;
+      /** Symbol */
+      symbol: string;
+    };
+    /**
+     * PassCatalogItem
+     * @description A single pass available for purchase in the catalog.
+     */
+    PassCatalogItem: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Subtitle */
+      subtitle: string;
+      /** Tools */
+      tools: number;
+      /** Uses Per Day */
+      uses_per_day: number;
+      /** Duration Days */
+      duration_days: number;
+      /** Price */
+      price: number;
+      /** Currency */
+      currency: string;
+      /** Symbol */
+      symbol: string;
+    };
+    /**
+     * PassOrderRequest
+     * @description Request to create a Razorpay order for a pass purchase.
+     */
+    PassOrderRequest: {
+      /**
+       * Pass Id
+       * @description Catalog pass ID e.g. 'day_triple'
+       */
+      pass_id: string;
+      /**
+       * Tool Ids
+       * @description Selected tool IDs (exactly pass.tools entries for scoped passes)
+       */
+      tool_ids?: string[];
+      /**
+       * Region
+       * @description Browser-detected region (IN, US, GB, EU)
+       * @default
+       */
+      region: string;
     };
     /**
      * RazorpayOrderResponse
@@ -5109,133 +4230,6 @@ export interface components {
       referral_url: string;
     };
     /**
-     * RegisterRequest
-     * @description Request schema for user registration.
-     */
-    RegisterRequest: {
-      /**
-       * Email
-       * Format: email
-       * @description User email address
-       */
-      email: string;
-      /**
-       * Password
-       * @description Password (8-128 chars)
-       */
-      password: string;
-      /**
-       * Display Name
-       * @description Display name
-       */
-      display_name: string;
-    };
-    /**
-     * ResendVerificationResponse
-     * @description Opaque response for /auth/resend-verification.
-     *
-     *     ``verification_token`` is echoed back **only** when the console email
-     *     backend is active (dev convenience — grab it from the response instead
-     *     of an inbox). It is ``None`` whenever a real SMTP relay is configured,
-     *     so production responses never leak the raw token.
-     */
-    ResendVerificationResponse: {
-      /**
-       * Detail
-       * @default If your email is unverified, a new verification link has been sent.
-       */
-      detail: string;
-      /** Verification Token */
-      verification_token?: string | null;
-    };
-    /**
-     * ResetPasswordRequest
-     * @description Request schema for completing a password reset.
-     */
-    ResetPasswordRequest: {
-      /**
-       * Token
-       * @description Token issued by /forgot-password
-       */
-      token: string;
-      /**
-       * New Password
-       * @description New password (8-128 chars)
-       */
-      new_password: string;
-    };
-    /**
-     * ResetPasswordResponse
-     * @description Confirmation that the password was reset successfully.
-     */
-    ResetPasswordResponse: {
-      /**
-       * Detail
-       * @default Password has been reset.
-       */
-      detail: string;
-    };
-    /**
-     * ShareCreate
-     * @description Schema for creating a shareable link from a tool's output.
-     */
-    ShareCreate: {
-      /** Tool Id */
-      tool_id: string;
-      /** Tool Label */
-      tool_label: string;
-      /** Output Text */
-      output_text: string;
-    };
-    /**
-     * ShareResponse
-     * @description Response after successfully creating a shareable link.
-     */
-    ShareResponse: {
-      /** Id */
-      id: string;
-      /** Share Url */
-      share_url: string;
-    };
-    /**
-     * SharedResultView
-     * @description Public view of a shared result (no auth required).
-     */
-    SharedResultView: {
-      /** Id */
-      id: string;
-      /** Tool Id */
-      tool_id: string;
-      /** Tool Label */
-      tool_label: string;
-      /** Output Text */
-      output_text: string;
-      /** Created At */
-      created_at: string;
-    };
-    /**
-     * SpinHistoryItem
-     * @description A single spin-the-wheel result entry.
-     */
-    SpinHistoryItem: {
-      /** Spin Date */
-      spin_date: string;
-      /** Reward Type */
-      reward_type: string;
-      /** Reward Ref */
-      reward_ref?: string | null;
-      /** Iso Week */
-      iso_week: number;
-    };
-    /**
-     * SpinHistoryResponse
-     * @description List of the user's spin history entries.
-     */
-    SpinHistoryResponse: {
-      /** Spins */
-      spins: components['schemas']['SpinHistoryItem'][];
-    };
-    /**
      * SpinResult
      * @description Result of a weekly spin-the-wheel attempt.
      */
@@ -5250,23 +4244,6 @@ export interface components {
       pass_name?: string | null;
       /** Message */
       message: string;
-    };
-    /**
-     * SplitJoinRequest
-     * @description Payload for split-to-lines and join-lines requests.
-     */
-    SplitJoinRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
-      /**
-       * Delimiter
-       * @description Delimiter or separator character(s).
-       * @default ,
-       */
-      delimiter: string;
     };
     /**
      * SubscriptionStatus
@@ -5304,378 +4281,34 @@ export interface components {
       active_passes_count: number;
       /** Region */
       region?: string | null;
-      /**
-       * Pro Expires At
-       * @description When the current Pro period ends (null when not Pro).
-       */
+      /** Pro Expires At */
       pro_expires_at?: string | null;
       /**
        * Pro Cancelled
-       * @description True when the Pro plan is cancelled but still in its paid period.
        * @default false
        */
-      pro_cancelled?: boolean;
+      pro_cancelled: boolean;
     };
-    /**
-     * SubstitutionRequest
-     * @description Payload for substitution cipher requests.
-     */
-    SubstitutionRequest: {
+    /** EnqueueResponse */
+    EnqueueResponse: {
+      /** Job Id */
+      job_id: string;
       /**
-       * Text
-       * @description The input text to be processed.
+       * Status
+       * @default queued
        */
-      text: string;
-      /**
-       * Mapping
-       * @description 26-character substitution alphabet (A-Z mapping).
-       */
-      mapping: string;
+      status: string;
     };
-    /**
-     * TemplateCreate
-     * @description Schema for creating a new template.
-     */
-    TemplateCreate: {
-      /** Name */
-      name: string;
-      /** Text */
-      text: string;
-      /** Tool Id */
-      tool_id?: string | null;
-    };
-    /**
-     * TemplateResponse
-     * @description Template as returned by the API.
-     */
-    TemplateResponse: {
-      /** Id */
-      id: string;
-      /** Name */
-      name: string;
-      /** Text */
-      text: string;
-      /** Tool Id */
-      tool_id?: string | null;
-      /** Created At */
-      created_at: string;
-      /** Updated At */
-      updated_at: string;
-    };
-    /**
-     * TemplateUpdate
-     * @description Schema for updating a template. All fields optional.
-     */
-    TemplateUpdate: {
-      /** Name */
-      name?: string | null;
-      /** Text */
-      text?: string | null;
-      /** Tool Id */
-      tool_id?: string | null;
-    };
-    /**
-     * TextRequest
-     * @description Payload sent by the client for any text transformation.
-     */
-    TextRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       * @example Hello World
-       */
-      text: string;
-    };
-    /**
-     * TextResponse
-     * @description Transformed text returned by the API.
-     */
-    TextResponse: {
-      /**
-       * Original
-       * @description The original input text.
-       */
-      original: string;
-      /**
-       * Result
-       * @description The transformed output text.
-       */
-      result: string;
-      /**
-       * Operation
-       * @description Name of the operation performed.
-       */
-      operation: string;
-    };
-    /**
-     * TokenResponse
-     * @description Response containing a JWT access token.
-     */
-    TokenResponse: {
-      /** Access Token */
-      access_token: string;
-      /**
-       * Token Type
-       * @default bearer
-       */
-      token_type: string;
-    };
-    /**
-     * ToneRequest
-     * @description Payload for tone change requests.
-     */
-    ToneRequest: {
-      /**
-       * Text
-       * @description The input text to change tone of.
-       */
-      text: string;
-      /**
-       * Tone
-       * @description Target tone: formal, casual, or friendly.
-       * @default formal
-       * @enum {string}
-       */
-      tone: 'formal' | 'casual' | 'friendly';
-    };
-    /**
-     * ToolGroupCreate
-     * @description Schema for creating a tool group, optionally pre-filled with tools.
-     */
-    ToolGroupCreate: {
-      /** Name */
-      name: string;
-      /**
-       * Tool Ids
-       * @default []
-       */
-      tool_ids: string[];
-    };
-    /**
-     * ToolGroupItemOut
-     * @description A single tool within a group, with its sort position.
-     */
-    ToolGroupItemOut: {
-      /** Tool Id */
-      tool_id: string;
-      /** Sort Order */
-      sort_order: number;
-    };
-    /**
-     * ToolGroupResponse
-     * @description A named tool group with its tools, as returned by the API.
-     */
-    ToolGroupResponse: {
-      /** Id */
-      id: string;
-      /** Name */
-      name: string;
-      /** Sort Order */
-      sort_order: number;
-      /** Tools */
-      tools: components['schemas']['ToolGroupItemOut'][];
-      /** Created At */
-      created_at: string;
-      /** Updated At */
-      updated_at: string;
-    };
-    /**
-     * ToolGroupUpdate
-     * @description Schema for renaming a tool group.
-     */
-    ToolGroupUpdate: {
-      /** Name */
-      name?: string | null;
-    };
-    /**
-     * ToolGroupsResponse
-     * @description All of the user's tool groups in display order.
-     */
-    ToolGroupsResponse: {
-      /** Groups */
-      groups: components['schemas']['ToolGroupResponse'][];
-    };
-    /**
-     * ToolStatItem
-     * @description Usage statistics for a single tool.
-     */
-    ToolStatItem: {
-      /** Tool Id */
-      tool_id: string;
-      /** Total Uses */
-      total_uses: number;
-      /** Last Used At */
-      last_used_at: string;
-    };
-    /**
-     * ToolStatsResponse
-     * @description Aggregated tool usage statistics for the user.
-     */
-    ToolStatsResponse: {
-      /** Stats */
-      stats: components['schemas']['ToolStatItem'][];
-    };
-    /**
-     * TranslateRequest
-     * @description Payload for translation requests.
-     */
-    TranslateRequest: {
-      /**
-       * Text
-       * @description The input text to be translated.
-       */
-      text: string;
-      /**
-       * Target Language
-       * @description The language to translate into.
-       * @default English
-       */
-      target_language: string;
-    };
-    /**
-     * TruncateRequest
-     * @description Payload for truncate-lines requests.
-     */
-    TruncateRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
-      /**
-       * Max Length
-       * @description Maximum character length per line.
-       * @default 80
-       */
-      max_length: number;
-    };
-    /**
-     * UiSettingsResponse
-     * @description Current UI settings for the user.
-     */
-    UiSettingsResponse: {
-      /**
-       * Tool View
-       * @default grid
-       */
-      tool_view: string;
-      /**
-       * Keybindings
-       * @default {}
-       */
-      keybindings: {
-        [key: string]: unknown;
-      };
-      /**
-       * Panel Sizes
-       * @default {}
-       */
-      panel_sizes: {
-        [key: string]: unknown;
-      };
-      /**
-       * Onboarding Seen
-       * @default false
-       */
-      onboarding_seen: boolean;
-    };
-    /**
-     * UiSettingsUpdate
-     * @description Partial update for UI settings. All fields optional.
-     */
-    UiSettingsUpdate: {
-      /** Tool View */
-      tool_view?: string | null;
-      /** Keybindings */
-      keybindings?: {
+    /** JobStatusResponse */
+    JobStatusResponse: {
+      /** Job Id */
+      job_id: string;
+      /** Status */
+      status: string;
+      /** Result */
+      result?: {
         [key: string]: unknown;
       } | null;
-      /** Panel Sizes */
-      panel_sizes?: {
-        [key: string]: unknown;
-      } | null;
-      /** Onboarding Seen */
-      onboarding_seen?: boolean | null;
-    };
-    /**
-     * UserResponse
-     * @description Response containing the authenticated user's profile.
-     */
-    UserResponse: {
-      /** Id */
-      id: string;
-      /** Email */
-      email: string;
-      /** Display Name */
-      display_name: string;
-      /**
-       * Subscription Tier
-       * @default free
-       */
-      subscription_tier: string;
-      /**
-       * Is Email Verified
-       * @default false
-       */
-      is_email_verified: boolean;
-    };
-    /** ValidationError */
-    ValidationError: {
-      /** Location */
-      loc: (string | number)[];
-      /** Message */
-      msg: string;
-      /** Error Type */
-      type: string;
-      /** Input */
-      input?: unknown;
-      /** Context */
-      ctx?: Record<string, never>;
-    };
-    /**
-     * VerifyEmailRequest
-     * @description Request schema for verifying an email via a one-time token.
-     */
-    VerifyEmailRequest: {
-      /**
-       * Token
-       * @description Token from the verification email
-       */
-      token: string;
-    };
-    /**
-     * VerifyEmailResponse
-     * @description Confirmation that the email was verified successfully.
-     */
-    VerifyEmailResponse: {
-      /**
-       * Detail
-       * @default Email verified successfully.
-       */
-      detail: string;
-    };
-    /**
-     * WrapRequest
-     * @description Payload for wrap-lines requests.
-     */
-    WrapRequest: {
-      /**
-       * Text
-       * @description The input text to be processed.
-       */
-      text: string;
-      /**
-       * Prefix
-       * @description Text to prepend to each line.
-       * @default
-       */
-      prefix: string;
-      /**
-       * Suffix
-       * @description Text to append to each line.
-       * @default
-       */
-      suffix: string;
     };
   };
   responses: never;
@@ -9184,2411 +7817,6 @@ export interface operations {
       };
     };
   };
-  tool_generate_hashtags_api_v1_text_generate_hashtags_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_generate_seo_titles_api_v1_text_generate_seo_titles_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_generate_meta_descriptions_api_v1_text_generate_meta_descriptions_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_generate_blog_outline_api_v1_text_generate_blog_outline_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_shorten_for_tweet_api_v1_text_shorten_for_tweet_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_rewrite_email_api_v1_text_rewrite_email_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_extract_keywords_api_v1_text_extract_keywords_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_translate_api_v1_text_translate_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TranslateRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_transliterate_api_v1_text_transliterate_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TranslateRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_emojify_api_v1_text_emojify_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_detect_language_api_v1_text_detect_language_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_summarize_api_v1_text_summarize_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_fix_grammar_api_v1_text_fix_grammar_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_paraphrase_api_v1_text_paraphrase_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_change_tone_api_v1_text_change_tone_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ToneRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_analyze_sentiment_api_v1_text_analyze_sentiment_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_lengthen_text_api_v1_text_lengthen_text_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_eli5_api_v1_text_eli5_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_proofread_api_v1_text_proofread_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_generate_title_api_v1_text_generate_title_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_refactor_prompt_api_v1_text_refactor_prompt_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_change_format_api_v1_text_change_format_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FormatRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_academic_style_api_v1_text_academic_style_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_creative_style_api_v1_text_creative_style_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_technical_style_api_v1_text_technical_style_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_active_voice_api_v1_text_active_voice_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_redundancy_remover_api_v1_text_redundancy_remover_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_sentence_splitter_api_v1_text_sentence_splitter_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_conciseness_api_v1_text_conciseness_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_resume_bullets_api_v1_text_resume_bullets_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_meeting_notes_api_v1_text_meeting_notes_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_cover_letter_api_v1_text_cover_letter_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_outline_to_draft_api_v1_text_outline_to_draft_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_continue_writing_api_v1_text_continue_writing_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_rewrite_unique_api_v1_text_rewrite_unique_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_tone_analyzer_api_v1_text_tone_analyzer_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_linkedin_post_api_v1_text_linkedin_post_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_twitter_thread_api_v1_text_twitter_thread_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_instagram_caption_api_v1_text_instagram_caption_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_youtube_description_api_v1_text_youtube_description_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_social_bio_api_v1_text_social_bio_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_product_description_api_v1_text_product_description_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_cta_generator_api_v1_text_cta_generator_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_ad_copy_api_v1_text_ad_copy_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_landing_headline_api_v1_text_landing_headline_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_email_subject_api_v1_text_email_subject_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_content_ideas_api_v1_text_content_ideas_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_hook_generator_api_v1_text_hook_generator_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_angle_generator_api_v1_text_angle_generator_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_faq_schema_api_v1_text_faq_schema_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_pos_tagger_api_v1_text_pos_tagger_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_sentence_type_api_v1_text_sentence_type_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_grammar_explain_api_v1_text_grammar_explain_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_synonym_finder_api_v1_text_synonym_finder_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_antonym_finder_api_v1_text_antonym_finder_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_define_words_api_v1_text_define_words_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_word_power_api_v1_text_word_power_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_vocab_complexity_api_v1_text_vocab_complexity_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_jargon_simplifier_api_v1_text_jargon_simplifier_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_formality_detector_api_v1_text_formality_detector_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_cliche_detector_api_v1_text_cliche_detector_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_regex_generator_api_v1_text_regex_generator_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_writing_prompt_api_v1_text_writing_prompt_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_team_name_generator_api_v1_text_team_name_generator_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  tool_mock_api_response_api_v1_text_mock_api_response_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TextResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  stream_tool_api_v1_text__tool_id__stream_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        tool_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TextRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  register_api_v1_auth_register_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RegisterRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TokenResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  login_api_v1_auth_login_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['LoginRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TokenResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  refresh_api_v1_auth_refresh_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TokenResponse'];
-        };
-      };
-    };
-  };
-  logout_api_v1_auth_logout_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': unknown;
-        };
-      };
-    };
-  };
-  forgot_password_api_v1_auth_forgot_password_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ForgotPasswordRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ForgotPasswordResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  reset_password_api_v1_auth_reset_password_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ResetPasswordRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ResetPasswordResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  verify_email_endpoint_api_v1_auth_verify_email_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VerifyEmailRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VerifyEmailResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  resend_verification_endpoint_api_v1_auth_resend_verification_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ResendVerificationResponse'];
-        };
-      };
-    };
-  };
   me_api_v1_auth_me_get: {
     parameters: {
       query?: never;
@@ -11606,6 +7834,42 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UserResponse'];
         };
+      };
+    };
+  };
+  resend_verification_api_v1_auth_resend_verification_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  clear_session_api_v1_auth_session_clear_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
@@ -11658,6 +7922,50 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_gamification_api_v1_user_gamification_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+  };
+  update_gamification_api_v1_user_gamification_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            [key: string]: unknown;
+          };
         };
       };
     };
@@ -11979,6 +8287,39 @@ export interface operations {
       };
     };
   };
+  reorder_tool_groups_api_v1_user_tool_groups_order_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupOrderUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupsResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
   rename_tool_group_api_v1_user_tool_groups__group_id__put: {
     parameters: {
       query?: never;
@@ -12093,6 +8434,41 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  set_tool_group_tools_api_v1_user_tool_groups__group_id__tools_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToolGroupItemsUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ToolGroupResponse'];
+        };
       };
       /** @description Validation Error */
       422: {
@@ -12308,9 +8684,13 @@ export interface operations {
       };
     };
   };
-  subscription_status_api_v1_subscription_status_get: {
+  list_history_api_v1_history_get: {
     parameters: {
-      query?: never;
+      query?: {
+        page?: number;
+        page_size?: number;
+        tool_id?: string | null;
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -12323,51 +8703,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['SubscriptionStatus'];
-        };
-      };
-    };
-  };
-  create_pro_checkout_api_v1_subscription_checkout_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['RazorpayProOrderResponse'];
-        };
-      };
-    };
-  };
-  verify_pro_payment_api_v1_subscription_verify_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RazorpayProVerifyRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': unknown;
+          'application/json': components['schemas']['HistoryListResponse'];
         };
       };
       /** @description Validation Error */
@@ -12381,27 +8717,58 @@ export interface operations {
       };
     };
   };
-  cancel_pro_api_v1_subscription_cancel_post: {
+  record_operation_api_v1_history_post: {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['HistoryCreate'];
+      };
+    };
     responses: {
       /** @description Successful Response */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': unknown;
+          'application/json': components['schemas']['HistoryResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
         };
       };
     };
   };
-  razorpay_webhook_api_v1_subscription_webhook_post: {
+  clear_history_api_v1_history_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_history_stats_api_v1_history_stats_summary_get: {
     parameters: {
       query?: never;
       header?: never;
@@ -12416,7 +8783,131 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': unknown;
+          'application/json': components['schemas']['HistoryStatsResponse'];
+        };
+      };
+    };
+  };
+  get_history_entry_api_v1_history__entry_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        entry_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HistoryResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  delete_history_entry_api_v1_history__entry_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        entry_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  create_share_api_v1_share_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ShareCreate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ShareResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_share_api_v1_share__share_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        share_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SharedResultView'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
         };
       };
     };
@@ -12644,91 +9135,7 @@ export interface operations {
       };
     };
   };
-  list_history_api_v1_history_get: {
-    parameters: {
-      query?: {
-        page?: number;
-        page_size?: number;
-        tool_id?: string | null;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HistoryListResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  record_operation_api_v1_history_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['HistoryCreate'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HistoryResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  clear_history_api_v1_history_delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  get_history_stats_api_v1_history_stats_summary_get: {
+  subscription_status_api_v1_subscription_status_get: {
     parameters: {
       query?: never;
       header?: never;
@@ -12743,18 +9150,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['HistoryStatsResponse'];
+          'application/json': components['schemas']['SubscriptionStatus'];
         };
       };
     };
   };
-  get_history_entry_api_v1_history__entry_id__get: {
+  create_pro_checkout_api_v1_subscription_checkout_post: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        entry_id: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -12765,50 +9170,12 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['HistoryResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': components['schemas']['RazorpayProOrderResponse'];
         };
       };
     };
   };
-  delete_history_entry_api_v1_history__entry_id__delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        entry_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  create_share_api_v1_share_post: {
+  verify_pro_payment_api_v1_subscription_verify_post: {
     parameters: {
       query?: never;
       header?: never;
@@ -12817,7 +9184,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['ShareCreate'];
+        'application/json': components['schemas']['RazorpayProVerifyRequest'];
       };
     };
     responses: {
@@ -12827,7 +9194,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ShareResponse'];
+          'application/json': unknown;
         };
       };
       /** @description Validation Error */
@@ -12841,12 +9208,87 @@ export interface operations {
       };
     };
   };
-  get_share_api_v1_share__share_id__get: {
+  cancel_pro_api_v1_subscription_cancel_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+    };
+  };
+  razorpay_webhook_api_v1_subscription_webhook_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+    };
+  };
+  check_access_internal_v1_check_access_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        'x-internal-secret'?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CheckAccessRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CheckAccessResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  run_ai_tool_api_v1_ai__tool_id__post: {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        share_id: string;
+        tool_id: string;
       };
       cookie?: never;
     };
@@ -12858,7 +9300,104 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['SharedResultView'];
+          'application/json': components['schemas']['TextResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  stream_ai_tool_api_v1_ai__tool_id__stream_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TextRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  enqueue_ai_tool_api_v1_ai__tool_id__enqueue_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tool_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['EnqueueResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_job_status_api_v1_ai_jobs__job_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        job_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobStatusResponse'];
         };
       };
       /** @description Validation Error */

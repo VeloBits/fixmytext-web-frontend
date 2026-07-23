@@ -112,7 +112,7 @@
     "test:packages": "npm run --workspaces --if-present test",
     "test:e2e": "npm run test:e2e -w @velobits/shell",
     "test:e2e:install": "playwright install --with-deps chromium",
-    "gen:types": "openapi-typescript ../backend/openapi.json -o packages/api-client/src/types/openapi.d.ts",
+    "gen:types": "openapi-typescript ../backend/openapi.json -o packages/api-client/src/types/openapi.d.ts && prettier --write packages/api-client/src/types/openapi.d.ts",
     "typecheck": "npm run --workspaces --if-present typecheck",
     "prepare": "husky",
     "deploy:shell": "npm run build:shell && npx wrangler pages deploy apps/shell/dist --project-name fixmytext-shell",

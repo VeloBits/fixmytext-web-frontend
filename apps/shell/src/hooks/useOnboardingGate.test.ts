@@ -50,6 +50,8 @@ function toolGroups(groupCount = 0, ready = true): ToolGroupsContextValue {
     deleteGroup: vi.fn(),
     addToolToGroup: vi.fn(),
     removeToolFromGroup: vi.fn(),
+    setGroupTools: vi.fn(),
+    reorderGroups: vi.fn(),
   };
 }
 

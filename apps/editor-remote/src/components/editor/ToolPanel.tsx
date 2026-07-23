@@ -1,18 +1,53 @@
-import { useState, useRef, useCallback, useMemo, memo } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  pointerWithin,
+  rectIntersection,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type {
+  CollisionDetection,
+  DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { USE_CASE_TABS, TOOL_GROUPS } from '@velobits/app-core/constants/tools';
-import { MAX_TOOL_GROUPS } from '@velobits/app-core/hooks/useToolGroups';
+import {
+  MAX_TOOL_GROUPS,
+  MAX_TOOLS_PER_GROUP,
+} from '@velobits/app-core/hooks/useToolGroups';
 import ToolIcon from '@velobits/app-core/components/editor/ToolIcon';
 import type { ToolDefinition, ToolTab } from '@velobits/app-core/types/tools';
 import type { ToolGroupsContextValue } from '@velobits/app-core/types/context';
 import {
   CheckIcon,
+  GripVerticalIcon,
   HeartIcon,
   MinusIcon,
   PenLineIcon,
   PlusIcon,
+  SearchIcon,
   Trash2Icon,
+  XIcon,
 } from '@velobits/design-system';
 
 interface TooltipState {
@@ -32,6 +67,35 @@ interface FavoritesState {
   toggleFavorite: (id: string) => void;
 }
 
+/* ── Drag-and-drop identity ──────────────────────────────────────────────────
+ * Sortable/draggable ids must be unique across the whole DndContext, and the
+ * same tool can appear in several sections (pinned, a custom group, its
+ * catalog group) — so every id is prefixed with its section. The `data`
+ * payload carries the semantic identity; ids are never parsed. */
+
+type ToolDragData =
+  | { kind: 'group-tool'; groupId: string; toolId: string; tool: ToolDefinition }
+  | { kind: 'catalog-tool'; toolId: string; tool: ToolDefinition };
+
+type DragData = ToolDragData | { kind: 'group'; groupId: string; label: string };
+
+type DropData =
+  | { kind: 'group-tool'; groupId: string; toolId: string }
+  | { kind: 'group-drop'; groupId: string }
+  | { kind: 'group'; groupId: string };
+
+/** dnd wiring injected into a tool row / card by its sortable or draggable
+ * wrapper. `rowProps` makes the whole row a pointer drag source; `handleProps`
+ * (custom-group items only) makes the grip button the keyboard-accessible
+ * activator. */
+interface ToolItemDnd {
+  setNodeRef: (el: HTMLElement | null) => void;
+  style?: React.CSSProperties;
+  isDragging: boolean;
+  rowProps?: Record<string, unknown>;
+  handleProps?: Record<string, unknown>;
+}
+
 interface ToolItemProps {
   tool: ToolDefinition;
   disabled: boolean;
@@ -47,6 +111,7 @@ interface ToolItemProps {
   customGroupId?: string;
   onRemoveFromGroup?: (groupId: string, toolId: string) => void;
   onOpenGroupMenu?: (toolId: string, anchor: DOMRect) => void;
+  dnd?: ToolItemDnd;
 }
 
 interface GroupHeaderProps {
@@ -64,6 +129,8 @@ interface CustomGroupHeaderProps {
   onToggle: () => void;
   onRename: (name: string) => void;
   onDelete: () => void;
+  onAddTools: () => void;
+  dragHandleProps: Record<string, unknown>;
 }
 
 interface ToolPanelProps {
@@ -123,6 +190,30 @@ function GroupActionButton({
   );
 }
 
+/** Grip rendered inside custom-group items: the keyboard activator for
+ * reordering (focus, Space/Enter to lift, arrows to move, Space to drop). */
+function DragGrip({
+  label,
+  handleProps,
+  extraClass = '',
+}: {
+  label: string;
+  handleProps: Record<string, unknown>;
+  extraClass?: string;
+}) {
+  return (
+    <button
+      className={`tu-titem-grip${extraClass}`}
+      {...handleProps}
+      onClick={(e) => e.stopPropagation()}
+      aria-label={`Reorder ${label}`}
+      title="Drag to reorder"
+    >
+      <GripVerticalIcon size={12} />
+    </button>
+  );
+}
+
 function ToolPanelItem(props: ToolItemProps) {
   const {
     tool,
@@ -134,10 +225,19 @@ function ToolPanelItem(props: ToolItemProps) {
     isSuggested,
     onHover,
     onLeave,
+    dnd,
   } = props;
   const [hovered, setHovered] = useState(false);
   const isDisabled = disabled && tool.type !== 'drawer' && (tool.type as string) !== 'action';
   const itemRef = useRef<HTMLDivElement | null>(null);
+
+  const setRefs = useCallback(
+    (el: HTMLDivElement | null) => {
+      itemRef.current = el;
+      dnd?.setNodeRef(el);
+    },
+    [dnd]
+  );
 
   const handleClick = () => {
     if (isDisabled) return;
@@ -159,8 +259,11 @@ function ToolPanelItem(props: ToolItemProps) {
 
   return (
     <div
-      ref={itemRef}
-      className={`tu-titem-wrap${hovered ? ' tu-titem-wrap--hover' : ''}`}
+      ref={setRefs}
+      style={dnd?.style}
+      className={`tu-titem-wrap${hovered ? ' tu-titem-wrap--hover' : ''}${
+        dnd?.isDragging ? ' tu-dnd-dragging' : ''
+      }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -169,7 +272,9 @@ function ToolPanelItem(props: ToolItemProps) {
           isDisabled ? ' tu-titem--disabled' : ''
         }`}
         onClick={handleClick}
+        {...(dnd?.rowProps ?? {})}
       >
+        {dnd?.handleProps && <DragGrip label={tool.label} handleProps={dnd.handleProps} />}
         <ToolIcon icon={tool.icon} color={tool.color} toolId={tool.id} />
         <span className="tu-titem-name">{tool.label}</span>
         {isSuggested && <span className="tu-titem-suggested">suggested</span>}
@@ -242,7 +347,8 @@ function GroupHeader({ label, count, collapsed, onToggle, pinned }: GroupHeaderP
   );
 }
 
-/* ── Custom (user-created) group header: rename + delete on hover ── */
+/* ── Custom (user-created) group header: drag grip, add tools, rename,
+ *    delete on hover ── */
 function CustomGroupHeader({
   label,
   count,
@@ -250,6 +356,8 @@ function CustomGroupHeader({
   onToggle,
   onRename,
   onDelete,
+  onAddTools,
+  dragHandleProps,
 }: CustomGroupHeaderProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(label);
@@ -282,6 +390,15 @@ function CustomGroupHeader({
       aria-expanded={!collapsed}
       aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${label} group`}
     >
+      <button
+        className="tu-group-grip"
+        {...dragHandleProps}
+        onClick={(e) => e.stopPropagation()}
+        aria-label={`Reorder ${label} group`}
+        title="Drag to reorder groups"
+      >
+        <GripVerticalIcon size={12} />
+      </button>
       <svg
         className="tu-group-chevron"
         width="16"
@@ -323,6 +440,17 @@ function CustomGroupHeader({
           className="tu-group-action"
           onClick={(e) => {
             e.stopPropagation();
+            onAddTools();
+          }}
+          aria-label={`Add tools to ${label} group`}
+          title="Add tools"
+        >
+          <PlusIcon size={12} />
+        </button>
+        <button
+          className="tu-group-action"
+          onClick={(e) => {
+            e.stopPropagation();
             setDraft(label);
             setEditing(true);
           }}
@@ -360,9 +488,18 @@ function ToolGridCard(props: ToolItemProps) {
     isSuggested,
     onHover,
     onLeave,
+    dnd,
   } = props;
   const isDisabled = disabled && tool.type !== 'drawer' && (tool.type as string) !== 'action';
   const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const setRefs = useCallback(
+    (el: HTMLDivElement | null) => {
+      cardRef.current = el;
+      dnd?.setNodeRef(el);
+    },
+    [dnd]
+  );
 
   const handleClick = () => {
     if (isDisabled) return;
@@ -378,14 +515,23 @@ function ToolGridCard(props: ToolItemProps) {
 
   return (
     <div
-      ref={cardRef}
+      ref={setRefs}
+      style={dnd?.style}
       className={`tu-tgrid-card${isActive ? ' tu-tgrid-card--active' : ''}${
         isDisabled ? ' tu-tgrid-card--disabled' : ''
-      }`}
+      }${dnd?.isDragging ? ' tu-dnd-dragging' : ''}`}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={onLeave}
+      {...(dnd?.rowProps ?? {})}
     >
+      {dnd?.handleProps && (
+        <DragGrip
+          label={tool.label}
+          handleProps={dnd.handleProps}
+          extraClass=" tu-tgrid-card-grip"
+        />
+      )}
       <div className="tu-tgrid-card-icon">
         <ToolIcon icon={tool.icon} color={tool.color} toolId={tool.id} />
       </div>
@@ -414,12 +560,111 @@ function ToolGridCard(props: ToolItemProps) {
   );
 }
 
+/** Sortable wrapper for a tool inside a custom group: whole row drags with
+ * the pointer, the grip is the keyboard activator. */
+function SortableGroupTool({
+  groupId,
+  viewMode,
+  ...itemProps
+}: ToolItemProps & { groupId: string; viewMode: string }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `grouptool:${groupId}:${itemProps.tool.id}`,
+    data: {
+      kind: 'group-tool',
+      groupId,
+      toolId: itemProps.tool.id,
+      tool: itemProps.tool,
+    } satisfies ToolDragData,
+  });
+  const dnd: ToolItemDnd = {
+    setNodeRef,
+    style: { transform: CSS.Transform.toString(transform), transition },
+    isDragging,
+    rowProps: listeners ?? {},
+    handleProps: { ...attributes, ...(listeners ?? {}) },
+  };
+  return viewMode === 'grid' ? (
+    <ToolGridCard {...itemProps} dnd={dnd} />
+  ) : (
+    <ToolPanelItem {...itemProps} dnd={dnd} />
+  );
+}
+
+/** Draggable wrapper for pinned/catalog tools: drag one onto a custom group
+ * to add it there. Not sortable — catalog order is fixed. Keyboard users add
+ * via the + menu instead, so no grip is rendered. */
+function DraggableCatalogTool({
+  sectionId,
+  viewMode,
+  ...itemProps
+}: ToolItemProps & { sectionId: string; viewMode: string }) {
+  const { listeners, setNodeRef, isDragging } = useDraggable({
+    id: `catalogtool:${sectionId}:${itemProps.tool.id}`,
+    data: { kind: 'catalog-tool', toolId: itemProps.tool.id, tool: itemProps.tool } satisfies ToolDragData,
+  });
+  const dnd: ToolItemDnd = {
+    setNodeRef,
+    isDragging,
+    rowProps: listeners ?? {},
+  };
+  return viewMode === 'grid' ? (
+    <ToolGridCard {...itemProps} dnd={dnd} />
+  ) : (
+    <ToolPanelItem {...itemProps} dnd={dnd} />
+  );
+}
+
+/** Sortable block wrapper for a custom group: the whole section moves when
+ * the header grip drags, and the inner div is the drop target for tools. */
+function SortableCustomGroup({
+  groupId,
+  label,
+  highlight,
+  children,
+}: {
+  groupId: string;
+  label: string;
+  highlight: boolean;
+  children: (dragHandleProps: Record<string, unknown>) => React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `groupblock:${groupId}`,
+    data: { kind: 'group', groupId, label } satisfies DragData,
+  });
+  const { setNodeRef: setDropRef } = useDroppable({
+    id: `groupdrop:${groupId}`,
+    data: { kind: 'group-drop', groupId } satisfies DropData,
+  });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`tu-group${isDragging ? ' tu-dnd-dragging' : ''}${
+        highlight ? ' tu-group--drop-target' : ''
+      }`}
+    >
+      <div ref={setDropRef}>{children({ ...attributes, ...(listeners ?? {}) })}</div>
+    </div>
+  );
+}
+
 interface PanelGroup {
   id: string;
   label: string;
   tools: ToolDefinition[];
   /** Present on user-created groups (the raw group id, without the section prefix). */
   customGroupId?: string;
+}
+
+interface SnackbarState {
+  message: string;
+  undo?: () => void;
+}
+
+interface PickerState {
+  groupId: string;
+  query: string;
+  selected: Set<string>;
 }
 
 export default memo(function ToolPanel({
@@ -441,6 +686,18 @@ export default memo(function ToolPanel({
   // null = the "New group…" row is a button; a string = its inline input value
   const [menuNewName, setMenuNewName] = useState<string | null>(null);
   const [newGroupName, setNewGroupName] = useState<string | null>(null);
+  const [activeDrag, setActiveDrag] = useState<DragData | null>(null);
+  const [dropGroupId, setDropGroupId] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState<SnackbarState | null>(null);
+  const [picker, setPicker] = useState<PickerState | null>(null);
+  const snackbarTimer = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (snackbarTimer.current) window.clearTimeout(snackbarTimer.current);
+    },
+    []
+  );
 
   const toggleGroup = useCallback((groupId: string) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -477,6 +734,34 @@ export default memo(function ToolPanel({
     setMenuNewName(null);
     setGroupMenu({ toolId, top, left });
   }, []);
+
+  /** Transient bottom-of-panel notice; pass `undo` to render an Undo action. */
+  const flash = useCallback((message: string, undo?: () => void) => {
+    if (snackbarTimer.current) window.clearTimeout(snackbarTimer.current);
+    setSnackbar({ message, undo });
+    snackbarTimer.current = window.setTimeout(() => setSnackbar(null), 6000);
+  }, []);
+
+  const dismissSnackbar = useCallback(() => {
+    if (snackbarTimer.current) window.clearTimeout(snackbarTimer.current);
+    setSnackbar(null);
+  }, []);
+
+  /** Removal with undo: capture the group's exact order first, so undo puts
+   * the tool back at its old position (setGroupTools replays the full list). */
+  const handleRemoveFromGroup = useCallback(
+    (groupId: string, toolId: string) => {
+      const group = toolGroups.groups.find((g) => g.id === groupId);
+      if (!group) return;
+      const prevToolIds = group.toolIds;
+      const label = tools.find((t) => t.id === toolId)?.label ?? toolId;
+      toolGroups.removeToolFromGroup(groupId, toolId);
+      flash(`Removed ${label} from ${group.name}`, () =>
+        toolGroups.setGroupTools(groupId, prevToolIds)
+      );
+    },
+    [toolGroups, tools, flash]
+  );
 
   // Count tools per tab
   const tabCounts = useMemo(() => {
@@ -571,73 +856,251 @@ export default memo(function ToolPanel({
     setNewGroupName(null);
   };
 
+  /* ── Drag and drop ─────────────────────────────────────────────────────── */
+
+  const sensors = useSensors(
+    // distance keeps plain clicks working; delay keeps touch scrolling working
+    // (long-press to lift on mobile).
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  /** Group drags only see other group blocks; tool drags prefer the exact
+   * item under the pointer, then a group's drop area. Keyboard drags have no
+   * pointer, so they fall through to rect intersection. */
+  const collisionDetection = useCallback<CollisionDetection>((args) => {
+    const kind = (args.active.data.current as DragData | undefined)?.kind;
+    if (kind === 'group') {
+      return closestCenter({
+        ...args,
+        droppableContainers: args.droppableContainers.filter(
+          (c) => (c.data.current as DropData | undefined)?.kind === 'group'
+        ),
+      });
+    }
+    const items = args.droppableContainers.filter(
+      (c) => (c.data.current as DropData | undefined)?.kind === 'group-tool'
+    );
+    const drops = args.droppableContainers.filter(
+      (c) => (c.data.current as DropData | undefined)?.kind === 'group-drop'
+    );
+    const hitItems = pointerWithin({ ...args, droppableContainers: items });
+    if (hitItems.length > 0) return hitItems;
+    const hitDrops = pointerWithin({ ...args, droppableContainers: drops });
+    if (hitDrops.length > 0) return hitDrops;
+    return rectIntersection({ ...args, droppableContainers: [...items, ...drops] });
+  }, []);
+
+  const handleDragStart = useCallback(({ active }: DragStartEvent) => {
+    setTooltip(null);
+    setActiveDrag((active.data.current as DragData | undefined) ?? null);
+  }, []);
+
+  const handleDragOver = useCallback(({ over }: DragOverEvent) => {
+    const data = over?.data.current as DropData | undefined;
+    setDropGroupId(
+      data?.kind === 'group-drop' || data?.kind === 'group-tool' ? data.groupId : null
+    );
+  }, []);
+
+  const handleDragCancel = useCallback(() => {
+    setActiveDrag(null);
+    setDropGroupId(null);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    ({ active, over }: DragEndEvent) => {
+      setActiveDrag(null);
+      setDropGroupId(null);
+      const a = active.data.current as DragData | undefined;
+      const o = over?.data.current as DropData | undefined;
+      if (!a || !o) return;
+
+      if (a.kind === 'group') {
+        if (o.kind !== 'group' || o.groupId === a.groupId) return;
+        const ids = customGroups.map((g) => g.id);
+        const from = ids.indexOf(a.groupId);
+        const to = ids.indexOf(o.groupId);
+        if (from < 0 || to < 0 || from === to) return;
+        toolGroups.reorderGroups(arrayMove(ids, from, to));
+        return;
+      }
+
+      if (o.kind === 'group') return;
+      const target = customGroups.find((g) => g.id === o.groupId);
+      if (!target) return;
+
+      // Reorder within the same group
+      if (a.kind === 'group-tool' && a.groupId === target.id) {
+        const from = target.toolIds.indexOf(a.toolId);
+        const to =
+          o.kind === 'group-tool' ? target.toolIds.indexOf(o.toolId) : target.toolIds.length - 1;
+        if (from < 0 || to < 0 || from === to) return;
+        toolGroups.setGroupTools(target.id, arrayMove(target.toolIds, from, to));
+        return;
+      }
+
+      // Add from the catalog, or move from another group
+      const label = a.tool.label;
+      if (target.toolIds.includes(a.toolId)) {
+        flash(`${label} is already in ${target.name}`);
+        return;
+      }
+      if (target.toolIds.length >= MAX_TOOLS_PER_GROUP) {
+        flash(`${target.name} is full (${MAX_TOOLS_PER_GROUP} tools max)`);
+        return;
+      }
+      const insertAt =
+        o.kind === 'group-tool' ? target.toolIds.indexOf(o.toolId) : target.toolIds.length;
+      const nextIds = [...target.toolIds];
+      nextIds.splice(insertAt < 0 ? nextIds.length : insertAt, 0, a.toolId);
+      toolGroups.setGroupTools(target.id, nextIds);
+      if (a.kind === 'group-tool') {
+        toolGroups.removeToolFromGroup(a.groupId, a.toolId);
+      }
+    },
+    [customGroups, toolGroups, flash]
+  );
+
+  /* ── Bulk "Add tools" picker ───────────────────────────────────────────── */
+
+  const sortedCatalog = useMemo(
+    () => [...tools].sort((a, b) => a.label.localeCompare(b.label)),
+    [tools]
+  );
+
+  const openPicker = useCallback(
+    (groupId: string) => {
+      const group = toolGroups.groups.find((g) => g.id === groupId);
+      if (!group) return;
+      setPicker({ groupId, query: '', selected: new Set(group.toolIds) });
+    },
+    [toolGroups]
+  );
+
+  const togglePickerTool = useCallback((toolId: string) => {
+    setPicker((prev) => {
+      if (!prev) return prev;
+      const selected = new Set(prev.selected);
+      if (selected.has(toolId)) selected.delete(toolId);
+      else if (selected.size < MAX_TOOLS_PER_GROUP) selected.add(toolId);
+      return { ...prev, selected };
+    });
+  }, []);
+
+  /** Kept tools preserve their curated order; newly picked ones append in
+   * catalog (alphabetical) order. setGroupTools is called outside any state
+   * updater — updaters must stay pure (no setState into other components). */
+  const commitPicker = useCallback(() => {
+    if (!picker) return;
+    const group = toolGroups.groups.find((g) => g.id === picker.groupId);
+    if (group) {
+      const kept = group.toolIds.filter((id) => picker.selected.has(id));
+      const added = sortedCatalog
+        .filter((t) => picker.selected.has(t.id) && !group.toolIds.includes(t.id))
+        .map((t) => t.id);
+      toolGroups.setGroupTools(picker.groupId, [...kept, ...added]);
+    }
+    setPicker(null);
+  }, [picker, toolGroups, sortedCatalog]);
+
+  const pickerGroup = picker ? toolGroups.groups.find((g) => g.id === picker.groupId) : null;
+  const pickerTools = useMemo(() => {
+    if (!picker) return [];
+    const q = picker.query.trim().toLowerCase();
+    return q ? sortedCatalog.filter((t) => t.label.toLowerCase().includes(q)) : sortedCatalog;
+  }, [picker, sortedCatalog]);
+
+  /* ── Rendering ─────────────────────────────────────────────────────────── */
+
+  const renderToolItem = (group: PanelGroup, tool: ToolDefinition) => {
+    const itemProps: ToolItemProps = {
+      tool,
+      disabled,
+      onClick: () => onToolClick(tool),
+      isFavorite: favoriteIds.includes(tool.id),
+      onToggleFavorite: favorites.toggleFavorite,
+      isActive: activeToolId === tool.id,
+      isSuggested: suggestedToolIds.includes(tool.id),
+      onHover: handleHover,
+      onLeave: handleLeave,
+      customGroupId: group.customGroupId,
+      onRemoveFromGroup: handleRemoveFromGroup,
+      onOpenGroupMenu: openGroupMenu,
+    };
+    return group.customGroupId ? (
+      <SortableGroupTool
+        key={tool.id}
+        groupId={group.customGroupId}
+        viewMode={viewMode}
+        {...itemProps}
+      />
+    ) : (
+      <DraggableCatalogTool key={tool.id} sectionId={group.id} viewMode={viewMode} {...itemProps} />
+    );
+  };
+
   const renderGroup = (group: PanelGroup) => (
     <div key={group.id} className="tu-group">
-      {group.customGroupId ? (
-        <CustomGroupHeader
-          label={group.label}
-          count={group.tools.length}
-          collapsed={!!collapsedGroups[group.id]}
-          onToggle={() => toggleGroup(group.id)}
-          onRename={(name) => toolGroups.renameGroup(group.customGroupId!, name)}
-          onDelete={() => toolGroups.deleteGroup(group.customGroupId!)}
-        />
-      ) : (
-        <GroupHeader
-          label={group.label}
-          count={group.tools.length}
-          collapsed={!!collapsedGroups[group.id]}
-          onToggle={() => toggleGroup(group.id)}
-          pinned={group.id === '_pinned'}
-        />
+      <GroupHeader
+        label={group.label}
+        count={group.tools.length}
+        collapsed={!!collapsedGroups[group.id]}
+        onToggle={() => toggleGroup(group.id)}
+        pinned={group.id === '_pinned'}
+      />
+      {!collapsedGroups[group.id] && (
+        <div className={viewMode === 'grid' ? 'tu-group-grid' : 'tu-group-items'}>
+          {group.tools.map((tool) => renderToolItem(group, tool))}
+        </div>
       )}
-      {!collapsedGroups[group.id] && group.customGroupId && group.tools.length === 0 && (
-        <div className="tu-group-empty-hint">Use the + on any tool to add it here</div>
-      )}
-      {!collapsedGroups[group.id] &&
-        (viewMode === 'grid' ? (
-          <div className="tu-group-grid">
-            {group.tools.map((tool) => (
-              <ToolGridCard
-                key={tool.id}
-                tool={tool}
-                disabled={disabled}
-                onClick={() => onToolClick(tool)}
-                isFavorite={favoriteIds.includes(tool.id)}
-                onToggleFavorite={favorites.toggleFavorite}
-                isActive={activeToolId === tool.id}
-                isSuggested={suggestedToolIds.includes(tool.id)}
-                onHover={handleHover}
-                onLeave={handleLeave}
-                customGroupId={group.customGroupId}
-                onRemoveFromGroup={toolGroups.removeToolFromGroup}
-                onOpenGroupMenu={openGroupMenu}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="tu-group-items">
-            {group.tools.map((tool) => (
-              <ToolPanelItem
-                key={tool.id}
-                tool={tool}
-                disabled={disabled}
-                onClick={() => onToolClick(tool)}
-                isFavorite={favoriteIds.includes(tool.id)}
-                onToggleFavorite={favorites.toggleFavorite}
-                isActive={activeToolId === tool.id}
-                isSuggested={suggestedToolIds.includes(tool.id)}
-                onHover={handleHover}
-                onLeave={handleLeave}
-                customGroupId={group.customGroupId}
-                onRemoveFromGroup={toolGroups.removeToolFromGroup}
-                onOpenGroupMenu={openGroupMenu}
-              />
-            ))}
-          </div>
-        ))}
     </div>
   );
+
+  const renderCustomGroup = (group: PanelGroup) => {
+    const gid = group.customGroupId!;
+    const collapsed = !!collapsedGroups[group.id];
+    // Highlight while a tool from outside this group hovers over it
+    const highlight =
+      dropGroupId === gid &&
+      activeDrag !== null &&
+      (activeDrag.kind === 'catalog-tool' ||
+        (activeDrag.kind === 'group-tool' && activeDrag.groupId !== gid));
+    return (
+      <SortableCustomGroup key={group.id} groupId={gid} label={group.label} highlight={highlight}>
+        {(dragHandleProps) => (
+          <>
+            <CustomGroupHeader
+              label={group.label}
+              count={group.tools.length}
+              collapsed={collapsed}
+              onToggle={() => toggleGroup(group.id)}
+              onRename={(name) => toolGroups.renameGroup(gid, name)}
+              onDelete={() => toolGroups.deleteGroup(gid)}
+              onAddTools={() => openPicker(gid)}
+              dragHandleProps={dragHandleProps}
+            />
+            {!collapsed && group.tools.length === 0 && (
+              <div className="tu-group-empty-hint">
+                Drag tools here, or use the + on any tool
+              </div>
+            )}
+            {!collapsed && group.tools.length > 0 && (
+              <SortableContext
+                items={group.tools.map((t) => `grouptool:${gid}:${t.id}`)}
+                strategy={viewMode === 'grid' ? rectSortingStrategy : verticalListSortingStrategy}
+              >
+                <div className={viewMode === 'grid' ? 'tu-group-grid' : 'tu-group-items'}>
+                  {group.tools.map((tool) => renderToolItem(group, tool))}
+                </div>
+              </SortableContext>
+            )}
+          </>
+        )}
+      </SortableCustomGroup>
+    );
+  };
 
   return (
     <div className="tu-tpanel">
@@ -658,52 +1121,110 @@ export default memo(function ToolPanel({
         </div>
       )}
 
-      <div className="tu-tpanel-list">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${activeTab}-${viewMode}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12 }}
-          >
-            {topGroups.map(renderGroup)}
-            {newGroupName !== null ? (
-              <div className="tu-group-new tu-group-new--editing">
-                <input
-                  className="tu-group-rename-input"
-                  value={newGroupName}
-                  autoFocus
-                  maxLength={100}
-                  placeholder="Group name"
-                  onChange={(e) => setNewGroupName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') commitNewGroup();
-                    if (e.key === 'Escape') setNewGroupName(null);
-                  }}
-                  onBlur={commitNewGroup}
-                  aria-label="New group name"
-                />
-              </div>
-            ) : (
-              <button
-                className="tu-group-new"
-                onClick={() => setNewGroupName('')}
-                disabled={customGroups.length >= MAX_TOOL_GROUPS}
-                title={
-                  customGroups.length >= MAX_TOOL_GROUPS
-                    ? `Group limit reached (${MAX_TOOL_GROUPS})`
-                    : 'Create a custom tool group'
-                }
+      <DndContext
+        sensors={sensors}
+        collisionDetection={collisionDetection}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <div className="tu-tpanel-list">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${activeTab}-${viewMode}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.12 }}
+            >
+              <SortableContext
+                items={customGroups.map((g) => `groupblock:${g.id}`)}
+                strategy={verticalListSortingStrategy}
               >
-                <PlusIcon size={12} />
-                <span>New Group</span>
-              </button>
-            )}
-            {catalogGroups.map(renderGroup)}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+                {topGroups.map((g) => (g.customGroupId ? renderCustomGroup(g) : renderGroup(g)))}
+              </SortableContext>
+              {newGroupName !== null ? (
+                <div className="tu-group-new tu-group-new--editing">
+                  <input
+                    className="tu-group-rename-input"
+                    value={newGroupName}
+                    autoFocus
+                    maxLength={100}
+                    placeholder="Group name"
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') commitNewGroup();
+                      if (e.key === 'Escape') setNewGroupName(null);
+                    }}
+                    onBlur={commitNewGroup}
+                    aria-label="New group name"
+                  />
+                </div>
+              ) : (
+                <button
+                  className="tu-group-new"
+                  onClick={() => setNewGroupName('')}
+                  disabled={customGroups.length >= MAX_TOOL_GROUPS}
+                  title={
+                    customGroups.length >= MAX_TOOL_GROUPS
+                      ? `Group limit reached (${MAX_TOOL_GROUPS})`
+                      : 'Create a custom tool group'
+                  }
+                >
+                  <PlusIcon size={12} />
+                  <span>New Group</span>
+                </button>
+              )}
+              {catalogGroups.map(renderGroup)}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <DragOverlay>
+          {activeDrag && activeDrag.kind !== 'group' && (
+            <div className="tu-dnd-overlay">
+              <ToolIcon
+                icon={activeDrag.tool.icon}
+                color={activeDrag.tool.color}
+                toolId={activeDrag.tool.id}
+              />
+              <span>{activeDrag.tool.label}</span>
+            </div>
+          )}
+          {activeDrag && activeDrag.kind === 'group' && (
+            <div className="tu-dnd-overlay tu-dnd-overlay--group">
+              <GripVerticalIcon size={12} />
+              <span>{activeDrag.label}</span>
+            </div>
+          )}
+        </DragOverlay>
+      </DndContext>
+
+      {/* Transient snackbar (undo removals, drop feedback) */}
+      {snackbar && (
+        <div className="tu-undo-snackbar" role="status" aria-live="polite">
+          <span className="tu-undo-snackbar-msg">{snackbar.message}</span>
+          {snackbar.undo && (
+            <button
+              className="tu-undo-snackbar-btn"
+              onClick={() => {
+                snackbar.undo?.();
+                dismissSnackbar();
+              }}
+            >
+              Undo
+            </button>
+          )}
+          <button
+            className="tu-undo-snackbar-close"
+            onClick={dismissSnackbar}
+            aria-label="Dismiss notification"
+          >
+            <XIcon size={12} />
+          </button>
+        </div>
+      )}
 
       {/* Portal tooltip */}
       {tooltip &&
@@ -738,7 +1259,7 @@ export default memo(function ToolPanel({
                     role="menuitemcheckbox"
                     aria-checked={checked}
                     onClick={() => {
-                      if (checked) toolGroups.removeToolFromGroup(g.id, groupMenu.toolId);
+                      if (checked) handleRemoveFromGroup(g.id, groupMenu.toolId);
                       else toolGroups.addToolToGroup(g.id, groupMenu.toolId);
                     }}
                   >
@@ -785,6 +1306,86 @@ export default memo(function ToolPanel({
                   aria-label="New group name"
                 />
               )}
+            </div>
+          </>,
+          document.body
+        )}
+
+      {/* Portal bulk "Add tools" picker */}
+      {picker &&
+        createPortal(
+          <>
+            <div className="tu-group-menu-backdrop" onClick={() => setPicker(null)} />
+            <div
+              className="tu-group-picker"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Add tools to ${pickerGroup?.name ?? 'group'}`}
+            >
+              <div className="tu-group-picker-head">
+                <span className="tu-group-picker-title">
+                  Add tools to {pickerGroup?.name ?? 'group'}
+                </span>
+                <button
+                  className="tu-group-picker-close"
+                  onClick={() => setPicker(null)}
+                  aria-label="Close"
+                >
+                  <XIcon size={14} />
+                </button>
+              </div>
+              <div className="tu-group-picker-search">
+                <SearchIcon size={13} />
+                <input
+                  autoFocus
+                  value={picker.query}
+                  placeholder="Search tools…"
+                  onChange={(e) =>
+                    setPicker((prev) => (prev ? { ...prev, query: e.target.value } : prev))
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setPicker(null);
+                  }}
+                  aria-label="Search tools"
+                />
+              </div>
+              <div className="tu-group-picker-list">
+                {pickerTools.map((t) => {
+                  const checked = picker.selected.has(t.id);
+                  const full = !checked && picker.selected.size >= MAX_TOOLS_PER_GROUP;
+                  return (
+                    <label
+                      key={t.id}
+                      className={`tu-group-picker-item${
+                        full ? ' tu-group-picker-item--disabled' : ''
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={full}
+                        onChange={() => togglePickerTool(t.id)}
+                      />
+                      <ToolIcon icon={t.icon} color={t.color} toolId={t.id} />
+                      <span className="tu-group-picker-name">{t.label}</span>
+                    </label>
+                  );
+                })}
+                {pickerTools.length === 0 && (
+                  <div className="tu-group-menu-empty">No tools match</div>
+                )}
+              </div>
+              <div className="tu-group-picker-foot">
+                <span className="tu-group-picker-count">
+                  {picker.selected.size}/{MAX_TOOLS_PER_GROUP} selected
+                </span>
+                <button className="tu-group-picker-cancel" onClick={() => setPicker(null)}>
+                  Cancel
+                </button>
+                <button className="tu-group-picker-save" onClick={commitPicker}>
+                  Save
+                </button>
+              </div>
             </div>
           </>,
           document.body

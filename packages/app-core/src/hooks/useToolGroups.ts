@@ -6,6 +6,8 @@ import {
   useDeleteToolGroupMutation,
   useAddToolToGroupMutation,
   useRemoveToolFromGroupMutation,
+  useSetToolGroupToolsMutation,
+  useReorderToolGroupsMutation,
 } from '../store/api/userDataApi';
 import { useOidcAuth } from '../auth/useOidcAuth';
 import type { ToolGroupsContextValue, ToolGroupView } from '../types/context';
@@ -119,6 +121,8 @@ export default function useToolGroups(): ToolGroupsContextValue {
   const [apiDeleteGroup] = useDeleteToolGroupMutation();
   const [apiAddTool] = useAddToolToGroupMutation();
   const [apiRemoveTool] = useRemoveToolFromGroupMutation();
+  const [apiSetGroupTools] = useSetToolGroupToolsMutation();
+  const [apiReorderGroups] = useReorderToolGroupsMutation();
 
   // Guards the one-time guest→account adoption: the effect re-runs on every
   // refetch (each create invalidates the ToolGroups tag), and without the ref
@@ -289,6 +293,53 @@ export default function useToolGroups(): ToolGroupsContextValue {
     [isAuthenticated, apiRemoveTool, persist]
   );
 
+  const setGroupTools = useCallback(
+    (groupId: string, toolIds: string[]): void => {
+      setGroups((prev) => {
+        const group = prev.find((g) => g.id === groupId);
+        if (!group) return prev;
+        const nextIds = dedupe(toolIds).slice(0, MAX_TOOLS_PER_GROUP);
+        if (JSON.stringify(nextIds) === JSON.stringify(group.toolIds)) return prev;
+        const next = prev.map((g) => (g.id === groupId ? { ...g, toolIds: nextIds } : g));
+        persist(next);
+        if (isAuthenticated && !isLocalId(groupId)) {
+          apiSetGroupTools({ groupId, toolIds: nextIds })
+            .unwrap()
+            .catch(() => {});
+        }
+        return next;
+      });
+    },
+    [isAuthenticated, apiSetGroupTools, persist]
+  );
+
+  const reorderGroups = useCallback(
+    (groupIds: string[]): void => {
+      setGroups((prev) => {
+        // Mirror the server's semantics: listed groups first (array position =
+        // display order), unlisted ones keep their relative order after them.
+        const byId = new Map(prev.map((g) => [g.id, g]));
+        const listed = groupIds
+          .map((id) => byId.get(id))
+          .filter((g): g is ToolGroupView => !!g);
+        const listedIds = new Set(listed.map((g) => g.id));
+        const next = [...listed, ...prev.filter((g) => !listedIds.has(g.id))];
+        if (next.every((g, i) => g === prev[i])) return prev;
+        persist(next);
+        if (isAuthenticated) {
+          const serverIds = next.map((g) => g.id).filter((id) => !isLocalId(id));
+          if (serverIds.length > 0) {
+            apiReorderGroups(serverIds)
+              .unwrap()
+              .catch(() => {});
+          }
+        }
+        return next;
+      });
+    },
+    [isAuthenticated, apiReorderGroups, persist]
+  );
+
   return {
     groups,
     // Guests are ready immediately; signed-in users once the server list has
@@ -299,6 +350,8 @@ export default function useToolGroups(): ToolGroupsContextValue {
     deleteGroup,
     addToolToGroup,
     removeToolFromGroup,
+    setGroupTools,
+    reorderGroups,
   };
 }
 
