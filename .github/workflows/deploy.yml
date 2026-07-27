@@ -202,7 +202,7 @@ jobs:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_KEYCLOAK_URL: ${{ vars.VITE_KEYCLOAK_URL }}
           # Realm must be passed explicitly — app-core silently falls back to the
-          # DEV realm (Velobits-Dev) when unset (keycloakConfig.ts).
+          # DEV realm (Velobits) when unset (keycloakConfig.ts).
           VITE_KEYCLOAK_REALM: ${{ vars.VITE_KEYCLOAK_REALM }}
           VITE_KEYCLOAK_CLIENT_ID: ${{ vars.VITE_KEYCLOAK_CLIENT_ID }}
           VITE_KEYCLOAK_ENABLED_PROVIDERS: ${{ vars.VITE_KEYCLOAK_ENABLED_PROVIDERS }}
