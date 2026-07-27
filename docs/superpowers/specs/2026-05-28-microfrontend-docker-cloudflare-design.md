@@ -226,7 +226,7 @@ Both profiles use the **same service names** (`editor-remote`, `analytics-remote
 ```
 VITE_API_URL=http://api-dev.velobits.dev
 VITE_KEYCLOAK_URL=http://auth-dev.velobits.dev
-VITE_KEYCLOAK_REALM=Velobits-Dev
+VITE_KEYCLOAK_REALM=Velobits
 VITE_KEYCLOAK_CLIENT_ID=develop-fixmytext
 VITE_USE_REMOTES=true
 VITE_EDITOR_REMOTE_ENTRY=http://localhost:3000/remotes/editor/remoteEntry.js

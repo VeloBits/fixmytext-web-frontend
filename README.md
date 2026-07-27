@@ -156,7 +156,7 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 | ------------------------- | -------- | ------------------------------ | ------------------------------------------------ |
 | `VITE_API_URL`            | Yes      | `http://api-dev.velobits.dev`  | Backend API base URL (Kong gateway)              |
 | `VITE_KEYCLOAK_URL`       | Yes      | `http://auth-dev.velobits.dev` | Keycloak server base URL (realm path is derived) |
-| `VITE_KEYCLOAK_REALM`     | Yes      | `Velobits-Dev`                 | Keycloak realm name                              |
+| `VITE_KEYCLOAK_REALM`     | Yes      | `Velobits`                 | Keycloak realm name                              |
 | `VITE_KEYCLOAK_CLIENT_ID` | Yes      | `develop-fixmytext`            | Keycloak client ID                               |
 
 ### `apps/content` (Next.js)
