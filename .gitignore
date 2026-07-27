@@ -10,13 +10,8 @@ dist/
 build/
 
 # ── Environment files (never commit secrets) ──────────────────────────────────
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.docker.dev
-.env.docker.prod
+.env*
+!.env.example
 
 # ── Logs ───────────────────────────────────────────────────────────
 npm-debug.log*

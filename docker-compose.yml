@@ -57,7 +57,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    env_file: .env.docker.dev
+    env_file: .env
     restart: unless-stopped
 
   # ── Shell — prod ───────────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ services:
         VITE_EDITOR_REMOTE_ENTRY: ${VITE_EDITOR_REMOTE_ENTRY:-http://localhost:3000/remotes/editor/remoteEntry.js}
         VITE_ANALYTICS_REMOTE_ENTRY: ${VITE_ANALYTICS_REMOTE_ENTRY:-http://localhost:3000/remotes/analytics/remoteEntry.js}
     container_name: fixmytext-shell-prod
-    env_file: .env.docker.prod
+    env_file: .env.prod
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:8080']
@@ -98,7 +98,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    env_file: .env.docker.dev
+    env_file: .env
     restart: unless-stopped
 
   # ── Editor Remote — prod ───────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ services:
         APP_WORKSPACE: '@velobits/editor-remote'
         APP_PATH: 'apps/editor-remote'
     container_name: fixmytext-editor-prod
-    env_file: .env.docker.prod
+    env_file: .env.prod
     restart: unless-stopped
 
   # ── Analytics Remote — dev ─────────────────────────────────────────────────────
@@ -128,7 +128,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    env_file: .env.docker.dev
+    env_file: .env
     restart: unless-stopped
 
   # ── Analytics Remote — prod ────────────────────────────────────────────────────
@@ -141,7 +141,7 @@ services:
         APP_WORKSPACE: '@velobits/analytics-remote'
         APP_PATH: 'apps/analytics-remote'
     container_name: fixmytext-analytics-prod
-    env_file: .env.docker.prod
+    env_file: .env.prod
     restart: unless-stopped
 
   # ── Content — dev ──────────────────────────────────────────────────────────────
@@ -156,7 +156,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    env_file: .env.docker.dev
+    env_file: .env
     environment:
       # Server-side fetches (apps/content/lib/api.ts) run inside this container,
       # where Kong's host-published 127.0.0.1:8000 is unreachable — talk to Kong
@@ -175,7 +175,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.content.prod
     container_name: fixmytext-content-prod
-    env_file: .env.docker.prod
+    env_file: .env.prod
     restart: unless-stopped
     healthcheck:
       # The app 307-redirects / to /app (owned by the shell via the router), so a
@@ -198,5 +198,8 @@ services:
 # joins it so server-side rendering can reach Kong at http://kong:8000.
 networks:
   backend:
-    name: backend_fixmytext-net
+    name: fixmytext-backend_fixmytext-net
+    external: true
+  infrastructure:
+    name: velobits-net
     external: true
