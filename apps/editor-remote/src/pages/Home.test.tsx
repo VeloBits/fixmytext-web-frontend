@@ -27,6 +27,8 @@ const baseProps = {
     deleteGroup: vi.fn(),
     addToolToGroup: vi.fn(),
     removeToolFromGroup: vi.fn(),
+    setGroupTools: vi.fn(),
+    reorderGroups: vi.fn(),
   } as ToolGroupsContextValue,
   favorites: { favorites: [], toggleFavorite: vi.fn() } as FavoritesContextValue,
   sidebarChips: {

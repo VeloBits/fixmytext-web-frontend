@@ -1,7 +1,7 @@
 # Generated API types
 
 The generated types live in **`packages/api-client/src/types/openapi.d.ts`**
-(single source of truth). `openapi.d.ts` in THIS directory is a one-line
+(single source of truth). `openapi.d.ts` in packages/app-core/src/types is a one-line
 type-only re-export of it, kept so app-core's `types/openapi` imports keep
 working. Never paste generated content here.
 

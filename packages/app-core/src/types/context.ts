@@ -33,6 +33,11 @@ export interface ToolGroupsContextValue {
   deleteGroup: (groupId: string) => void;
   addToolToGroup: (groupId: string, toolId: string) => void;
   removeToolFromGroup: (groupId: string, toolId: string) => void;
+  /** Replace a group's tools with an explicit ordered list (drag-and-drop:
+   * one call covers reorder, insert-at-position, bulk add/remove, and undo). */
+  setGroupTools: (groupId: string, toolIds: string[]) => void;
+  /** Reorder the groups themselves; array position becomes display order. */
+  reorderGroups: (groupIds: string[]) => void;
 }
 
 // ── Sidebar chips ─────────────────────────────────────────────────────────────
