@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => ({
         // Singleton: the host provides the one store/api instance at runtime.
         // Pinned (not '*') so a breaking app-core change forces a coordinated
         // rebuild instead of silent version skew.
-        '@velobits/app-core': { singleton: true, requiredVersion: '^0.3.0' },
+        '@velobits/app-core': { singleton: true, requiredVersion: '^0.4.0' },
       },
     }),
     react(),

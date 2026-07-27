@@ -30,6 +30,13 @@ export interface ToolGroupItemArg {
   toolId: string;
 }
 
+export interface SetToolGroupToolsArg {
+  groupId: string;
+  /** Full ordered list — array position becomes sort_order (covers reorder,
+   * bulk add, and bulk remove in one idempotent call). */
+  toolIds: string[];
+}
+
 export const userDataApi = createApi({
   reducerPath: 'userDataApi',
   baseQuery: baseQueryWithRetry,
@@ -130,6 +137,22 @@ export const userDataApi = createApi({
       }),
       invalidatesTags: ['ToolGroups'],
     }),
+    setToolGroupTools: builder.mutation<ToolGroupResponse, SetToolGroupToolsArg>({
+      query: ({ groupId, toolIds }) => ({
+        url: `/api/v1/user/tool-groups/${groupId}/tools`,
+        method: 'PUT',
+        body: { tool_ids: toolIds },
+      }),
+      invalidatesTags: ['ToolGroups'],
+    }),
+    reorderToolGroups: builder.mutation<ToolGroupsResponse, string[]>({
+      query: (groupIds) => ({
+        url: '/api/v1/user/tool-groups/order',
+        method: 'PUT',
+        body: { group_ids: groupIds },
+      }),
+      invalidatesTags: ['ToolGroups'],
+    }),
 
     // Tool Stats (lifetime per-tool usage)
     getToolStats: builder.query<ToolStatsResponse, void>({
@@ -163,6 +186,8 @@ export const {
   useDeleteToolGroupMutation,
   useAddToolToGroupMutation,
   useRemoveToolFromGroupMutation,
+  useSetToolGroupToolsMutation,
+  useReorderToolGroupsMutation,
   useGetToolStatsQuery,
   useGetSpinHistoryQuery,
 } = userDataApi;

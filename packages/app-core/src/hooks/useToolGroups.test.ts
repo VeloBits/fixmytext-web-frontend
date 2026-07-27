@@ -5,6 +5,8 @@ const mockRenameGroup = vi.fn();
 const mockDeleteGroup = vi.fn();
 const mockAddTool = vi.fn();
 const mockRemoveTool = vi.fn();
+const mockSetGroupTools = vi.fn();
+const mockReorderGroups = vi.fn();
 
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
@@ -29,6 +31,8 @@ vi.mock('../store/api/userDataApi', () => ({
   useDeleteToolGroupMutation: () => [mockDeleteGroup],
   useAddToolToGroupMutation: () => [mockAddTool],
   useRemoveToolFromGroupMutation: () => [mockRemoveTool],
+  useSetToolGroupToolsMutation: () => [mockSetGroupTools],
+  useReorderToolGroupsMutation: () => [mockReorderGroups],
 }));
 
 import { useOidcAuth } from '../auth/useOidcAuth';
@@ -80,6 +84,8 @@ describe('useToolGroups', () => {
     mockDeleteGroup.mockReturnValue(unwrapOk);
     mockAddTool.mockReturnValue(unwrapOk);
     mockRemoveTool.mockReturnValue(unwrapOk);
+    mockSetGroupTools.mockReturnValue(unwrapOk);
+    mockReorderGroups.mockReturnValue(unwrapOk);
   });
 
   it('createGroup adds an editable group and syncs to the API when authenticated', () => {
@@ -184,14 +190,94 @@ describe('useToolGroups', () => {
       result.current.renameGroup(localId, 'Kit 2');
       result.current.addToolToGroup(localId, 'word_count');
       result.current.removeToolFromGroup(localId, 'eli5');
+      result.current.setGroupTools(localId, ['word_count']);
       result.current.deleteGroup(localId);
     });
     expect(mockRenameGroup).not.toHaveBeenCalled();
     expect(mockAddTool).not.toHaveBeenCalled();
     expect(mockRemoveTool).not.toHaveBeenCalled();
+    expect(mockSetGroupTools).not.toHaveBeenCalled();
     expect(mockDeleteGroup).not.toHaveBeenCalled();
     // create itself DOES sync (server assigns the real id via refetch)
     expect(mockCreateGroup).toHaveBeenCalledTimes(1);
+  });
+
+  describe('drag-and-drop primitives (2026-07-22)', () => {
+    it('setGroupTools replaces membership and order, syncing storage and API', () => {
+      mockAuth(true, 'user-a');
+      mockGetToolGroups.mockReturnValue({
+        data: serverGroups({ id: 'g1', name: 'Kit', toolIds: ['eli5', 'word_count'] }),
+        isLoading: false,
+      });
+      const { result } = renderHook(() => useToolGroups());
+
+      act(() => result.current.setGroupTools('g1', ['word_count', 'summarize']));
+      expect(result.current.groups[0]!.toolIds).toEqual(['word_count', 'summarize']);
+      expect(storedGroups()[0]!.toolIds).toEqual(['word_count', 'summarize']);
+      expect(mockSetGroupTools).toHaveBeenCalledWith({
+        groupId: 'g1',
+        toolIds: ['word_count', 'summarize'],
+      });
+    });
+
+    it('setGroupTools dedupes and no-ops on an identical list', () => {
+      mockAuth(true, 'user-a');
+      mockGetToolGroups.mockReturnValue({
+        data: serverGroups({ id: 'g1', name: 'Kit', toolIds: ['eli5'] }),
+        isLoading: false,
+      });
+      const { result } = renderHook(() => useToolGroups());
+
+      act(() => result.current.setGroupTools('g1', ['eli5', 'eli5']));
+      expect(mockSetGroupTools).not.toHaveBeenCalled(); // deduped list === current
+
+      act(() => result.current.setGroupTools('missing', ['eli5']));
+      expect(mockSetGroupTools).not.toHaveBeenCalled(); // unknown group ignored
+    });
+
+    it('reorderGroups applies listed-first order and sends server ids only', () => {
+      mockAuth(true, 'user-a');
+      mockGetToolGroups.mockReturnValue({
+        data: serverGroups(
+          { id: 'g1', name: 'A', toolIds: [] },
+          { id: 'g2', name: 'B', toolIds: [] },
+          { id: 'g3', name: 'C', toolIds: [] }
+        ),
+        isLoading: false,
+      });
+      const { result } = renderHook(() => useToolGroups());
+
+      // partial list: g3 first, unlisted g1/g2 keep relative order after it
+      act(() => result.current.reorderGroups(['g3']));
+      expect(result.current.groups.map((g) => g.name)).toEqual(['C', 'A', 'B']);
+      expect(storedGroups().map((g) => g.id)).toEqual(['g3', 'g1', 'g2']);
+      expect(mockReorderGroups).toHaveBeenCalledWith(['g3', 'g1', 'g2']);
+
+      // same order again → no state change, no API call
+      mockReorderGroups.mockClear();
+      act(() => result.current.reorderGroups(['g3', 'g1', 'g2']));
+      expect(mockReorderGroups).not.toHaveBeenCalled();
+    });
+
+    it('reorderGroups works for guests via localStorage without API calls', () => {
+      mockAuth(false);
+      localStorage.setItem(
+        TOOL_GROUPS_STORAGE_KEYS.groups,
+        JSON.stringify([
+          { id: 'local-1', name: 'A', toolIds: [] },
+          { id: 'local-2', name: 'B', toolIds: [] },
+        ])
+      );
+      const { result } = renderHook(() => useToolGroups());
+
+      act(() => result.current.reorderGroups(['local-2', 'local-1']));
+      expect(result.current.groups.map((g) => g.name)).toEqual(['B', 'A']);
+      expect(storedGroups().map((g) => g.id)).toEqual(['local-2', 'local-1']);
+      act(() => result.current.setGroupTools('local-2', ['eli5']));
+      expect(storedGroups()[0]!.toolIds).toEqual(['eli5']);
+      expect(mockReorderGroups).not.toHaveBeenCalled();
+      expect(mockSetGroupTools).not.toHaveBeenCalled();
+    });
   });
 
   // Hydration is self-contained (keyed on the query data), the pattern

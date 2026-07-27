@@ -67,7 +67,7 @@ created automatically by its first deploy — nothing to pre-create for develop.
    VITE_EDITOR_REMOTE_ENTRY    = https://<that-env's-router-host>/remotes/editor/remoteEntry.js
    VITE_ANALYTICS_REMOTE_ENTRY = https://<that-env's-router-host>/remotes/analytics/remoteEntry.js
    VITE_API_URL / VITE_KEYCLOAK_URL                  (per-env backend)
-   VITE_KEYCLOAK_REALM         # ⚠ falls back to Velobits-Dev if unset — always set on production
+   VITE_KEYCLOAK_REALM         # ⚠ falls back to Velobits if unset — always set on production
    VITE_KEYCLOAK_CLIENT_ID / VITE_KEYCLOAK_ENABLED_PROVIDERS / VITE_SSO_DOMAIN_MAP
    SENTRY_ORG
    ```
