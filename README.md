@@ -79,7 +79,7 @@ docker compose --profile dev up
 # shell → http://localhost:3100 (served at /)
 # editor-remote → http://localhost:3101 (federation remote)
 # analytics-remote → http://localhost:3102 (federation remote)
-# content → http://localhost:3001 (parked — not routed via :3100)
+# content → http://localhost:3103 (parked — not routed via :3100)
 ```
 
 To run the production simulation (built artifacts behind the nginx router, mirroring
@@ -103,7 +103,7 @@ Or start individually (requires host npm install):
 npm run dev -w @velobits/shell              # http://localhost:3104
 npm run dev -w @velobits/editor-remote      # http://localhost:3101
 npm run dev -w @velobits/analytics-remote   # http://localhost:3102
-npm run dev -w @velobits/content-app        # http://localhost:3001
+npm run dev -w @velobits/content-app        # http://localhost:3103
 ```
 
 With Traefik running (`docker compose --profile dev up`), all apps are accessible
@@ -133,7 +133,7 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 | `npm run dev -w @velobits/analytics-remote`           | Start analytics remote dev server (port 3102)        |
 | `npm run build -w @velobits/analytics-remote`         | Production build (analytics remote)                  |
 | `npm run test:coverage -w @velobits/analytics-remote` | Vitest with coverage                                 |
-| `npm run dev -w @velobits/content-app`                | Start Next.js dev server (port 3001)                 |
+| `npm run dev -w @velobits/content-app`                | Start Next.js dev server (port 3103)                 |
 | `npm run build -w @velobits/content-app`              | Next.js production build                             |
 | `npm run test:coverage -w @velobits/api-client`       | Package coverage (thresholds enforced)               |
 | `npm run gen:types -w @velobits/api-client`           | Regenerate OpenAPI types from `backend/openapi.json` |
