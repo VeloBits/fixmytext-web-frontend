@@ -19,7 +19,7 @@ services:
         NGINX_CONF: docker/nginx.router.dev.conf
     container_name: fixmytext-router
     ports:
-      - '3000:80'
+      - '3100:80'
     depends_on:
       - shell-dev
       - editor-remote-dev
@@ -36,7 +36,7 @@ services:
         NGINX_CONF: docker/nginx.router.prod.conf
     container_name: fixmytext-router-prod
     ports:
-      - '3000:80'
+      - '3100:80'
     depends_on:
       - shell-prod
       - editor-remote-prod
@@ -53,7 +53,8 @@ services:
         APP_WORKSPACE: '@velobits/shell'
     container_name: fixmytext-shell-dev
     ports:
-      - '3100:3100'
+      # 3104, not 3100 - the router owns 3100 on the host.
+      - '3104:3104'
     volumes:
       - .:/app
       - /app/node_modules
@@ -71,10 +72,10 @@ services:
         APP_PATH: 'apps/shell'
         # Vite bakes these at BUILD time, so they must arrive as build args - the
         # `env_file` below is runtime-only (nginx) and cannot reach the build stage.
-        # Defaults point at the local router (port 3000) for the prod simulation;
+        # Defaults point at the local router (port 3100) for the prod simulation;
         # override via host env / a root `.env` for a real deployment.
-        VITE_EDITOR_REMOTE_ENTRY: ${VITE_EDITOR_REMOTE_ENTRY:-http://localhost:3000/remotes/editor/remoteEntry.js}
-        VITE_ANALYTICS_REMOTE_ENTRY: ${VITE_ANALYTICS_REMOTE_ENTRY:-http://localhost:3000/remotes/analytics/remoteEntry.js}
+        VITE_EDITOR_REMOTE_ENTRY: ${VITE_EDITOR_REMOTE_ENTRY:-http://localhost:3100/remotes/editor/remoteEntry.js}
+        VITE_ANALYTICS_REMOTE_ENTRY: ${VITE_ANALYTICS_REMOTE_ENTRY:-http://localhost:3100/remotes/analytics/remoteEntry.js}
     container_name: fixmytext-shell-prod
     env_file: .env.prod
     restart: unless-stopped

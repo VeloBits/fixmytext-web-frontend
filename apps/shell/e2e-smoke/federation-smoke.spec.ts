@@ -4,7 +4,7 @@ import { test, expect, type Response } from '@playwright/test';
  * Hermetic Module Federation smoke test - the PR gate for the host↔remote contract.
  *
  * Unlike the specs in ../e2e (which need a deployed backend + Keycloak), this runs
- * against the local prod compose stack (router on :3000) with the backend + Keycloak
+ * against the local prod compose stack (router on :3100) with the backend + Keycloak
  * MOCKED at the network layer. It exercises exactly the gaps Phase 6.1/6.2 fixed:
  *
  *   1. Each remote's `remoteEntry.js` is reachable under its `/remotes/<name>/` prefix

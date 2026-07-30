@@ -28,12 +28,12 @@ The shell is the **only** Module Federation host — it provides the Redux store
 
 | App              | Package                      | Port (Docker/nginx) | Port (host vite) |
 | ---------------- | ---------------------------- | ------------------- | ---------------- |
-| shell            | `@velobits/shell`            | 3000                | 3000             |
+| shell            | `@velobits/shell`            | 3104                | 3104             |
 | editor-remote    | `@velobits/editor-remote`    | 3101                | 3101             |
 | analytics-remote | `@velobits/analytics-remote` | 3102                | 3102             |
 | content          | `@velobits/content-app`      | 3103 (nginx)        | 3001             |
 
-> Note: `apps/content` runs on port 3001 locally but is served via nginx on port 3103 in the Docker Compose stack. This is intentional — nginx handles the path-based routing at 3000.
+> Note: `apps/content` runs on port 3001 locally but is served via nginx on port 3103 in the Docker Compose stack. This is intentional — nginx handles the path-based routing at 3100.
 
 ## Layer Diagram
 

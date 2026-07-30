@@ -32,7 +32,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) before particip
    ```bash
    npm run dev
    ```
-   The app will be available at `http://localhost:3000`.
+   The app will be available at `http://localhost:3100`.
 
 ### Docker Option
 
@@ -235,7 +235,7 @@ npx playwright test e2e/02-local-tool.spec.js   # single spec
 
 | Variable                  | Default                 | Purpose                                |
 | ------------------------- | ----------------------- | -------------------------------------- |
-| `E2E_FRONTEND_URL`        | `http://localhost:3000` | Where Playwright points the browser    |
+| `E2E_FRONTEND_URL`        | `http://localhost:3100` | Where Playwright points the browser    |
 | `E2E_API_URL`             | `http://localhost:8000` | Where helpers send direct API calls    |
 | `E2E_RAZORPAY_KEY_SECRET` | `fake_secret_for_e2e`   | HMAC secret for the signed-verify spec |
 

@@ -76,10 +76,10 @@ Start the full stack via Docker (recommended — node_modules live in Docker vol
 
 ```bash
 docker compose --profile dev up
-# shell → http://localhost:3000 (served at /)
+# shell → http://localhost:3100 (served at /)
 # editor-remote → http://localhost:3101 (federation remote)
 # analytics-remote → http://localhost:3102 (federation remote)
-# content → http://localhost:3001 (parked — not routed via :3000)
+# content → http://localhost:3001 (parked — not routed via :3100)
 ```
 
 To run the production simulation (built artifacts behind the nginx router, mirroring
@@ -88,19 +88,19 @@ up the `prod` profile:
 
 ```bash
 cp .env.docker.prod.example .env.docker.prod   # required — prod services declare env_file: .env.docker.prod
-docker compose --profile prod up --build        # everything served at http://localhost:3000
+docker compose --profile prod up --build        # everything served at http://localhost:3100
 ```
 
 > The shell bakes the federation remote-entry URLs at **build** time (Vite). The prod
 > profile passes them as Docker build args (defaulting to the local router URLs
-> `http://localhost:3000/remotes/{editor,analytics}/remoteEntry.js`); override
+> `http://localhost:3100/remotes/{editor,analytics}/remoteEntry.js`); override
 > `VITE_EDITOR_REMOTE_ENTRY` / `VITE_ANALYTICS_REMOTE_ENTRY` in your host env or a root
 > `.env` to point at real deployment URLs.
 
 Or start individually (requires host npm install):
 
 ```bash
-npm run dev -w @velobits/shell              # http://localhost:3000
+npm run dev -w @velobits/shell              # http://localhost:3104
 npm run dev -w @velobits/editor-remote      # http://localhost:3101
 npm run dev -w @velobits/analytics-remote   # http://localhost:3102
 npm run dev -w @velobits/content-app        # http://localhost:3001
@@ -122,7 +122,7 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 
 | Command                                               | Description                                          |
 | ----------------------------------------------------- | ---------------------------------------------------- |
-| `npm run dev -w @velobits/shell`                      | Start shell dev server (port 3000)                   |
+| `npm run dev -w @velobits/shell`                      | Start shell dev server (port 3104)                   |
 | `npm run build -w @velobits/shell`                    | Production build (shell)                             |
 | `npm run test -w @velobits/shell`                     | Vitest unit tests (shell)                            |
 | `npm run test:coverage -w @velobits/shell`            | Vitest with coverage (thresholds enforced)           |

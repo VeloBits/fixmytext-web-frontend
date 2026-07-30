@@ -43,7 +43,7 @@ Traefik routes by path within `develop-fixmytext.velobits.dev`:
 | Path                             | → App       | Port |
 | -------------------------------- | ----------- | ---- |
 | `/about`, `/pricing`, `/share/*` | content-app | 3001 |
-| `/app/*`, `/`                    | shell       | 3000 |
+| `/app/*`, `/`                    | shell       | 3104 |
 
 Both apps can also be accessed directly by port during development.
 

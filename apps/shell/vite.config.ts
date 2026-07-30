@@ -95,8 +95,8 @@ export default defineConfig({
     ],
   },
   base: '/',
-  server: { port: 3100, host: true },
-  preview: { port: 3100 },
+  server: { port: 3104, host: true },
+  preview: { port: 3104 },
   build: {
     sourcemap: true,
     rollupOptions: { output: { manualChunks } },
