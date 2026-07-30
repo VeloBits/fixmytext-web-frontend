@@ -35,7 +35,7 @@ frontend/
 
 - Node.js 20+
 - npm 10+
-- Backend running via docker compose (see [backend README](../backend/README.md))
+- Backend running via docker compose (see [backend README](../FixMyText-backend/README.md))
 - **`/etc/hosts` entries** for the VeloBits subdomain architecture (see below)
 
 ## Local subdomain setup
