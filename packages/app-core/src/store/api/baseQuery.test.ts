@@ -7,7 +7,7 @@
  */
 
 // ---------------------------------------------------------------------------
-// Mocks — must be declared before the module-under-test is imported.
+// Mocks - must be declared before the module-under-test is imported.
 // ---------------------------------------------------------------------------
 
 // `mockRawBaseQuery` is the function returned by fetchBaseQuery().
@@ -164,7 +164,7 @@ describe('baseQuery module exports', () => {
 // 1. Token injection in prepareHeaders
 // ---------------------------------------------------------------------------
 
-describe('createAuthBaseQuery — prepareHeaders', () => {
+describe('createAuthBaseQuery - prepareHeaders', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
     capturedFetchBaseQueryConfig = null;
@@ -244,10 +244,10 @@ describe('createAuthBaseQuery — prepareHeaders', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 2. baseQueryWithReauth — successful request (no 401)
+// 2. baseQueryWithReauth - successful request (no 401)
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — successful requests', () => {
+describe('baseQueryWithReauth - successful requests', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -284,10 +284,10 @@ describe('baseQueryWithReauth — successful requests', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 3. baseQueryWithReauth — 401 → refresh → retry flow (success)
+// 3. baseQueryWithReauth - 401 → refresh → retry flow (success)
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — 401 refresh flow', () => {
+describe('baseQueryWithReauth - 401 refresh flow', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -321,10 +321,10 @@ describe('baseQueryWithReauth — 401 refresh flow', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 4. baseQueryWithReauth — 401 → refresh fails → logout
+// 4. baseQueryWithReauth - 401 → refresh fails → logout
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — refresh failure', () => {
+describe('baseQueryWithReauth - refresh failure', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -350,10 +350,10 @@ describe('baseQueryWithReauth — refresh failure', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 5. baseQueryWithReauth — auth endpoint → no refresh attempted
+// 5. baseQueryWithReauth - auth endpoint → no refresh attempted
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — auth endpoint skip', () => {
+describe('baseQueryWithReauth - auth endpoint skip', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -368,7 +368,7 @@ describe('baseQueryWithReauth — auth endpoint skip', () => {
 
       const result = await baseQueryWithReauth(authPath, api, {});
 
-      // Should not dispatch anything — no refresh, no logout
+      // Should not dispatch anything - no refresh, no logout
       expect(api.dispatch).not.toHaveBeenCalled();
       expect(result).toEqual({ error: { status: 401 } });
 
@@ -395,10 +395,10 @@ describe('baseQueryWithReauth — auth endpoint skip', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. baseQueryWithReauth — max retry exceeded → logout
+// 6. baseQueryWithReauth - max retry exceeded → logout
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — max retry exceeded', () => {
+describe('baseQueryWithReauth - max retry exceeded', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -426,7 +426,7 @@ describe('baseQueryWithReauth — max retry exceeded', () => {
 // 7. Concurrent 401s share a single refresh (mutex)
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — refresh mutex', () => {
+describe('baseQueryWithReauth - refresh mutex', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -463,10 +463,10 @@ describe('baseQueryWithReauth — refresh mutex', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 8. baseQueryWithRetry — 5xx triggers retry
+// 8. baseQueryWithRetry - 5xx triggers retry
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithRetry — retry on 5xx', () => {
+describe('baseQueryWithRetry - retry on 5xx', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -495,13 +495,13 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
     // Verify retryCondition directly through the exposed options
     const retryCondition = baseQueryWithRetry._retryOptions!.retryCondition;
 
-    // 400 — should not retry
+    // 400 - should not retry
     expect(retryCondition({ status: 400 }, {}, { attempt: 1 })).toBe(false);
-    // 403 — should not retry
+    // 403 - should not retry
     expect(retryCondition({ status: 403 }, {}, { attempt: 1 })).toBe(false);
-    // 404 — should not retry
+    // 404 - should not retry
     expect(retryCondition({ status: 404 }, {}, { attempt: 1 })).toBe(false);
-    // 422 — should not retry
+    // 422 - should not retry
     expect(retryCondition({ status: 422 }, {}, { attempt: 1 })).toBe(false);
   });
 
@@ -518,7 +518,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
     const { baseQueryWithRetry } = await freshImport();
     const retryCondition = baseQueryWithRetry._retryOptions!.retryCondition;
 
-    // attempt 3 — should not retry even for 500
+    // attempt 3 - should not retry even for 500
     expect(retryCondition({ status: 500 }, {}, { attempt: 3 })).toBe(false);
   });
 
@@ -526,7 +526,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
     const { baseQueryWithRetry } = await freshImport();
     const retryCondition = baseQueryWithRetry._retryOptions!.retryCondition;
 
-    // No status property — treated as non-4xx, should retry
+    // No status property - treated as non-4xx, should retry
     expect(retryCondition({}, {}, { attempt: 1 })).toBe(true);
     expect(retryCondition(null, {}, { attempt: 1 })).toBe(true);
   });
@@ -538,7 +538,7 @@ describe('baseQueryWithRetry — retry on 5xx', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 9. createBaseQueryWithReauth — factory with extra headers
+// 9. createBaseQueryWithReauth - factory with extra headers
 // ---------------------------------------------------------------------------
 
 describe('createBaseQueryWithReauth', () => {
@@ -595,7 +595,7 @@ describe('createBaseQueryWithReauth', () => {
 // 10. Non-401 errors pass through without refresh
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — non-401 errors', () => {
+describe('baseQueryWithReauth - non-401 errors', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -630,7 +630,7 @@ describe('baseQueryWithReauth — non-401 errors', () => {
 // 11. Edge case: args is a string vs object
 // ---------------------------------------------------------------------------
 
-describe('baseQueryWithReauth — args type handling', () => {
+describe('baseQueryWithReauth - args type handling', () => {
   beforeEach(() => {
     mockRawBaseQuery.mockReset();
   });
@@ -641,7 +641,7 @@ describe('baseQueryWithReauth — args type handling', () => {
 
     mockRawBaseQuery.mockResolvedValue({ error: { status: 401 } });
 
-    // String arg containing auth path — should skip refresh
+    // String arg containing auth path - should skip refresh
     await baseQueryWithReauth('/auth/login', api, {});
     expect(api.dispatch).not.toHaveBeenCalled();
   });
@@ -670,7 +670,7 @@ describe('baseQueryWithReauth — args type handling', () => {
       return Promise.resolve({ data: 'ok' });
     });
 
-    // args is an object without url — should not be treated as auth endpoint
+    // args is an object without url - should not be treated as auth endpoint
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await baseQueryWithReauth({ body: 'data' } as any, api, {});
     expect(userManager.signinSilent).toHaveBeenCalled();

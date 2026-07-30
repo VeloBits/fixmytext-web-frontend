@@ -1251,9 +1251,9 @@ describe('useClientTools', () => {
     });
   });
 
-  // ─── handleCronExplain — day-of-week Sunday (7) ──────────────────────────
+  // ─── handleCronExplain - day-of-week Sunday (7) ──────────────────────────
 
-  describe('handleCronExplain — dow edge cases', () => {
+  describe('handleCronExplain - dow edge cases', () => {
     it('maps dow 7 to Sunday', () => {
       const { handlers, setToolResults } = setup('0 9 * * 7');
       handlers.handleCronExplain();
@@ -1269,9 +1269,9 @@ describe('useClientTools', () => {
     });
   });
 
-  // ─── handleJsonToTs — array of objects path ───────────────────────────────
+  // ─── handleJsonToTs - array of objects path ───────────────────────────────
 
-  describe('handleJsonToTs — array of objects', () => {
+  describe('handleJsonToTs - array of objects', () => {
     it('generates type for array of objects', () => {
       const { handlers, setToolResults } = setup('[{"id":1,"name":"x"}]');
       handlers.handleJsonToTs();
@@ -1288,9 +1288,9 @@ describe('useClientTools', () => {
     });
   });
 
-  // ─── handleJwtDecode — invalid base64url chars ────────────────────────────
+  // ─── handleJwtDecode - invalid base64url chars ────────────────────────────
 
-  describe('handleJwtDecode — invalid base64', () => {
+  describe('handleJwtDecode - invalid base64', () => {
     it('shows danger for JWT header with invalid base64url chars', () => {
       const { handlers, showAlert } = setup('header!!!.payload.sig');
       handlers.handleJwtDecode();
@@ -1298,9 +1298,9 @@ describe('useClientTools', () => {
     });
   });
 
-  // ─── handleTextToTable — empty cells ─────────────────────────────────────
+  // ─── handleTextToTable - empty cells ─────────────────────────────────────
 
-  describe('handleTextToTable — empty cells', () => {
+  describe('handleTextToTable - empty cells', () => {
     it('handles rows with missing columns gracefully', () => {
       const { handlers, setPreviewMode } = setup('A,B,C\n1,2');
       handlers.handleTextToTable();
@@ -1308,9 +1308,9 @@ describe('useClientTools', () => {
     });
   });
 
-  // ─── handleTimestampConvert — relative dates ──────────────────────────────
+  // ─── handleTimestampConvert - relative dates ──────────────────────────────
 
-  describe('handleTimestampConvert — now keyword variants', () => {
+  describe('handleTimestampConvert - now keyword variants', () => {
     it('converts NOW (uppercase) using now regex', () => {
       const { handlers, setToolResults } = setup('NOW');
       handlers.handleTimestampConvert();

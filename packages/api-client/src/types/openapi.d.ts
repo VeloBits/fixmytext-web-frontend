@@ -2138,7 +2138,7 @@ export interface paths {
      *     Side effect: issues the ``fixmytext_session`` cookie. The browser stores it
      *     HttpOnly + host-only, and from this request onward the cookie is sufficient
      *     for authentication on subsequent requests (Bearer JWT is still accepted in
-     *     parallel for the transition window — see ``get_current_user``).
+     *     parallel for the transition window - see ``get_current_user``).
      */
     get: operations['me_api_v1_auth_me_get'];
     put?: never;
@@ -2164,7 +2164,7 @@ export interface paths {
      *
      *     Backs the in-app "Verify your email" banner. With the realm's blocking
      *     verify-email requirement disabled, Keycloak no longer emails at signup or
-     *     on login — this endpoint (and the first-login send in ``deps.py``) is how
+     *     on login - this endpoint (and the first-login send in ``deps.py``) is how
      *     verification links reach the user. No-op for already-verified users.
      */
     post: operations['resend_verification_api_v1_auth_resend_verification_post'];
@@ -2188,7 +2188,7 @@ export interface paths {
      * @description Clear the per-app session cookie. Called by the frontend on logout
      *     BEFORE redirecting to Keycloak's end-session endpoint.
      *
-     *     No auth required — clearing is idempotent. As a side effect the current
+     *     No auth required - clearing is idempotent. As a side effect the current
      *     session is added to the Redis revocation set so it cannot be replayed
      *     even if the browser ignores the Max-Age=0 instruction.
      */
@@ -2232,12 +2232,12 @@ export interface paths {
     };
     /**
      * Get Gamification
-     * @description Transitional stub — gamification removed; returns a static zero-state.
+     * @description Transitional stub - gamification removed; returns a static zero-state.
      */
     get: operations['get_gamification_api_v1_user_gamification_get'];
     /**
      * Update Gamification
-     * @description Transitional stub — accepts any body, persists nothing, returns zero-state.
+     * @description Transitional stub - accepts any body, persists nothing, returns zero-state.
      */
     put: operations['update_gamification_api_v1_user_gamification_put'];
     post?: never;
@@ -2386,7 +2386,7 @@ export interface paths {
      * @description Create a named tool group, optionally pre-filled with tools.
      *
      *     Idempotent by name: if the user already has a group with this name, the
-     *     existing group is returned unchanged (200) — tool_ids are NOT merged in.
+     *     existing group is returned unchanged (200) - tool_ids are NOT merged in.
      *     This keeps guest-adoption retries and double-clicked starter-kit cards
      *     from erroring or duplicating.
      */
@@ -2411,7 +2411,7 @@ export interface paths {
      *
      *     Groups listed in `group_ids` get sort_order = array position; the user's
      *     remaining groups keep their relative order after the listed ones. Unknown
-     *     and foreign ids are ignored. Idempotent — resending the same list is a
+     *     and foreign ids are ignored. Idempotent - resending the same list is a
      *     no-op. Returns all groups in the new display order.
      */
     put: operations['reorder_tool_groups_api_v1_user_tool_groups_order_put'];
@@ -2486,7 +2486,7 @@ export interface paths {
      *
      *     Array position becomes sort_order, so a single call covers drag-reorder,
      *     bulk add, and bulk remove. Duplicates keep their first position.
-     *     Idempotent — resending the current list is a no-op.
+     *     Idempotent - resending the current list is a no-op.
      */
     put: operations['set_tool_group_tools_api_v1_user_tool_groups__group_id__tools_put'];
     post?: never;
@@ -2849,7 +2849,7 @@ export interface paths {
      *     Razorpay webhook converge on a single ledger keyed by the payment id, so a
      *     replayed body or a verify/webhook race grants the entitlement only once.
      *     Tool scope and the paid amount are validated server-side against the order
-     *     notes and the catalog — the client-supplied ``tool_ids`` are ignored.
+     *     notes and the catalog - the client-supplied ``tool_ids`` are ignored.
      */
     post: operations['verify_pass_payment_api_v1_passes_verify_post'];
     delete?: never;
@@ -3025,7 +3025,7 @@ export interface paths {
      *     Supports: payment.captured, payment.authorized, payment.failed,
      *     subscription.cancelled, subscription.halted.
      *
-     *     Idempotent — duplicate events (same razorpay_event_id) are acknowledged
+     *     Idempotent - duplicate events (same razorpay_event_id) are acknowledged
      *     but not reprocessed.
      */
     post: operations['razorpay_webhook_api_v1_subscription_webhook_post'];
@@ -3181,7 +3181,7 @@ export interface paths {
     };
     /**
      * Readiness Check
-     * @description Readiness probe — verifies Groq client is initialised.
+     * @description Readiness probe - verifies Groq client is initialised.
      */
     get: operations['readiness_check_health_ready_get'];
     put?: never;
@@ -3664,7 +3664,7 @@ export interface components {
      * @description Partial update for user preferences. All fields optional.
      *
      *     A `persona` key sent by a stale bundle is silently ignored (pydantic
-     *     drops unknown fields) — deliberate transitional behavior.
+     *     drops unknown fields) - deliberate transitional behavior.
      */
     PreferencesUpdate: {
       /** Theme */
@@ -3801,7 +3801,7 @@ export interface components {
      * ToolGroupItemsUpdate
      * @description Schema for replacing a group's tools with an explicit ordered list.
      *
-     *     The array position IS the sort order — one call covers reorder, bulk add,
+     *     The array position IS the sort order - one call covers reorder, bulk add,
      *     and bulk remove (drag-and-drop sends the full list after every move).
      */
     ToolGroupItemsUpdate: {
@@ -3880,7 +3880,7 @@ export interface components {
      *
      *     `view` ids are client-defined (all/pinned/recent/suggested), `group` ids
      *     are catalog TOOL_GROUPS ids, `custom_group` ids are user_tool_groups UUIDs.
-     *     The server stays structural — semantics (e.g. 'all' never removable) are
+     *     The server stays structural - semantics (e.g. 'all' never removable) are
      *     enforced by the client that owns the vocabulary.
      */
     SidebarChipItem: {

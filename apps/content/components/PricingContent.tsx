@@ -1,6 +1,6 @@
 'use client';
 /**
- * PricingContent — client component for the pricing page.
+ * PricingContent - client component for the pricing page.
  * The Next.js page shell (app/pricing/page.tsx) provides the SEO meta tags;
  * this component handles all interactive behaviour (Razorpay checkout,
  * pass catalog fetch, subscription state).
@@ -15,7 +15,7 @@ const PLANS = [
     highlight: false,
     features: [
       '3 AI tool uses / day',
-      '53 local text tools — unlimited',
+      '53 local text tools - unlimited',
       'No account required',
       'Copy, export to PDF / DOCX',
     ],

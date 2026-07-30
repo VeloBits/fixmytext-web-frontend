@@ -1,6 +1,6 @@
 /**
  * Single source of truth for the generated API types is
- * packages/api-client/src/types/openapi.d.ts — regenerated via
+ * packages/api-client/src/types/openapi.d.ts - regenerated via
  * `npm run gen:types` (see the README next to that file).
  *
  * This module only re-exports them so app-core's existing

@@ -3,7 +3,7 @@ import type { SidebarChip } from '@velobits/app-core/types/tools';
 import type { ToolGroupView } from '@velobits/app-core/types/context';
 
 /**
- * Display label for a chip — identical to the panel section headers by
+ * Display label for a chip - identical to the panel section headers by
  * design. Returns null for a dangling custom_group chip (its group is gone or
  * not hydrated yet); callers skip rendering those.
  */

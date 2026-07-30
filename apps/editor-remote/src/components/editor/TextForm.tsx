@@ -89,7 +89,7 @@ import TabBar from './TabBar';
 import DrawerPanel from '@/components/drawers/DrawerPanel';
 import FmtConfigBar from './FmtConfigBar';
 
-// Drawers are lazy-loaded — each only renders when its panel/tab is active,
+// Drawers are lazy-loaded - each only renders when its panel/tab is active,
 // so pulling them out of the main bundle has no UX cost beyond a one-shot
 // chunk fetch the first time a user opens that particular drawer.
 //
@@ -139,7 +139,7 @@ const SampleJsonDrawer = lazy(() =>
 
 // Tiny wrapper so each lazy drawer call site stays a single JSX expression.
 // fallback={null} keeps the drawer slot empty during the (typically <100ms)
-// chunk fetch — drawers are user-initiated, so a flash of empty space is
+// chunk fetch - drawers are user-initiated, so a flash of empty space is
 // less jarring than a spinner that disappears almost immediately.
 function LazyDrawer({ children }: { children: ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>;
@@ -152,7 +152,7 @@ import { chipLabel, chipInitials } from './chipUtils';
 import CommandPalette from '@/components/layout/CommandPalette';
 import KeyboardShortcuts from '@/components/layout/KeyboardShortcuts';
 
-// SVG icons for activity bar (module-level constant — avoids recreation on every render)
+// SVG icons for activity bar (module-level constant - avoids recreation on every render)
 const ACTIVITY_ICONS = {
   all: (
     <svg
@@ -267,7 +267,7 @@ const ACTIVITY_ICONS = {
   ),
 };
 
-// Drawer panel metadata (static — no need to recreate per render)
+// Drawer panel metadata (static - no need to recreate per render)
 const DRAWERS = {
   find: { title: 'Find & Replace', color: 'teal' },
   compare: { title: 'Text Compare', color: 'purple' },
@@ -357,7 +357,7 @@ export default function TextForm(props: TextFormProps) {
   const [chipEditorAnchor, setChipEditorAnchor] = useState<DOMRect | null>(null);
   const [chipOverflowOpen, setChipOverflowOpen] = useState(false);
   const chipOverflowBtnRef = useRef<HTMLButtonElement | null>(null);
-  // Must match the mobile breakpoint in editor.css — inline resize sizes would
+  // Must match the mobile breakpoint in editor.css - inline resize sizes would
   // otherwise override the media query and collapse the layout on small screens
   const isMobile = useMediaQuery('(max-width: 768px)');
   // Desktop: sidebar visible by default; mobile: it's a bottom sheet, start closed
@@ -371,7 +371,7 @@ export default function TextForm(props: TextFormProps) {
   useEffect(() => {
     if (isMobile) setSidebarOpen(false);
   }, [isMobile]);
-  // Mobile: picking a tool opens a workspace — dismiss the sheet so the editor shows
+  // Mobile: picking a tool opens a workspace - dismiss the sheet so the editor shows
   useEffect(() => {
     if (isMobile && activeWorkspaceId) setSidebarOpen(false);
   }, [isMobile, activeWorkspaceId]);
@@ -434,7 +434,7 @@ export default function TextForm(props: TextFormProps) {
   const history = useHistory(setText, showAlert);
   // Server-authoritative 402 (daily quota exhausted): open the pass-purchase
   // upsell for signed-in users; guests get a sign-in prompt instead. The
-  // client-side counter gate can desync from the server — the server verdict
+  // client-side counter gate can desync from the server - the server verdict
   // always wins here.
   const handleToolBlocked = useCallback(
     (toolId: string): void => {
@@ -446,7 +446,7 @@ export default function TextForm(props: TextFormProps) {
       showAlert(
         isAuthenticated
           ? 'Daily limit reached for this tool. Get a pass or go Pro for more uses.'
-          : 'Daily free limit reached — sign in for an extra free use, or get a pass.',
+          : 'Daily free limit reached - sign in for an extra free use, or get a pass.',
         'warning'
       );
     },
@@ -605,7 +605,7 @@ export default function TextForm(props: TextFormProps) {
   }, [isAuthenticated, syncPanelSizes, sidebarResize.size, splitResize.size, bottomResize.size]);
 
   // The shell dispatches this right after a starter-kit pick so the editor
-  // lands on the kit's tab. Transient by design — nothing is persisted, and
+  // lands on the kit's tab. Transient by design - nothing is persisted, and
   // it only ever fires from the onboarding modal.
   useEffect(() => {
     const onKitTab = (e: Event) => {
@@ -676,7 +676,7 @@ export default function TextForm(props: TextFormProps) {
     async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
       const t = textRef.current;
       // Whitespace-only input is not runnable (backend rejects it with 422 and it
-      // must never burn a free use). Prompt only when something was typed —
+      // must never burn a free use). Prompt only when something was typed -
       // fully-empty input keeps the silent no-op so tab-switch auto-runs stay quiet.
       if (!t.trim()) {
         if (t) showAlert('Please enter some text', 'warning');
@@ -1171,12 +1171,12 @@ export default function TextForm(props: TextFormProps) {
     (toolId: string | null, content: string) => {
       const tool = toolId ? TOOLS.find((t) => t.id === toolId) : null;
       if (!tool) {
-        // No tool_id or tool not found — load into current tab if open, otherwise open a generic tab
+        // No tool_id or tool not found - load into current tab if open, otherwise open a generic tab
         const activeId = activeTabIdRef.current;
         if (activeId) {
           setToolTexts((prev) => ({ ...prev, [activeId]: content }));
         } else {
-          // No tab open — pick the first non-drawer, non-action tool as a generic text holder
+          // No tab open - pick the first non-drawer, non-action tool as a generic text holder
 
           const fallback = TOOLS.find((t) => t.type === 'api' && t.group === 'case') ?? TOOLS[0]!;
           const tabId = `tool-${fallback.id}`;
@@ -1363,7 +1363,7 @@ export default function TextForm(props: TextFormProps) {
     if (!ws || ws.type !== 'tool') return;
 
     const prevText = lastTextPerTab.current[activeWorkspaceId];
-    // First time seeing this tab — record text, don't auto-run (result may already be stored)
+    // First time seeing this tab - record text, don't auto-run (result may already be stored)
     if (prevText === undefined) {
       lastTextPerTab.current[activeWorkspaceId] = text;
       return;
@@ -1372,7 +1372,7 @@ export default function TextForm(props: TextFormProps) {
     if (text === prevText) return;
     lastTextPerTab.current[activeWorkspaceId] = text;
 
-    // Text genuinely changed — clear stale result and schedule re-run
+    // Text genuinely changed - clear stale result and schedule re-run
     if (toolResults[activeWorkspaceId]) {
       setToolResults((prev) => {
         const next = { ...prev };
@@ -1496,7 +1496,7 @@ export default function TextForm(props: TextFormProps) {
     },
     runTool: (tool: ToolDefinition) => handleToolClick(tool),
   };
-  // Stable proxy object — never changes identity, always delegates to latest ref
+  // Stable proxy object - never changes identity, always delegates to latest ref
   const keyboardActions = useMemo(() => {
     const proxy: Record<string, (...args: unknown[]) => unknown> = {};
     const keys = [
@@ -1593,7 +1593,7 @@ export default function TextForm(props: TextFormProps) {
     }
   };
 
-  // Activity bar tab click — toggles sidebar
+  // Activity bar tab click - toggles sidebar
   const handleActivityClick = (tabId: string) => {
     if (activeTab === tabId && sidebarOpen) {
       setSidebarOpen(false);
@@ -1622,7 +1622,7 @@ export default function TextForm(props: TextFormProps) {
     [sidebarChips.chips, suggestions.suggestions.length, activeTab, toolGroups.groups]
   );
 
-  // Cap the vertical bar; the active chip is never hidden in the ⋯ overflow —
+  // Cap the vertical bar; the active chip is never hidden in the ⋯ overflow -
   // it swaps into the last visible slot (VSCode active-editor-tab rule).
   const MAX_BAR_CHIPS = 8;
   const { visibleBarChips, overflowBarChips } = useMemo(() => {
@@ -1945,7 +1945,7 @@ export default function TextForm(props: TextFormProps) {
             </div>
           )}
 
-          {/* Tool panel — when a chip view is active */}
+          {/* Tool panel - when a chip view is active */}
           {activeTab && !activeTab.startsWith('_') && (
             <ToolPanel
               tools={TOOLS}
@@ -2530,7 +2530,7 @@ export default function TextForm(props: TextFormProps) {
                       </div>
                       <h2 className="tu-landing-feature-title">AI-Powered</h2>
                       <p className="tu-landing-feature-desc">
-                        Translate, rewrite in any tone, ELI5, summarize — backed by state-of-the-art
+                        Translate, rewrite in any tone, ELI5, summarize - backed by state-of-the-art
                         AI models.
                       </p>
                     </div>
@@ -2554,7 +2554,7 @@ export default function TextForm(props: TextFormProps) {
                       </div>
                       <h2 className="tu-landing-feature-title">Instant Transforms</h2>
                       <p className="tu-landing-feature-desc">
-                        UPPERCASE, lowercase, title case, reverse, sort lines, remove duplicates —
+                        UPPERCASE, lowercase, title case, reverse, sort lines, remove duplicates -
                         one click away.
                       </p>
                     </div>
@@ -2860,7 +2860,7 @@ export default function TextForm(props: TextFormProps) {
                         <span>Dyslexia</span>
                       </button>
                     </div>
-                    {/* Find & Replace bar — shown inline below toolbar */}
+                    {/* Find & Replace bar - shown inline below toolbar */}
                     {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId === 'find' && (
                       <LazyDrawer>
                         <FindReplaceDrawer
@@ -3077,7 +3077,7 @@ export default function TextForm(props: TextFormProps) {
                         }
                       })()}
                     </LazyDrawer>
-                    {/* Formatter config bar — shown inline for formatter tools */}
+                    {/* Formatter config bar - shown inline for formatter tools */}
                     {(() => {
                       const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                       const fmtToolId =
@@ -3262,7 +3262,7 @@ export default function TextForm(props: TextFormProps) {
                           </LazyDrawer>
                         );
                       }
-                      // These render inline in input area — fall through to OutputPanel
+                      // These render inline in input area - fall through to OutputPanel
                       if (
                         [
                           'find',
@@ -3396,7 +3396,7 @@ export default function TextForm(props: TextFormProps) {
                 style={isMobile ? undefined : { height: bottomResize.size }}
               />
 
-              {/* Smart Suggestions — below bottom panel */}
+              {/* Smart Suggestions - below bottom panel */}
               {suggestions.suggestions.length > 0 && (
                 <SmartSuggestions
                   suggestions={suggestions.suggestions}
@@ -3409,7 +3409,7 @@ export default function TextForm(props: TextFormProps) {
         </div>
       </main>
 
-      {/* Mobile: the sidebar is a bottom sheet — this FAB is its always-visible
+      {/* Mobile: the sidebar is a bottom sheet - this FAB is its always-visible
           entry point (the activity bar that opens it on desktop is hidden) */}
       {isMobile && (
         <>
@@ -3518,7 +3518,7 @@ export default function TextForm(props: TextFormProps) {
               <span className="tu-settings-item-hint">Stats & settings</span>
             </button>
 
-            {/* Upgrade to Pro — shown for authenticated free-tier users */}
+            {/* Upgrade to Pro - shown for authenticated free-tier users */}
             {props.isAuthenticated && subscription && !subscription.isPro && (
               <button
                 className="tu-settings-item tu-settings-item--accent"
@@ -3582,7 +3582,7 @@ export default function TextForm(props: TextFormProps) {
             )}
 
             {/* About */}
-            <div className="tu-settings-footer">FixMyText v1.0 — {TOOLS.length} tools</div>
+            <div className="tu-settings-footer">FixMyText v1.0 - {TOOLS.length} tools</div>
           </div>
         </>
       )}

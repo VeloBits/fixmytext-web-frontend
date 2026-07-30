@@ -45,7 +45,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // A cross-tab logout (BroadcastChannel → removeUser) or Keycloak-side session
   // end clears the OIDC user but not the Redux identity: signoutRedirect only
   // navigates the tab that initiated it, so a background tab keeps s.auth.user
-  // and every user-scoped RTK Query cache — the chrome shows "Sign In" while
+  // and every user-scoped RTK Query cache - the chrome shows "Sign In" while
   // the profile menu still names the signed-out user. When auth drops while a
   // profile is loaded, purge it all so this tab renders as a true guest and
   // nothing leaks into a later session. All user-scoped queries skip while
@@ -66,13 +66,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     refetch: refetchMe,
   } = useGetMeQuery(undefined, { skip: !accessToken });
   // Signed in but the profile hasn't landed in Redux yet (and the fetch hasn't
-  // failed) — identity UI should show loading, not guest. The !meFailed guard
+  // failed) - identity UI should show loading, not guest. The !meFailed guard
   // keeps a broken /auth/me from wedging consumers in a permanent loading state.
   const userResolving = isAuthenticated && !user && !meFailed;
   // A transiently failing /auth/me (rate-limited 429, 5xx, network drop) is not
   // a sign-out: only a definitive 401/403 settles the identity. Keep refetching
   // in the background so a burst of 429s can't strand a signed-in user in
-  // guest-looking chrome — the profile pops in as soon as a poll succeeds.
+  // guest-looking chrome - the profile pops in as soon as a poll succeeds.
   const meStatus = (meError as { status?: number | string } | undefined)?.status;
   const meAuthRejected = meStatus === 401 || meStatus === 403;
   useEffect(() => {

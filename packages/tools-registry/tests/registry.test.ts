@@ -103,7 +103,7 @@ describe('STARTER_KITS', () => {
   it('every kit except explorer seeds a named, non-empty group', () => {
     for (const kit of STARTER_KITS) {
       if (kit.id === 'explorer') {
-        // "Just Exploring" promises the whole catalog — creates no group
+        // "Just Exploring" promises the whole catalog - creates no group
         expect(kit.toolIds).toEqual([]);
         expect(kit.groupName).toBe('');
       } else {

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { dismissOnboardingIfPresent } from './helpers';
 
 test('local tool (MD5) transforms input client-side', async ({ page }) => {
-  // Deep-link straight into the editor with the tool pre-selected — a plain
+  // Deep-link straight into the editor with the tool pre-selected - a plain
   // / visit lands fresh guests on the marketing/landing view without a
   // textarea until a tool is chosen.
   await page.goto('/?tool=md5');
@@ -10,7 +10,7 @@ test('local tool (MD5) transforms input client-side', async ({ page }) => {
 
   const input = page.locator('textarea.tu-textarea').first();
   await expect(input).toBeVisible();
-  // The editor's auto-run listens for real keystrokes — fill() alone does not
+  // The editor's auto-run listens for real keystrokes - fill() alone does not
   // trigger the transform debounce.
   await input.pressSequentially('hello world');
 

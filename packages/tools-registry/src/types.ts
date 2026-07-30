@@ -42,7 +42,7 @@ export type ToolTab = 'all' | 'writing' | 'transform' | 'code' | 'ai' | 'languag
 // view or a filter on one group. Persisted per-account as
 // ui-settings.sidebar_chips; [] there means "never customized".
 
-/** Smart-view identifiers — the default chip row. */
+/** Smart-view identifiers - the default chip row. */
 export type SidebarViewId = 'all' | 'pinned' | 'recent' | 'suggested';
 
 export type SidebarChipType = 'view' | 'group' | 'custom_group';
@@ -109,7 +109,7 @@ export type SelectOption = [string, string];
  *
  * Some select-type tools also carry handlerKey (all of them do).
  * Some ai-type tools also omit handlerKey in principle, but in practice
- * every 'ai' tool in the catalog has one — keeping it optional covers edge cases.
+ * every 'ai' tool in the catalog has one - keeping it optional covers edge cases.
  */
 export interface ToolDefinition {
   // ── Always present ──────────────────────────────────────
@@ -171,7 +171,7 @@ export interface UseCaseTab {
   color: string;
 }
 
-/** Valid starter-kit keys — literal union (not derived from STARTER_KITS) to avoid a types→tools import cycle. */
+/** Valid starter-kit keys - literal union (not derived from STARTER_KITS) to avoid a types→tools import cycle. */
 export type StarterKitId = 'writer' | 'student' | 'developer' | 'social' | 'explorer';
 
 /** A starter-kit entry from STARTER_KITS: an onboarding card whose pick seeds

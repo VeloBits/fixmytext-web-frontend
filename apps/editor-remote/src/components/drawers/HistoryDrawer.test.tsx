@@ -10,7 +10,7 @@ vi.mock('react-redux', () => ({
   useDispatch: () => vi.fn(),
 }));
 
-// Mock useOidcAuth — HistoryDrawer uses this for isAuthenticated
+// Mock useOidcAuth - HistoryDrawer uses this for isAuthenticated
 vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
   useOidcAuth: vi.fn().mockReturnValue({
     isAuthenticated: false,

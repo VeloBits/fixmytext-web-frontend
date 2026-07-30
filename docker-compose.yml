@@ -1,15 +1,15 @@
-# fixmytext-frontend — unified compose for all microfrontends.
+# fixmytext-frontend - unified compose for all microfrontends.
 #
 # Profiles:
-#   dev  — Vite dev servers + next dev (hot reload, volume-mounted source)
-#   prod — Built nginx containers + wrangler pages dev (Cloudflare simulation)
+#   dev  - Vite dev servers + next dev (hot reload, volume-mounted source)
+#   prod - Built nginx containers + wrangler pages dev (Cloudflare simulation)
 #
 # Usage:
 #   docker compose --profile dev up --build
 #   docker compose --profile prod up --build
 
 services:
-  # ── Router — dev ──────────────────────────────────────────────────────────────
+  # ── Router - dev ──────────────────────────────────────────────────────────────
   router:
     profiles: ['dev']
     build:
@@ -26,7 +26,7 @@ services:
       - analytics-remote-dev
     restart: unless-stopped
 
-  # ── Router — prod ─────────────────────────────────────────────────────────────
+  # ── Router - prod ─────────────────────────────────────────────────────────────
   router-prod:
     profiles: ['prod']
     build:
@@ -43,7 +43,7 @@ services:
       - analytics-remote-prod
     restart: unless-stopped
 
-  # ── Shell — dev ────────────────────────────────────────────────────────────────
+  # ── Shell - dev ────────────────────────────────────────────────────────────────
   shell-dev:
     profiles: ['dev']
     build:
@@ -60,7 +60,7 @@ services:
     env_file: .env
     restart: unless-stopped
 
-  # ── Shell — prod ───────────────────────────────────────────────────────────────
+  # ── Shell - prod ───────────────────────────────────────────────────────────────
   shell-prod:
     profiles: ['prod']
     build:
@@ -69,7 +69,7 @@ services:
       args:
         APP_WORKSPACE: '@velobits/shell'
         APP_PATH: 'apps/shell'
-        # Vite bakes these at BUILD time, so they must arrive as build args — the
+        # Vite bakes these at BUILD time, so they must arrive as build args - the
         # `env_file` below is runtime-only (nginx) and cannot reach the build stage.
         # Defaults point at the local router (port 3000) for the prod simulation;
         # override via host env / a root `.env` for a real deployment.
@@ -84,7 +84,7 @@ services:
       timeout: 5s
       retries: 3
 
-  # ── Editor Remote — dev ────────────────────────────────────────────────────────
+  # ── Editor Remote - dev ────────────────────────────────────────────────────────
   editor-remote-dev:
     profiles: ['dev']
     build:
@@ -101,7 +101,7 @@ services:
     env_file: .env
     restart: unless-stopped
 
-  # ── Editor Remote — prod ───────────────────────────────────────────────────────
+  # ── Editor Remote - prod ───────────────────────────────────────────────────────
   editor-remote-prod:
     profiles: ['prod']
     build:
@@ -114,7 +114,7 @@ services:
     env_file: .env.prod
     restart: unless-stopped
 
-  # ── Analytics Remote — dev ─────────────────────────────────────────────────────
+  # ── Analytics Remote - dev ─────────────────────────────────────────────────────
   analytics-remote-dev:
     profiles: ['dev']
     build:
@@ -131,7 +131,7 @@ services:
     env_file: .env
     restart: unless-stopped
 
-  # ── Analytics Remote — prod ────────────────────────────────────────────────────
+  # ── Analytics Remote - prod ────────────────────────────────────────────────────
   analytics-remote-prod:
     profiles: ['prod']
     build:
@@ -144,7 +144,7 @@ services:
     env_file: .env.prod
     restart: unless-stopped
 
-  # ── Content — dev ──────────────────────────────────────────────────────────────
+  # ── Content - dev ──────────────────────────────────────────────────────────────
   content-dev:
     profiles: ['dev']
     build:
@@ -159,7 +159,7 @@ services:
     env_file: .env
     environment:
       # Server-side fetches (apps/content/lib/api.ts) run inside this container,
-      # where Kong's host-published 127.0.0.1:8000 is unreachable — talk to Kong
+      # where Kong's host-published 127.0.0.1:8000 is unreachable - talk to Kong
       # directly over the backend compose network instead. Requires the backend
       # stack to be up first (it owns the external network below).
       CONTENT_API_URL: http://kong:8000
@@ -168,7 +168,7 @@ services:
       - backend
     restart: unless-stopped
 
-  # ── Content — prod ─────────────────────────────────────────────────────────────
+  # ── Content - prod ─────────────────────────────────────────────────────────────
   content-prod:
     profiles: ['prod']
     build:
@@ -179,7 +179,7 @@ services:
     restart: unless-stopped
     healthcheck:
       # The app 307-redirects / to /app (owned by the shell via the router), so a
-      # redirect-following wget always lands on a 404 — probe with node instead
+      # redirect-following wget always lands on a 404 - probe with node instead
       # and treat any non-5xx answer as "workerd is up and serving".
       test:
         [

@@ -1,5 +1,5 @@
 # Development image for apps/content (Next.js).
-# Uses plain next dev — no CF compilation step for faster iteration.
+# Uses plain next dev - no CF compilation step for faster iteration.
 
 FROM node:24-alpine
 

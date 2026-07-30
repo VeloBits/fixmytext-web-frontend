@@ -1,5 +1,5 @@
 /**
- * useDrawerState — manages which drawer panel is currently open.
+ * useDrawerState - manages which drawer panel is currently open.
  *
  * Extracted from TextForm.jsx to reduce component complexity.
  */

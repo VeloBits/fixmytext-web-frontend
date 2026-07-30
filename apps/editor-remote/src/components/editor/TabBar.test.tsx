@@ -117,7 +117,7 @@ describe('TabBar', () => {
     render(<TabBar {...baseProps} />);
     const tabBar = document.querySelector('.tu-tab-bar')!;
 
-    // jsdom does not implement Element.scrollBy — stub it so the onClick handlers
+    // jsdom does not implement Element.scrollBy - stub it so the onClick handlers
     // don't throw an unhandled exception (which would fail the whole run).
     const scrollBySpy = vi.fn();
     (tabBar as unknown as { scrollBy: typeof scrollBySpy }).scrollBy = scrollBySpy;

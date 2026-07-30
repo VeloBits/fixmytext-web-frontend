@@ -29,7 +29,7 @@ interface UseResizeReturn {
 }
 
 /**
- * useResize — drag-to-resize hook
+ * useResize - drag-to-resize hook
  * @param direction - 'horizontal' or 'vertical'
  * @param initial - initial size (px or %)
  * @param opts - { min, max, storageKey, unit: 'px'|'percent', containerRef }

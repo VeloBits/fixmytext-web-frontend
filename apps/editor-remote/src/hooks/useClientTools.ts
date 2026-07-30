@@ -181,7 +181,7 @@ export default function useClientTools({
         .filter(Boolean);
       const blocks = inputs.map((input) => {
         const out = convertOne(input);
-        return out || `(invalid — could not parse "${input}")`;
+        return out || `(invalid - could not parse "${input}")`;
       });
       const validCount = inputs.filter((input) => convertOne(input) !== null).length;
       if (validCount === 0) {
@@ -249,7 +249,7 @@ export default function useClientTools({
         .filter(Boolean);
       const blocks = inputs.map((input) => {
         const out = convertOne(input);
-        return out || '(invalid — expected HEX or RGB)';
+        return out || '(invalid - expected HEX or RGB)';
       });
       const valid = blocks.filter((_, i) => convertOne(inputs[i] ?? '') !== null).length;
       if (valid === 0) {
@@ -331,7 +331,7 @@ export default function useClientTools({
         .filter(Boolean);
       const blocks = inputs.map((expr) => {
         const out = explainOne(expr);
-        return out || '(invalid — expected 5 or 6 space-separated fields)';
+        return out || '(invalid - expected 5 or 6 space-separated fields)';
       });
       const validCount = inputs.filter((expr) => explainOne(expr) !== null).length;
       if (validCount === 0) {

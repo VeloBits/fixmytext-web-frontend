@@ -738,7 +738,7 @@
   scrollbar-width: none;
 }
 
-/* Webkit — 1px accent scrollbar at bottom, same as INPUT underline */
+/* Webkit - 1px accent scrollbar at bottom, same as INPUT underline */
 .tu-tab-bar::-webkit-scrollbar {
   height: 1px;
 }
@@ -778,7 +778,7 @@
   background: var(--surface-2);
 }
 
-/* Icon inside tab — override sidebar icon constraints */
+/* Icon inside tab - override sidebar icon constraints */
 .tu-tab .tu-titem-icon {
   width: 16px;
   min-width: 16px;
@@ -1497,7 +1497,7 @@
 }
 
 /* Editable line rows. Match the input textarea's line-height exactly so
-   stacked rows have no extra inter-row gap — the visual spacing should
+   stacked rows have no extra inter-row gap - the visual spacing should
    match the input pane line-for-line. */
 .tu-output-row-text--editable {
   display: block;
@@ -1505,7 +1505,7 @@
   cursor: text;
 }
 
-/* Editable output — contentEditable div */
+/* Editable output - contentEditable div */
 .tu-output-editable {
   width: 100%;
   min-height: 100%;
@@ -1553,7 +1553,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   Format Panel — collapsible rich text formatting bar
+   Format Panel - collapsible rich text formatting bar
    ═══════════════════════════════════════════════════════ */
 .tu-fmt-panel {
   display: flex;
@@ -2305,7 +2305,7 @@ body:not(.dark) .tu-output-empty {
   background: #f4f4f5;
 }
 
-/* ── Light Theme: Bottom Panel — warm tinted zone ── */
+/* ── Light Theme: Bottom Panel - warm tinted zone ── */
 body:not(.dark) .tu-bottom-panel {
   background: #e8e8ea;
   border-top: none;

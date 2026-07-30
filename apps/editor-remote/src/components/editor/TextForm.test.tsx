@@ -511,7 +511,7 @@ describe('TextForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
-    // Provide a ResizeObserver stub — TabBar uses it and jsdom does not support it.
+    // Provide a ResizeObserver stub - TabBar uses it and jsdom does not support it.
     if (!window.ResizeObserver) {
       window.ResizeObserver = class {
         observe() {}
@@ -571,7 +571,7 @@ describe('TextForm', () => {
 
   it('renders no sidebar footer without subscription badges', () => {
     render(<TextForm {...defaultProps} />);
-    // The footer only exists for PRO/credits badges now — with none, it is
+    // The footer only exists for PRO/credits badges now - with none, it is
     // skipped entirely so its border/padding don't render as an empty strip.
     expect(document.querySelector('.tu-sidebar-footer')).not.toBeInTheDocument();
   });
@@ -960,7 +960,7 @@ describe('TextForm', () => {
       fireEvent.click(saveTabBtn);
       expect(screen.getByText('Save to Templates')).toBeInTheDocument();
     } else {
-      // Modal not reachable without the button — just confirm no crash
+      // Modal not reachable without the button - just confirm no crash
       expect(document.querySelector('.tu-forge')).toBeInTheDocument();
     }
   });
@@ -1158,7 +1158,7 @@ describe('TextForm tool groups and favorites (post-gamification-removal)', () =>
     expect(screen.queryByText('Daily Quest')).not.toBeInTheDocument();
     expect(screen.queryByText('Recent Badges')).not.toBeInTheDocument();
     expect(screen.queryByText('Most Used')).not.toBeInTheDocument();
-    // favorites card survives — it's a product feature, not gamification
+    // favorites card survives - it's a product feature, not gamification
     expect(screen.getByText('Popular Tools')).toBeInTheDocument();
   });
 

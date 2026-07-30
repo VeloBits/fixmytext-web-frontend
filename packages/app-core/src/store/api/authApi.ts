@@ -7,7 +7,7 @@ type UserResponse = components['schemas']['UserResponse'];
 export const authApi = createApi({
   reducerPath: 'authApi',
   // Reauth + transient retry: a rate-limited (429) or flaky /auth/me must not
-  // read as "signed out" — see AppContext's userResolving/guest handling.
+  // read as "signed out" - see AppContext's userResolving/guest handling.
   // resendVerification is a mutation, so the retry wrapper skips it.
   baseQuery: baseQueryWithRetry,
   tagTypes: ['Me'],

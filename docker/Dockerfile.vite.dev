@@ -1,5 +1,5 @@
 # Development image for Vite apps (shell, editor-remote, analytics-remote).
-# Source is mounted as a volume — Vite hot-reloads on change.
+# Source is mounted as a volume - Vite hot-reloads on change.
 
 FROM node:24-alpine
 

@@ -3,7 +3,7 @@
 # Single-stage so wrangler and its node_modules are available at runtime.
 #
 # Must be a glibc (Debian) base: wrangler dev spawns workerd, which Cloudflare
-# ships as a glibc-linked binary — on musl (alpine) it dies with
+# ships as a glibc-linked binary - on musl (alpine) it dies with
 # `spawn .../workerd-linux-64/bin/workerd ENOENT`.
 
 FROM node:24-bookworm-slim
@@ -19,7 +19,7 @@ COPY packages/tools-registry/package.json ./packages/tools-registry/
 
 RUN npm ci --silent
 
-# apps/content/tsconfig.json extends the monorepo base — next build hard-fails
+# apps/content/tsconfig.json extends the monorepo base - next build hard-fails
 # (TS5083) without it in the build context.
 COPY tsconfig.base.json ./
 COPY packages/ ./packages/

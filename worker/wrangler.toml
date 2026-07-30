@@ -14,7 +14,7 @@ ANALYTICS_PAGES_URL = "https://fixmytext-analytics-remote.pages.dev"
 CONTENT_URL         = "https://fixmytext-content.velobits.workers.dev"
 
 # Same-account worker→worker fetches over workers.dev never reach the target
-# (Cloudflare serves its placeholder 404 instead) — the content app must be
+# (Cloudflare serves its placeholder 404 instead) - the content app must be
 # reached via a service binding. CONTENT_URL is only used by the local-dev
 # plain-fetch fallback (the binding forwards the original request untouched).
 [[services]]
@@ -25,7 +25,7 @@ service = "fixmytext-content"
 # Deployed by CI from the `develop` branch (wrangler deploy --env develop) as a
 # separate worker: develop-fixmytext-router.<account-subdomain>.workers.dev.
 # URLs point at the Pages *branch aliases* created by `pages deploy --branch develop`.
-# Env blocks do not inherit top-level [vars] — every var must be redeclared here.
+# Env blocks do not inherit top-level [vars] - every var must be redeclared here.
 [env.develop]
 name = "develop-fixmytext-router"
 

@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // In a production build the remote is served behind the router at /remotes/editor/
 // (nginx + the CF Worker strip that prefix), so the prefix must be baked into every
-// asset/chunk URL in remoteEntry.js — otherwise chunks request /assets/* and fall
+// asset/chunk URL in remoteEntry.js - otherwise chunks request /assets/* and fall
 // through the `/`→content route. The dev server is reached port-direct (3101) at
 // root, so dev keeps base '/'. See docs/architecture.md + docker/nginx.router.*.conf.
 export default defineConfig(({ mode }) => ({
@@ -51,7 +51,7 @@ export default defineConfig(({ mode }) => ({
   server: { port: 3101, host: true },
   build: {
     // 'hidden' emits maps without referencing them in the bundle; the deploy
-    // script deletes them so they're never published to Cloudflare Pages (M-11 —
+    // script deletes them so they're never published to Cloudflare Pages (M-11 -
     // a parsed .map leaks the original TypeScript source).
     sourcemap: 'hidden',
   },

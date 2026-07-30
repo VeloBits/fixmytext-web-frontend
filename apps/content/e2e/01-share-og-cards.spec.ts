@@ -21,7 +21,7 @@ test.describe('Share page OG cards', () => {
     const ogTitle = page.locator('meta[property="og:title"]');
     await expect(ogTitle).toHaveAttribute('content', /.+/);
     const content = await ogTitle.getAttribute('content');
-    expect(content).not.toBe('FixMyText — Free Online Text Tools');
+    expect(content).not.toBe('FixMyText - Free Online Text Tools');
     expect(content).toContain('FixMyText');
   });
 
@@ -77,7 +77,7 @@ test.describe('Pricing page', () => {
   });
 });
 
-test.describe('Share page — not found / expired', () => {
+test.describe('Share page - not found / expired', () => {
   test('returns 404 for a nonexistent share ID', async ({ page }) => {
     const response = await page.goto('/share/00000000-0000-0000-0000-000000000000');
     // Next.js notFound() returns 404

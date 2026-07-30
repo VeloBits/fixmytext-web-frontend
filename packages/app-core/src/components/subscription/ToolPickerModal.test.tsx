@@ -62,7 +62,7 @@ describe('ToolPickerModal', () => {
 
   it('gates confirm on exactly N selections and returns the chosen ids', () => {
     renderPicker();
-    const confirm = screen.getByRole('button', { name: /continue to pay — ₹25/i });
+    const confirm = screen.getByRole('button', { name: /continue to pay - ₹25/i });
     expect(confirm).toBeDisabled();
 
     const checkboxes = screen.getAllByRole('menuitemcheckbox');

@@ -57,7 +57,7 @@ const FEATURES = [
     icon: LockIcon,
     title: 'Encoding & Decoding',
     description:
-      'Base64, URL encoding, hex, Morse code, HTML/JSON escaping, ROT13 — encode and decode anything.',
+      'Base64, URL encoding, hex, Morse code, HTML/JSON escaping, ROT13 - encode and decode anything.',
     color: 'var(--amber)',
   },
   {
@@ -80,7 +80,7 @@ const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Paste or type',
-    desc: 'Drop your text into the split editor — input on the left, output on the right.',
+    desc: 'Drop your text into the split editor - input on the left, output on the right.',
   },
   {
     step: '02',

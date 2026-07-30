@@ -77,7 +77,7 @@ describe('useFavorites', () => {
     expect(mockApiRemoveFavorite).toHaveBeenCalledWith('uppercase');
   });
 
-  it('guest favorites stay in-memory — no API sync when unauthenticated', () => {
+  it('guest favorites stay in-memory - no API sync when unauthenticated', () => {
     mockAuth(false);
     const { result } = renderHook(() => useFavorites());
     act(() => {

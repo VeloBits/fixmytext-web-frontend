@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   Share Page — Polished landing-style result viewer
+   Share Page - Polished landing-style result viewer
    ═══════════════════════════════════════════════════════ */
 
 .sh-page {
@@ -41,7 +41,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   Hero — branded top section with glow
+   Hero - branded top section with glow
    ═══════════════════════════════════════════════════════ */
 .sh-hero {
   position: relative;
@@ -196,7 +196,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   Mock Editor Card — the main output display
+   Mock Editor Card - the main output display
    ═══════════════════════════════════════════════════════ */
 .sh-card-wrap {
   display: flex;

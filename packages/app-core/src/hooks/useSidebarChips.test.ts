@@ -236,7 +236,7 @@ describe('useSidebarChips', () => {
     );
     expect(result.current.chips.map((c) => c.id)).toContain('local-abc');
     // Adoption: useToolGroups dispatches the id map, then swaps the group list
-    // to server ids — the chip must follow instead of being pruned.
+    // to server ids - the chip must follow instead of being pruned.
     act(() => {
       window.dispatchEvent(
         new CustomEvent('fmx:tool-groups-adopted', {

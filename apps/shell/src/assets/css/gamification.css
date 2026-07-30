@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   Legacy stylesheet — VSCode Style
+   Legacy stylesheet - VSCode Style
    Despite the filename (kept to avoid churn), this file no
    longer holds gamification rules. It now mainly contains the
    persona onboarding modal styles plus shared editor chrome
@@ -483,7 +483,7 @@
   opacity: 0.6;
 }
 
-/* Dismiss (X) — skip the picker, defaults to the explorer persona */
+/* Dismiss (X) - skip the picker, defaults to the explorer persona */
 .tu-onboard-close {
   position: absolute;
   top: 0.65rem;

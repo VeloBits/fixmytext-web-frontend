@@ -322,7 +322,7 @@ describe('CipherDrawer', () => {
     fireEvent.click(screen.getByTitle('Apply'));
 
     await vi.waitFor(() => {
-      expect(showAlert).toHaveBeenCalledWith('Decryption failed — wrong passphrase?', 'danger');
+      expect(showAlert).toHaveBeenCalledWith('Decryption failed - wrong passphrase?', 'danger');
     });
   });
 });
