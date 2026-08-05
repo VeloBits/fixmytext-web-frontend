@@ -2208,7 +2208,7 @@ export interface paths {
     };
     /**
      * Get Preferences
-     * @description Return the authenticated user's preferences (theme, persona, skin).
+     * @description Return the authenticated user's preferences (theme, persona, skin, auto-run).
      */
     get: operations['get_preferences_api_v1_user_preferences_get'];
     /**
@@ -3647,6 +3647,10 @@ export interface components {
      *     custom tool groups 2026-07-14): stale deployed bundles still read it, and
      *     PreferencesUpdate no longer accepts it. Remove the field together with the
      *     column drop migration.
+     *
+     *     `auto_run` defaults to False: manual Run is the default execution mode, so
+     *     a stale bundle (or a user who never toggled it) gets the safe, quota-
+     *     preserving behavior.
      */
     PreferencesResponse: {
       /**
@@ -3658,6 +3662,11 @@ export interface components {
       persona?: string | null;
       /** Theme Skin */
       theme_skin?: string | null;
+      /**
+       * Auto Run
+       * @default false
+       */
+      auto_run: boolean;
     };
     /**
      * PreferencesUpdate
@@ -3671,6 +3680,8 @@ export interface components {
       theme?: string | null;
       /** Theme Skin */
       theme_skin?: string | null;
+      /** Auto Run */
+      auto_run?: boolean | null;
     };
     /**
      * ShareCreate
@@ -3709,6 +3720,24 @@ export interface components {
       output_text: string;
       /** Created At */
       created_at: string;
+    };
+    /**
+     * SidebarChipItem
+     * @description One tool-panel sidebar chip: a smart view or a group filter.
+     *
+     *     `view` ids are client-defined (all/pinned/recent/suggested), `group` ids
+     *     are catalog TOOL_GROUPS ids, `custom_group` ids are user_tool_groups UUIDs.
+     *     The server stays structural - semantics (e.g. 'all' never removable) are
+     *     enforced by the client that owns the vocabulary.
+     */
+    SidebarChipItem: {
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'view' | 'group' | 'custom_group';
+      /** Id */
+      id: string;
     };
     /**
      * SpinHistoryItem
@@ -3873,24 +3902,6 @@ export interface components {
     ToolStatsResponse: {
       /** Stats */
       stats: components['schemas']['ToolStatItem'][];
-    };
-    /**
-     * SidebarChipItem
-     * @description One tool-panel sidebar chip: a smart view or a group filter.
-     *
-     *     `view` ids are client-defined (all/pinned/recent/suggested), `group` ids
-     *     are catalog TOOL_GROUPS ids, `custom_group` ids are user_tool_groups UUIDs.
-     *     The server stays structural - semantics (e.g. 'all' never removable) are
-     *     enforced by the client that owns the vocabulary.
-     */
-    SidebarChipItem: {
-      /**
-       * Type
-       * @enum {string}
-       */
-      type: 'view' | 'group' | 'custom_group';
-      /** Id */
-      id: string;
     };
     /**
      * UiSettingsResponse
