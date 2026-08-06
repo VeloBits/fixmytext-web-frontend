@@ -10,7 +10,7 @@
 
 services:
   # ── Router - dev ──────────────────────────────────────────────────────────────
-  router:
+  fixmytext-router:
     profiles: ['dev']
     build:
       context: .
@@ -21,10 +21,13 @@ services:
     ports:
       - '3100:80'
     depends_on:
-      - shell-dev
-      - editor-remote-dev
-      - analytics-remote-dev
+      - fixmytext-shell-dev
+      - fixmytext-editor-remote-dev
+      - fixmytext-analytics-remote-dev
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
 
   # ── Router - prod ─────────────────────────────────────────────────────────────
   router-prod:
@@ -38,13 +41,16 @@ services:
     ports:
       - '3100:80'
     depends_on:
-      - shell-prod
-      - editor-remote-prod
-      - analytics-remote-prod
+      - fixmytext-shell-prod
+      - fixmytext-editor-remote-prod
+      - fixmytext-analytics-remote-prod
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
 
   # ── Shell - dev ────────────────────────────────────────────────────────────────
-  shell-dev:
+  fixmytext-shell-dev:
     profiles: ['dev']
     build:
       context: .
@@ -60,9 +66,12 @@ services:
       - /app/node_modules
     env_file: .env
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
 
   # ── Shell - prod ───────────────────────────────────────────────────────────────
-  shell-prod:
+  fixmytext-shell-prod:
     profiles: ['prod']
     build:
       context: .
@@ -79,6 +88,9 @@ services:
     container_name: fixmytext-shell-prod
     env_file: .env.prod
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:8080']
       interval: 30s
@@ -86,24 +98,27 @@ services:
       retries: 3
 
   # ── Editor Remote - dev ────────────────────────────────────────────────────────
-  editor-remote-dev:
+  fixmytext-editor-remote-dev:
     profiles: ['dev']
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/Dockerfile.vite.dev
       args:
         APP_WORKSPACE: '@velobits/editor-remote'
     container_name: fixmytext-editor-dev
+    env_file: .env
     ports:
       - '3101:3101'
     volumes:
       - .:/app
       - /app/node_modules
-    env_file: .env
-    restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
 
   # ── Editor Remote - prod ───────────────────────────────────────────────────────
-  editor-remote-prod:
+  fixmytext-editor-remote-prod:
     profiles: ['prod']
     build:
       context: .
@@ -114,9 +129,12 @@ services:
     container_name: fixmytext-editor-prod
     env_file: .env.prod
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
 
   # ── Analytics Remote - dev ─────────────────────────────────────────────────────
-  analytics-remote-dev:
+  fixmytext-analytics-remote-dev:
     profiles: ['dev']
     build:
       context: .
@@ -131,9 +149,12 @@ services:
       - /app/node_modules
     env_file: .env
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
 
   # ── Analytics Remote - prod ────────────────────────────────────────────────────
-  analytics-remote-prod:
+  fixmytext-analytics-remote-prod:
     profiles: ['prod']
     build:
       context: .
@@ -144,9 +165,12 @@ services:
     container_name: fixmytext-analytics-prod
     env_file: .env.prod
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
 
   # ── Content - dev ──────────────────────────────────────────────────────────────
-  content-dev:
+  fixmytext-content-dev:
     profiles: ['dev']
     build:
       context: .
@@ -165,12 +189,12 @@ services:
       # stack to be up first (it owns the external network below).
       CONTENT_API_URL: http://kong:8000
     networks:
-      - default
-      - backend
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
     restart: unless-stopped
 
   # ── Content - prod ─────────────────────────────────────────────────────────────
-  content-prod:
+  fixmytext-content-prod:
     profiles: ['prod']
     build:
       context: .
@@ -178,6 +202,9 @@ services:
     container_name: fixmytext-content-prod
     env_file: .env.prod
     restart: unless-stopped
+    networks:
+      - fixmytext-web-frontend-net
+      - velobits-proxy-net
     healthcheck:
       # The app 307-redirects / to /app (owned by the shell via the router), so a
       # redirect-following wget always lands on a 404 - probe with node instead
@@ -194,13 +221,10 @@ services:
       retries: 5
       start_period: 30s
 
-# ── Networks ──────────────────────────────────────────────────────────────────
-# The backend stack (backend/docker-compose.yml) owns this network; content-dev
-# joins it so server-side rendering can reach Kong at http://kong:8000.
 networks:
-  backend:
-    name: fixmytext-backend_fixmytext-net
-    external: true
-  infrastructure:
-    name: velobits-net
+  fixmytext-web-frontend-net:
+    name: fixmytext-web-frontend-net
+    driver: bridge
+  velobits-proxy-net:
+    name: velobits-proxy-net
     external: true
