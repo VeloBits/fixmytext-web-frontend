@@ -69,7 +69,7 @@ export default [
       'dist/',
       'node_modules/',
       'coverage/',
-      // Next.js auto-generated files — never edit or lint these
+      // Next.js auto-generated files - never edit or lint these
       '**/next-env.d.ts',
       '**/.next/**',
       '**/tsconfig.tsbuildinfo',

@@ -14,7 +14,7 @@ interface ProfileSectionProps {
 /**
  * Dashboard profile section.
  * Allows editing display name and toggling theme. (The persona picker that
- * lived here was removed with the persona feature — custom tool groups are
+ * lived here was removed with the persona feature - custom tool groups are
  * managed in the editor's tool panel.)
  */
 export default function ProfileSection({
@@ -56,7 +56,7 @@ export default function ProfileSection({
   }, [cooldownUntil]);
 
   const handleResendVerification = async () => {
-    // TODO(partial-impl): placeholder — only shows an info alert instead of triggering a
+    // TODO(partial-impl): placeholder - only shows an info alert instead of triggering a
     // resend. Backend endpoint does not exist yet (see resend stub above, #4).
     showAlert('Please check your Keycloak account to resend the verification email.', 'info');
   };
@@ -81,7 +81,7 @@ export default function ProfileSection({
             {user?.display_name?.charAt(0)?.toUpperCase() || 'G'}
           </div>
           <div className="tu-dash-profile-large-info">
-            {/* TODO(partial-impl): display-name edit is not persisted — both Save paths
+            {/* TODO(partial-impl): display-name edit is not persisted - both Save paths
                 below only show "(local only)" and never call the backend, so the change
                 is lost on reload. Wire account-svc PATCH /api/v1/user (display_name). */}
             {editingName ? (
@@ -199,7 +199,7 @@ export default function ProfileSection({
               <h3 className="tu-dash-card-title">Verify your email</h3>
               <p className="tu-dash-card-desc">
                 We sent a verification link to <b>{user?.email}</b>. Confirm your address to unlock
-                all FixMyText tools — AI-powered tools and local transformations both require a
+                all FixMyText tools - AI-powered tools and local transformations both require a
                 verified email.
               </p>
             </div>

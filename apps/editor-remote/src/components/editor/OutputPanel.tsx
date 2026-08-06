@@ -358,7 +358,7 @@ export default memo(function OutputPanel({
               </span>
               <span>
                 {activeTool
-                  ? 'Start typing — output updates automatically'
+                  ? 'Start typing - output updates automatically'
                   : 'Select a tool to get started'}
               </span>
               <span className="tu-output-empty-hint">Results will appear here</span>

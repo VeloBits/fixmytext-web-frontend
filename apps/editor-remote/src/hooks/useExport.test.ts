@@ -59,7 +59,7 @@ describe('useExport', () => {
     act(() => {
       result.current.setOutputText('my text');
     });
-    // Verify by downloading — triggers blob creation with stored text
+    // Verify by downloading - triggers blob creation with stored text
     const clickSpy = vi.fn();
     vi.spyOn(document, 'createElement').mockReturnValueOnce({
       href: '',

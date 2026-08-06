@@ -12,7 +12,7 @@ jobs:
     # Gates the PR's dependency *diff* for newly introduced vulnerable packages
     # (DO-11). actions/dependency-review-action was dropped: it calls GitHub's
     # Dependency Review API, which private repos only get with GitHub Advanced
-    # Security — the same wall that forced `upload: never` in codeql.yml.
+    # Security - the same wall that forced `upload: never` in codeql.yml.
     # OSV-Scanner reproduces the gate locally on the runner: it scans lockfiles
     # at the PR base and head and fails only on newly introduced vulnerabilities.
     # The full-tree high-severity audit remains CI's "Dependency Audit" job.

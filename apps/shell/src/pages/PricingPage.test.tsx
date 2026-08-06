@@ -275,7 +275,7 @@ describe('PricingPage', () => {
   it('switches pass group by clicking tabs', () => {
     renderPricing();
     fireEvent.click(screen.getByText('Multi-Day'));
-    // multiday tab active — day pass group desc changes
+    // multiday tab active - day pass group desc changes
     expect(screen.getByText('Short-term commitment')).toBeInTheDocument();
   });
 
@@ -405,7 +405,7 @@ describe('PricingPage', () => {
     renderPricing();
     const passCard = screen.getByLabelText(/View 1-Day Single details/i);
     fireEvent.click(passCard);
-    // subtitle appears in both grid card and drawer — check drawer content
+    // subtitle appears in both grid card and drawer - check drawer content
     expect(screen.getAllByText('One tool for a day').length).toBeGreaterThanOrEqual(1);
     // Drawer-specific content: "What's included" heading
     expect(screen.getByText("What's included")).toBeInTheDocument();
@@ -441,7 +441,7 @@ describe('PricingPage', () => {
   it('switches to Micro tab', () => {
     renderPricing();
     fireEvent.click(screen.getByText('Micro'));
-    expect(screen.getByText('Just a taste — pocket change')).toBeInTheDocument();
+    expect(screen.getByText('Just a taste - pocket change')).toBeInTheDocument();
   });
 
   it('switches to Day tab', () => {
@@ -542,7 +542,7 @@ describe('PricingPage', () => {
 
   it('shows upgradeLoading state on pro button', () => {
     renderPricing({ subscription: { ...defaultSubscription, upgradeLoading: true } });
-    // Checkout opens as an in-page Razorpay overlay — there is no redirect.
+    // Checkout opens as an in-page Razorpay overlay - there is no redirect.
     expect(screen.getByText('Opening checkout…')).toBeInTheDocument();
   });
 

@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const CONTENT_URL = process.env.E2E_CONTENT_URL ?? 'http://localhost:3001';
+const CONTENT_URL = process.env.E2E_CONTENT_URL ?? 'http://localhost:3103';
 
 export default defineConfig({
   testDir: '.',

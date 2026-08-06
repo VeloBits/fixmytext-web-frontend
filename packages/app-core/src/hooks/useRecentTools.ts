@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 
 // Deliberately device-local (no account sync, no owner tag): recents are
-// ephemeral per-device context, like VSCode's recent files — syncing them
+// ephemeral per-device context, like VSCode's recent files - syncing them
 // would let a phone session pollute the desktop's list. Decided 2026-07-22
 // with the sidebar-chips feature; the Recent view chip reads this.
 const RECENT_TOOLS_KEY = 'fmx_recent_tools';

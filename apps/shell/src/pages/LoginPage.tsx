@@ -26,7 +26,7 @@ export function LoginPage() {
   const returnTo = searchParams.get('returnTo');
 
   // Kick off the redirect to Keycloak's hosted login. If Keycloak is
-  // unreachable the promise rejects — surface an error card with a retry
+  // unreachable the promise rejects - surface an error card with a retry
   // instead of stranding the user on a skeleton forever.
   const redirect = useCallback(() => {
     setError(false);
@@ -46,7 +46,7 @@ export function LoginPage() {
   // Browser Back from the Keycloak page restores this page from the
   // back/forward cache: effects don't re-run, so the redirect above never
   // re-fires and the skeleton would sit frozen forever. pageshow with
-  // persisted=true is exactly that restore — the user backed out of
+  // persisted=true is exactly that restore - the user backed out of
   // sign-in, so return them to the guest home instead of re-trapping them.
   useEffect(() => {
     const onPageShow = (e: PageTransitionEvent) => {

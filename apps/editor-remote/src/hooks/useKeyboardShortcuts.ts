@@ -8,7 +8,7 @@ import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 import type { ToolDefinition } from '@velobits/app-core/types/tools';
 
 /* ═══════════════════════════════════════════════════════
-   useKeyboardShortcuts — Customizable power-user hotkeys
+   useKeyboardShortcuts - Customizable power-user hotkeys
    ═══════════════════════════════════════════════════════ */
 
 export interface ShortcutDef {

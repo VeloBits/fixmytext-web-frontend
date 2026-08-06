@@ -82,7 +82,7 @@
   color: var(--text);
 }
 
-/* Inline action (e.g. Undo) — always visible, unlike the hover-only close */
+/* Inline action (e.g. Undo) - always visible, unlike the hover-only close */
 .tu-toast-action {
   flex-shrink: 0;
   border: none;

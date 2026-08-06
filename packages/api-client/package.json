@@ -13,7 +13,7 @@
     "lint": "eslint src/ tests/",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "gen:types": "openapi-typescript ../../../backend/openapi.json -o src/types/openapi.d.ts && prettier --write src/types/openapi.d.ts"
+    "gen:types": "openapi-typescript ../../../FixMyText-backend/openapi.json -o src/types/openapi.d.ts && prettier --write src/types/openapi.d.ts"
   },
   "devDependencies": {
     "typescript": "*",

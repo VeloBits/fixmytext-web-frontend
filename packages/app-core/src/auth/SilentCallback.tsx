@@ -19,7 +19,7 @@ import { userManager } from './userManager';
 export function SilentCallback() {
   useEffect(() => {
     userManager.signinSilentCallback().catch((err) => {
-      // Hidden iframe — no UI to show. Capture for observability; the parent
+      // Hidden iframe - no UI to show. Capture for observability; the parent
       // frame falls back to an interactive login when the renewed token never
       // arrives.
       Sentry.captureException(err);
@@ -27,6 +27,6 @@ export function SilentCallback() {
     });
   }, []);
 
-  // This page is shown in a hidden iframe — render nothing visible.
+  // This page is shown in a hidden iframe - render nothing visible.
   return null;
 }

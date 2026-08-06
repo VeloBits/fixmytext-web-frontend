@@ -57,13 +57,13 @@ describe('SharePage', () => {
     render(<SharePage showAlert={showAlert} />);
     expect(screen.getByText('Shared Result')).toBeInTheDocument();
     expect(screen.getByText('Uppercase')).toBeInTheDocument();
-    // Output text is rendered — check body text content
+    // Output text is rendered - check body text content
     expect(document.body.textContent).toContain('HELLO WORLD');
   });
 
   it('shows stats (lines, words, chars)', () => {
     render(<SharePage showAlert={showAlert} />);
-    // Stats text may be split across elements — check body text
+    // Stats text may be split across elements - check body text
     expect(document.body.textContent).toMatch(/lines/);
     expect(document.body.textContent).toMatch(/words/);
     expect(document.body.textContent).toMatch(/chars/);

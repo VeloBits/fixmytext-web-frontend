@@ -8,7 +8,7 @@ export interface ToolPickerModalProps {
   /** Exact number of tools the pass covers (pass_def.tools > 0). */
   requiredCount: number;
   passName: string;
-  /** e.g. "₹25" — shown on the confirm button when provided. */
+  /** e.g. "₹25" - shown on the confirm button when provided. */
   priceLabel?: string;
   /** Pre-selected tool ids (e.g. the tool that triggered the upsell). */
   initialSelection?: string[];
@@ -50,7 +50,7 @@ const modalStyle: React.CSSProperties = {
 
 /**
  * Pre-purchase tool selector for tool-scoped passes. The buyer must pick
- * exactly `requiredCount` tools before checkout opens — the selection becomes
+ * exactly `requiredCount` tools before checkout opens - the selection becomes
  * the pass's server-validated scope (order notes), so an unscoped purchase
  * can never reach Razorpay.
  */
@@ -153,7 +153,7 @@ export default function ToolPickerModal({
             </button>
           </div>
           <p style={{ margin: '0.35rem 0 0.75rem', opacity: 0.7, fontSize: '0.85rem' }}>
-            Your pass only works on the tools you pick — choose the ones you use most.
+            Your pass only works on the tools you pick - choose the ones you use most.
           </p>
           <input
             ref={searchRef}
@@ -286,7 +286,7 @@ export default function ToolPickerModal({
                 fontWeight: 600,
               }}
             >
-              {priceLabel ? `Continue to pay — ${priceLabel}` : 'Continue to pay'}
+              {priceLabel ? `Continue to pay - ${priceLabel}` : 'Continue to pay'}
             </button>
           </div>
         </div>

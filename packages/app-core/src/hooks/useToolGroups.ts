@@ -55,7 +55,7 @@ function loadGuestGroups(): ToolGroupView[] {
   }
 }
 
-/** null = entry written before owner tagging — treated as adoptable, same as 'guest'. */
+/** null = entry written before owner tagging - treated as adoptable, same as 'guest'. */
 function loadGuestGroupsOwner(): string | null {
   try {
     return localStorage.getItem(GUEST_GROUPS_OWNER_KEY);
@@ -100,7 +100,7 @@ function serverToView(data: ServerGroups): ToolGroupView[] {
 
 /**
  * Custom tool groups: user-created named groups of tools, shown as pinned
- * sections in the tool panel. Replaced personas (2026-07-14) — the onboarding
+ * sections in the tool panel. Replaced personas (2026-07-14) - the onboarding
  * starter-kit pick just calls createGroup.
  *
  * Signed-in users persist via /user/tool-groups; guests persist to
@@ -129,7 +129,7 @@ export default function useToolGroups(): ToolGroupsContextValue {
   // a slow server response would re-POST the same groups.
   const adoptionStarted = useRef(false);
 
-  // Hydration is deliberately its own effect keyed on the query data — the
+  // Hydration is deliberately its own effect keyed on the query data - the
   // same self-contained pattern usePersona settled on after the P2-TC-22
   // ordering race (a shared one-shot hydration guard re-showed onboarding
   // for already-onboarded users).
@@ -139,7 +139,7 @@ export default function useToolGroups(): ToolGroupsContextValue {
     if (serverGroups.length > 0) {
       // Adoption just swapped local- ids for server UUIDs (create is by-name,
       // so name is the join key). Broadcast the mapping before overwriting the
-      // mirror — sidebar chips referencing these groups remap instead of
+      // mirror - sidebar chips referencing these groups remap instead of
       // dangling (useSidebarChips listens).
       const idMap: Record<string, string> = {};
       for (const local of loadGuestGroups()) {
@@ -179,7 +179,7 @@ export default function useToolGroups(): ToolGroupsContextValue {
       }
     } else {
       clearGuestGroups();
-      // Only clear state that came from the foreign copy — never groups the
+      // Only clear state that came from the foreign copy - never groups the
       // user just actively created (createGroup may have run in between).
       const storedJson = JSON.stringify(stored);
       setGroups((prev) => (JSON.stringify(prev) === storedJson ? [] : prev));
@@ -205,7 +205,7 @@ export default function useToolGroups(): ToolGroupsContextValue {
       const trimmed = name.trim();
       if (!trimmed) return;
       // Generated OUTSIDE the updater: StrictMode re-invokes updaters, and an
-      // id minted inside produced two different ids — state kept one while the
+      // id minted inside produced two different ids - state kept one while the
       // localStorage mirror kept the other, so anything referencing the group
       // by id (sidebar chips) dangled after reload.
       const newId = newLocalId();
@@ -361,7 +361,7 @@ export default function useToolGroups(): ToolGroupsContextValue {
   return {
     groups,
     // Guests are ready immediately; signed-in users once the server list has
-    // settled (either way) — gating UI must not act on a half-hydrated state.
+    // settled (either way) - gating UI must not act on a half-hydrated state.
     ready: !isAuthenticated || !isLoading,
     createGroup,
     renameGroup,

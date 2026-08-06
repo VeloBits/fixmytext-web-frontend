@@ -1,4 +1,4 @@
-// @velobits/app-core — shared runtime foundation for the FixMyText micro-frontends.
+// @velobits/app-core - shared runtime foundation for the FixMyText micro-frontends.
 //
 // Holds the Redux/RTK-Query store, OIDC auth runtime, domain constants, shared
 // data hooks, utilities, and the host<->remote contract types.

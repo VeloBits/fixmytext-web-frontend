@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'FixMyText — Free Online Text Tools',
+    default: 'FixMyText - Free Online Text Tools',
     template: '%s | FixMyText',
   },
   description:
@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       {/* The share viewer's theme-init script adds `dark` to <body> before
-          hydration (see app/share/[id]/layout.tsx) — suppress the resulting
+          hydration (see app/share/[id]/layout.tsx) - suppress the resulting
           className mismatch warning. */}
       <body suppressHydrationWarning>{children}</body>
     </html>

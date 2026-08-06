@@ -138,7 +138,7 @@ export function getVisitorId() {
 }
 
 /**
- * Reset internal state — test-only helper for module isolation.
+ * Reset internal state - test-only helper for module isolation.
  * @internal
  */
 export function _resetForTest() {

@@ -1,15 +1,15 @@
-# fixmytext-frontend — unified compose for all microfrontends.
+# fixmytext-frontend - unified compose for all microfrontends.
 #
 # Profiles:
-#   dev  — Vite dev servers + next dev (hot reload, volume-mounted source)
-#   prod — Built nginx containers + wrangler pages dev (Cloudflare simulation)
+#   dev  - Vite dev servers + next dev (hot reload, volume-mounted source)
+#   prod - Built nginx containers + wrangler pages dev (Cloudflare simulation)
 #
 # Usage:
 #   docker compose --profile dev up --build
 #   docker compose --profile prod up --build
 
 services:
-  # ── Router — dev ──────────────────────────────────────────────────────────────
+  # ── Router - dev ──────────────────────────────────────────────────────────────
   router:
     profiles: ['dev']
     build:
@@ -19,14 +19,14 @@ services:
         NGINX_CONF: docker/nginx.router.dev.conf
     container_name: fixmytext-router
     ports:
-      - '3000:80'
+      - '3100:80'
     depends_on:
       - shell-dev
       - editor-remote-dev
       - analytics-remote-dev
     restart: unless-stopped
 
-  # ── Router — prod ─────────────────────────────────────────────────────────────
+  # ── Router - prod ─────────────────────────────────────────────────────────────
   router-prod:
     profiles: ['prod']
     build:
@@ -36,14 +36,14 @@ services:
         NGINX_CONF: docker/nginx.router.prod.conf
     container_name: fixmytext-router-prod
     ports:
-      - '3000:80'
+      - '3100:80'
     depends_on:
       - shell-prod
       - editor-remote-prod
       - analytics-remote-prod
     restart: unless-stopped
 
-  # ── Shell — dev ────────────────────────────────────────────────────────────────
+  # ── Shell - dev ────────────────────────────────────────────────────────────────
   shell-dev:
     profiles: ['dev']
     build:
@@ -53,14 +53,15 @@ services:
         APP_WORKSPACE: '@velobits/shell'
     container_name: fixmytext-shell-dev
     ports:
-      - '3100:3100'
+      # 3104, not 3100 - the router owns 3100 on the host.
+      - '3104:3104'
     volumes:
       - .:/app
       - /app/node_modules
     env_file: .env
     restart: unless-stopped
 
-  # ── Shell — prod ───────────────────────────────────────────────────────────────
+  # ── Shell - prod ───────────────────────────────────────────────────────────────
   shell-prod:
     profiles: ['prod']
     build:
@@ -69,12 +70,12 @@ services:
       args:
         APP_WORKSPACE: '@velobits/shell'
         APP_PATH: 'apps/shell'
-        # Vite bakes these at BUILD time, so they must arrive as build args — the
+        # Vite bakes these at BUILD time, so they must arrive as build args - the
         # `env_file` below is runtime-only (nginx) and cannot reach the build stage.
-        # Defaults point at the local router (port 3000) for the prod simulation;
+        # Defaults point at the local router (port 3100) for the prod simulation;
         # override via host env / a root `.env` for a real deployment.
-        VITE_EDITOR_REMOTE_ENTRY: ${VITE_EDITOR_REMOTE_ENTRY:-http://localhost:3000/remotes/editor/remoteEntry.js}
-        VITE_ANALYTICS_REMOTE_ENTRY: ${VITE_ANALYTICS_REMOTE_ENTRY:-http://localhost:3000/remotes/analytics/remoteEntry.js}
+        VITE_EDITOR_REMOTE_ENTRY: ${VITE_EDITOR_REMOTE_ENTRY:-http://localhost:3100/remotes/editor/remoteEntry.js}
+        VITE_ANALYTICS_REMOTE_ENTRY: ${VITE_ANALYTICS_REMOTE_ENTRY:-http://localhost:3100/remotes/analytics/remoteEntry.js}
     container_name: fixmytext-shell-prod
     env_file: .env.prod
     restart: unless-stopped
@@ -84,7 +85,7 @@ services:
       timeout: 5s
       retries: 3
 
-  # ── Editor Remote — dev ────────────────────────────────────────────────────────
+  # ── Editor Remote - dev ────────────────────────────────────────────────────────
   editor-remote-dev:
     profiles: ['dev']
     build:
@@ -101,7 +102,7 @@ services:
     env_file: .env
     restart: unless-stopped
 
-  # ── Editor Remote — prod ───────────────────────────────────────────────────────
+  # ── Editor Remote - prod ───────────────────────────────────────────────────────
   editor-remote-prod:
     profiles: ['prod']
     build:
@@ -114,7 +115,7 @@ services:
     env_file: .env.prod
     restart: unless-stopped
 
-  # ── Analytics Remote — dev ─────────────────────────────────────────────────────
+  # ── Analytics Remote - dev ─────────────────────────────────────────────────────
   analytics-remote-dev:
     profiles: ['dev']
     build:
@@ -131,7 +132,7 @@ services:
     env_file: .env
     restart: unless-stopped
 
-  # ── Analytics Remote — prod ────────────────────────────────────────────────────
+  # ── Analytics Remote - prod ────────────────────────────────────────────────────
   analytics-remote-prod:
     profiles: ['prod']
     build:
@@ -144,7 +145,7 @@ services:
     env_file: .env.prod
     restart: unless-stopped
 
-  # ── Content — dev ──────────────────────────────────────────────────────────────
+  # ── Content - dev ──────────────────────────────────────────────────────────────
   content-dev:
     profiles: ['dev']
     build:
@@ -159,7 +160,7 @@ services:
     env_file: .env
     environment:
       # Server-side fetches (apps/content/lib/api.ts) run inside this container,
-      # where Kong's host-published 127.0.0.1:8000 is unreachable — talk to Kong
+      # where Kong's host-published 127.0.0.1:8000 is unreachable - talk to Kong
       # directly over the backend compose network instead. Requires the backend
       # stack to be up first (it owns the external network below).
       CONTENT_API_URL: http://kong:8000
@@ -168,7 +169,7 @@ services:
       - backend
     restart: unless-stopped
 
-  # ── Content — prod ─────────────────────────────────────────────────────────────
+  # ── Content - prod ─────────────────────────────────────────────────────────────
   content-prod:
     profiles: ['prod']
     build:
@@ -179,7 +180,7 @@ services:
     restart: unless-stopped
     healthcheck:
       # The app 307-redirects / to /app (owned by the shell via the router), so a
-      # redirect-following wget always lands on a 404 — probe with node instead
+      # redirect-following wget always lands on a 404 - probe with node instead
       # and treat any non-5xx answer as "workerd is up and serving".
       test:
         [

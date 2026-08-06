@@ -49,12 +49,12 @@ export interface SidebarChipsContextValue {
   /** The resolved row: the user's customized list, or the default four views. */
   chips: SidebarChip[];
   /** True once persistence has settled (guests immediately, signed-in after
-   * the ui-settings fetch) — chip-editing UI should wait for it. */
+   * the ui-settings fetch) - chip-editing UI should wait for it. */
   ready: boolean;
   /** True when the user has customized the row (a reset target exists). */
   isCustomized: boolean;
   addChip: (chip: SidebarChip) => void;
-  /** No-op for view:all — the escape-hatch chip is not removable. */
+  /** No-op for view:all - the escape-hatch chip is not removable. */
   removeChip: (chip: SidebarChip) => void;
   moveChip: (from: number, to: number) => void;
   /** Full replace (reorder / undo-restore). Must keep view:all present. */

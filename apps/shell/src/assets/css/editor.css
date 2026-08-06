@@ -339,6 +339,50 @@
   color: #f44747;
 }
 
+/* Toggle item (Auto Run) - the switch replaces the hint/kbd slot */
+.tu-settings-item--switch {
+  cursor: pointer;
+}
+
+.tu-switch {
+  position: relative;
+  width: 26px;
+  height: 14px;
+  border-radius: 7px;
+  background: #4d4d4d;
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: background 0.14s ease;
+}
+
+.tu-switch--on {
+  background: var(--accent, #007acc);
+}
+
+.tu-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.14s ease;
+}
+
+.tu-switch--on .tu-switch-knob {
+  transform: translateX(12px);
+}
+
+/* Helper text under a settings toggle */
+.tu-settings-help {
+  margin: 0;
+  padding: 0 14px 8px 42px;
+  font-size: 0.62rem;
+  line-height: 1.45;
+  color: #858585;
+}
+
 /* Footer */
 .tu-settings-footer {
   padding: 6px 14px;
@@ -738,7 +782,7 @@
   scrollbar-width: none;
 }
 
-/* Webkit — 1px accent scrollbar at bottom, same as INPUT underline */
+/* Webkit - 1px accent scrollbar at bottom, same as INPUT underline */
 .tu-tab-bar::-webkit-scrollbar {
   height: 1px;
 }
@@ -778,7 +822,7 @@
   background: var(--surface-2);
 }
 
-/* Icon inside tab — override sidebar icon constraints */
+/* Icon inside tab - override sidebar icon constraints */
 .tu-tab .tu-titem-icon {
   width: 16px;
   min-width: 16px;
@@ -1497,7 +1541,7 @@
 }
 
 /* Editable line rows. Match the input textarea's line-height exactly so
-   stacked rows have no extra inter-row gap — the visual spacing should
+   stacked rows have no extra inter-row gap - the visual spacing should
    match the input pane line-for-line. */
 .tu-output-row-text--editable {
   display: block;
@@ -1505,7 +1549,7 @@
   cursor: text;
 }
 
-/* Editable output — contentEditable div */
+/* Editable output - contentEditable div */
 .tu-output-editable {
   width: 100%;
   min-height: 100%;
@@ -1553,7 +1597,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   Format Panel — collapsible rich text formatting bar
+   Format Panel - collapsible rich text formatting bar
    ═══════════════════════════════════════════════════════ */
 .tu-fmt-panel {
   display: flex;
@@ -2085,6 +2129,99 @@
   border-color: var(--rose);
 }
 
+/* ── Run bar (primary action under the input) ─────── */
+.tu-run-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+
+.tu-run-bar-mode {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 0.68rem;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-run-bar-mode--auto {
+  color: var(--accent);
+}
+
+.tu-run-bar-mode svg {
+  flex-shrink: 0;
+}
+
+.tu-run-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: var(--accent, #007acc);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background var(--t),
+    opacity var(--t);
+}
+
+.tu-run-btn:hover:not(:disabled) {
+  background: #0098ff;
+}
+
+.tu-run-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 1px;
+}
+
+.tu-run-btn:disabled {
+  background: var(--surface-3, #333333);
+  color: var(--text-3);
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.tu-run-btn svg {
+  flex-shrink: 0;
+}
+
+.tu-run-btn-kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Button-local spinner: white on the accent fill, unlike .tu-spinner */
+.tu-run-btn-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: spin 0.65s linear infinite;
+}
+
 /* ── Loading indicator ────────────────────────────── */
 .tu-loading {
   display: flex;
@@ -2305,7 +2442,7 @@ body:not(.dark) .tu-output-empty {
   background: #f4f4f5;
 }
 
-/* ── Light Theme: Bottom Panel — warm tinted zone ── */
+/* ── Light Theme: Bottom Panel - warm tinted zone ── */
 body:not(.dark) .tu-bottom-panel {
   background: #e8e8ea;
   border-top: none;

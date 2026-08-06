@@ -1,5 +1,5 @@
 /**
- * useTheme — manages light/dark mode.
+ * useTheme - manages light/dark mode.
  * Syncs to DB when authenticated, falls back to localStorage.
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -9,7 +9,7 @@ import {
 } from '@velobits/app-core/store/api/userDataApi';
 import { useOidcAuth } from '@velobits/app-core/auth/useOidcAuth';
 
-/** Light or dark theme mode — mirrors ThemeContext.ThemeMode */
+/** Light or dark theme mode - mirrors ThemeContext.ThemeMode */
 type ThemeMode = 'light' | 'dark';
 
 interface ThemeContextValue {
@@ -37,7 +37,7 @@ export function useTheme(): ThemeContextValue {
   const { data: prefs } = useGetPreferencesQuery(undefined, { skip: !isAuthenticated });
   const [updatePrefs] = useUpdatePreferencesMutation();
 
-  // Hydrate from DB on first fetch — DB is authoritative for authenticated users
+  // Hydrate from DB on first fetch - DB is authoritative for authenticated users
   useEffect(() => {
     if (prefs && !hydrated.current) {
       hydrated.current = true;

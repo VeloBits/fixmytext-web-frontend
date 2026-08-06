@@ -71,7 +71,7 @@ export default function useTemplates(
   const [localTemplates, setLocalTemplates] = useState<LocalTemplate[]>(loadTemplates);
   const [templateName, setTemplateName] = useState('');
 
-  // RTK Query — DB-backed templates when authenticated
+  // RTK Query - DB-backed templates when authenticated
   const { data: dbTemplates } = useGetTemplatesQuery(undefined, { skip: !isAuthenticated });
   const [apiCreate] = useCreateTemplateMutation();
   const [apiUpdate] = useUpdateTemplateMutation();
@@ -159,7 +159,7 @@ export default function useTemplates(
     (idx: number): void => {
       const t = templates[idx];
       if (!t) return;
-      // Always open via the tool tab — either the saved tool or a fallback
+      // Always open via the tool tab - either the saved tool or a fallback
       if (openToolById) {
         openToolById(t.tool_id || null, t.text);
       } else {

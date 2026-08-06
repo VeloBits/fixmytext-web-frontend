@@ -9,7 +9,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'text-summary', 'lcov', 'json-summary'],
       reportsDirectory: './coverage',
-      // tools.ts is a static data file (254 tool definitions) — no logic to test
+      // tools.ts is a static data file (254 tool definitions) - no logic to test
       exclude: ['node_modules/', 'tests/', 'src/tools.ts'],
       thresholds: {
         lines: 100,

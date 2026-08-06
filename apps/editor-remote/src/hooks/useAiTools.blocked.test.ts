@@ -1,7 +1,7 @@
 /**
  * HTTP 402 routing in useAiTools: a server-side "daily quota exhausted"
  * response must open the pass-purchase upsell via onBlocked instead of a
- * generic error toast — and fall back to a warning toast when no onBlocked
+ * generic error toast - and fall back to a warning toast when no onBlocked
  * is wired (e.g. anonymous users).
  */
 import { renderHook, act } from '@testing-library/react';

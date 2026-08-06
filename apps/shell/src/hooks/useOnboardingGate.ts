@@ -23,7 +23,7 @@ function loadSeen(): boolean {
   }
 }
 
-/** null = flag written before owner tagging — treated as adoptable, same as 'guest'. */
+/** null = flag written before owner tagging - treated as adoptable, same as 'guest'. */
 function loadSeenOwner(): string | null {
   try {
     return sessionStorage.getItem(SEEN_OWNER_KEY);
@@ -53,7 +53,7 @@ function clearSeen(): void {
 export interface OnboardingGate {
   /** The user has answered (or dismissed) the starter-kit picker. */
   seen: boolean;
-  /** False while a signed-in user's server state is still settling — the
+  /** False while a signed-in user's server state is still settling - the
    * modal must not flash for someone who onboarded long ago elsewhere. */
   resolved: boolean;
   markSeen: () => void;
@@ -63,7 +63,7 @@ export interface OnboardingGate {
  * Gates the starter-kit onboarding modal. Shell-local on purpose: the remotes
  * never gate on onboarding, so this stays out of the federation contract.
  *
- * Having any custom tool group also counts as onboarded — groups are the
+ * Having any custom tool group also counts as onboarded - groups are the
  * modal's only output, so a user who already has some needs no pitch.
  */
 export default function useOnboardingGate(toolGroups: ToolGroupsContextValue): OnboardingGate {
@@ -84,7 +84,7 @@ export default function useOnboardingGate(toolGroups: ToolGroupsContextValue): O
   // a slow response would re-PUT the adopted flag.
   const adoptionSynced = useRef(false);
 
-  // Reconciliation is its own effect keyed on the query data — the
+  // Reconciliation is its own effect keyed on the query data - the
   // self-contained pattern usePersona settled on after the P2-TC-22 ordering
   // race (a shared hydration guard re-showed onboarding for onboarded users).
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function useOnboardingGate(toolGroups: ToolGroupsContextValue): O
       return;
     }
     // Server says unseen. A tab flag set as a guest (or by this same account)
-    // is adopted and synced up — the user just answered the picker, don't ask
+    // is adopted and synced up - the user just answered the picker, don't ask
     // again. One left behind by a DIFFERENT account is not ours: drop it so
     // this user gets their own onboarding.
     if (!loadSeen()) return;
@@ -127,7 +127,7 @@ export default function useOnboardingGate(toolGroups: ToolGroupsContextValue): O
     }
   }, [isAuthenticated, userSub, updateUiSettings]);
 
-  // A failed ui-settings fetch still resolves (falling back to the tab flag) —
+  // A failed ui-settings fetch still resolves (falling back to the tab flag) -
   // a flaky endpoint must not permanently block the modal or the app.
   const settingsSettled = !isAuthenticated || !!uiSettings || settingsFailed;
 

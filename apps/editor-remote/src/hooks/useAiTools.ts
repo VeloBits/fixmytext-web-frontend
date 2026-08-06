@@ -56,7 +56,7 @@ function formatToolError(err: ToolError, fallback: string): ErrorResult {
           ? (detail as { message?: string }).message
           : undefined;
     return {
-      message: msg402 || 'Daily free limit reached — sign in for more free uses, or get a pass.',
+      message: msg402 || 'Daily free limit reached - sign in for more free uses, or get a pass.',
       tone: 'warning',
     };
   }
@@ -269,7 +269,7 @@ const AI_TOOL_DEFINITIONS: AiToolDefinition[] = [
     errorMsg: 'Could not expand outline.',
     toolId: 'outline_to_draft',
   },
-  // NOTE: handleContinueWriting is implemented manually below — it splits the
+  // NOTE: handleContinueWriting is implemented manually below - it splits the
   // input into paragraphs and continues each independently so a multi-paragraph
   // input doesn't collapse to a single continuation of only the last paragraph.
   {
@@ -518,7 +518,7 @@ export default function useAiTools(
     | ((label: string, orig: string, result: string, meta: Record<string, string>) => void)
     | undefined,
   /** Called instead of a toast when a tool API returns HTTP 402 (server-side
-   * daily quota exhausted) — the caller opens the pass-purchase upsell. */
+   * daily quota exhausted) - the caller opens the pass-purchase upsell. */
   onBlocked?: (toolId: string) => void
 ) {
   const { isAuthenticated } = useOidcAuth();
@@ -540,7 +540,7 @@ export default function useAiTools(
   const [transformText] = useTransformTextMutation();
 
   // Whitespace-only input is not runnable (backend rejects it with 422 and it
-  // must never burn a use). Prompt only when something was typed — fully-empty
+  // must never burn a use). Prompt only when something was typed - fully-empty
   // input keeps the silent no-op so auto-run paths stay quiet.
   const guardText = useCallback((): boolean => {
     if (text.trim()) return true;
@@ -577,7 +577,7 @@ export default function useAiTools(
    */
   // TODO(partial-impl): all AI tools use the non-streaming transformText mutation. The
   // backend exposes POST /api/v1/ai/{tool_id}/stream (SSE) and the OpenAPI types include
-  // it, but there is no streaming caller here — long AI calls block until complete. Add a
+  // it, but there is no streaming caller here - long AI calls block until complete. Add a
   // useAiStream path + progressive output. See docs/PARTIAL_IMPLEMENTATIONS.md (#6).
   const callAi = useCallback(
     async (endpoint: string, label: string, errorMsg: string, toolId?: string): Promise<void> => {
@@ -676,7 +676,7 @@ export default function useAiTools(
    * Continue Writing splits multi-paragraph input on blank lines and continues
    * each paragraph independently. Without this, the backend AI sees the whole
    * input and only continues from the last paragraph, producing a single
-   * continuation block — the user sees output for the second paragraph only.
+   * continuation block - the user sees output for the second paragraph only.
    */
   const handleContinueWriting = async (): Promise<void> => {
     if (!guardText()) return;

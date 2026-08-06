@@ -4,7 +4,7 @@ import { API_URL, apiPost, registerVerifiedUser, razorpaySignature } from './hel
 /**
  * Purchases a pass end-to-end against the backend with PAYMENTS_BACKEND=fake.
  *
- * We do NOT drive Razorpay's hosted checkout modal — that would require live
+ * We do NOT drive Razorpay's hosted checkout modal - that would require live
  * sandbox network access. Instead, the spec exercises every backend boundary:
  *   1. UI navigation to /pricing (asserts the page renders)
  *   2. POST /passes/order  → real handler, fake create_order

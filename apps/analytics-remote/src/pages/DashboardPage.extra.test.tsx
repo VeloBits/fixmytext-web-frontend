@@ -140,7 +140,7 @@ function renderDash(props: Record<string, unknown> = {}) {
   );
 }
 
-describe('DashboardPage — payment redirects and tool stats', () => {
+describe('DashboardPage - payment redirects and tool stats', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     searchParamsValue = new URLSearchParams();

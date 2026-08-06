@@ -1,7 +1,7 @@
 /* Import VeloBits design tokens (Tailwind v4 @theme from design-system package) */
 @import '@velobits/design-system/theme.css';
 
-/* VSCode Dark+ theme variables — applied at body level to match the Vite app */
+/* VSCode Dark+ theme variables - applied at body level to match the Vite app */
 body {
   --bg: #f8f8f8;
   --bg2: #eaeaeb;

@@ -11,7 +11,7 @@ interface HistorySectionProps {
  * Shows the session timeline and the tool discovery grid. Session ops and
  * discovery were tracked by the removed gamification state, so with no
  * producer left the timeline shows its empty state and the discovery grid
- * renders fully locked — identical to the previous kill-switch-off behavior.
+ * renders fully locked - identical to the previous kill-switch-off behavior.
  */
 export default function HistorySection({ recentOps = [] }: HistorySectionProps) {
   return (

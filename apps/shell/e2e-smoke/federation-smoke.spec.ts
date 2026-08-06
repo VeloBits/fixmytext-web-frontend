@@ -1,25 +1,25 @@
 import { test, expect, type Response } from '@playwright/test';
 
 /**
- * Hermetic Module Federation smoke test — the PR gate for the host↔remote contract.
+ * Hermetic Module Federation smoke test - the PR gate for the host↔remote contract.
  *
  * Unlike the specs in ../e2e (which need a deployed backend + Keycloak), this runs
- * against the local prod compose stack (router on :3000) with the backend + Keycloak
+ * against the local prod compose stack (router on :3100) with the backend + Keycloak
  * MOCKED at the network layer. It exercises exactly the gaps Phase 6.1/6.2 fixed:
  *
  *   1. Each remote's `remoteEntry.js` is reachable under its `/remotes/<name>/` prefix
  *      and returned as JS (proves the remote `base` is baked in and the router serves it).
  *   2. The shell actually mounts the editor remote at `/` (proves the shell's baked
- *      VITE_*_REMOTE_ENTRY URL resolves and the @velobits/app-core store singleton boots —
+ *      VITE_*_REMOTE_ENTRY URL resolves and the @velobits/app-core store singleton boots -
  *      the editor uses RTK Query hooks, which throw on mount if the store isn't shared).
  *
- * It does NOT assert data flow (that needs a real backend — see e2e.yml).
+ * It does NOT assert data flow (that needs a real backend - see e2e.yml).
  */
 
 const REMOTE_ENTRIES = ['/remotes/editor/remoteEntry.js', '/remotes/analytics/remoteEntry.js'];
 
 // Stub the backend + Keycloak so the public home route boots deterministically without
-// a real API. Home is not auth-gated, so OIDC silent-renew failing is fine — but we mock
+// a real API. Home is not auth-gated, so OIDC silent-renew failing is fine - but we mock
 // it to keep the run quiet and fast.
 async function stubBackend(page: import('@playwright/test').Page) {
   await page.route('**/api/v1/**', (route) =>

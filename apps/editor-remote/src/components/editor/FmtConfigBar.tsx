@@ -244,7 +244,7 @@ export default function FmtConfigBar({ toolId, fmtCfg, setFmtCfg }: FmtConfigBar
         </div>
       )}
 
-      {/* Presets — JS/TS only */}
+      {/* Presets - JS/TS only */}
       {hasPresets && (
         <>
           <span className="tu-fmtbar-sep" />

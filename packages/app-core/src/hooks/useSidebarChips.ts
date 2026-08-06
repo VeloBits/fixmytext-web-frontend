@@ -96,7 +96,7 @@ type UiSettingsData = { sidebar_chips?: SidebarChip[] } | undefined;
  * first login (server-wins when the account already customized).
  *
  * Takes the toolGroups context so custom_group chips can be pruned when their
- * group disappears (delete cascade) — pass the same instance AppProvider owns.
+ * group disappears (delete cascade) - pass the same instance AppProvider owns.
  */
 export default function useSidebarChips(
   toolGroups: Pick<ToolGroupsContextValue, 'groups' | 'ready'>
@@ -130,7 +130,7 @@ export default function useSidebarChips(
     [isAuthenticated, owner, apiUpdateUiSettings]
   );
 
-  // Hydration — self-contained, keyed on the query data (the useToolGroups
+  // Hydration - self-contained, keyed on the query data (the useToolGroups
   // pattern from the P2-TC-22 ordering race).
   useEffect(() => {
     if (!isAuthenticated || !uiSettings) return;
@@ -164,7 +164,7 @@ export default function useSidebarChips(
   }, [isAuthenticated, uiSettings, userSub, apiUpdateUiSettings]);
 
   // Just-remapped ids are exempt from pruning until their server group shows
-  // up in the groups list — the remap and the groups update land in separate
+  // up in the groups list - the remap and the groups update land in separate
   // renders in some flows, and the prune effect must not win that race.
   const remapGraceRef = useRef<Set<string>>(new Set());
 
@@ -204,11 +204,11 @@ export default function useSidebarChips(
 
   // Delete cascade: a custom_group chip whose group no longer exists (deleted
   // here, on another device, or left behind by adoption) silently disappears.
-  // Runs only when both sides have settled — never against half-hydrated state.
+  // Runs only when both sides have settled - never against half-hydrated state.
   useEffect(() => {
     if (!ready || !toolGroups.ready || custom === null) return;
     const alive = new Set(toolGroups.groups.map((g) => g.id));
-    // A graced id has arrived — it no longer needs protection.
+    // A graced id has arrived - it no longer needs protection.
     for (const id of [...remapGraceRef.current]) {
       if (alive.has(id)) remapGraceRef.current.delete(id);
     }

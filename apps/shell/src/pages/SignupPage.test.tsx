@@ -30,7 +30,7 @@ describe('SignupPage', () => {
     render(<SignupPage />);
     expect(mockSigninRedirect).toHaveBeenCalledTimes(1);
     // signupUserManager targets Keycloak's /registrations endpoint, so the
-    // call takes no args (no prompt=create — that param is ignored by Keycloak).
+    // call takes no args (no prompt=create - that param is ignored by Keycloak).
     expect(mockSigninRedirect).toHaveBeenCalledWith();
     expect(screen.getByTestId('page-skeleton')).toBeInTheDocument();
   });

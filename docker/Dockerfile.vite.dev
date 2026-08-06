@@ -1,5 +1,5 @@
 # Development image for Vite apps (shell, editor-remote, analytics-remote).
-# Source is mounted as a volume — Vite hot-reloads on change.
+# Source is mounted as a volume - Vite hot-reloads on change.
 
 FROM node:24-alpine
 
@@ -12,8 +12,8 @@ RUN npm install --loglevel=error
 
 ENV APP_WORKSPACE=$APP_WORKSPACE
 
-EXPOSE 3100
 EXPOSE 3101
 EXPOSE 3102
+EXPOSE 3104
 
 CMD sh -c "npm run dev -w ${APP_WORKSPACE}"

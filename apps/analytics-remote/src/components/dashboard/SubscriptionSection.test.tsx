@@ -256,7 +256,7 @@ describe('SubscriptionSection', () => {
   });
 });
 
-describe('SubscriptionSection — active passes & credit breakdown', () => {
+describe('SubscriptionSection - active passes & credit breakdown', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

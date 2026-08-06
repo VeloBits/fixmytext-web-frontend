@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // Auth was migrated to Keycloak (PKCE auth-code flow, hosted login/registration
 // pages). The shell's /signup and /login routes no longer render a local
-// form — they immediately call userManager.signinRedirect(), so the browser ends
+// form - they immediately call userManager.signinRedirect(), so the browser ends
 // up on Keycloak's hosted page. The previous version of this spec filled a local
 // #displayName/#email/#password form that no longer exists.
 
@@ -25,7 +25,7 @@ test('signup redirects to the Keycloak hosted registration/login page', async ({
 // entirely inside Keycloak (account creation, email verification action, and
 // credential entry are all Keycloak-owned). Exercising it from Playwright
 // requires a seeded test realm with a deterministic user + an email sink to
-// capture the verification link — neither is wired up in this environment yet.
+// capture the verification link - neither is wired up in this environment yet.
 // Skipped (not deleted) so the intent is preserved once a test realm exists.
 // See backend/docs/TECH_DEBT_ROADMAP.md for the Keycloak test-realm follow-up.
 test.skip('full signup → verify email → login journey (needs a test Keycloak realm)', async () => {

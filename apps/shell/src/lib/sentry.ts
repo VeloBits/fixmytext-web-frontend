@@ -41,7 +41,7 @@ export function initSentry(): void {
           }),
         ];
       }
-      // autoSessionTracking was removed in Sentry v9 — dropping the BrowserSession
+      // autoSessionTracking was removed in Sentry v9 - dropping the BrowserSession
       // default integration keeps session tracking production-only.
       return defaultIntegrations.filter((i) => i.name !== 'BrowserSession');
     },

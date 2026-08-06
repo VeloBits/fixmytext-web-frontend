@@ -2,8 +2,8 @@
 #
 # These Playwright suites validate the host<->remote Module Federation contract
 # and full user journeys (signup, tools, purchase, share, cross-app navigation).
-# They run against a DEPLOYED environment — the shell config has no webServer and
-# the specs hit a real backend + Keycloak — so this is intentionally NOT a blocking
+# They run against a DEPLOYED environment - the shell config has no webServer and
+# the specs hit a real backend + Keycloak - so this is intentionally NOT a blocking
 # PR gate. Trigger it manually after deploying, or point E2E_FRONTEND_URL at any
 # running stack (e.g. a `docker compose --profile prod` host).
 name: E2E (on-demand)

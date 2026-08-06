@@ -17,7 +17,7 @@ cd backend
 .venv/bin/python scripts/dump_openapi.py openapi.json
 
 # 2. Regenerate + format the TS types from it (from the frontend repo root)
-cd ../frontend
+cd ../FixMyText-frontend
 npm run gen:types
 
 # 3. Commit backend/openapi.json and

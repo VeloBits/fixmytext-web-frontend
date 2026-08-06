@@ -343,7 +343,7 @@ describe('useHashTools', () => {
       const { result } = renderHook(() => useHashTools(deps));
 
       // Call every handler. Goal is function body coverage; some mocks may route
-      // to the catch path (showAlert 'danger') rather than success — that's fine.
+      // to the catch path (showAlert 'danger') rather than success - that's fine.
       for (const handlerName of REMAINING_HANDLERS) {
         await (result.current as Record<string, () => Promise<void>>)[handlerName]!();
       }
@@ -368,7 +368,7 @@ describe('useHashTools', () => {
     });
   });
 
-  // ── Multi-line input — covers the map callback branch ────────────────────
+  // ── Multi-line input - covers the map callback branch ────────────────────
 
   describe('multi-line input handling', () => {
     it('hashes each line separately and joins with newline', async () => {
