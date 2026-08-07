@@ -268,5 +268,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Gates on high/critical advisories, minus the reviewed, dated exceptions in
+      # scripts/audit-allowlist.json. See that file for why each one is accepted.
       - name: Audit for vulnerabilities
-        run: npm audit --audit-level=high
+        run: node scripts/audit-allowlist.mjs
