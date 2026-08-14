@@ -2,38 +2,61 @@ name = "fixmytext-router"
 main = "src/index.ts"
 compatibility_date = "2024-09-23"
 
-# Uncomment and configure for production deployment:
-# [[routes]]
-# pattern = "fixmytext.com/*"
-# zone_name = "fixmytext.com"
+# ── Public origin (production) ───────────────────────────────────────────────
+# Workers Custom Domain on the velobits.dev zone. `custom_domain = true` makes
+# wrangler create the proxied DNS record AND bind the hostname to this worker on
+# every deploy - there is no manual DNS step. In exchange the CI API token needs
+# Zone → DNS → Edit and Zone → Workers Routes → Edit on velobits.dev (on top of
+# the Workers Scripts / Pages permissions).
+#
+# A Custom Domain claims the WHOLE hostname (all paths) - exactly right here:
+# the router is the single entry point and forwards to the units below. The
+# pattern must be a bare hostname (no path, no wildcard).
+[[routes]]
+pattern = "fixmytext.velobits.dev"
+custom_domain = true
 
+# Internal fetch targets stay on *.pages.dev: they are invisible to users, and a
+# same-zone Worker→Pages subrequest is the one hop we don't want to bet the
+# origin on. Each Pages project ALSO carries a fixmytext-*.velobits.dev custom
+# domain for direct/branded access - swap these vars over once you've confirmed
+# those hostnames serve correctly.
 [vars]
 SHELL_PAGES_URL     = "https://fixmytext-shell.pages.dev"
 EDITOR_PAGES_URL    = "https://fixmytext-editor-remote.pages.dev"
 ANALYTICS_PAGES_URL = "https://fixmytext-analytics-remote.pages.dev"
-CONTENT_URL         = "https://fixmytext-content.velobits.workers.dev"
+CONTENT_URL         = "https://fixmytext-content.velobits.dev"
 
 # Same-account worker→worker fetches over workers.dev never reach the target
 # (Cloudflare serves its placeholder 404 instead) - the content app must be
 # reached via a service binding. CONTENT_URL is only used by the local-dev
-# plain-fetch fallback (the binding forwards the original request untouched).
+# plain-fetch fallback (the binding forwards the original request untouched);
+# it points at the content worker's custom domain, which - unlike workers.dev -
+# is a valid cross-worker fetch target.
 [[services]]
 binding = "CONTENT"
 service = "fixmytext-content"
 
 # ── Develop environment ──────────────────────────────────────────────────────
 # Deployed by CI from the `develop` branch (wrangler deploy --env develop) as a
-# separate worker: develop-fixmytext-router.<account-subdomain>.workers.dev.
-# URLs point at the Pages *branch aliases* created by `pages deploy --branch develop`.
-# Env blocks do not inherit top-level [vars] - every var must be redeclared here.
+# separate worker on its own custom domain, develop-fixmytext.velobits.dev.
+# Every unit is a SEPARATE Cloudflare project in this environment (develop-*),
+# so the URLs below are that project's bare production hostname - not a
+# `develop.<project>.pages.dev` branch alias.
+# Env blocks do not inherit top-level config - routes, vars and services are
+# all redeclared here.
 [env.develop]
 name = "develop-fixmytext-router"
 
+[[env.develop.routes]]
+pattern = "develop-fixmytext.velobits.dev"
+custom_domain = true
+
 [env.develop.vars]
-SHELL_PAGES_URL     = "https://develop.fixmytext-shell.pages.dev"
-EDITOR_PAGES_URL    = "https://develop.fixmytext-editor-remote.pages.dev"
-ANALYTICS_PAGES_URL = "https://develop.fixmytext-analytics-remote.pages.dev"
-CONTENT_URL         = "https://develop-fixmytext-content.velobits.workers.dev"
+SHELL_PAGES_URL     = "https://develop-fixmytext-shell.pages.dev"
+EDITOR_PAGES_URL    = "https://develop-fixmytext-editor-remote.pages.dev"
+ANALYTICS_PAGES_URL = "https://develop-fixmytext-analytics-remote.pages.dev"
+CONTENT_URL         = "https://develop-fixmytext-content.velobits.dev"
 
 [[env.develop.services]]
 binding = "CONTENT"
