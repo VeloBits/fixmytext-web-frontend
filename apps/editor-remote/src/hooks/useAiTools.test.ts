@@ -131,7 +131,7 @@ describe('useAiTools', () => {
     mockTransformText.mockReturnValue({ unwrap: () => Promise.resolve({ result: 'output' }) });
   });
 
-  // Dynamic handlers (handleHashtags etc.) are spread from a Record — cast for test access
+  // Dynamic handlers (handleHashtags etc.) are spread from a Record - cast for test access
   type AiToolsWithDynamic = ReturnType<typeof useAiTools> & Record<string, () => Promise<void>>;
 
   const renderAiTools = (text = 'hello world') =>
@@ -1279,7 +1279,7 @@ describe('useAiTools', () => {
     await act(async () => {
       await (result.current as AiToolsWithDynamic).handleHashtags!();
     });
-    // Two calls — one per non-empty token
+    // Two calls - one per non-empty token
     expect(mockTransformText).toHaveBeenCalledTimes(2);
     expect(showAlert).toHaveBeenCalledWith(
       expect.stringContaining('generated for 2 lines'),
@@ -1316,7 +1316,7 @@ describe('useAiTools', () => {
   it('handleCurlToCode shows danger on unexpected error', async () => {
     // Force an error by mocking showAlert to throw the second time, then checking the catch block
     // Better: provide text that triggers the try but then causes an error inside
-    // Actually the function catches errors from within — let's test the catch by making text that
+    // Actually the function catches errors from within - let's test the catch by making text that
     // causes convertOne to throw (edge: mock JSON.stringify to throw on headers)
     const original = JSON.stringify;
     JSON.stringify = () => {
@@ -1330,7 +1330,7 @@ describe('useAiTools', () => {
       await result.current.handleCurlToCode('javascript');
     });
     JSON.stringify = original;
-    // Either success or error depending on engine — just verify no crash
+    // Either success or error depending on engine - just verify no crash
     expect(typeof result.current.aiResult === 'object' || showAlert.mock.calls.length > 0).toBe(
       true
     );

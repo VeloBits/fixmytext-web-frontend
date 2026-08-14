@@ -4,7 +4,7 @@
 // URL builders (the shell's ForgotPasswordPage) read from here. Keeping one
 // copy avoids the class of bug where userManager pointed at
 // Velobits/develop-fixmytext while another URL builder defaulted to a
-// stale localhost:8080/fixmytext realm — silently breaking password reset
+// stale localhost:8080/fixmytext realm - silently breaking password reset
 // (and any other direct Keycloak link) whenever a VITE_KEYCLOAK_* var was
 // unset.
 //

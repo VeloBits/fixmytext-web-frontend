@@ -135,7 +135,7 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
             <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
             <span className="w-3 h-3 rounded-full bg-[#28C840]" />
             <span className="flex-1 text-center text-xs text-[var(--text-3)] truncate">
-              output.txt — {share.tool_label}
+              output.txt - {share.tool_label}
             </span>
             <button
               onClick={handleCopy}
@@ -185,7 +185,7 @@ export default function ShareClient({ share, tool, editorUrl }: Props) {
 
         {/* Footer CTA */}
         <div className="mt-6 text-center text-sm text-[var(--text-3)]">
-          Transform your text with 254+ tools —{' '}
+          Transform your text with 254+ tools -{' '}
           <a href={editorUrl} className="text-[var(--accent)] hover:underline font-medium">
             Get started free →
           </a>

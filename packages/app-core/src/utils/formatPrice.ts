@@ -2,10 +2,10 @@ type SupportedCurrency = 'inr' | 'usd' | 'gbp' | 'eur';
 
 /**
  * Format a price in smallest currency unit (paise/cents) for display.
- * @param price    — amount in smallest unit (e.g. 1000 = ₹10 or $10.00)
- * @param currency — 'inr', 'usd', 'gbp', 'eur'
- * @param symbol   — '₹', '$', '£', '€'
- * @param decimals — override decimal places (INR auto-detects)
+ * @param price    - amount in smallest unit (e.g. 1000 = ₹10 or $10.00)
+ * @param currency - 'inr', 'usd', 'gbp', 'eur'
+ * @param symbol   - '₹', '$', '£', '€'
+ * @param decimals - override decimal places (INR auto-detects)
  */
 export function formatPrice(
   price: number,

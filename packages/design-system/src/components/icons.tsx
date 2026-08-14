@@ -1,14 +1,14 @@
 import type { ReactNode, SVGProps } from 'react';
 
 export interface IconProps extends SVGProps<SVGSVGElement> {
-  /** Width and height in px — icons are square. */
+  /** Width and height in px - icons are square. */
   size?: number | string;
 }
 
 /**
  * Stroke-based icon set (Feather/Lucide-style, 24×24 grid, currentColor).
  * Replaces emoji glyphs so icons render consistently across platforms and
- * inherit text color. Icons are decorative by default (aria-hidden) — pass
+ * inherit text color. Icons are decorative by default (aria-hidden) - pass
  * `aria-hidden={undefined}` plus an `aria-label` for semantic use.
  */
 function createIcon(displayName: string, children: ReactNode) {

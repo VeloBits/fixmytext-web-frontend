@@ -22,7 +22,7 @@ interface LinePosition {
  * sized identically to the textarea to measure where each paragraph begins,
  * which is the only way to get correct positions when text wraps.
  *
- * The textarea itself is unchanged — this component only handles gutter
+ * The textarea itself is unchanged - this component only handles gutter
  * rendering and scroll syncing.
  */
 export default function ParagraphGutter({ textareaRef, text, scrollTop }: ParagraphGutterProps) {
@@ -38,7 +38,7 @@ export default function ParagraphGutter({ textareaRef, text, scrollTop }: Paragr
     const mirror = mirrorRef.current;
     if (!ta || !mirror) return;
 
-    // Mirror styling — copy width and text-formatting properties from the
+    // Mirror styling - copy width and text-formatting properties from the
     // live textarea so wrapping math matches exactly.
     const cs = window.getComputedStyle(ta);
     mirror.style.width = ta.clientWidth + 'px';
@@ -86,7 +86,7 @@ export default function ParagraphGutter({ textareaRef, text, scrollTop }: Paragr
     if (!ta) return;
     const ro = new ResizeObserver(() => {
       // Trigger re-render by toggling a state that the layout effect depends
-      // on. We can't depend on `text` only — width changes alone need a
+      // on. We can't depend on `text` only - width changes alone need a
       // re-measure. Cheapest: use a microtask to nudge React state.
       setPositions((p) => [...p]);
     });
@@ -96,7 +96,7 @@ export default function ParagraphGutter({ textareaRef, text, scrollTop }: Paragr
 
   return (
     <div className="tu-paragraph-gutter">
-      {/* Hidden mirror — rendered offscreen for measurement only */}
+      {/* Hidden mirror - rendered offscreen for measurement only */}
       <div ref={mirrorRef} className="tu-paragraph-gutter-mirror" aria-hidden="true" />
       {/* Visible numbers, absolutely positioned at each paragraph's measured top */}
       <div className="tu-paragraph-gutter-numbers">

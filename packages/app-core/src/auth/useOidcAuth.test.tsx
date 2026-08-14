@@ -73,7 +73,7 @@ describe('useOidcAuth', () => {
 
     expect(callOrder).toEqual(['clearSession', 'signoutRedirect']);
     expect(mockClearSession).toHaveBeenCalledTimes(1);
-    // Logged-out app home (origin root), NOT /login — the login page
+    // Logged-out app home (origin root), NOT /login - the login page
     // auto-redirects straight back to Keycloak, stranding the just-signed-out
     // user there.
     expect(mockSignoutRedirect).toHaveBeenCalledWith(
@@ -86,7 +86,7 @@ describe('useOidcAuth', () => {
   it('logout passes the captured id_token as id_token_hint', async () => {
     // The 'user_signed_out' broadcast in logout() is also delivered to this
     // tab's channel listener, whose removeUser() can win the race against
-    // signoutRedirect's internal user lookup — so logout must capture the
+    // signoutRedirect's internal user lookup - so logout must capture the
     // id_token up front and pass it explicitly.
     vi.mocked(userManager.getUser).mockResolvedValueOnce({
       id_token: 'test-id-token',
@@ -115,7 +115,7 @@ describe('useOidcAuth', () => {
     const { result } = renderHook(() => useOidcAuth());
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    // Should not throw — the await rejects internally but the test asserts
+    // Should not throw - the await rejects internally but the test asserts
     // the user-facing logout still completes by checking signoutRedirect ran.
     await act(async () => {
       try {

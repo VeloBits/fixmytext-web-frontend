@@ -174,7 +174,7 @@ vi.mock('./pages/ForgotPasswordPage', () => ({
   default: () => React.createElement('div', { 'data-testid': 'forgot-password-page' }),
 }));
 // ResetPasswordPage and VerifyEmailPage are not in the router (Keycloak handles these flows).
-// Mocks omitted — no routes exist to test.
+// Mocks omitted - no routes exist to test.
 // DashboardPage lives in analytics-remote now; its route renders analytics-remote/AnalyticsPage
 // (resolved via the vitest alias), so no ./pages/DashboardPage mock is needed.
 vi.mock('./pages/PricingPage', () => ({
@@ -275,7 +275,7 @@ describe('App', () => {
 
   it('handles rtk-api-error event without crashing', () => {
     render(<App />);
-    // Dispatch a global rtk-api-error event — the useEffect handler should process it
+    // Dispatch a global rtk-api-error event - the useEffect handler should process it
     window.dispatchEvent(
       new CustomEvent('rtk-api-error', { detail: { message: 'Server error', type: 'danger' } })
     );

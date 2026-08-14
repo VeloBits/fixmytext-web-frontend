@@ -23,7 +23,7 @@ export interface OidcAuthState {
   isLoading: boolean;
   /** A session existed in this browser before this page load (persisted,
    * non-sensitive hint). While isLoading it distinguishes "probably signed in,
-   * restore in flight" from a genuine guest — render a loading state for the
+   * restore in flight" from a genuine guest - render a loading state for the
    * former instead of logged-out chrome. */
   wasAuthenticated: boolean;
   accessToken: string | null;
@@ -42,7 +42,7 @@ export function useOidcAuth(): OidcAuthState {
   useEffect(() => {
     let cancelled = false;
     // Load the session on mount: in-memory user, else a silent renew from the
-    // Keycloak SSO cookie (H-8 — no persisted refresh token to re-hydrate from).
+    // Keycloak SSO cookie (H-8 - no persisted refresh token to re-hydrate from).
     loadUser().then((u) => {
       if (cancelled) return;
       setOidcUser(u);
@@ -105,9 +105,9 @@ export function useOidcAuth(): OidcAuthState {
     try {
       await clearSession();
     } catch {
-      // best-effort — always proceed to Keycloak SSO signout regardless
+      // best-effort - always proceed to Keycloak SSO signout regardless
     }
-    // Land on the logged-out app home, NOT /login — the login page
+    // Land on the logged-out app home, NOT /login - the login page
     // immediately re-redirects to Keycloak, which would dump a user who just
     // signed out straight onto the Keycloak sign-in form with no way back.
     // The URI must be listed in the client's post.logout.redirect.uris.

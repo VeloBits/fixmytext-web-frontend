@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   About Page — Enhanced centered layout
+   About Page - Enhanced centered layout
    ═══════════════════════════════════════════════════════ */
 
 .about-page {
@@ -18,7 +18,7 @@
   padding-right: 56px;
 }
 
-/* ── Nav — fixed top bar ──────────────────────────────── */
+/* ── Nav - fixed top bar ──────────────────────────────── */
 .about-nav {
   position: fixed;
   top: 0;
@@ -428,7 +428,7 @@
   margin: 0;
 }
 
-/* ── How it works — steps ─────────────────────────────── */
+/* ── How it works - steps ─────────────────────────────── */
 .about-steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

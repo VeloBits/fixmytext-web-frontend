@@ -80,7 +80,7 @@ export interface OpenRazorpayCheckoutParams {
 
 /**
  * Opens the Razorpay checkout modal for one-time payments (passes/credits).
- * Loads the SDK on first use; never rejects — failures go to onFailure.
+ * Loads the SDK on first use; never rejects - failures go to onFailure.
  */
 export async function openRazorpayCheckout({
   orderId,

@@ -1,7 +1,7 @@
 # Multi-stage Vite production build.
 # Build args:
-#   APP_WORKSPACE — npm workspace name, e.g. @velobits/shell
-#   APP_PATH      — path from monorepo root, e.g. apps/shell
+#   APP_WORKSPACE - npm workspace name, e.g. @velobits/shell
+#   APP_PATH      - path from monorepo root, e.g. apps/shell
 
 ARG APP_WORKSPACE=@velobits/shell
 ARG APP_PATH=apps/shell
@@ -28,7 +28,7 @@ COPY packages/tools-registry/package.json ./packages/tools-registry/
 RUN npm ci --silent
 
 # Copy all source (packages + apps/shell since remotes resolve @/ from there).
-# tsconfig.base.json is extended by every app/package tsconfig — without it
+# tsconfig.base.json is extended by every app/package tsconfig - without it
 # esbuild warns and silently falls back to default transform options.
 COPY tsconfig.base.json ./
 COPY packages/ ./packages/
@@ -61,7 +61,7 @@ RUN find /app/${APP_PATH}/dist -name "*.map" -delete
 
 # ── Stage 2: Serve ─────────────────────────────────────────────────────────────
 # nginx-unprivileged: runs as the nginx user out of the box (writable cache/pid
-# paths, listens on 8080). Plain `USER nginx` on the stock image crash-loops —
+# paths, listens on 8080). Plain `USER nginx` on the stock image crash-loops -
 # its master process needs root to create /var/cache/nginx/* and the pid file.
 FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
 

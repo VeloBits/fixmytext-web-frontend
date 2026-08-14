@@ -26,7 +26,7 @@ function renderProfile({ user, isAuthenticated = true }: RenderProfileOptions = 
   );
 }
 
-describe('ProfileSection — email verification', () => {
+describe('ProfileSection - email verification', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -121,7 +121,7 @@ describe('ProfileSection — email verification', () => {
   });
 });
 
-describe('ProfileSection — persona removal', () => {
+describe('ProfileSection - persona removal', () => {
   it('renders no persona picker (feature replaced by custom tool groups)', () => {
     renderProfile({ user: { email: 'a@b.c', display_name: 'A' } as Partial<User> });
     expect(screen.queryByText('Persona')).not.toBeInTheDocument();

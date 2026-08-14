@@ -174,7 +174,7 @@ export default function SharePage({ showAlert }: SharePageProps) {
             <span className="sh-card-dot" style={{ background: '#FF5F57' }} />
             <span className="sh-card-dot" style={{ background: '#FEBC2E' }} />
             <span className="sh-card-dot" style={{ background: '#28C840' }} />
-            <span className="sh-card-title">output.txt — {data.tool_label}</span>
+            <span className="sh-card-title">output.txt - {data.tool_label}</span>
             <button
               className={`sh-card-copy${copied ? ' sh-card-copy--done' : ''}`}
               onClick={handleCopy}
@@ -235,7 +235,7 @@ export default function SharePage({ showAlert }: SharePageProps) {
 
       {/* ── Bottom CTA strip ─── */}
       <div className="sh-footer">
-        <span className="sh-footer-text">Transform your text with 70+ tools —</span>
+        <span className="sh-footer-text">Transform your text with 70+ tools -</span>
         <a href="/" className="sh-footer-link">
           Get started free →
         </a>

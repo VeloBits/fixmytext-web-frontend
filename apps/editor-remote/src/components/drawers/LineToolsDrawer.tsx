@@ -7,7 +7,7 @@ interface PreviewResult {
   result: string;
 }
 
-// ── Debounced preview hook — fires after 3s of inactivity ───────────
+// ── Debounced preview hook - fires after 3s of inactivity ───────────
 
 function useDebouncedPreview(
   onPreview: ((result: PreviewResult | null) => void) | undefined,
@@ -306,7 +306,7 @@ export function FilterLinesDrawer({
 
   return (
     <div className="tu-fr">
-      {/* Find row — input + toggles inside field (VS Code pattern) */}
+      {/* Find row - input + toggles inside field (VS Code pattern) */}
       <div className="tu-fr-row">
         <div className="tu-fr-field tu-fr-field--has-toggles">
           <input
@@ -360,7 +360,7 @@ export function FilterLinesDrawer({
       {hasPattern && matchCount > 0 && (
         <div className="tu-fr-status">
           <CheckIcon />
-          {matchLabel} —{' '}
+          {matchLabel} -{' '}
           {mode === 'keep'
             ? `${matchCount} line${matchCount !== 1 ? 's' : ''} will be kept`
             : `${matchCount} line${matchCount !== 1 ? 's' : ''} will be removed`}
@@ -433,7 +433,7 @@ export function TruncateLinesDrawer({
       </div>
       {hasInput && overCount > 0 && (
         <div className="tu-fr-status">
-          {overCount} line{overCount !== 1 ? 's' : ''} exceed {maxLength} chars — will be cut with …
+          {overCount} line{overCount !== 1 ? 's' : ''} exceed {maxLength} chars - will be cut with …
         </div>
       )}
     </div>
@@ -515,7 +515,7 @@ export function NthLineDrawer({ onApply, onPreview, disabled, text = '' }: NthLi
       {hasInput && resultCount > 0 && (
         <div className="tu-fr-status">
           <CheckIcon />
-          Every {nVal} lines{offVal > 0 ? `, skipping first ${offVal}` : ''} — {resultCount} line
+          Every {nVal} lines{offVal > 0 ? `, skipping first ${offVal}` : ''} - {resultCount} line
           {resultCount !== 1 ? 's' : ''} selected
         </div>
       )}

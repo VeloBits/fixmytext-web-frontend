@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 /**
- * useMediaQuery — reactive CSS media query match
+ * useMediaQuery - reactive CSS media query match
  * @param query - media query string, e.g. '(max-width: 768px)'
  * @returns whether the query currently matches (false where matchMedia is unavailable, e.g. jsdom)
  */

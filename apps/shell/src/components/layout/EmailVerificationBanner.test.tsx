@@ -30,7 +30,7 @@ vi.mock('@velobits/app-core/auth/useOidcAuth', () => ({
 }));
 
 // Resend is an account-svc mutation (POST /auth/resend-verification), not a
-// Keycloak page navigation — mock the RTK hook so no store Provider is needed.
+// Keycloak page navigation - mock the RTK hook so no store Provider is needed.
 const mockResendTrigger = vi.fn();
 let mockIsResending = false;
 vi.mock('@velobits/app-core/store/api/authApi', () => ({

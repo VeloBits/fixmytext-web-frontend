@@ -86,10 +86,11 @@
     "ws": "8.21.0",
     "esbuild": "0.28.1",
     "form-data": "4.0.6",
-    "js-yaml": "^4.3.0",
+    "js-yaml": "^4.3.1",
     "sharp": "^0.35.0",
+    "undici": "7.29.0",
     "next": {
-      "postcss": "^8.5.15"
+      "postcss": "^8.5.23"
     }
   },
   "scripts": {
@@ -113,7 +114,7 @@
     "test:packages": "npm run --workspaces --if-present test",
     "test:e2e": "npm run test:e2e -w @velobits/shell",
     "test:e2e:install": "playwright install --with-deps chromium",
-    "gen:types": "openapi-typescript ../backend/openapi.json -o packages/api-client/src/types/openapi.d.ts && prettier --write packages/api-client/src/types/openapi.d.ts",
+    "gen:types": "openapi-typescript ../FixMyText-backend/openapi.json -o packages/api-client/src/types/openapi.d.ts && prettier --write packages/api-client/src/types/openapi.d.ts",
     "typecheck": "npm run --workspaces --if-present typecheck",
     "prepare": "husky",
     "deploy:shell": "npm run build:shell && npx wrangler pages deploy apps/shell/dist --project-name fixmytext-shell",

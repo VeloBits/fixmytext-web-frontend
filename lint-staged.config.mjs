@@ -4,7 +4,7 @@
  * On Windows, passing 200+ staged file paths as CLI arguments exceeds
  * MAX_COMMAND_LINE_LENGTH. Using a function lets lint-staged call the
  * task with the file list, but we ignore it and run eslint on the fixed
- * directories instead — same coverage, no length limit.
+ * directories instead - same coverage, no length limit.
  *
  * Docker-based dev environments: node_modules live in a Docker volume and are
  * not accessible on the host. When the shell container is running, delegate to

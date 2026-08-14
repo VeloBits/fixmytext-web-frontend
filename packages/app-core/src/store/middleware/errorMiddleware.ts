@@ -28,7 +28,7 @@ export const errorMiddleware: Middleware = (_api) => (next) => (action) => {
     const queryType = arg?.type;
     const endpoint = arg?.endpointName;
 
-    // Skip all mutations — they're handled at the component level
+    // Skip all mutations - they're handled at the component level
     if (queryType === 'mutation') {
       return next(action);
     }
@@ -56,7 +56,7 @@ export const errorMiddleware: Middleware = (_api) => (next) => (action) => {
     // Capture non-401 query errors in Sentry
     const status = (action.payload as RtkErrorPayload | undefined)?.status;
     if (status !== 401 && status !== undefined) {
-      Sentry.captureException(new Error(`RTK Query error: ${endpoint ?? 'unknown'} — ${status}`), {
+      Sentry.captureException(new Error(`RTK Query error: ${endpoint ?? 'unknown'} - ${status}`), {
         extra: { endpoint, status },
       });
     }

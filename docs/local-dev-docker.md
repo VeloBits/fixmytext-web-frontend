@@ -73,15 +73,15 @@ docker compose --profile dev down -v     # also remove volumes (full reset)
 
 ## URLs
 
-All traffic enters through the nginx router on port **3000**. Each path prefix is routed to a specific container — if one container is down, only its paths are affected. Other services continue to work independently.
+All traffic enters through the nginx router on port **3100**. Each path prefix is routed to a specific container — if one container is down, only its paths are affected. Other services continue to work independently.
 
 ### Which frontend serves what
 
 | URL pattern                     | Container              | Port | Framework    | What's here                                       |
 | ------------------------------- | ---------------------- | ---- | ------------ | ------------------------------------------------- |
-| `localhost:3000/`               | `shell-dev`            | 3100 | Vite + React | Editor surface (shell owns the origin root)       |
-| `localhost:3000/dashboard`      | `shell-dev`            | 3100 | Vite + React | Analytics / dashboard                             |
-| `localhost:3000/login`          | `shell-dev`            | 3100 | Vite + React | Login page                                        |
+| `localhost:3100/`               | `shell-dev`            | 3104 | Vite + React | Editor surface (shell owns the origin root)       |
+| `localhost:3100/dashboard`      | `shell-dev`            | 3104 | Vite + React | Analytics / dashboard                             |
+| `localhost:3100/login`          | `shell-dev`            | 3104 | Vite + React | Login page                                        |
 | `localhost:3101/remoteEntry.js` | `editor-remote-dev`    | 3101 | Vite + React | Editor MFE bundle (loaded by shell at runtime)    |
 | `localhost:3102/remoteEntry.js` | `analytics-remote-dev` | 3102 | Vite + React | Analytics MFE bundle (loaded by shell at runtime) |
 
@@ -95,23 +95,23 @@ Hit these to isolate a specific service without going through nginx — useful w
 
 | Direct URL              | Container              | Same as via router                  |
 | ----------------------- | ---------------------- | ----------------------------------- |
-| `http://localhost:3100` | `shell-dev`            | `localhost:3000/`                   |
-| `http://localhost:3101` | `editor-remote-dev`    | `localhost:3000/remotes/editor/`    |
-| `http://localhost:3102` | `analytics-remote-dev` | `localhost:3000/remotes/analytics/` |
+| `http://localhost:3104` | `shell-dev`            | `localhost:3100/`                   |
+| `http://localhost:3101` | `editor-remote-dev`    | `localhost:3100/remotes/editor/`    |
+| `http://localhost:3102` | `analytics-remote-dev` | `localhost:3100/remotes/analytics/` |
 | `http://localhost:3103` | `content-dev`          | — (not routed)                      |
 
-> **Note:** When hitting direct ports, the shell still tries to load remotes from `localhost:3000/remotes/...` (baked into `.env.docker.dev`), so the router must also be running for module federation to work.
+> **Note:** When hitting direct ports, the shell still tries to load remotes from `localhost:3100/remotes/...` (baked into `.env.docker.dev`), so the router must also be running for module federation to work.
 
 ---
 
 ## How Routing Works
 
 ```
-Browser → localhost:3000 (nginx router)
+Browser → localhost:3100 (nginx router)
               │
               ├── /remotes/editor/*    → strips prefix → editor-remote-dev:3101
               ├── /remotes/analytics/* → strips prefix → analytics-remote-dev:3102
-              └── /*                   → shell-dev:3100
+              └── /*                   → shell-dev:3104
 ```
 
 This matches the Cloudflare Worker routing in `worker/src/index.ts` exactly — the same path rules, same prefix stripping. What works locally works on Cloudflare.
@@ -122,8 +122,8 @@ This matches the Cloudflare Worker routing in `worker/src/index.ts` exactly — 
 
 | Service          | Package                      | Framework    | Container port | Profile    |
 | ---------------- | ---------------------------- | ------------ | -------------- | ---------- |
-| nginx router     | —                            | nginx        | 3000 (→ host)  | dev + prod |
-| shell            | `@velobits/shell`            | Vite + React | 3100           | dev + prod |
+| nginx router     | —                            | nginx        | 80 (→ host 3100) | dev + prod |
+| shell            | `@velobits/shell`            | Vite + React | 3104           | dev + prod |
 | editor-remote    | `@velobits/editor-remote`    | Vite + React | 3101           | dev + prod |
 | analytics-remote | `@velobits/analytics-remote` | Vite + React | 3102           | dev + prod |
 | content          | `@velobits/content-app`      | Next.js 15   | 3103           | dev + prod |
@@ -134,7 +134,7 @@ All three Vite apps resolve `@/` imports to `apps/shell/src` — the shell owns 
 
 ## Verifying MFE Wiring
 
-Open `http://localhost:3000/` in a browser, then open DevTools → Network tab → filter by `remoteEntry`. You should see two requests:
+Open `http://localhost:3100/` in a browser, then open DevTools → Network tab → filter by `remoteEntry`. You should see two requests:
 
 - `GET /remotes/editor/remoteEntry.js` → 200
 - `GET /remotes/analytics/remoteEntry.js` → 200
@@ -149,7 +149,7 @@ If these 404 or fail, the editor/analytics containers aren't ready yet — give 
 Check your `/etc/hosts` entries. All three hostnames must resolve to `127.0.0.1`.
 
 **Port already in use**
-Something else is using 3000, 3100–3103. Stop the conflicting process or change the host ports in `docker-compose.yml`.
+Something else is using 3100–3104. Stop the conflicting process or change the host ports in `docker-compose.yml`.
 
 **Content app starts slowly**
 Next.js compiles on first request in dev mode. The first load of any content page may take 5–10 seconds; subsequent loads are fast.

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, act } from '@testing-library/react';
 import ParagraphGutter from './ParagraphGutter';
 
-// ResizeObserver is not available in jsdom — provide a minimal stub.
+// ResizeObserver is not available in jsdom - provide a minimal stub.
 class ResizeObserverStub {
   private cb: ResizeObserverCallback;
   constructor(cb: ResizeObserverCallback) {
@@ -138,7 +138,7 @@ describe('ParagraphGutter', () => {
       instances[instances.length - 1]!.trigger();
     });
 
-    // Component must still be in the DOM — no crash.
+    // Component must still be in the DOM - no crash.
     expect(container.querySelector('.tu-paragraph-gutter')).toBeTruthy();
 
     document.body.removeChild(textarea);

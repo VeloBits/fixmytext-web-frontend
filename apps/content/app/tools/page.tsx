@@ -4,9 +4,9 @@ import { WEB_APP_BASE_URL } from '@velobits/api-client';
 
 export const metadata: Metadata = {
   title: 'All Tools',
-  description: `Browse all ${TOOLS.length}+ free online text tools — case converters, encoders, ciphers, AI writing tools, developer utilities, and more. No install, no signup.`,
+  description: `Browse all ${TOOLS.length}+ free online text tools - case converters, encoders, ciphers, AI writing tools, developer utilities, and more. No install, no signup.`,
   openGraph: {
-    title: `All ${TOOLS.length}+ Free Text Tools — FixMyText`,
+    title: `All ${TOOLS.length}+ Free Text Tools - FixMyText`,
     description:
       'Case converters, encoders, ciphers, AI writing tools, developer utilities, and more.',
     type: 'website',

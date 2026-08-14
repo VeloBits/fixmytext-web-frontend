@@ -60,7 +60,7 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
   );
 
   // The queries above are skipped while signed out, and RTK Query's refetch()
-  // throws on a query that never started — so refetches must no-op when
+  // throws on a query that never started - so refetches must no-op when
   // unauthenticated.
   const refetchPasses = useCallback((): void => {
     if (isAuthenticated) refetch();
@@ -113,7 +113,7 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
             keyId: key_id as string | undefined,
             userEmail: user_email as string | undefined,
             userName: user_name as string | undefined,
-            description: `FixMyText Pass — ${passId}`,
+            description: `FixMyText Pass - ${passId}`,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onSuccess: onSuccess as any,
             onFailure: onFailure as ((msg: string) => void) | undefined,
@@ -160,7 +160,7 @@ export default function usePasses({ showAlert }: UsePassesOptions = {}): UsePass
             keyId: key_id as string | undefined,
             userEmail: user_email as string | undefined,
             userName: user_name as string | undefined,
-            description: `FixMyText Credits — ${packId}`,
+            description: `FixMyText Credits - ${packId}`,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onSuccess: onSuccess as any,
             onFailure: onFailure as ((msg: string) => void) | undefined,

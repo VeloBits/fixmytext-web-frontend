@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   Tool Panel — VSCode Explorer Sidebar Style
+   Tool Panel - VSCode Explorer Sidebar Style
    ═══════════════════════════════════════════════════════ */
 
 /* ── Panel container ──────────────────────────────── */
@@ -579,7 +579,7 @@
   cursor: not-allowed;
 }
 
-/* Icon — uniform 20×20 box for all tool icons (SVG or text fallback) */
+/* Icon - uniform 20×20 box for all tool icons (SVG or text fallback) */
 .tu-titem-icon {
   width: 20px;
   min-width: 20px;
@@ -597,7 +597,7 @@
   overflow: hidden;
   letter-spacing: -0.02em;
 }
-/* Uniform sizing for 3-char and 4-char text icons — scale down to fit the same box */
+/* Uniform sizing for 3-char and 4-char text icons - scale down to fit the same box */
 .tu-titem-icon--3ch {
   font-size: 0.54rem;
   letter-spacing: -0.04em;
@@ -612,7 +612,7 @@
   flex-shrink: 0;
 }
 
-/* VSCode-style icon colors (subtle, no background) — one per tool group */
+/* VSCode-style icon colors (subtle, no background) - one per tool group */
 .tu-titem-icon--violet {
   color: var(--violet);
 } /* case transform */
@@ -854,7 +854,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   Grid View — compact card layout
+   Grid View - compact card layout
    ═══════════════════════════════════════════════════════ */
 
 /* ── Grid container ──────────────────────────────── */
@@ -897,7 +897,7 @@
   cursor: not-allowed;
 }
 
-/* Icon wrapper — centered, slightly larger than list view */
+/* Icon wrapper - centered, slightly larger than list view */
 .tu-tgrid-card-icon {
   width: 28px;
   height: 28px;
@@ -924,7 +924,7 @@
   height: 20px;
 }
 
-/* Name — centered, truncated to two lines */
+/* Name - centered, truncated to two lines */
 .tu-tgrid-card-name {
   font-size: 0.65rem;
   font-weight: 500;
@@ -962,7 +962,7 @@
   color: #fff;
 }
 
-/* Favorite — positioned top-left, shown on hover */
+/* Favorite - positioned top-left, shown on hover */
 .tu-tgrid-card-fav {
   position: absolute;
   top: 1px;
@@ -1000,7 +1000,7 @@
 }
 
 /* On mobile the panel lives inside the .tu-forge-sidebar bottom sheet
-   (see editor.css) — no mobile hiding needed here */
+   (see editor.css) - no mobile hiding needed here */
 
 /* ── Drag and drop (custom tool groups, 2026-07-22) ─────────────── */
 /* Grip handles: pointer drag works on the whole row/card; the grip is the

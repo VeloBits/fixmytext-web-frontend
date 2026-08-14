@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   Format Toolbar — Slack-style floating text formatter
+   Format Toolbar - Slack-style floating text formatter
    ═══════════════════════════════════════════════════════ */
 
 .tu-fmt-toolbar {
@@ -88,7 +88,7 @@
   text-decoration: line-through;
 }
 
-/* Code — mono font */
+/* Code - mono font */
 .tu-fmt-toolbar-group:nth-child(4) .tu-fmt-toolbar-kbd,
 .tu-fmt-toolbar-group:nth-child(5) .tu-fmt-toolbar-kbd {
   font-family: var(--font-mono);

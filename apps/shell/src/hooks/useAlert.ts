@@ -1,5 +1,5 @@
 /**
- * useAlert — manages stackable toast notifications.
+ * useAlert - manages stackable toast notifications.
  *
  * Usage:
  *   const { alerts, showAlert, dismissAlert } = useAlert();

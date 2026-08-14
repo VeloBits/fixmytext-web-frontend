@@ -14,14 +14,14 @@ const nextConfig: NextConfig = {
     // page renders an inline JSON-LD <script>), so enforcing `script-src 'self'`
     // requires per-request nonces via middleware. Validate the reports, wire
     // nonces, then rename to `Content-Security-Policy` to enforce. The edge
-    // router worker also sets a CSP — this is defense-in-depth for direct hits.
+    // router worker also sets a CSP - this is defense-in-depth for direct hits.
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
       "object-src 'none'",
       "frame-ancestors 'none'",
       // The sha256 hash allow-lists the share viewer's pre-paint theme-init
-      // inline script (app/share/[id]/layout.tsx) — keep the two in sync.
+      // inline script (app/share/[id]/layout.tsx) - keep the two in sync.
       "script-src 'self' 'sha256-bIvnsZiLYYbrTPbl1Pa25fSaxmN+KG7t7TkGSDdnCNE='",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",

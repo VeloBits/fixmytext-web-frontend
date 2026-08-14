@@ -24,11 +24,11 @@ const baseSettings: UserManagerSettings = {
   response_type: 'code',
   scope: 'openid email profile',
   automaticSilentRenew: true,
-  // Default is 10s; give throttled background tabs extra slack — a slow
+  // Default is 10s; give throttled background tabs extra slack - a slow
   // success beats a swallowed timeout (the foreground reconciler is the
   // backstop, not the primary path).
   silentRequestTimeoutInSeconds: 30,
-  // H-8: tokens (incl. the refresh_token) live ONLY in memory — never in
+  // H-8: tokens (incl. the refresh_token) live ONLY in memory - never in
   // session/local storage, so an XSS can't read a long-lived refresh token.
   // On a reload the user is re-hydrated from Keycloak's SSO cookie via silent
   // renew (see loadUser). The PKCE state store is left at its default
@@ -41,7 +41,7 @@ export const userManager = new UserManager(baseSettings);
 // Dedicated manager that starts the flow on Keycloak's REGISTRATION form.
 //
 // The OIDC `prompt=create` param is NOT honored by our Keycloak build (it
-// silently falls back to the login page — verified live), so we instead point
+// silently falls back to the login page - verified live), so we instead point
 // the authorization step at Keycloak's dedicated `/registrations` endpoint,
 // which takes the exact same params as `/auth` but renders the sign-up form.
 // We supply explicit `metadata` (skipping discovery) so only the authorization
@@ -63,7 +63,7 @@ export const signupUserManager = new UserManager({
 // H-8 keeps tokens in memory only, so every hard reload starts logged-out and
 // needs a silent-renew round trip before isAuthenticated flips true. This
 // boolean ("a session existed in this browser") carries no token material, so
-// persisting it doesn't weaken H-8 — it lets the UI hold a loading state
+// persisting it doesn't weaken H-8 - it lets the UI hold a loading state
 // during the restore instead of flashing logged-out chrome that corrects
 // itself a second later.
 const AUTH_HINT_KEY = 'fmx_auth_hint';
@@ -72,7 +72,7 @@ export function hasAuthHint(): boolean {
   try {
     return localStorage.getItem(AUTH_HINT_KEY) === '1';
   } catch {
-    return false; // storage unavailable — behave as before the hint existed
+    return false; // storage unavailable - behave as before the hint existed
   }
 }
 
@@ -81,7 +81,7 @@ function setAuthHint(present: boolean): void {
     if (present) localStorage.setItem(AUTH_HINT_KEY, '1');
     else localStorage.removeItem(AUTH_HINT_KEY);
   } catch {
-    // storage unavailable — the hint is best-effort
+    // storage unavailable - the hint is best-effort
   }
 }
 
@@ -100,7 +100,7 @@ void userManager.clearStaleState();
 // The fixmytext_session cookie outlives the Keycloak SSO session (7-day TTL
 // vs 2h SSO idle / browser-session identity cookie). When the app concludes
 // "logged out" because the SSO session is gone, the cookie must be revoked
-// too — otherwise the browser silently keeps a live API credential while the
+// too - otherwise the browser silently keeps a live API credential while the
 // UI shows Sign In. Best-effort: clearSession never throws.
 function clearServerSession(): void {
   void clearSession();
@@ -114,7 +114,7 @@ function clearServerSession(): void {
 let _loadUserPromise: Promise<User | null> | null = null;
 
 export function loadUser(): Promise<User | null> {
-  // Never run on the redirect / silent-renew callback routes — those pages are
+  // Never run on the redirect / silent-renew callback routes - those pages are
   // driven by signinRedirectCallback / signinSilentCallback, and a concurrent
   // signinSilent here would race them.
   const path = window.location.pathname;
@@ -126,7 +126,7 @@ export function loadUser(): Promise<User | null> {
       const existing = await userManager.getUser();
       if (existing && !existing.expired) return existing;
       // Only a previously-signed-in browser holds a session cookie worth
-      // revoking — a plain guest failing signinSilent has nothing to clear.
+      // revoking - a plain guest failing signinSilent has nothing to clear.
       const hadHint = hasAuthHint();
       try {
         // Success also fires userLoaded (→ hint set); the explicit set covers
@@ -136,9 +136,9 @@ export function loadUser(): Promise<User | null> {
         if (!restored && hadHint) clearServerSession();
         return restored;
       } catch {
-        setAuthHint(false); // stale hint — the SSO session is gone
+        setAuthHint(false); // stale hint - the SSO session is gone
         if (hadHint) clearServerSession(); // …and so must the session cookie
-        return null; // no live SSO session — caller treats as logged out
+        return null; // no live SSO session - caller treats as logged out
       }
     })();
   }
@@ -172,18 +172,18 @@ if (typeof BroadcastChannel !== 'undefined') {
   const ch = new BroadcastChannel(AUTH_CHANNEL);
   ch.onmessage = async ({ data }: MessageEvent<AuthMessage>) => {
     if (data?.type === 'user_loaded') {
-      // Another tab completed login — silently acquire tokens here so this tab
+      // Another tab completed login - silently acquire tokens here so this tab
       // picks up the SSO session without a page refresh.
       resetLoadUser();
       try {
         await userManager.signinSilent();
       } catch {
         /* SSO cookie absent, or this tab is backgrounded and the browser
-           throttled the silent iframe past its timeout — the foreground
+           throttled the silent iframe past its timeout - the foreground
            reconciler below retries when the tab is next looked at. */
       }
     } else if (data?.type === 'user_signed_out') {
-      // Another tab logged out — drop the in-memory user immediately.
+      // Another tab logged out - drop the in-memory user immediately.
       resetLoadUser();
       await userManager.removeUser();
     }
@@ -193,7 +193,7 @@ if (typeof BroadcastChannel !== 'undefined') {
 // ── Foreground reconciliation ───────────────────────────────────────────────
 // The broadcast pickup above is best-effort: signinSilent() runs in a hidden
 // iframe, and in a backgrounded tab the browser can throttle/freeze that flow
-// past its timeout — the failure is swallowed and the tab silently keeps the
+// past its timeout - the failure is swallowed and the tab silently keeps the
 // wrong identity until a manual reload. The auth hint is shared localStorage
 // ("a session exists in this browser"), so whenever a tab returns to the
 // foreground, reconcile the in-memory user against it: acquire the session
@@ -223,14 +223,14 @@ async function doReconcileSessionWithHint(): Promise<void> {
     try {
       hint = localStorage.getItem(AUTH_HINT_KEY) === '1';
     } catch {
-      hintReadable = false; // storage unavailable — hint says nothing either way
+      hintReadable = false; // storage unavailable - hint says nothing either way
     }
     if (hint && (!user || user.expired)) {
       resetLoadUser();
       try {
         await userManager.signinSilent(); // success fires userLoaded → UI updates
       } catch {
-        setAuthHint(false); // stale hint — the SSO session is gone
+        setAuthHint(false); // stale hint - the SSO session is gone
         clearServerSession(); // …and so must the session cookie
       }
     } else if (hintReadable && !hint && user) {
@@ -239,7 +239,7 @@ async function doReconcileSessionWithHint(): Promise<void> {
       await userManager.removeUser();
     }
   } catch {
-    // best-effort — a failed reconcile leaves the tab in its previous state
+    // best-effort - a failed reconcile leaves the tab in its previous state
   }
 }
 

@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════
-   Pricing Page — Enhanced UI
+   Pricing Page - Enhanced UI
    ══════════════════════════════════════════════════════ */
 
 .tu-pricing {
@@ -632,7 +632,7 @@
   color: var(--text);
 }
 
-/* Left column — sticks to left, spans all rows */
+/* Left column - sticks to left, spans all rows */
 .tu-pass-detail-left {
   grid-row: 1 / -1;
   display: flex;
@@ -673,7 +673,7 @@
   margin-top: 8px;
 }
 
-/* Stats — stacked vertically in left column */
+/* Stats - stacked vertically in left column */
 .tu-pass-detail-stats {
   display: flex;
   flex-direction: column;

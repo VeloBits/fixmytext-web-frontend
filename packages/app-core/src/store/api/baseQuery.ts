@@ -53,7 +53,7 @@ function isIdempotent(args: string | FetchArgs): boolean {
  * Creates a baseQueryWithReauth that wraps a given rawBaseQuery.
  * On 401, attempts a silent renew via oidc-client-ts. The refreshed token is
  * available for subsequent requests, but the original request is auto-retried
- * ONLY when it is idempotent — retrying a mutation after reauth can
+ * ONLY when it is idempotent - retrying a mutation after reauth can
  * double-submit (the first attempt may have already succeeded), so mutations
  * surface the 401 and the caller re-issues with the fresh token (FE-AUTH-04).
  * Falls back to redirect-to-login if silent renew fails.
@@ -69,7 +69,7 @@ function createReauthQuery(rawBaseQuery: RtkBaseQuery): RtkBaseQuery {
       try {
         await userManager.signinSilent();
       } catch {
-        // Silent renew failed — redirect to Keycloak login
+        // Silent renew failed - redirect to Keycloak login
         await userManager.signinRedirect();
         return result;
       }
@@ -101,7 +101,7 @@ export function isTransientError(error: { status?: number | string } | undefined
 
 /**
  * Reauth base query with automatic retry for transient errors (429/5xx/network).
- * Retries are limited to idempotent requests — a retried mutation can
+ * Retries are limited to idempotent requests - a retried mutation can
  * double-submit, so mutations surface the error to the caller instead.
  */
 

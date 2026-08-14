@@ -87,7 +87,7 @@ describe('useFormatter', () => {
 
   it('handles format error', async () => {
     const prettier = await import('prettier/standalone');
-    // vi.mock replaces format with a mock — cast for access to mock methods
+    // vi.mock replaces format with a mock - cast for access to mock methods
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockFormat = prettier.default.format as unknown as any;
     mockFormat.mockImplementationOnce(() => {

@@ -18,7 +18,7 @@ const p: SVGProps<SVGSVGElement> = {
   strokeLinejoin: 'round',
 };
 
-// SVG icons keyed by tool.id — every icon renders at a uniform 16×16
+// SVG icons keyed by tool.id - every icon renders at a uniform 16×16
 const ICONS = {
   // ── Transform / Case ──
   uppercase: (

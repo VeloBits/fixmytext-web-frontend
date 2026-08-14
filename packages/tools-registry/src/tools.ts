@@ -9,12 +9,12 @@ import type {
 } from './types';
 
 /* ═══════════════════════════════════════════════════════
-   Tool & Category Configuration — Data-driven tool system
+   Tool & Category Configuration - Data-driven tool system
    ═══════════════════════════════════════════════════════ */
 
 // Starter kits: the onboarding picker's cards. Picking one creates a normal,
 // fully editable custom tool group named `groupName`, seeded with `toolIds`
-// (it is NOT a persistent identity — personas were replaced 2026-07-14).
+// (it is NOT a persistent identity - personas were replaced 2026-07-14).
 // groupName values must stay in sync with the seed names in backend
 // account-svc migration 0004.
 export const STARTER_KITS: StarterKit[] = [
@@ -47,7 +47,7 @@ export const STARTER_KITS: StarterKit[] = [
     toolIds: ['hashtags', 'seo_titles', 'tweet_shorten', 'meta_desc'],
   },
   {
-    // "Just Exploring" promises the full catalog — creates no group on purpose
+    // "Just Exploring" promises the full catalog - creates no group on purpose
     id: 'explorer',
     label: 'Just Exploring',
     icon: '?>',
@@ -113,7 +113,7 @@ export function parseChipKey(key: string | null): SidebarChip | null {
     'select'  → tools with a dropdown selector (translate, tone, format)
 */
 
-// Group definitions — order determines display order (like VSCode Source Control sections)
+// Group definitions - order determines display order (like VSCode Source Control sections)
 export const TOOL_GROUPS: { id: string; label: string }[] = [
   { id: 'case', label: 'Case Transform' },
   { id: 'cleanup', label: 'Text Cleanup' },
@@ -149,7 +149,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     id: 'ap_title_case',
     label: 'AP Title Case',
-    description: 'Smart title case — lowercase articles & prepositions',
+    description: 'Smart title case - lowercase articles & prepositions',
     icon: 'AP',
     color: 'violet',
     group: 'case',

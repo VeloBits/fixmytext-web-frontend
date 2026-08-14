@@ -20,17 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: tool.label,
-    description: `${tool.description} Free online tool — no install, no signup.`,
+    description: `${tool.description} Free online tool - no install, no signup.`,
     keywords: [...(tool.keywords ?? []), tool.label, 'free online tool', 'text tool'],
     openGraph: {
-      title: `${tool.label} — Free Online Text Tool`,
+      title: `${tool.label} - Free Online Text Tool`,
       description: tool.description,
       type: 'website',
       url: `${siteUrl}/tools/${slug}`,
     },
     twitter: {
       card: 'summary',
-      title: `${tool.label} — FixMyText`,
+      title: `${tool.label} - FixMyText`,
       description: tool.description,
     },
     alternates: { canonical: `${siteUrl}/tools/${slug}` },
@@ -162,7 +162,7 @@ export default async function ToolPage({ params }: Props) {
         <section className="max-w-3xl mx-auto px-4 py-10">
           <h2 className="text-lg font-bold text-[var(--text)] mb-3">What does it do?</h2>
           <p className="text-[var(--text-2)] leading-relaxed">
-            {tool.description}. This tool runs entirely in your browser — no data is sent to any
+            {tool.description}. This tool runs entirely in your browser - no data is sent to any
             server unless you choose to use the AI-powered features. It is part of the{' '}
             <strong>{group?.label}</strong> category in FixMyText.
           </p>
