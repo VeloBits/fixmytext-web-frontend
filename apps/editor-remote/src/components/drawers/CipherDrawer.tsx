@@ -98,7 +98,7 @@ export default function CipherDrawer({
           showAlert(
             toolId === 'aes_encrypt'
               ? 'Encryption failed'
-              : 'Decryption failed — wrong passphrase?',
+              : 'Decryption failed - wrong passphrase?',
             'danger'
           );
         }

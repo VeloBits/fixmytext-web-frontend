@@ -63,7 +63,7 @@ export default function useHistory(
         })
           .unwrap()
           .catch(() => {
-            // Silently fail — local history already captured
+            // Silently fail - local history already captured
           });
       }
     },

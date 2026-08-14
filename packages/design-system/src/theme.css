@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* ═══════════════════════════════════════════════════════
-   VeloBits Design System — Tailwind v4 Theme
+   VeloBits Design System - Tailwind v4 Theme
    VSCode Dark+ inspired. Ported from tokens.css.
    ═══════════════════════════════════════════════════════ */
 
@@ -55,7 +55,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   Scrollbar — VSCode style (applied globally when theme is imported)
+   Scrollbar - VSCode style (applied globally when theme is imported)
    ═══════════════════════════════════════════════════════ */
 * {
   scrollbar-width: thin;

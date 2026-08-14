@@ -21,7 +21,7 @@ export const PRO_PRICES: Record<SupportedCurrency, string> = {
  * Tools that never consume quota, passes, or credits.
  * Superset of backend ALWAYS_FREE_TOOL_IDS
  * (backend/services/payments-svc/app/core/pass_catalog.py) plus
- * frontend-only free tools — buying pass scope for any of these is wasted
+ * frontend-only free tools - buying pass scope for any of these is wasted
  * money, so pickers must exclude them too.
  */
 export const ALWAYS_FREE_IDS = new Set([

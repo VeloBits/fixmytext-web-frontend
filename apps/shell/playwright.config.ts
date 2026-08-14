@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 // The Vite app is served at the origin root (Vite base: '/').
 // E2E_FRONTEND_URL overrides the full origin (without path suffix).
-const FRONTEND_URL = process.env.E2E_FRONTEND_URL || 'http://develop-fixmytext.velobits.dev:3000';
+const FRONTEND_URL = process.env.E2E_FRONTEND_URL || 'http://local-fixmytext.velobits.dev:3100';
 
 export default defineConfig({
   testDir: './e2e',

@@ -138,7 +138,7 @@ describe('DiffDrawer', () => {
     fireEvent.change(screen.getByPlaceholderText(/Paste the second text/), {
       target: { value: 'b' },
     });
-    // 'Compare' appears as both title and button — click the button specifically
+    // 'Compare' appears as both title and button - click the button specifically
     fireEvent.click(screen.getByRole('button', { name: 'Compare' }));
 
     expect(showAlert).toHaveBeenCalledWith('Unknown comparison mode', 'danger');

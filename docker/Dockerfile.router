@@ -1,4 +1,4 @@
-# nginx reverse proxy — routes to all MFE containers.
+# nginx reverse proxy - routes to all MFE containers.
 # Replicates the Cloudflare Worker routing logic locally.
 
 FROM nginx:1.27-alpine

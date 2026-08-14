@@ -2,7 +2,7 @@ import { errorMiddleware } from './errorMiddleware';
 import type { MiddlewareAPI, Dispatch } from 'redux';
 
 // Minimal stub for the Redux MiddlewareAPI used in middleware tests.
-// The errorMiddleware does not use the api (dispatch/getState) — it only
+// The errorMiddleware does not use the api (dispatch/getState) - it only
 // uses `next` and `action`, so a no-op stub is sufficient.
 const noopApi = { dispatch: (() => {}) as Dispatch, getState: () => ({}) } satisfies MiddlewareAPI;
 

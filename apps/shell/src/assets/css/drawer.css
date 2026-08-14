@@ -303,7 +303,7 @@
   flex-shrink: 0;
 }
 
-/* Toggle buttons for case-sensitive / regex — inside the input field */
+/* Toggle buttons for case-sensitive / regex - inside the input field */
 .tu-fr-toggles {
   position: absolute;
   right: 4px;
@@ -394,7 +394,7 @@
   overflow: auto;
 }
 
-/* Segmented field — inline label + button group */
+/* Segmented field - inline label + button group */
 .tu-fr-field--segmented {
   display: flex;
   align-items: center;

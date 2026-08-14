@@ -27,23 +27,23 @@ The Vite editor app handles interactive surfaces where SSR adds nothing:
 ```bash
 cd frontend
 npm install          # installs all workspace packages
-npm run dev -w @velobits/content-app    # starts on http://localhost:3001
+npm run dev -w @velobits/content-app    # starts on http://localhost:3103
 ```
 
 Visit:
 
-- `http://localhost:3001/about`
-- `http://localhost:3001/pricing`
-- `http://localhost:3001/share/<id>` (needs a real share ID from the running backend)
+- `http://localhost:3103/about`
+- `http://localhost:3103/pricing`
+- `http://localhost:3103/share/<id>` (needs a real share ID from the running backend)
 
 ### Path routing
 
-Traefik routes by path within `develop-fixmytext.velobits.dev`:
+Traefik routes by path within `local-fixmytext.velobits.dev`:
 
 | Path                             | → App       | Port |
 | -------------------------------- | ----------- | ---- |
-| `/about`, `/pricing`, `/share/*` | content-app | 3001 |
-| `/app/*`, `/`                    | shell       | 3000 |
+| `/about`, `/pricing`, `/share/*` | content-app  | 3103 |
+| everything else (`/`, ...)       | nginx router | 3100 |
 
 Both apps can also be accessed directly by port during development.
 

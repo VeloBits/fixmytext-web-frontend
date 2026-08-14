@@ -14,7 +14,7 @@ interface CompareInputProps {
 }
 
 /**
- * CompareInput — Renders in the LEFT panel (below the main input textarea).
+ * CompareInput - Renders in the LEFT panel (below the main input textarea).
  * A second editor for the "compare with" text.
  */
 export function CompareInput({ compareText, setCompareText, setDiffResult }: CompareInputProps) {
@@ -123,7 +123,7 @@ interface CompareOutputProps {
 }
 
 /**
- * CompareOutput — Renders in the RIGHT panel (output area).
+ * CompareOutput - Renders in the RIGHT panel (output area).
  * Shows the diff results.
  */
 export default function CompareOutput({ diffResult, compareText }: CompareOutputProps) {

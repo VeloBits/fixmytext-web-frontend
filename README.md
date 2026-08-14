@@ -20,7 +20,7 @@ frontend/
 └── package.json          ← npm workspace root
 ```
 
-### Path routing (via Cloudflare Worker + Traefik at `develop-fixmytext.velobits.dev`)
+### Path routing (via Cloudflare Worker in the cloud, Traefik at `local-fixmytext.velobits.dev` locally)
 
 | URL prefix             | App                     | Framework                        |
 | ---------------------- | ----------------------- | -------------------------------- |
@@ -31,11 +31,30 @@ frontend/
 > `apps/content` (Next.js) is no longer routed on this origin — the shell owns
 > the origin root. The container is parked and only reachable directly.
 
+### Deployed origins (`velobits.dev`)
+
+Everything is hosted on the `velobits.dev` zone. A service's Cloudflare project
+name is its hostname label; the develop copy is the same name prefixed
+`develop-`. The **router is the only origin users should see** — the rest are
+addressable for debugging, and all canonical/OG URLs point at the router.
+
+| Service               | production                                     | develop                                                |
+| --------------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| Router (public)       | `fixmytext.velobits.dev`                       | `develop-fixmytext.velobits.dev`                       |
+| Shell (Pages)         | `fixmytext-shell.velobits.dev`                 | `develop-fixmytext-shell.velobits.dev`                 |
+| Editor remote (Pages) | `fixmytext-editor-remote.velobits.dev`         | `develop-fixmytext-editor-remote.velobits.dev`         |
+| Analytics (Pages)     | `fixmytext-analytics-remote.velobits.dev`      | `develop-fixmytext-analytics-remote.velobits.dev`      |
+| Content (Worker)      | `fixmytext-content.velobits.dev`               | `develop-fixmytext-content.velobits.dev`               |
+
+Local dev uses `local-fixmytext.velobits.dev` (loopback via `/etc/hosts`) —
+never map a deployed hostname to `127.0.0.1`. Setup reference:
+[`docs/cloudflare-pages-setup.md`](docs/cloudflare-pages-setup.md).
+
 ## Prerequisites
 
 - Node.js 20+
 - npm 10+
-- Backend running via docker compose (see [backend README](../backend/README.md))
+- Backend running via docker compose (see [backend README](../FixMyText-backend/README.md))
 - **`/etc/hosts` entries** for the VeloBits subdomain architecture (see below)
 
 ## Local subdomain setup
@@ -50,7 +69,7 @@ Add these to your dev machine's `/etc/hosts` (one-time):
 sudo tee -a /etc/hosts <<EOF
 127.0.0.1 auth-dev.velobits.dev
 127.0.0.1 api-dev.velobits.dev
-127.0.0.1 develop-fixmytext.velobits.dev
+127.0.0.1 local-fixmytext.velobits.dev
 EOF
 ```
 
@@ -76,10 +95,10 @@ Start the full stack via Docker (recommended — node_modules live in Docker vol
 
 ```bash
 docker compose --profile dev up
-# shell → http://localhost:3000 (served at /)
+# shell → http://localhost:3100 (served at /)
 # editor-remote → http://localhost:3101 (federation remote)
 # analytics-remote → http://localhost:3102 (federation remote)
-# content → http://localhost:3001 (parked — not routed via :3000)
+# content → http://localhost:3103 (parked — not routed via :3100)
 ```
 
 To run the production simulation (built artifacts behind the nginx router, mirroring
@@ -88,26 +107,26 @@ up the `prod` profile:
 
 ```bash
 cp .env.docker.prod.example .env.docker.prod   # required — prod services declare env_file: .env.docker.prod
-docker compose --profile prod up --build        # everything served at http://localhost:3000
+docker compose --profile prod up --build        # everything served at http://localhost:3100
 ```
 
 > The shell bakes the federation remote-entry URLs at **build** time (Vite). The prod
 > profile passes them as Docker build args (defaulting to the local router URLs
-> `http://localhost:3000/remotes/{editor,analytics}/remoteEntry.js`); override
+> `http://localhost:3100/remotes/{editor,analytics}/remoteEntry.js`); override
 > `VITE_EDITOR_REMOTE_ENTRY` / `VITE_ANALYTICS_REMOTE_ENTRY` in your host env or a root
 > `.env` to point at real deployment URLs.
 
 Or start individually (requires host npm install):
 
 ```bash
-npm run dev -w @velobits/shell              # http://localhost:3000
+npm run dev -w @velobits/shell              # http://localhost:3104
 npm run dev -w @velobits/editor-remote      # http://localhost:3101
 npm run dev -w @velobits/analytics-remote   # http://localhost:3102
-npm run dev -w @velobits/content-app        # http://localhost:3001
+npm run dev -w @velobits/content-app        # http://localhost:3103
 ```
 
 With Traefik running (`docker compose --profile dev up`), all apps are accessible
-at `http://develop-fixmytext.velobits.dev` with path-based routing.
+at `http://local-fixmytext.velobits.dev` with path-based routing.
 
 ## Scripts
 
@@ -122,7 +141,7 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 
 | Command                                               | Description                                          |
 | ----------------------------------------------------- | ---------------------------------------------------- |
-| `npm run dev -w @velobits/shell`                      | Start shell dev server (port 3000)                   |
+| `npm run dev -w @velobits/shell`                      | Start shell dev server (port 3104)                   |
 | `npm run build -w @velobits/shell`                    | Production build (shell)                             |
 | `npm run test -w @velobits/shell`                     | Vitest unit tests (shell)                            |
 | `npm run test:coverage -w @velobits/shell`            | Vitest with coverage (thresholds enforced)           |
@@ -133,7 +152,7 @@ at `http://develop-fixmytext.velobits.dev` with path-based routing.
 | `npm run dev -w @velobits/analytics-remote`           | Start analytics remote dev server (port 3102)        |
 | `npm run build -w @velobits/analytics-remote`         | Production build (analytics remote)                  |
 | `npm run test:coverage -w @velobits/analytics-remote` | Vitest with coverage                                 |
-| `npm run dev -w @velobits/content-app`                | Start Next.js dev server (port 3001)                 |
+| `npm run dev -w @velobits/content-app`                | Start Next.js dev server (port 3103)                 |
 | `npm run build -w @velobits/content-app`              | Next.js production build                             |
 | `npm run test:coverage -w @velobits/api-client`       | Package coverage (thresholds enforced)               |
 | `npm run gen:types -w @velobits/api-client`           | Regenerate OpenAPI types from `backend/openapi.json` |

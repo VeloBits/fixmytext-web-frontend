@@ -38,7 +38,7 @@ export default defineConfig({
   plugins: [
     federation({
       name: 'fixmytext-shell',
-      // Shell is a host only — remotes are separate builds deployed independently.
+      // Shell is a host only - remotes are separate builds deployed independently.
       remotes: {
         'editor-remote': {
           type: 'module',
@@ -85,7 +85,7 @@ export default defineConfig({
   resolve: {
     // Array form: app-core resolved before the '@' alias. app-core is a brand-new
     // workspace package (no node_modules symlink baked into older installs), so we
-    // alias it to source directly — same pattern the remotes use for shared packages.
+    // alias it to source directly - same pattern the remotes use for shared packages.
     alias: [
       {
         find: '@velobits/app-core',
@@ -95,8 +95,8 @@ export default defineConfig({
     ],
   },
   base: '/',
-  server: { port: 3100, host: true },
-  preview: { port: 3100 },
+  server: { port: 3104, host: true },
+  preview: { port: 3104 },
   build: {
     sourcemap: true,
     rollupOptions: { output: { manualChunks } },

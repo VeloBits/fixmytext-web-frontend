@@ -1,5 +1,5 @@
 # Development image for apps/content (Next.js).
-# Uses plain next dev — no CF compilation step for faster iteration.
+# Uses plain next dev - no CF compilation step for faster iteration.
 
 FROM node:24-alpine
 
@@ -10,7 +10,6 @@ RUN npm install --loglevel=error
 
 EXPOSE 3103
 
-# Run next dev directly to control the port.
-# The package.json "dev" script hardcodes --port 3001 (for bare local dev),
-# so we invoke next directly here to use 3103 (the Docker-internal port).
-CMD ["sh", "-c", "cd apps/content && npx next dev --port 3103"]
+# The package.json "dev" script owns the port (3103) - same value everywhere,
+# so there is nothing to override here.
+CMD ["npm", "run", "dev", "-w", "@velobits/content-app"]

@@ -81,7 +81,7 @@ interface FavoritesState {
 /* ── Drag-and-drop identity ──────────────────────────────────────────────────
  * Sortable/draggable ids must be unique across the whole DndContext, and the
  * same tool can appear in several sections (pinned, a custom group, its
- * catalog group) — so every id is prefixed with its section. The `data`
+ * catalog group) - so every id is prefixed with its section. The `data`
  * payload carries the semantic identity; ids are never parsed. */
 
 type ToolDragData =
@@ -117,7 +117,7 @@ interface ToolItemProps {
   isSuggested: boolean;
   onHover: (text: string, rect: DOMRect) => void;
   onLeave: () => void;
-  /** Set when the item renders inside a custom group section — swaps the
+  /** Set when the item renders inside a custom group section - swaps the
    * add-to-group button for a remove-from-this-group one. */
   customGroupId?: string;
   onRemoveFromGroup?: (groupId: string, toolId: string) => void;
@@ -157,7 +157,7 @@ interface ToolPanelProps {
   recentToolIds: string[];
   showAlert: ShowAlertFn;
   activeToolId?: string | null;
-  /** Desktop hides the in-panel chip row — the activity bar renders the chips. */
+  /** Desktop hides the in-panel chip row - the activity bar renders the chips. */
   hideChips?: boolean;
   viewMode?: string;
   suggestedToolIds?: string[];
@@ -607,7 +607,7 @@ function SortableGroupTool({
 }
 
 /** Draggable wrapper for pinned/catalog tools: drag one onto a custom group
- * to add it there. Not sortable — catalog order is fixed. Keyboard users add
+ * to add it there. Not sortable - catalog order is fixed. Keyboard users add
  * via the + menu instead, so no grip is rendered. */
 function DraggableCatalogTool({
   sectionId,
@@ -857,7 +857,7 @@ export default memo(function ToolPanel({
     };
 
     // Custom groups keep user-curated order; favorites NOT excluded (the user
-    // put them there). Empty groups still render — a just-created group needs
+    // put them there). Empty groups still render - a just-created group needs
     // a visible home for its + affordance.
     const customPanelGroup = (
       g: ToolGroupView,
@@ -899,7 +899,7 @@ export default memo(function ToolPanel({
     }
 
     if (activeChip.id === 'recent') {
-      // Recency order is the point — one flat section, most recent first.
+      // Recency order is the point - one flat section, most recent first.
       const list = recentToolIds
         .map((id) => tools.find((t) => t.id === id))
         .filter((t): t is ToolDefinition => !!t);
@@ -919,7 +919,7 @@ export default memo(function ToolPanel({
       };
     }
 
-    // view:all — pinned favorites and custom groups above the full catalog
+    // view:all - pinned favorites and custom groups above the full catalog
     const top: PanelGroup[] = [];
     const pinnedTools =
       favoriteIds.length > 0
@@ -958,7 +958,7 @@ export default memo(function ToolPanel({
     [sidebarChips.chips, suggestedToolIds.length, activeChipKey, customGroups]
   );
 
-  // The active chip is never hidden in the ⋯ +N overflow — it swaps into the
+  // The active chip is never hidden in the ⋯ +N overflow - it swaps into the
   // last visible slot (the VSCode active-editor-tab rule).
   const { visibleRowChips, overflowRowChips } = useMemo(() => {
     if (rowChips.length <= MOBILE_MAX_VISIBLE_CHIPS) {
@@ -979,7 +979,7 @@ export default memo(function ToolPanel({
     if (topGroups.length > 0 || catalogGroups.length > 0) return null;
     if (query) return `No tools match "${filterQuery.trim()}"`;
     if (activeChip.type === 'view' && activeChip.id === 'pinned') {
-      return 'No pinned tools yet — click the ♥ on any tool.';
+      return 'No pinned tools yet - click the ♥ on any tool.';
     }
     if (activeChip.type === 'view' && activeChip.id === 'recent') {
       return 'Tools you run will appear here.';
@@ -1128,7 +1128,7 @@ export default memo(function ToolPanel({
 
   /** Kept tools preserve their curated order; newly picked ones append in
    * catalog (alphabetical) order. setGroupTools is called outside any state
-   * updater — updaters must stay pure (no setState into other components). */
+   * updater - updaters must stay pure (no setState into other components). */
   const commitPicker = useCallback(() => {
     if (!picker) return;
     const group = toolGroups.groups.find((g) => g.id === picker.groupId);

@@ -85,7 +85,7 @@ interface MarkdownPreviewDrawerProps {
 }
 
 export function MarkdownPreviewDrawer({ text }: MarkdownPreviewDrawerProps) {
-  // Render Markdown via `marked`, then DOMPurify-sanitize before injecting —
+  // Render Markdown via `marked`, then DOMPurify-sanitize before injecting -
   // mirrors OutputPanel's sanitized path so editor text can't inject HTML/JS
   // (FE-XSS-01). The previous hand-rolled regex fed straight into
   // dangerouslySetInnerHTML with no sanitization.
@@ -127,7 +127,7 @@ export function LoremIpsumDrawer({ onResult, showAlert }: SharedDrawerProps) {
       );
     } else {
       // One paragraph per line so the output gutter line numbers match the
-      // count (3 paragraphs → lines 1, 2, 3 — no empty rows in between).
+      // count (3 paragraphs → lines 1, 2, 3 - no empty rows in between).
       result = Array.from({ length: count }, () => LOREM).join('\n\n');
     }
     onResult('Lorem Ipsum', result);

@@ -38,7 +38,7 @@ test.describe('Tool index page', () => {
 
 test.describe('Per-tool SEO page', () => {
   for (const slug of SAMPLE_SLUGS) {
-    test(`/tools/${slug} — has og:title and JSON-LD`, async ({ page }) => {
+    test(`/tools/${slug} - has og:title and JSON-LD`, async ({ page }) => {
       const response = await page.goto(`/tools/${slug}`);
       expect(response?.status()).toBe(200);
 
@@ -55,7 +55,7 @@ test.describe('Per-tool SEO page', () => {
       expect(parsed.offers?.price).toBe('0');
     });
 
-    test(`/tools/${slug} — CTA links to editor`, async ({ page }) => {
+    test(`/tools/${slug} - CTA links to editor`, async ({ page }) => {
       await page.goto(`/tools/${slug}`);
       const cta = page.getByRole('link', { name: /Try .* Free|Open .* in Editor/i }).first();
       await expect(cta).toBeVisible();

@@ -7,7 +7,7 @@ import type { ThemeMode } from '@/contexts/ThemeContext';
 
 export interface NavbarProps {
   showAlert?: (message: string, type: AlertLevel) => void;
-  /* Account/appearance data for the mobile menu — on desktop the editor's
+  /* Account/appearance data for the mobile menu - on desktop the editor's
      activity-bar avatar menu covers these, but that bar is hidden ≤768px */
   user?: { display_name?: string; email?: string } | null;
   mode?: ThemeMode;
@@ -184,7 +184,7 @@ export default function Navbar({ showAlert, user, mode, setMode }: NavbarProps) 
         </button>
       </div>
 
-      {/* Mobile dropdown — tu-mobile-menu class kept for test selectors */}
+      {/* Mobile dropdown - tu-mobile-menu class kept for test selectors */}
       {menuOpen && (
         <div className="tu-mobile-menu absolute top-11 left-0 right-0 bg-[var(--surface)] border-b border-[var(--border)] flex flex-col p-1 z-[200] max-h-[calc(100dvh-44px)] overflow-y-auto">
           {/* Account header (signed-in) */}

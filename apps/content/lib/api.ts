@@ -29,11 +29,11 @@ export type ShareLookup =
  * Fetch a shared result by its public ID.
  *
  * The API distinguishes 404 (unknown id) from 410 (expired share), and a
- * network failure means neither — collapsing them all into "not found" hides
+ * network failure means neither - collapsing them all into "not found" hides
  * outages and loses the expiry message, so each maps to its own status.
  */
 export async function getShareResult(id: string): Promise<ShareLookup> {
-  if (!SHARE_ID_RE.test(id)) return { status: 'not_found' }; // not a share id — don't hit the API
+  if (!SHARE_ID_RE.test(id)) return { status: 'not_found' }; // not a share id - don't hit the API
   try {
     const res = await fetch(`${API_BASE}/api/v1/share/${encodeURIComponent(id)}`, {
       next: { revalidate: 300 },

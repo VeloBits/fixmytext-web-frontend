@@ -50,7 +50,7 @@ function MostUsedToolsCard({ topTools }: { topTools: TopTool[] }) {
     <div className="tu-dash-card">
       <h3 className="tu-dash-card-title">Most Used Tools</h3>
       {topTools.length === 0 ? (
-        <div className="tu-dash-empty">No tools used yet — start exploring!</div>
+        <div className="tu-dash-empty">No tools used yet - start exploring!</div>
       ) : (
         <div className="tu-dash-tool-list">
           {topTools.map((tool, i) => (

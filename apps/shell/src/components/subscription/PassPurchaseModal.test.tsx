@@ -96,7 +96,7 @@ describe('PassPurchaseModal', () => {
 
   it('shows blocked tool usage', () => {
     render(<PassPurchaseModal {...baseProps} />);
-    // 'Fix Grammar' may appear multiple times (title + body) — check at least one
+    // 'Fix Grammar' may appear multiple times (title + body) - check at least one
     expect(screen.getAllByText(/Fix Grammar/).length).toBeGreaterThan(0);
     expect(screen.getByText('3/3')).toBeInTheDocument();
   });

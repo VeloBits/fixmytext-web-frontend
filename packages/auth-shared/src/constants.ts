@@ -1,16 +1,17 @@
 /**
  * Per-app session cookie name.
- * Host-only, scoped to `fixmytext.velobits.dev` (or `develop-fixmytext.velobits.dev` in dev).
+ * Host-only, scoped to `fixmytext.velobits.dev` (production),
+ * `develop-fixmytext.velobits.dev` (develop) or `local-fixmytext.velobits.dev` (local).
  * Issued by account-svc on successful /auth/me.
  *
  * Per-app naming convention: every VeloBits product has its OWN session cookie
- * (CHAT_SESSION, NOTES_SESSION, ...). Cookies are never shared across apps —
+ * (CHAT_SESSION, NOTES_SESSION, ...). Cookies are never shared across apps -
  * shared identity is achieved via the SSO cookie below (managed by Keycloak).
  */
 export const SESSION_COOKIE_NAME = 'fixmytext_session';
 
 /**
- * Global SSO cookie name (informational only — frontend never reads it).
+ * Global SSO cookie name (informational only - frontend never reads it).
  * Issued by Keycloak at `.velobits.dev` scope. Browser sends it automatically
  * on every *.velobits.dev request. Used by Keycloak to skip the login UI on
  * subsequent cross-app navigation (e.g. fixmytext → chat).

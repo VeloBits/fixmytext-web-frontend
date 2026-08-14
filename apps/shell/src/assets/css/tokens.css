@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   FixMyText — Design Tokens
+   FixMyText - Design Tokens
    VSCode Dark+ inspired theme
    ═══════════════════════════════════════════════════════ */
 
@@ -31,7 +31,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   Light Theme (default) — Clean, readable, VSCode Light inspired
+   Light Theme (default) - Clean, readable, VSCode Light inspired
    ═══════════════════════════════════════════════════════ */
 body {
   --bg: #f8f8f8;
@@ -57,7 +57,7 @@ body {
   --activitybar-border: #2c2c2c;
   --activitybar-badge: #007acc;
 
-  /* Sidebar — darker tint for depth */
+  /* Sidebar - darker tint for depth */
   --sidebar-bg: #e4e4e5;
   --sidebar-fg: #2a2a2a;
   --sidebar-border: #c8c8c8;
@@ -138,7 +138,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════
-   Dark Theme — VSCode Dark+
+   Dark Theme - VSCode Dark+
    ═══════════════════════════════════════════════════════ */
 body.dark {
   --bg: #1e1e1e;
@@ -219,7 +219,7 @@ body.dark {
 }
 
 /* ═══════════════════════════════════════════════════════
-   Global Scrollbar — VSCode style
+   Global Scrollbar - VSCode style
    ═══════════════════════════════════════════════════════ */
 
 /* Firefox */

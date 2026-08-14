@@ -176,7 +176,7 @@ describe('KeyboardShortcuts', () => {
     const rebindBtns = screen.getAllByTitle('Click to rebind');
     fireEvent.click(rebindBtns[0]!);
     expect(screen.getByText('Press keys...')).toBeInTheDocument();
-    // Press Escape while recording — triggers cancelRecording
+    // Press Escape while recording - triggers cancelRecording
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(screen.queryByText('Press keys...')).not.toBeInTheDocument();
   });
@@ -187,7 +187,7 @@ describe('KeyboardShortcuts', () => {
     renderShortcuts({ updateBinding });
     const rebindBtns = screen.getAllByTitle('Click to rebind');
     fireEvent.click(rebindBtns[0]!);
-    // Press Ctrl+J while recording — valid modifier key
+    // Press Ctrl+J while recording - valid modifier key
     fireEvent.keyDown(window, { key: 'j', ctrlKey: true, shiftKey: false, altKey: false });
     expect(updateBinding).toHaveBeenCalledWith(
       'palette',
@@ -202,7 +202,7 @@ describe('KeyboardShortcuts', () => {
     renderShortcuts({ updateBinding });
     const rebindBtns = screen.getAllByTitle('Click to rebind');
     fireEvent.click(rebindBtns[0]!);
-    // Press bare letter 'a' — should be ignored
+    // Press bare letter 'a' - should be ignored
     fireEvent.keyDown(window, { key: 'a', ctrlKey: false, shiftKey: false, altKey: false });
     expect(updateBinding).not.toHaveBeenCalled();
     expect(screen.getByText('Press keys...')).toBeInTheDocument();
@@ -213,7 +213,7 @@ describe('KeyboardShortcuts', () => {
     renderShortcuts({ updateBinding });
     const rebindBtns = screen.getAllByTitle('Click to rebind');
     fireEvent.click(rebindBtns[0]!);
-    // Press bare Shift — eventToBinding returns null, should be ignored
+    // Press bare Shift - eventToBinding returns null, should be ignored
     fireEvent.keyDown(window, { key: 'Shift', shiftKey: true });
     expect(updateBinding).not.toHaveBeenCalled();
     expect(screen.getByText('Press keys...')).toBeInTheDocument();
@@ -301,7 +301,7 @@ describe('KeyboardShortcuts', () => {
     // Press Escape from the PANEL keydown handler (not window)
     const panel = document.querySelector('.tu-shortcuts')!;
     fireEvent.keyDown(panel, { key: 'Escape' });
-    // onClose should NOT be called — we're recording; window listener handles Escape→cancelRecording
+    // onClose should NOT be called - we're recording; window listener handles Escape→cancelRecording
     expect(onClose).not.toHaveBeenCalled();
   });
 
