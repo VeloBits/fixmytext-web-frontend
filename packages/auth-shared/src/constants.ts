@@ -1,6 +1,7 @@
 /**
  * Per-app session cookie name.
- * Host-only, scoped to `fixmytext.velobits.dev` (or `develop-fixmytext.velobits.dev` in dev).
+ * Host-only, scoped to `fixmytext.velobits.dev` (production),
+ * `develop-fixmytext.velobits.dev` (develop) or `local-fixmytext.velobits.dev` (local).
  * Issued by account-svc on successful /auth/me.
  *
  * Per-app naming convention: every VeloBits product has its OWN session cookie
