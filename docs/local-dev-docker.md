@@ -21,17 +21,24 @@ The OIDC auth flow (Keycloak) redirects to named subdomains. Add these entries o
 sudo tee -a /etc/hosts <<EOF
 127.0.0.1 auth-dev.velobits.dev
 127.0.0.1 api-dev.velobits.dev
-127.0.0.1 develop-fixmytext.velobits.dev
+127.0.0.1 local-fixmytext.velobits.dev
 EOF
 ```
 
 **Windows (run PowerShell as Administrator):**
 
 ```powershell
-Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "`n127.0.0.1 auth-dev.velobits.dev`n127.0.0.1 api-dev.velobits.dev`n127.0.0.1 develop-fixmytext.velobits.dev"
+Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "`n127.0.0.1 auth-dev.velobits.dev`n127.0.0.1 api-dev.velobits.dev`n127.0.0.1 local-fixmytext.velobits.dev"
 ```
 
 Without these entries, login will fail even though the app loads.
+
+> **Never map `fixmytext.velobits.dev` or `develop-fixmytext.velobits.dev` to
+> 127.0.0.1.** Those are the deployed production and develop origins; an
+> `/etc/hosts` entry for either makes the real site unreachable from your
+> machine. The local host is deliberately prefixed `local-`, which is reserved
+> for loopback and never deployed. (If you added `develop-fixmytext.velobits.dev`
+> before this change, remove that line.)
 
 ### 3. Create your env file
 

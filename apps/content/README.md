@@ -38,7 +38,7 @@ Visit:
 
 ### Path routing
 
-Traefik routes by path within `develop-fixmytext.velobits.dev`:
+Traefik routes by path within `local-fixmytext.velobits.dev`:
 
 | Path                             | → App       | Port |
 | -------------------------------- | ----------- | ---- |

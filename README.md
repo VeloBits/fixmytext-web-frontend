@@ -20,7 +20,7 @@ frontend/
 └── package.json          ← npm workspace root
 ```
 
-### Path routing (via Cloudflare Worker + Traefik at `develop-fixmytext.velobits.dev`)
+### Path routing (via Cloudflare Worker in the cloud, Traefik at `local-fixmytext.velobits.dev` locally)
 
 | URL prefix             | App                     | Framework                        |
 | ---------------------- | ----------------------- | -------------------------------- |
@@ -30,6 +30,25 @@ frontend/
 
 > `apps/content` (Next.js) is no longer routed on this origin — the shell owns
 > the origin root. The container is parked and only reachable directly.
+
+### Deployed origins (`velobits.dev`)
+
+Everything is hosted on the `velobits.dev` zone. A service's Cloudflare project
+name is its hostname label; the develop copy is the same name prefixed
+`develop-`. The **router is the only origin users should see** — the rest are
+addressable for debugging, and all canonical/OG URLs point at the router.
+
+| Service               | production                                     | develop                                                |
+| --------------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| Router (public)       | `fixmytext.velobits.dev`                       | `develop-fixmytext.velobits.dev`                       |
+| Shell (Pages)         | `fixmytext-shell.velobits.dev`                 | `develop-fixmytext-shell.velobits.dev`                 |
+| Editor remote (Pages) | `fixmytext-editor-remote.velobits.dev`         | `develop-fixmytext-editor-remote.velobits.dev`         |
+| Analytics (Pages)     | `fixmytext-analytics-remote.velobits.dev`      | `develop-fixmytext-analytics-remote.velobits.dev`      |
+| Content (Worker)      | `fixmytext-content.velobits.dev`               | `develop-fixmytext-content.velobits.dev`               |
+
+Local dev uses `local-fixmytext.velobits.dev` (loopback via `/etc/hosts`) —
+never map a deployed hostname to `127.0.0.1`. Setup reference:
+[`docs/cloudflare-pages-setup.md`](docs/cloudflare-pages-setup.md).
 
 ## Prerequisites
 
@@ -50,7 +69,7 @@ Add these to your dev machine's `/etc/hosts` (one-time):
 sudo tee -a /etc/hosts <<EOF
 127.0.0.1 auth-dev.velobits.dev
 127.0.0.1 api-dev.velobits.dev
-127.0.0.1 develop-fixmytext.velobits.dev
+127.0.0.1 local-fixmytext.velobits.dev
 EOF
 ```
 
@@ -107,7 +126,7 @@ npm run dev -w @velobits/content-app        # http://localhost:3001
 ```
 
 With Traefik running (`docker compose --profile dev up`), all apps are accessible
-at `http://develop-fixmytext.velobits.dev` with path-based routing.
+at `http://local-fixmytext.velobits.dev` with path-based routing.
 
 ## Scripts
 

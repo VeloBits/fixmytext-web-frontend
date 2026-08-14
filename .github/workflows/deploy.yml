@@ -5,12 +5,21 @@
 #   content (Worker, OpenNext — SSR/SEO + share OG cards, bot-routed) ─┘
 #
 # ── Environments ─────────────────────────────────────────────────────────────
+# Every unit is a SEPARATE Cloudflare project per environment, named `<unit>` on
+# production and `develop-<unit>` on develop, each with its own
+# <project>.velobits.dev / develop-<project>.velobits.dev custom domain.
+# Pages custom domains can only ever serve a project's production branch, so
+# develop cannot be a branch alias of the production project — hence the split.
 # Branch → GitHub environment → Cloudflare target:
-#   main    → production → Pages production deployments (bare *.pages.dev URLs)
-#                          + worker `fixmytext-router`   [manual dispatch only]
-#   develop → develop    → Pages branch deployments (develop.<project>.pages.dev)
-#                          + worker `develop-fixmytext-router` (wrangler --env develop)
+#   main    → production → Pages projects fixmytext-{shell,editor-remote,analytics-remote}
+#                          + workers `fixmytext-{content,router}`   [manual dispatch only]
+#   develop → develop    → Pages projects develop-fixmytext-{shell,editor-remote,analytics-remote}
+#                          + workers `develop-fixmytext-{content,router}` (wrangler --env develop)
 #                          [auto on green CI]
+# Both tracks deploy to their own project's PRODUCTION branch (`--branch main`);
+# the environment is selected by `--project-name` (Pages) / `--env` (Workers),
+# never by the branch. The custom domains are declared in the wrangler configs,
+# so the CI token needs Zone → DNS → Edit + Zone → Workers Routes → Edit too.
 #
 # ── Selective deploys (deploy "versions") ────────────────────────────────────
 # After each successful deploy, the commit is tagged `deployed/<env>/<app>`
@@ -30,8 +39,8 @@
 #   vars.VITE_API_URL, vars.VITE_KEYCLOAK_URL, vars.VITE_KEYCLOAK_REALM,
 #   vars.VITE_KEYCLOAK_CLIENT_ID, vars.VITE_KEYCLOAK_ENABLED_PROVIDERS  (+ Sentry as needed)
 #   vars.NEXT_PUBLIC_SITE_URL = that environment's public origin (content OG/canonical URLs)
-# (Confirm the CF Pages project names in package.json deploy:* scripts match your
-#  account, and that each Pages project's "Production branch" setting is `main`.)
+# (All six Pages projects must exist before the first run, and every one of them
+#  must have its "Production branch" setting = `main`.)
 name: Deploy (Cloudflare)
 
 # Release model (asymmetric):
@@ -139,8 +148,12 @@ jobs:
     needs: changes
     if: needs.changes.outputs.any_remote == 'true'
     env:
-      DEPLOY_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
+      # Prefixes the Cloudflare project name to select the environment's project.
+      # The non-main branch carries the truthy operand so production resolves to a
+      # genuinely empty string (`cond && '' || x` always yields x — empty strings
+      # are falsy in GitHub expressions).
+      CF_PROJECT_PREFIX: ${{ (github.event.workflow_run.head_branch || github.ref_name) != 'main' && 'develop-' || '' }}
     strategy:
       matrix:
         # Only the remotes the `changes` job flagged.
@@ -157,10 +170,14 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Build & deploy ${{ matrix.remote }}-remote to Cloudflare Pages
-        # --branch selects production vs branch-alias deployment on the same
-        # Pages project (develop → https://develop.<project>.pages.dev).
-        run: npm run deploy:${{ matrix.remote }} -- --branch "$DEPLOY_BRANCH"
+        # The environment is chosen by CF_PAGES_PROJECT_* (which project), not by
+        # --branch: each project has its own custom domain, and a Pages custom
+        # domain only serves that project's production branch. Only the variable
+        # matching this matrix leg is read by the deploy:<remote> script.
+        run: npm run deploy:${{ matrix.remote }} -- --branch main
         env:
+          CF_PAGES_PROJECT_EDITOR: ${{ env.CF_PROJECT_PREFIX }}fixmytext-editor-remote
+          CF_PAGES_PROJECT_ANALYTICS: ${{ env.CF_PROJECT_PREFIX }}fixmytext-analytics-remote
           VITE_API_URL: ${{ vars.VITE_API_URL }}
       - name: Update deploy marker tag
         run: |
@@ -179,8 +196,9 @@ jobs:
       needs.changes.outputs.shell == 'true' &&
       (needs.deploy-remotes.result == 'success' || needs.deploy-remotes.result == 'skipped')
     env:
-      DEPLOY_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
+      # See the CF_PROJECT_PREFIX note on deploy-remotes for the expression shape.
+      CF_PROJECT_PREFIX: ${{ (github.event.workflow_run.head_branch || github.ref_name) != 'main' && 'develop-' || '' }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
@@ -193,8 +211,9 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Build & deploy shell to Cloudflare Pages
-        run: npm run deploy:shell -- --branch "$DEPLOY_BRANCH"
+        run: npm run deploy:shell -- --branch main
         env:
+          CF_PAGES_PROJECT_SHELL: ${{ env.CF_PROJECT_PREFIX }}fixmytext-shell
           # Federation entry points baked into the host bundle — must point at the
           # environment's router so the browser loads each remote under /remotes/<name>/.
           VITE_EDITOR_REMOTE_ENTRY: ${{ vars.VITE_EDITOR_REMOTE_ENTRY }}
