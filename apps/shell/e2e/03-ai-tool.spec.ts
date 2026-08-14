@@ -5,7 +5,7 @@ test('AI tool (Summarize) returns backend response (AI_BACKEND=fake)', async ({
   page,
   request,
 }) => {
-  // AI tools require auth — register + verify a user, then seed tokens.
+  // AI tools require auth - register + verify a user, then seed tokens.
   const { email, password, verificationToken } = await registerVerifiedUser(request);
 
   // Verify email via the API directly to keep this spec focused.

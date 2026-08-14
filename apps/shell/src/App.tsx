@@ -26,16 +26,16 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 // In-app (authenticated) marketing pages. Distinct from the public SSR/SEO
-// versions in apps/content — these let logged-in users browse the full pass/credit
+// versions in apps/content - these let logged-in users browse the full pass/credit
 // catalog and purchase via Razorpay without leaving the SPA. The navbar, editor,
 // and dashboard link here ('/about', '/pricing').
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 // In-app authenticated share view at /share/:id. The former public SSR/SEO share
-// page (apps/content) is no longer routed on this origin — the shell owns /.
+// page (apps/content) is no longer routed on this origin - the shell owns /.
 const SharePage = lazy(() => import('./pages/SharePage'));
 
-// Remote surfaces — loaded from their independently deployed MFE builds.
+// Remote surfaces - loaded from their independently deployed MFE builds.
 // No local fallback: if a remote is down, RemoteBoundary shows the error state.
 const EditorPage = lazy(() =>
   import('editor-remote/EditorPage').then((m) => ({ default: m.default }))
@@ -54,7 +54,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   // When the access token quietly expired (e.g. a minutes-long Razorpay
   // checkout outlived it), first try a silent renew from the Keycloak SSO
-  // cookie instead of bouncing through a full-page login — the bounce used to
+  // cookie instead of bouncing through a full-page login - the bounce used to
   // eat the post-purchase ?purchase=… params and their success alert.
   useEffect(() => {
     if (isLoading || isAuthenticated || restore !== 'idle') return;

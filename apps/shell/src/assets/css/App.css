@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════════════
-   FixMyText — Design System
+   FixMyText - Design System
    Modular CSS imports
    ═══════════════════════════════════════════════════════ */
 
 @import './tokens.css';
 @import './base.css';
-/* navbar.css removed — Navbar.tsx now uses Tailwind utilities */
+/* navbar.css removed - Navbar.tsx now uses Tailwind utilities */
 @import './editor.css';
 @import './buttons.css';
 @import './toolcard.css';

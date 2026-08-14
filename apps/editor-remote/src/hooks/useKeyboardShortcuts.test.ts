@@ -40,7 +40,7 @@ vi.mock('@velobits/app-core/constants/tools', () => ({
 import { useSelector } from 'react-redux';
 import type { KeyboardActions } from './useKeyboardShortcuts';
 
-// vi.mock replaces useSelector — cast so TS knows
+// vi.mock replaces useSelector - cast so TS knows
 const mockUseSelector = useSelector as unknown as ReturnType<typeof vi.fn>;
 
 describe('useKeyboardShortcuts', () => {
@@ -442,7 +442,7 @@ function fireKey(
 
 // ── Additional keyboard shortcut tests ──────────────────────────────────────
 
-describe('useKeyboardShortcuts — additional keyboard cases', () => {
+describe('useKeyboardShortcuts - additional keyboard cases', () => {
   let actions: KeyboardActions;
 
   beforeEach(() => {
@@ -603,7 +603,7 @@ describe('useKeyboardShortcuts — additional keyboard cases', () => {
 
 // ── Authenticated paths ──────────────────────────────────────────────────────
 
-describe('useKeyboardShortcuts — authenticated paths', () => {
+describe('useKeyboardShortcuts - authenticated paths', () => {
   let actions: KeyboardActions;
 
   beforeEach(() => {

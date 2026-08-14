@@ -1,15 +1,15 @@
-# Cloudflare deployment — runs the root `deploy:*` scripts in the order the
+# Cloudflare deployment - runs the root `deploy:*` scripts in the order the
 # Module Federation topology requires:
 #
 #   remotes (Pages) ─▶ shell (Pages, bakes remoteEntry URLs) ─▶ router worker (last)
-#   content (Worker, OpenNext — SSR/SEO + share OG cards, bot-routed) ─┘
+#   content (Worker, OpenNext - SSR/SEO + share OG cards, bot-routed) ─┘
 #
 # ── Environments ─────────────────────────────────────────────────────────────
 # Every unit is a SEPARATE Cloudflare project per environment, named `<unit>` on
 # production and `develop-<unit>` on develop, each with its own
 # <project>.velobits.dev / develop-<project>.velobits.dev custom domain.
 # Pages custom domains can only ever serve a project's production branch, so
-# develop cannot be a branch alias of the production project — hence the split.
+# develop cannot be a branch alias of the production project - hence the split.
 # Branch → GitHub environment → Cloudflare target:
 #   main    → production → Pages projects fixmytext-{shell,editor-remote,analytics-remote}
 #                          + workers `fixmytext-{content,router}`   [manual dispatch only]
@@ -44,9 +44,9 @@
 name: Deploy (Cloudflare)
 
 # Release model (asymmetric):
-#   develop    — deploys AUTOMATICALLY after "Frontend CI" succeeds on the
-#                develop branch (never on a raw push — H-6).
-#   production — NEVER auto-deploys. Releases are manual: Actions →
+#   develop    - deploys AUTOMATICALLY after "Frontend CI" succeeds on the
+#                develop branch (never on a raw push - H-6).
+#   production - NEVER auto-deploys. Releases are manual: Actions →
 #                "Deploy (Cloudflare)" → Run workflow from `main`. Branch
 #                protection guarantees main only carries CI-green commits.
 on:
@@ -61,7 +61,7 @@ on:
         type: boolean
         default: false
 
-# contents:write — the deploy jobs push the `deployed/<env>/<app>` marker tags.
+# contents:write - the deploy jobs push the `deployed/<env>/<app>` marker tags.
 permissions:
   contents: write
 
@@ -80,7 +80,7 @@ jobs:
     # Only run for a successful CI run, or a manual dispatch from a branch that
     # maps to a real environment. Without the branch check, dispatching from a
     # feature branch would deploy it INTO the develop environment (branch-alias
-    # uploads, develop worker, deployed/develop/* marker tags) — inconsistent
+    # uploads, develop worker, deployed/develop/* marker tags) - inconsistent
     # state that then masquerades as develop.
     if: >-
       (github.event_name == 'workflow_dispatch' &&
@@ -102,7 +102,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.ref }}
-          # Full history + tags — needed to diff against the marker tags.
+          # Full history + tags - needed to diff against the marker tags.
           fetch-depth: 0
           fetch-tags: true
       - name: Diff each app against its last-deployed marker tag
@@ -121,7 +121,7 @@ jobs:
             if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
               echo true; return   # never deployed to this env yet
             fi
-            # shellcheck disable=SC2086 — path list is intentionally word-split
+            # shellcheck disable=SC2086 - path list is intentionally word-split
             if [ -n "$(git diff --name-only "$tag" HEAD -- ${PATHS[$app]})" ]; then
               echo true
             else
@@ -151,7 +151,7 @@ jobs:
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
       # Prefixes the Cloudflare project name to select the environment's project.
       # The non-main branch carries the truthy operand so production resolves to a
-      # genuinely empty string (`cond && '' || x` always yields x — empty strings
+      # genuinely empty string (`cond && '' || x` always yields x - empty strings
       # are falsy in GitHub expressions).
       CF_PROJECT_PREFIX: ${{ (github.event.workflow_run.head_branch || github.ref_name) != 'main' && 'develop-' || '' }}
     strategy:
@@ -190,7 +190,7 @@ jobs:
     environment: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
     needs: [changes, deploy-remotes]
     # Run when the shell changed AND the remotes either deployed successfully or
-    # were skipped entirely (no changes) — but never after a remote failure.
+    # were skipped entirely (no changes) - but never after a remote failure.
     if: >-
       !cancelled() &&
       needs.changes.outputs.shell == 'true' &&
@@ -214,13 +214,13 @@ jobs:
         run: npm run deploy:shell -- --branch main
         env:
           CF_PAGES_PROJECT_SHELL: ${{ env.CF_PROJECT_PREFIX }}fixmytext-shell
-          # Federation entry points baked into the host bundle — must point at the
+          # Federation entry points baked into the host bundle - must point at the
           # environment's router so the browser loads each remote under /remotes/<name>/.
           VITE_EDITOR_REMOTE_ENTRY: ${{ vars.VITE_EDITOR_REMOTE_ENTRY }}
           VITE_ANALYTICS_REMOTE_ENTRY: ${{ vars.VITE_ANALYTICS_REMOTE_ENTRY }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_KEYCLOAK_URL: ${{ vars.VITE_KEYCLOAK_URL }}
-          # Realm must be passed explicitly — app-core silently falls back to the
+          # Realm must be passed explicitly - app-core silently falls back to the
           # DEV realm (Velobits) when unset (keycloakConfig.ts).
           VITE_KEYCLOAK_REALM: ${{ vars.VITE_KEYCLOAK_REALM }}
           VITE_KEYCLOAK_CLIENT_ID: ${{ vars.VITE_KEYCLOAK_CLIENT_ID }}
@@ -230,7 +230,7 @@ jobs:
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
           VITE_SENTRY_ENVIRONMENT: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
-          # Must match the commit actually checked out and built — for
+          # Must match the commit actually checked out and built - for
           # workflow_run triggers, github.sha is NOT that commit.
           VITE_SENTRY_RELEASE: ${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Update deploy marker tag
@@ -246,8 +246,8 @@ jobs:
     if: needs.changes.outputs.content == 'true'
     env:
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
-      # Selects [env.develop] in apps/content/wrangler.toml — and thus the
-      # develop-fixmytext-content worker — for develop deploys (see the
+      # Selects [env.develop] in apps/content/wrangler.toml - and thus the
+      # develop-fixmytext-content worker - for develop deploys (see the
       # WRANGLER_ENV_FLAG note on deploy-router for the expression shape).
       WRANGLER_ENV_FLAG: ${{ (github.event.workflow_run.head_branch || github.ref_name) != 'main' && '--env develop' || '' }}
     steps:
@@ -262,7 +262,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Build & deploy content app
-        # Runtime secrets (AUTH_SECRET, COOKIE_SECRET) are NOT build inputs —
+        # Runtime secrets (AUTH_SECRET, COOKIE_SECRET) are NOT build inputs -
         # they live on each worker as dashboard Secrets and survive deploys.
         run: npm run deploy:content -- $WRANGLER_ENV_FLAG
         env:
@@ -277,7 +277,7 @@ jobs:
     name: Deploy router worker
     runs-on: ubuntu-latest
     environment: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
-    # The router stitches the deployed units together — deploy it last so it never
+    # The router stitches the deployed units together - deploy it last so it never
     # routes to a unit that hasn't been published yet.
     needs: [changes, deploy-remotes, deploy-shell, deploy-content]
     if: >-
@@ -289,10 +289,10 @@ jobs:
     env:
       DEPLOY_ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'develop' }}
       # Empty for production (top-level wrangler.toml config); selects the
-      # [env.develop] block — and thus the develop-fixmytext-router worker —
+      # [env.develop] block - and thus the develop-fixmytext-router worker -
       # for develop deploys. The non-main branch carries the truthy operand so
       # production resolves to a genuinely empty string (`cond && '' || x`
-      # would always yield x — empty strings are falsy in GitHub expressions).
+      # would always yield x - empty strings are falsy in GitHub expressions).
       WRANGLER_ENV_FLAG: ${{ (github.event.workflow_run.head_branch || github.ref_name) != 'main' && '--env develop' || '' }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1

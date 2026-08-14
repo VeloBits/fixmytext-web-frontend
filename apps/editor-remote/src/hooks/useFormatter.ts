@@ -76,7 +76,7 @@ export default function useFormatter(
   onResult: (label: string, formatted: string) => void
 ): FormatterValue {
   const [fmtCfg, setFmtCfg] = useState(defaultFmtCfg);
-  // Ref always holds the latest config — avoids stale closures in handlers
+  // Ref always holds the latest config - avoids stale closures in handlers
   const cfgRef = useRef(fmtCfg);
   useEffect(() => {
     cfgRef.current = fmtCfg;

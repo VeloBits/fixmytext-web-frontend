@@ -47,6 +47,6 @@ setTimeout(() => {
     sessionStorage.removeItem('fmx_guest_persona');
     sessionStorage.removeItem('fmx_guest_persona_owner');
   } catch {
-    /* storage unavailable (e.g. blocked third-party context) — ignore */
+    /* storage unavailable (e.g. blocked third-party context) - ignore */
   }
 }, 0);

@@ -41,7 +41,7 @@ const PASS_GROUPS = [
     key: 'micro',
     label: 'Micro',
     icon: <DropletIcon size={16} />,
-    desc: 'Just a taste — pocket change',
+    desc: 'Just a taste - pocket change',
   },
   { key: 'day', label: 'Day', icon: <SunIcon size={16} />, desc: 'One productive day' },
   {
@@ -226,7 +226,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
       return;
     }
     const pass = passMap[passId];
-    // Tool-scoped pass: the buyer picks exactly N tools first — the selection
+    // Tool-scoped pass: the buyer picks exactly N tools first - the selection
     // becomes the server-validated pass scope.
     if (pass && pass.tools > 0) {
       setSelectedPass(null); // close the detail drawer under the picker
@@ -559,7 +559,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
           </div>
           <h3>Free Forever</h3>
           <p>
-            Every tool gets <strong>3 free uses per day</strong> — no sign-up needed.
+            Every tool gets <strong>3 free uses per day</strong> - no sign-up needed.
             <br />
             Log in for a <strong>+1 daily bonus</strong>. Earn free passes with the weekly reward
             spin!
@@ -656,7 +656,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                 >
                   {buyingId === detailPass.id
                     ? 'Loading...'
-                    : `Buy Now — ${formatPrice(detailPass.price)}`}
+                    : `Buy Now - ${formatPrice(detailPass.price)}`}
                 </button>
                 <p className="tu-pass-detail-footer">Secure payment via Razorpay</p>
               </div>
@@ -672,7 +672,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                         ? 'every tool (70+)'
                         : `${detailPass.tools} tool${detailPass.tools > 1 ? 's' : ''} you pick`}
                     </li>
-                    <li>Works on AI tools, text transforms, exports — everything</li>
+                    <li>Works on AI tools, text transforms, exports - everything</li>
                     <li>
                       Active for {detailPass.duration_days} day
                       {detailPass.duration_days > 1 ? 's' : ''} from purchase
@@ -821,7 +821,7 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                 >
                   {buyingId === detailCredit.id
                     ? 'Loading...'
-                    : `Buy Now — ${formatPrice(detailCredit.price)}`}
+                    : `Buy Now - ${formatPrice(detailCredit.price)}`}
                 </button>
                 <p className="tu-pass-detail-footer">Secure payment via Razorpay</p>
               </div>
@@ -833,8 +833,8 @@ export default function PricingPage({ showAlert, subscription: subProp }: Pricin
                   <ul className="tu-pass-detail-list">
                     <li>{detailCredit.credits} credits that work on any tool</li>
                     <li>1 credit = 1 extra use beyond the daily free limit</li>
-                    <li>No expiry — use them whenever you need</li>
-                    <li>Works on AI tools, text transforms, exports — everything</li>
+                    <li>No expiry - use them whenever you need</li>
+                    <li>Works on AI tools, text transforms, exports - everything</li>
                     <li>Credits are consumed in order (oldest first)</li>
                   </ul>
                 </div>

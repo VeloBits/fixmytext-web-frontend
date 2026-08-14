@@ -125,7 +125,7 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
           keyId: key_id as string | undefined,
           userEmail: user_email as string | undefined,
           userName: user_name as string | undefined,
-          description: 'Pro — Unlimited Access',
+          description: 'Pro - Unlimited Access',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onSuccess: onSuccess as any,
           onFailure: onFailure as ((msg: string) => void) | undefined,
@@ -155,7 +155,7 @@ export default function useSubscription({ showAlert }: UseSubscriptionOptions = 
           month: 'long',
           day: 'numeric',
         });
-        showAlert?.(`Your Pro plan is cancelled — access continues until ${until}.`, 'info');
+        showAlert?.(`Your Pro plan is cancelled - access continues until ${until}.`, 'info');
       }
       refetchStatus();
     } catch (err) {

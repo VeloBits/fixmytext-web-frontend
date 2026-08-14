@@ -203,7 +203,7 @@ describe('NthLineDrawer', () => {
   });
 });
 
-describe('WrapLinesDrawer — additional coverage', () => {
+describe('WrapLinesDrawer - additional coverage', () => {
   const props = {
     onApply: vi.fn(),
     onPreview: vi.fn(),
@@ -243,7 +243,7 @@ describe('WrapLinesDrawer — additional coverage', () => {
   });
 });
 
-describe('TruncateLinesDrawer — additional coverage', () => {
+describe('TruncateLinesDrawer - additional coverage', () => {
   const props = {
     onApply: vi.fn(),
     onPreview: vi.fn(),
@@ -272,7 +272,7 @@ describe('TruncateLinesDrawer — additional coverage', () => {
 
 // ── Fake-timer tests: exercise useDebouncedPreview + pure helpers ────
 
-describe('WrapLinesDrawer — debounced preview fires after delay', () => {
+describe('WrapLinesDrawer - debounced preview fires after delay', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
@@ -308,7 +308,7 @@ describe('WrapLinesDrawer — debounced preview fires after delay', () => {
         text="line1\nline2"
       />
     );
-    // No changes to prefix/suffix — they stay empty, so wrapLines returns null
+    // No changes to prefix/suffix - they stay empty, so wrapLines returns null
     act(() => {
       vi.advanceTimersByTime(3100);
     });
@@ -328,12 +328,12 @@ describe('WrapLinesDrawer — debounced preview fires after delay', () => {
     act(() => {
       vi.advanceTimersByTime(3100);
     });
-    // Only one invocation — earlier timer was cleared
+    // Only one invocation - earlier timer was cleared
     expect(onPreview).toHaveBeenCalled();
   });
 });
 
-describe('FilterLinesDrawer — debounced preview fires after delay', () => {
+describe('FilterLinesDrawer - debounced preview fires after delay', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
@@ -357,7 +357,7 @@ describe('FilterLinesDrawer — debounced preview fires after delay', () => {
     act(() => {
       vi.advanceTimersByTime(3100);
     });
-    // Verify onPreview was called — coverage goal is that filterLines/lineMatches executed
+    // Verify onPreview was called - coverage goal is that filterLines/lineMatches executed
     expect(onPreview).toHaveBeenCalled();
   });
 
@@ -372,7 +372,7 @@ describe('FilterLinesDrawer — debounced preview fires after delay', () => {
         text="apple\nbanana"
       />
     );
-    // Pattern stays empty — filterLines returns null
+    // Pattern stays empty - filterLines returns null
     act(() => {
       vi.advanceTimersByTime(3100);
     });
@@ -457,7 +457,7 @@ describe('FilterLinesDrawer — debounced preview fires after delay', () => {
   });
 });
 
-describe('TruncateLinesDrawer — debounced preview fires after delay', () => {
+describe('TruncateLinesDrawer - debounced preview fires after delay', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
@@ -499,7 +499,7 @@ describe('TruncateLinesDrawer — debounced preview fires after delay', () => {
   });
 });
 
-describe('NthLineDrawer — debounced preview fires after delay', () => {
+describe('NthLineDrawer - debounced preview fires after delay', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
@@ -566,7 +566,7 @@ describe('NthLineDrawer — debounced preview fires after delay', () => {
     render(
       <NthLineDrawer onApply={vi.fn()} onPreview={onPreview} disabled={false} text="a\nb\nc" />
     );
-    // n stays at default '' which parses to 0 — extractNthLines returns null
+    // n stays at default '' which parses to 0 - extractNthLines returns null
     act(() => {
       vi.advanceTimersByTime(3100);
     });
@@ -576,7 +576,7 @@ describe('NthLineDrawer — debounced preview fires after delay', () => {
 
 // ── lineMatches branch coverage (via FilterLinesDrawer UI) ───────────
 
-describe('FilterLinesDrawer — lineMatches branches', () => {
+describe('FilterLinesDrawer - lineMatches branches', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

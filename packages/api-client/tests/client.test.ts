@@ -190,7 +190,7 @@ describe('default base URL resolution', () => {
   });
 });
 
-describe('apiFetch — defaults and edge cases', () => {
+describe('apiFetch - defaults and edge cases', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();

@@ -49,11 +49,14 @@ vi.mock('react-router-dom', () => ({
 }));
 
 // ── RTK Query API mocks ──
+// Module-level spy so tests can assert whether a tool actually executed.
+// Shaped like an RTK Query trigger (returns a thenable with .unwrap()), which
+// is what callApi awaits.
+const mockTransform = vi.fn(() => ({
+  unwrap: () => Promise.resolve({ result: 'transformed' }),
+}));
 vi.mock('@velobits/app-core/store/api/textApi', () => ({
-  useTransformTextMutation: () => [
-    vi.fn().mockResolvedValue({ result: 'transformed' }),
-    { isLoading: false },
-  ],
+  useTransformTextMutation: () => [mockTransform, { isLoading: false }],
 }));
 vi.mock('@velobits/app-core/store/api/authApi', () => ({
   useLogoutMutation: () => [vi.fn().mockResolvedValue(undefined), {}],
@@ -63,9 +66,14 @@ vi.mock('@velobits/app-core/store/api/historyApi', () => ({
   useDeleteHistoryEntryMutation: () => [vi.fn(), {}],
   useClearHistoryMutation: () => [vi.fn(), {}],
 }));
+const mockUpdatePrefs = vi.fn(() => ({ unwrap: () => Promise.resolve({}) }));
 vi.mock('@velobits/app-core/store/api/userDataApi', () => ({
   useGetUiSettingsQuery: () => ({ data: null }),
   useUpdateUiSettingsMutation: () => [vi.fn().mockResolvedValue(undefined), {}],
+  // Backs useAutoRun; unauthenticated tests skip the query, so data stays null
+  // and the execution mode comes from localStorage.
+  useGetPreferencesQuery: () => ({ data: null }),
+  useUpdatePreferencesMutation: () => [mockUpdatePrefs, {}],
 }));
 vi.mock('@velobits/app-core/store/api/shareApi', () => ({
   useCreateShareMutation: () => [
@@ -310,17 +318,37 @@ vi.mock('@velobits/app-core/hooks/useTrialLimit', () => ({
     trialCount: 0,
   })),
 }));
+// The hook itself is mocked (its own suite covers key matching), so we capture
+// the actions TextForm hands it. Invoking captured.runActiveTool() is how these
+// tests exercise the Ctrl+Enter path without a real keydown listener.
+const kb = vi.hoisted(() => ({
+  actions: {} as Record<string, (...args: unknown[]) => unknown>,
+}));
 vi.mock('@/hooks/useKeyboardShortcuts', () => ({
-  default: () => ({
-    shortcutsOpen: false,
-    setShortcutsOpen: vi.fn(),
-    groups: [],
-    overrides: {},
-    updateBinding: vi.fn(),
-    resetAll: vi.fn(),
-    resetOne: vi.fn(),
-    isCustomized: vi.fn(() => false),
-  }),
+  default: (actions: Record<string, (...args: unknown[]) => unknown>) => {
+    kb.actions = actions;
+    return {
+      shortcutsOpen: false,
+      setShortcutsOpen: vi.fn(),
+      // Real default binding for "Run Active Tool" so the Run button can render
+      // its keyboard hint from the live binding, as it does in the app.
+      groups: [
+        {
+          group: 'Editor',
+          shortcuts: [{ keys: 'Enter', ctrl: true, label: 'Run Active Tool', id: 'run_tool' }],
+        },
+      ],
+      overrides: {},
+      updateBinding: vi.fn(),
+      resetAll: vi.fn(),
+      resetOne: vi.fn(),
+      isCustomized: vi.fn(() => false),
+    };
+  },
+  formatShortcut: (sc: { ctrl?: boolean; keys: string }) => [
+    ...(sc.ctrl ? ['Ctrl'] : []),
+    sc.keys === 'Enter' ? '↵' : sc.keys.toUpperCase(),
+  ],
 }));
 
 // ── Child component mocks ──
@@ -511,7 +539,7 @@ describe('TextForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
-    // Provide a ResizeObserver stub — TabBar uses it and jsdom does not support it.
+    // Provide a ResizeObserver stub - TabBar uses it and jsdom does not support it.
     if (!window.ResizeObserver) {
       window.ResizeObserver = class {
         observe() {}
@@ -571,7 +599,7 @@ describe('TextForm', () => {
 
   it('renders no sidebar footer without subscription badges', () => {
     render(<TextForm {...defaultProps} />);
-    // The footer only exists for PRO/credits badges now — with none, it is
+    // The footer only exists for PRO/credits badges now - with none, it is
     // skipped entirely so its border/padding don't render as an empty strip.
     expect(document.querySelector('.tu-sidebar-footer')).not.toBeInTheDocument();
   });
@@ -960,7 +988,7 @@ describe('TextForm', () => {
       fireEvent.click(saveTabBtn);
       expect(screen.getByText('Save to Templates')).toBeInTheDocument();
     } else {
-      // Modal not reachable without the button — just confirm no crash
+      // Modal not reachable without the button - just confirm no crash
       expect(document.querySelector('.tu-forge')).toBeInTheDocument();
     }
   });
@@ -1158,7 +1186,7 @@ describe('TextForm tool groups and favorites (post-gamification-removal)', () =>
     expect(screen.queryByText('Daily Quest')).not.toBeInTheDocument();
     expect(screen.queryByText('Recent Badges')).not.toBeInTheDocument();
     expect(screen.queryByText('Most Used')).not.toBeInTheDocument();
-    // favorites card survives — it's a product feature, not gamification
+    // favorites card survives - it's a product feature, not gamification
     expect(screen.getByText('Popular Tools')).toBeInTheDocument();
   });
 
@@ -1200,20 +1228,198 @@ describe('TextForm tool groups and favorites (post-gamification-removal)', () =>
     expect(panel.getAttribute('data-group-names')).toBe('Writing essentials');
   });
 
-  it('executes tools on paste (debounced auto-run)', async () => {
+  it('does not execute tools on paste while Auto Run is off (the default)', async () => {
     render(<TextForm {...defaultProps} />);
     // Open a workspace tab via the mocked ToolPanel (first real tool)
     fireEvent.click(screen.getByTestId('tool-panel'));
     const textarea = document.querySelector('.tu-textarea') as HTMLTextAreaElement;
     expect(textarea).toBeInTheDocument();
     fireEvent.change(textarea, { target: { value: 'hello world' } });
-    // Paste schedules executeToolAction (150ms)
     fireEvent.paste(textarea);
     await act(async () => {
       await new Promise((r) => setTimeout(r, 250));
     });
+    expect(mockTransform).not.toHaveBeenCalled();
     expect(screen.getByTestId('output-panel')).toBeInTheDocument();
     expect(document.querySelector('.tu-forge')).toBeInTheDocument();
+  });
+});
+
+// ── Execution mode: manual Run vs Auto Run ──────────────────────────────────
+// Manual is the default; Auto Run is an opt-in preference read from
+// localStorage (and, for signed-in users, from the DB via useAutoRun).
+describe('TextForm execution mode', () => {
+  /** Open a tool tab and return its textarea. */
+  const openToolTab = () => {
+    fireEvent.click(screen.getByTestId('tool-panel'));
+    return document.querySelector('.tu-textarea') as HTMLTextAreaElement;
+  };
+  const runButton = () => document.querySelector('.tu-run-btn') as HTMLButtonElement | null;
+  /** Let the 2s auto-run debounce (plus slack) elapse. */
+  const advancePastDebounce = async () => {
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 2400));
+    });
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorageMock.getItem.mockReturnValue(null);
+    if (!window.ResizeObserver) {
+      window.ResizeObserver = class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      } as unknown as typeof ResizeObserver;
+    }
+  });
+
+  it('renders a Run button on a tool tab', () => {
+    render(<TextForm {...defaultProps} />);
+    openToolTab();
+    expect(runButton()).toBeInTheDocument();
+    expect(runButton()).toHaveTextContent('Run');
+  });
+
+  it('disables Run while the input is empty', () => {
+    render(<TextForm {...defaultProps} />);
+    openToolTab();
+    expect(runButton()).toBeDisabled();
+  });
+
+  it('disables Run for whitespace-only input', () => {
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    fireEvent.change(textarea, { target: { value: '   \n  ' } });
+    expect(runButton()).toBeDisabled();
+  });
+
+  it('enables Run once the input has content', () => {
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    expect(runButton()).toBeEnabled();
+  });
+
+  it('executes the active tool when Run is clicked', async () => {
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    await act(async () => {
+      fireEvent.click(runButton()!);
+    });
+    expect(mockTransform).toHaveBeenCalledTimes(1);
+    expect(mockTransform).toHaveBeenCalledWith(expect.objectContaining({ text: 'hello' }));
+  });
+
+  it('routes the keyboard shortcut through the same centralized runner', async () => {
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    await act(async () => {
+      kb.actions.runActiveTool?.();
+    });
+    expect(mockTransform).toHaveBeenCalledTimes(1);
+    expect(mockTransform).toHaveBeenCalledWith(expect.objectContaining({ text: 'hello' }));
+  });
+
+  it('ignores the keyboard shortcut when the input is empty', async () => {
+    render(<TextForm {...defaultProps} />);
+    openToolTab();
+    await act(async () => {
+      kb.actions.runActiveTool?.();
+    });
+    expect(mockTransform).not.toHaveBeenCalled();
+  });
+
+  it('shows the keyboard hint on the Run button', () => {
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    expect(runButton()?.querySelector('.tu-run-btn-kbd')).toHaveTextContent('Ctrl↵');
+    expect(runButton()).toHaveAttribute('aria-keyshortcuts', 'Control+Enter');
+  });
+
+  it('never executes from typing while Auto Run is off', async () => {
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    // Two changes: the first only records the tab's baseline text, so this also
+    // covers the keystroke that would arm the debounce if it were enabled.
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    fireEvent.change(textarea, { target: { value: 'hello world' } });
+    await advancePastDebounce();
+    expect(mockTransform).not.toHaveBeenCalled();
+  });
+
+  it('executes after the debounce when Auto Run is on', async () => {
+    localStorageMock.getItem.mockImplementation((k: string) =>
+      k === 'fmx_auto_run' ? 'true' : null
+    );
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    fireEvent.change(textarea, { target: { value: 'hello world' } });
+    await advancePastDebounce();
+    expect(mockTransform).toHaveBeenCalledTimes(1);
+    expect(mockTransform).toHaveBeenCalledWith(expect.objectContaining({ text: 'hello world' }));
+  });
+
+  it('keeps Run working as an immediate action while Auto Run is on', async () => {
+    localStorageMock.getItem.mockImplementation((k: string) =>
+      k === 'fmx_auto_run' ? 'true' : null
+    );
+    render(<TextForm {...defaultProps} />);
+    const textarea = openToolTab();
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    // Click before the debounce elapses - the run happens now, not in 2s.
+    await act(async () => {
+      fireEvent.click(runButton()!);
+    });
+    expect(mockTransform).toHaveBeenCalledTimes(1);
+  });
+
+  it('labels the button Generate for authored-output tool groups', () => {
+    render(<TextForm {...defaultProps} />);
+    // TOOLS[0] is a case-transform tool, so the default label applies.
+    openToolTab();
+    expect(runButton()).toHaveTextContent('Run');
+    expect(runButton()).not.toHaveTextContent('Generate');
+  });
+
+  it('shows the Auto Run switch as off by default in settings', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar') as HTMLElement);
+    const toggle = screen.getByRole('switch', { name: /auto run/i });
+    expect(toggle).toHaveAttribute('aria-checked', 'false');
+  });
+
+  it('persists Auto Run to localStorage when toggled on', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar') as HTMLElement);
+    fireEvent.click(screen.getByRole('switch', { name: /auto run/i }));
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('fmx_auto_run', 'true');
+    expect(screen.getByRole('switch', { name: /auto run/i })).toHaveAttribute(
+      'aria-checked',
+      'true'
+    );
+  });
+
+  it('warns that Auto Run can consume usage while typing', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar') as HTMLElement);
+    expect(document.querySelector('.tu-settings-help')).toHaveTextContent(/usage/i);
+  });
+
+  it('does not persist Auto Run to the DB for guests', () => {
+    render(<TextForm {...defaultProps} />);
+    fireEvent.click(document.querySelector('.tu-activity-avatar') as HTMLElement);
+    fireEvent.click(screen.getByRole('switch', { name: /auto run/i }));
+    expect(mockUpdatePrefs).not.toHaveBeenCalled();
+  });
+
+  it('shows no Run button on the landing page (no tool tab open)', () => {
+    render(<TextForm {...defaultProps} />);
+    expect(runButton()).not.toBeInTheDocument();
   });
 });
 

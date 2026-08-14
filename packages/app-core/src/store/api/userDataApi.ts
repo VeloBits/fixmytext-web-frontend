@@ -32,7 +32,7 @@ export interface ToolGroupItemArg {
 
 export interface SetToolGroupToolsArg {
   groupId: string;
-  /** Full ordered list — array position becomes sort_order (covers reorder,
+  /** Full ordered list - array position becomes sort_order (covers reorder,
    * bulk add, and bulk remove in one idempotent call). */
   toolIds: string[];
 }

@@ -215,7 +215,7 @@ real site unreachable from your machine. See
 [`local-dev-docker.md`](./local-dev-docker.md) and [`.env.example`](../.env.example).
 
 Keycloak needs a valid redirect URI + web origin for
-`http://local-fixmytext.velobits.dev:3000` on the `local-velobits` client, and for
+`http://local-fixmytext.velobits.dev:3100` on the `local-velobits` client, and for
 each deployed origin on its respective client.
 
 ## Deploying

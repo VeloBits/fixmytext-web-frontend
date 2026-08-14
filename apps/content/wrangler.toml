@@ -8,26 +8,26 @@ directory = ".open-next/assets"
 
 # Workers Custom Domain on the velobits.dev zone (wrangler creates the DNS record
 # and hostname binding on deploy). The router still reaches this worker through
-# its CONTENT service binding — the domain exists so the worker is addressable
+# its CONTENT service binding - the domain exists so the worker is addressable
 # on velobits.dev rather than workers.dev, and so the local-dev fallback in
 # worker/src/index.ts has a fetchable host.
 #
 # SEO note: this hostname serves the same HTML as the router origin. That is
 # harmless because every page's canonical/OG URL is built from
 # NEXT_PUBLIC_SITE_URL (app/layout.tsx metadataBase, sitemap.ts, robots.ts),
-# which points at the router origin — keep that variable set per environment.
+# which points at the router origin - keep that variable set per environment.
 [[routes]]
 pattern = "fixmytext-content.velobits.dev"
 custom_domain = true
 
 # ── Develop environment ──────────────────────────────────────────────────────
 # Deployed by CI from the `develop` branch (wrangler deploy --env develop).
-# Runtime secrets (AUTH_SECRET, COOKIE_SECRET) are per-worker — set them on
+# Runtime secrets (AUTH_SECRET, COOKIE_SECRET) are per-worker - set them on
 # BOTH workers via the dashboard (Secrets survive deploys; plaintext vars don't).
 [env.develop]
 name = "develop-fixmytext-content"
 
-# Assets and routes are not inherited into env blocks — redeclare.
+# Assets and routes are not inherited into env blocks - redeclare.
 [env.develop.assets]
 directory = ".open-next/assets"
 

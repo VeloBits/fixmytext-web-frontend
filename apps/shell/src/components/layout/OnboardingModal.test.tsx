@@ -95,7 +95,7 @@ import OnboardingModal from './OnboardingModal';
 describe('OnboardingModal', () => {
   it('renders welcome title', () => {
     render(<OnboardingModal onComplete={vi.fn()} />);
-    // TypingText renders each character as a separate span — check body text
+    // TypingText renders each character as a separate span - check body text
     expect(document.body.textContent).toContain('Welcome');
   });
 
@@ -118,7 +118,7 @@ describe('OnboardingModal', () => {
   it('calls onComplete with null on X (dismiss creates nothing)', () => {
     const onComplete = vi.fn();
     render(<OnboardingModal onComplete={onComplete} />);
-    fireEvent.click(screen.getByLabelText('Skip — explore all tools'));
+    fireEvent.click(screen.getByLabelText('Skip - explore all tools'));
     expect(onComplete).toHaveBeenCalledWith(null);
   });
 
@@ -141,7 +141,7 @@ describe('OnboardingModal', () => {
   it('renders footer text', () => {
     render(<OnboardingModal onComplete={vi.fn()} />);
     expect(
-      screen.getByText('Your kit becomes an editable group — rename or change it anytime')
+      screen.getByText('Your kit becomes an editable group - rename or change it anytime')
     ).toBeInTheDocument();
   });
 
@@ -152,7 +152,7 @@ describe('OnboardingModal', () => {
 
   it('renders logo icon', () => {
     render(<OnboardingModal onComplete={vi.fn()} />);
-    // Logo renders a single letter — may appear in multiple places, check at least one
+    // Logo renders a single letter - may appear in multiple places, check at least one
     expect(document.body.textContent).toMatch(/F/);
   });
 });

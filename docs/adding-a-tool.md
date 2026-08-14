@@ -94,7 +94,7 @@ If the backend endpoint doesn't exist yet, see the backend repo's `docs/adding-a
 ## Step 4: Test
 
 1. Run `npm run dev`
-2. Open http://localhost:3000
+2. Open http://localhost:3100
 3. Search for your tool name in the tool search
 4. Verify it appears in the correct category
 5. Enter sample text, click the tool, verify the result

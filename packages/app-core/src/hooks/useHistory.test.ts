@@ -31,7 +31,7 @@ import { useOidcAuth } from '../auth/useOidcAuth';
 const mockUseOidcAuth = vi.mocked(useOidcAuth);
 
 describe('useHistory', () => {
-  // vi.fn() returns a Mock — cast to target signature for use with useHistory
+  // vi.fn() returns a Mock - cast to target signature for use with useHistory
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let setText: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -102,7 +102,7 @@ describe('OutputPanel', () => {
         activeTool={{ id: 'test', label: 'Test', group: 'case' } as unknown as ToolDefinition}
       />
     );
-    expect(screen.getByText('Start typing — output updates automatically')).toBeInTheDocument();
+    expect(screen.getByText('Start typing - output updates automatically')).toBeInTheDocument();
   });
 
   it('shows loading spinner when loading=true', () => {

@@ -132,7 +132,7 @@ export const ENDPOINTS = {
   CSV_TO_TABLE: '/api/v1/text/csv-to-table',
   SQL_INSERT_GEN: '/api/v1/text/sql-insert-gen',
 
-  // AI Writing — served by ai-svc at /api/v1/ai/
+  // AI Writing - served by ai-svc at /api/v1/ai/
   ACADEMIC_STYLE: '/api/v1/ai/academic-style',
   CREATIVE_STYLE: '/api/v1/ai/creative-style',
   TECHNICAL_STYLE: '/api/v1/ai/technical-style',
@@ -148,7 +148,7 @@ export const ENDPOINTS = {
   REWRITE_UNIQUE: '/api/v1/ai/rewrite-unique',
   TONE_ANALYZER: '/api/v1/ai/tone-analyzer',
 
-  // AI Content — served by ai-svc at /api/v1/ai/
+  // AI Content - served by ai-svc at /api/v1/ai/
   LINKEDIN_POST: '/api/v1/ai/linkedin-post',
   TWITTER_THREAD: '/api/v1/ai/twitter-thread',
   INSTAGRAM_CAPTION: '/api/v1/ai/instagram-caption',
@@ -164,7 +164,7 @@ export const ENDPOINTS = {
   ANGLE_GENERATOR: '/api/v1/ai/angle-generator',
   FAQ_SCHEMA: '/api/v1/ai/faq-schema',
 
-  // Language — served by ai-svc at /api/v1/ai/
+  // Language - served by ai-svc at /api/v1/ai/
   POS_TAGGER: '/api/v1/ai/pos-tagger',
   SENTENCE_TYPE: '/api/v1/ai/sentence-type',
   GRAMMAR_EXPLAIN: '/api/v1/ai/grammar-explain',
@@ -177,13 +177,13 @@ export const ENDPOINTS = {
   FORMALITY_DETECTOR: '/api/v1/ai/formality-detector',
   CLICHE_DETECTOR: '/api/v1/ai/cliche-detector',
 
-  // Generator — served by ai-svc at /api/v1/ai/
+  // Generator - served by ai-svc at /api/v1/ai/
   REGEX_GEN: '/api/v1/ai/regex-generator',
   WRITING_PROMPT: '/api/v1/ai/writing-prompt',
   TEAM_NAME_GEN: '/api/v1/ai/team-name-generator',
   MOCK_API_RESPONSE: '/api/v1/ai/mock-api-response',
 
-  // AI Tools — served by ai-svc at /api/v1/ai/
+  // AI Tools - served by ai-svc at /api/v1/ai/
   GENERATE_HASHTAGS: '/api/v1/ai/generate-hashtags',
   GENERATE_SEO_TITLES: '/api/v1/ai/generate-seo-titles',
   GENERATE_META_DESCRIPTIONS: '/api/v1/ai/generate-meta-descriptions',

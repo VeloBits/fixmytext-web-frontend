@@ -1,7 +1,7 @@
 /**
  * Server-only session-cookie helpers.
  *
- * Uses Node.js `node:crypto` — do NOT import this file in browser bundles.
+ * Uses Node.js `node:crypto` - do NOT import this file in browser bundles.
  * Import path: `@velobits/auth-shared/server`.
  */
 import { createHmac, timingSafeEqual } from 'node:crypto';
@@ -33,7 +33,7 @@ export function verifySession(raw: string, secret: string): SessionClaims | null
     .update(payloadB64, 'ascii')
     .digest('hex');
 
-  // Constant-time comparison — prevents timing side-channels on the signature.
+  // Constant-time comparison - prevents timing side-channels on the signature.
   try {
     const sigBuf = Buffer.from(sig);
     const expBuf = Buffer.from(expectedSig);
@@ -44,6 +44,6 @@ export function verifySession(raw: string, secret: string): SessionClaims | null
     return null;
   }
 
-  // Signature is valid — now validate shape and expiry via the shared parser.
+  // Signature is valid - now validate shape and expiry via the shared parser.
   return parseSession(raw);
 }

@@ -253,7 +253,7 @@ export default function PassPurchaseModal({
                 <div className="tu-pass-option-body">
                   <span className="tu-pass-option-name">{triplePass.name}</span>
                   <span className="tu-pass-option-desc">
-                    Pick {triplePass.tools} tools — {blockedTool.label} + {triplePass.tools - 1}{' '}
+                    Pick {triplePass.tools} tools - {blockedTool.label} + {triplePass.tools - 1}{' '}
                     more, 24 hours
                   </span>
                 </div>
@@ -308,7 +308,7 @@ export default function PassPurchaseModal({
             <div className="tu-pass-pro-left">
               <CrownIcon />
               <span>
-                Or go <strong>Pro</strong> — unlimited everything
+                Or go <strong>Pro</strong> - unlimited everything
               </span>
             </div>
             <span className="tu-pass-pro-price">{`${PRO_PRICES[currency] || '$5'}/mo`}</span>

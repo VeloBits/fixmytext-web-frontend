@@ -66,6 +66,7 @@ import useExport from '@/hooks/useExport';
 import useRegexTester from '@/hooks/useRegexTester';
 import useTemplates from '@/hooks/useTemplates';
 import useHistory from '@velobits/app-core/hooks/useHistory';
+import useAutoRun from '@velobits/app-core/hooks/useAutoRun';
 import useWordFrequency from '@/hooks/useWordFrequency';
 import usePipeline from '@/hooks/usePipeline';
 import useSmartSuggestions from '@/hooks/useSmartSuggestions';
@@ -74,7 +75,7 @@ import useResize from '@/hooks/useResize';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import useTrialLimit from '@velobits/app-core/hooks/useTrialLimit';
 import useDrawerState from '@/hooks/useDrawerState';
-import useKeyboardShortcuts from '@/hooks/useKeyboardShortcuts';
+import useKeyboardShortcuts, { formatShortcut } from '@/hooks/useKeyboardShortcuts';
 import useHashTools from '@/hooks/useHashTools';
 import useClientTools from '@/hooks/useClientTools';
 
@@ -85,11 +86,19 @@ import ParagraphGutter from './ParagraphGutter';
 
 // Same groups OutputPanel treats as prose-style (paragraph numbering, etc.).
 const PROSE_GROUPS = new Set(['ai_writing', 'ai_content', 'language', 'cleanup', 'case', 'lines']);
+
+// Tool groups whose output is authored rather than transformed - "Generate"
+// reads more truthfully than "Run" on the primary button for these.
+const GENERATE_GROUPS = new Set(['ai_content', 'generate']);
+
+// Idle time before Auto Run re-fires the active tool. Single source of truth:
+// the debounce timer and the label that promises it must not drift apart.
+const AUTO_RUN_DEBOUNCE_MS = 2000;
 import TabBar from './TabBar';
 import DrawerPanel from '@/components/drawers/DrawerPanel';
 import FmtConfigBar from './FmtConfigBar';
 
-// Drawers are lazy-loaded — each only renders when its panel/tab is active,
+// Drawers are lazy-loaded - each only renders when its panel/tab is active,
 // so pulling them out of the main bundle has no UX cost beyond a one-shot
 // chunk fetch the first time a user opens that particular drawer.
 //
@@ -139,7 +148,7 @@ const SampleJsonDrawer = lazy(() =>
 
 // Tiny wrapper so each lazy drawer call site stays a single JSX expression.
 // fallback={null} keeps the drawer slot empty during the (typically <100ms)
-// chunk fetch — drawers are user-initiated, so a flash of empty space is
+// chunk fetch - drawers are user-initiated, so a flash of empty space is
 // less jarring than a spinner that disappears almost immediately.
 function LazyDrawer({ children }: { children: ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>;
@@ -152,7 +161,7 @@ import { chipLabel, chipInitials } from './chipUtils';
 import CommandPalette from '@/components/layout/CommandPalette';
 import KeyboardShortcuts from '@/components/layout/KeyboardShortcuts';
 
-// SVG icons for activity bar (module-level constant — avoids recreation on every render)
+// SVG icons for activity bar (module-level constant - avoids recreation on every render)
 const ACTIVITY_ICONS = {
   all: (
     <svg
@@ -267,7 +276,7 @@ const ACTIVITY_ICONS = {
   ),
 };
 
-// Drawer panel metadata (static — no need to recreate per render)
+// Drawer panel metadata (static - no need to recreate per render)
 const DRAWERS = {
   find: { title: 'Find & Replace', color: 'teal' },
   compare: { title: 'Text Compare', color: 'purple' },
@@ -357,7 +366,7 @@ export default function TextForm(props: TextFormProps) {
   const [chipEditorAnchor, setChipEditorAnchor] = useState<DOMRect | null>(null);
   const [chipOverflowOpen, setChipOverflowOpen] = useState(false);
   const chipOverflowBtnRef = useRef<HTMLButtonElement | null>(null);
-  // Must match the mobile breakpoint in editor.css — inline resize sizes would
+  // Must match the mobile breakpoint in editor.css - inline resize sizes would
   // otherwise override the media query and collapse the layout on small screens
   const isMobile = useMediaQuery('(max-width: 768px)');
   // Desktop: sidebar visible by default; mobile: it's a bottom sheet, start closed
@@ -371,7 +380,7 @@ export default function TextForm(props: TextFormProps) {
   useEffect(() => {
     if (isMobile) setSidebarOpen(false);
   }, [isMobile]);
-  // Mobile: picking a tool opens a workspace — dismiss the sheet so the editor shows
+  // Mobile: picking a tool opens a workspace - dismiss the sheet so the editor shows
   useEffect(() => {
     if (isMobile && activeWorkspaceId) setSidebarOpen(false);
   }, [isMobile, activeWorkspaceId]);
@@ -400,6 +409,19 @@ export default function TextForm(props: TextFormProps) {
   const sharedTextRef = useRef<string | null>(null);
   const pendingAutoRun = useRef<ToolDefinition | null>(null);
   const selectValueRef = useRef<string | null>(null); // holds the freshly-clicked value for select tools
+
+  // ── Execution mode ──────────────────────────────────────
+  // Manual is the default: nothing runs until the user presses Run (or
+  // Ctrl/Cmd+Enter). Auto Run is the opt-in that restores debounce-driven
+  // execution. The ref lets the pending debounce timer and the paste handlers
+  // read the live value instead of the one captured when they were scheduled.
+  const { autoRun, setAutoRun } = useAutoRun();
+  const autoRunRef = useRef(autoRun);
+  autoRunRef.current = autoRun;
+  // Focus target for the "seeded text, manual mode" case (see the pending-run
+  // effect) - pressing Run is the user's next logical action there.
+  const runBtnRef = useRef<HTMLButtonElement | null>(null);
+  const focusRunOnNextRender = useRef(false);
 
   const showAlert = props.showAlert;
   const navigate = useNavigate();
@@ -434,7 +456,7 @@ export default function TextForm(props: TextFormProps) {
   const history = useHistory(setText, showAlert);
   // Server-authoritative 402 (daily quota exhausted): open the pass-purchase
   // upsell for signed-in users; guests get a sign-in prompt instead. The
-  // client-side counter gate can desync from the server — the server verdict
+  // client-side counter gate can desync from the server - the server verdict
   // always wins here.
   const handleToolBlocked = useCallback(
     (toolId: string): void => {
@@ -446,7 +468,7 @@ export default function TextForm(props: TextFormProps) {
       showAlert(
         isAuthenticated
           ? 'Daily limit reached for this tool. Get a pass or go Pro for more uses.'
-          : 'Daily free limit reached — sign in for an extra free use, or get a pass.',
+          : 'Daily free limit reached - sign in for an extra free use, or get a pass.',
         'warning'
       );
     },
@@ -605,7 +627,7 @@ export default function TextForm(props: TextFormProps) {
   }, [isAuthenticated, syncPanelSizes, sidebarResize.size, splitResize.size, bottomResize.size]);
 
   // The shell dispatches this right after a starter-kit pick so the editor
-  // lands on the kit's tab. Transient by design — nothing is persisted, and
+  // lands on the kit's tab. Transient by design - nothing is persisted, and
   // it only ever fires from the onboarding modal.
   useEffect(() => {
     const onKitTab = (e: Event) => {
@@ -676,7 +698,7 @@ export default function TextForm(props: TextFormProps) {
     async (endpoint: string, successMsg: string, toolMeta?: Record<string, unknown>) => {
       const t = textRef.current;
       // Whitespace-only input is not runnable (backend rejects it with 422 and it
-      // must never burn a free use). Prompt only when something was typed —
+      // must never burn a free use). Prompt only when something was typed -
       // fully-empty input keeps the silent no-op so tab-switch auto-runs stay quiet.
       if (!t.trim()) {
         if (t) showAlert('Please enter some text', 'warning');
@@ -759,9 +781,13 @@ export default function TextForm(props: TextFormProps) {
     navigator.clipboard.writeText(textRef.current);
     showAlert('Copied to clipboard', 'success');
   };
+  // Pasting fills the input but is not an explicit "run" gesture, so it only
+  // triggers execution when Auto Run is on - otherwise it would burn usage on
+  // text the user may still be about to edit.
   const handlePaste = () => {
     navigator.clipboard.readText().then((t) => {
       setText((prev) => prev + t);
+      if (!autoRunRef.current) return;
       const ws = workspaceTabs.find((tab) => tab.id === activeWorkspaceId);
       if (ws?.type === 'tool') setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
     });
@@ -770,6 +796,7 @@ export default function TextForm(props: TextFormProps) {
   const handleClearPaste = () => {
     navigator.clipboard.readText().then((t) => {
       setText(t);
+      if (!autoRunRef.current) return;
       const ws = workspaceTabs.find((tab) => tab.id === activeWorkspaceId);
       if (ws?.type === 'tool') setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
     });
@@ -1171,12 +1198,12 @@ export default function TextForm(props: TextFormProps) {
     (toolId: string | null, content: string) => {
       const tool = toolId ? TOOLS.find((t) => t.id === toolId) : null;
       if (!tool) {
-        // No tool_id or tool not found — load into current tab if open, otherwise open a generic tab
+        // No tool_id or tool not found - load into current tab if open, otherwise open a generic tab
         const activeId = activeTabIdRef.current;
         if (activeId) {
           setToolTexts((prev) => ({ ...prev, [activeId]: content }));
         } else {
-          // No tab open — pick the first non-drawer, non-action tool as a generic text holder
+          // No tab open - pick the first non-drawer, non-action tool as a generic text holder
 
           const fallback = TOOLS.find((t) => t.type === 'api' && t.group === 'case') ?? TOOLS[0]!;
           const tabId = `tool-${fallback.id}`;
@@ -1347,23 +1374,61 @@ export default function TextForm(props: TextFormProps) {
     [openToolTab, executeToolAction, compare, setActivePanel, recents]
   );
 
-  // ── Auto-run tool on first open (when text was seeded) ──
+  // ── Centralized explicit execution ──────────────────────
+  // Single entry point for every deliberate run - the Run button, the
+  // Ctrl/Cmd+Enter shortcut, and anything added later. Keeping the guards here
+  // (rather than at each call site) is what makes duplicate-submission and
+  // empty-input protection uniform across all tools.
+  const activeTool = useMemo(() => {
+    const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
+    return ws?.type === 'tool' ? ((ws.tool ?? null) as ToolDefinition | null) : null;
+  }, [workspaceTabs, activeWorkspaceId]);
+
+  /** Whether an explicit run is currently possible (drives the Run button). */
+  const canRun = !!activeTool && !loading && text.trim().length > 0;
+
+  const runActiveTool = useCallback(() => {
+    // Re-read text from the ref so a run fired from a stale closure (e.g. a
+    // keydown handler registered earlier) still sees the current input.
+    if (!activeTool || loading || !textRef.current.trim()) return;
+    executeToolAction(activeTool);
+  }, [activeTool, loading, executeToolAction]);
+
+  // ── Tool opened with seeded text (shared ?t= link, template load) ──
+  // Auto Run executes it immediately; manual mode instead moves focus to Run,
+  // which is the only thing left for the user to do on a pre-filled tab.
   useEffect(() => {
     if (pendingAutoRun.current && text) {
       const tool = pendingAutoRun.current;
       pendingAutoRun.current = null;
-      setTimeout(() => executeToolAction(tool), 50);
+      if (autoRunRef.current) {
+        setTimeout(() => executeToolAction(tool), 50);
+      } else {
+        focusRunOnNextRender.current = true;
+      }
     }
   }, [text, activeWorkspaceId, executeToolAction]);
 
-  // ── Debounced auto-run: re-run tool 2s after user stops typing ──
+  // Move focus to Run once it has actually rendered. Deliberately never fires
+  // on plain typing - stealing focus out of the textarea mid-sentence would be
+  // far worse than the keyboard user having to Tab once.
+  useEffect(() => {
+    if (focusRunOnNextRender.current && runBtnRef.current && !runBtnRef.current.disabled) {
+      focusRunOnNextRender.current = false;
+      runBtnRef.current.focus();
+    }
+  });
+
+  // ── Debounced re-run, 2s after the user stops typing (Auto Run only) ──
+  // The stale-result cleanup below runs in BOTH modes: once the input diverges
+  // from what produced the output, the shown result is wrong either way.
   useEffect(() => {
     if (!activeWorkspaceId || !text || loading) return;
     const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
     if (!ws || ws.type !== 'tool') return;
 
     const prevText = lastTextPerTab.current[activeWorkspaceId];
-    // First time seeing this tab — record text, don't auto-run (result may already be stored)
+    // First time seeing this tab - record text, don't auto-run (result may already be stored)
     if (prevText === undefined) {
       lastTextPerTab.current[activeWorkspaceId] = text;
       return;
@@ -1372,7 +1437,7 @@ export default function TextForm(props: TextFormProps) {
     if (text === prevText) return;
     lastTextPerTab.current[activeWorkspaceId] = text;
 
-    // Text genuinely changed — clear stale result and schedule re-run
+    // Text genuinely changed - clear stale result and schedule re-run
     if (toolResults[activeWorkspaceId]) {
       setToolResults((prev) => {
         const next = { ...prev };
@@ -1381,9 +1446,11 @@ export default function TextForm(props: TextFormProps) {
       });
     }
 
+    if (!autoRunRef.current) return;
     const timer = setTimeout(() => {
-      if (ws.tool) executeToolAction(ws.tool as ToolDefinition);
-    }, 2000);
+      // Re-check: the user may have switched to manual while this was pending.
+      if (autoRunRef.current && ws.tool) executeToolAction(ws.tool as ToolDefinition);
+    }, AUTO_RUN_DEBOUNCE_MS);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce must re-arm only on text/tab change; other deps re-running the effect would cancel the pending timer
   }, [text, activeWorkspaceId]);
@@ -1449,10 +1516,7 @@ export default function TextForm(props: TextFormProps) {
         return;
       }
     },
-    runActiveTool: () => {
-      const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
-      if (ws?.type === 'tool' && ws.tool) executeToolAction(ws.tool as ToolDefinition);
-    },
+    runActiveTool,
     saveTemplate: () => {
       if (activeWorkspaceId) {
         const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
@@ -1496,7 +1560,7 @@ export default function TextForm(props: TextFormProps) {
     },
     runTool: (tool: ToolDefinition) => handleToolClick(tool),
   };
-  // Stable proxy object — never changes identity, always delegates to latest ref
+  // Stable proxy object - never changes identity, always delegates to latest ref
   const keyboardActions = useMemo(() => {
     const proxy: Record<string, (...args: unknown[]) => unknown> = {};
     const keys = [
@@ -1534,6 +1598,32 @@ export default function TextForm(props: TextFormProps) {
     resetOne: resetOneBinding,
     isCustomized: isBindingCustomized,
   } = useKeyboardShortcuts(keyboardActions);
+
+  // ── Run button labelling ────────────────────────────────
+  // Read the live binding rather than hardcoding Ctrl+Enter so a user who
+  // rebound "Run Active Tool" sees their own key in the hint and in
+  // aria-keyshortcuts.
+  const runBinding = useMemo(
+    () => shortcutGroups.flatMap((g) => g.shortcuts).find((s) => s.id === 'run_tool'),
+    [shortcutGroups]
+  );
+  const runShortcutParts = useMemo(
+    () => (runBinding ? formatShortcut(runBinding) : []),
+    [runBinding]
+  );
+  const runShortcutAria = useMemo(() => {
+    if (!runBinding) return undefined;
+    const parts: string[] = [];
+    // aria-keyshortcuts wants the physical modifier; Ctrl is bound to Cmd on
+    // Mac by the shortcut layer, and "Meta" is the correct token there.
+    if (runBinding.ctrl)
+      parts.push(/Mac|iPod|iPhone|iPad/.test(navigator.userAgent) ? 'Meta' : 'Control');
+    if (runBinding.shift) parts.push('Shift');
+    if (runBinding.alt) parts.push('Alt');
+    parts.push(runBinding.keys.length === 1 ? runBinding.keys.toUpperCase() : runBinding.keys);
+    return parts.join('+');
+  }, [runBinding]);
+  const runLabel = activeTool && GENERATE_GROUPS.has(activeTool.group ?? '') ? 'Generate' : 'Run';
 
   // ── Derived stats ───────────────────────────────────────
   const disabled = text.trim().length === 0 || loading;
@@ -1593,7 +1683,7 @@ export default function TextForm(props: TextFormProps) {
     }
   };
 
-  // Activity bar tab click — toggles sidebar
+  // Activity bar tab click - toggles sidebar
   const handleActivityClick = (tabId: string) => {
     if (activeTab === tabId && sidebarOpen) {
       setSidebarOpen(false);
@@ -1622,7 +1712,7 @@ export default function TextForm(props: TextFormProps) {
     [sidebarChips.chips, suggestions.suggestions.length, activeTab, toolGroups.groups]
   );
 
-  // Cap the vertical bar; the active chip is never hidden in the ⋯ overflow —
+  // Cap the vertical bar; the active chip is never hidden in the ⋯ overflow -
   // it swaps into the last visible slot (VSCode active-editor-tab rule).
   const MAX_BAR_CHIPS = 8;
   const { visibleBarChips, overflowBarChips } = useMemo(() => {
@@ -1945,7 +2035,7 @@ export default function TextForm(props: TextFormProps) {
             </div>
           )}
 
-          {/* Tool panel — when a chip view is active */}
+          {/* Tool panel - when a chip view is active */}
           {activeTab && !activeTab.startsWith('_') && (
             <ToolPanel
               tools={TOOLS}
@@ -2530,7 +2620,7 @@ export default function TextForm(props: TextFormProps) {
                       </div>
                       <h2 className="tu-landing-feature-title">AI-Powered</h2>
                       <p className="tu-landing-feature-desc">
-                        Translate, rewrite in any tone, ELI5, summarize — backed by state-of-the-art
+                        Translate, rewrite in any tone, ELI5, summarize - backed by state-of-the-art
                         AI models.
                       </p>
                     </div>
@@ -2554,7 +2644,7 @@ export default function TextForm(props: TextFormProps) {
                       </div>
                       <h2 className="tu-landing-feature-title">Instant Transforms</h2>
                       <p className="tu-landing-feature-desc">
-                        UPPERCASE, lowercase, title case, reverse, sort lines, remove duplicates —
+                        UPPERCASE, lowercase, title case, reverse, sort lines, remove duplicates -
                         one click away.
                       </p>
                     </div>
@@ -2860,7 +2950,7 @@ export default function TextForm(props: TextFormProps) {
                         <span>Dyslexia</span>
                       </button>
                     </div>
-                    {/* Find & Replace bar — shown inline below toolbar */}
+                    {/* Find & Replace bar - shown inline below toolbar */}
                     {workspaceTabs.find((t) => t.id === activeWorkspaceId)?.panelId === 'find' && (
                       <LazyDrawer>
                         <FindReplaceDrawer
@@ -3077,7 +3167,7 @@ export default function TextForm(props: TextFormProps) {
                         }
                       })()}
                     </LazyDrawer>
-                    {/* Formatter config bar — shown inline for formatter tools */}
+                    {/* Formatter config bar - shown inline for formatter tools */}
                     {(() => {
                       const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                       const fmtToolId =
@@ -3202,7 +3292,9 @@ export default function TextForm(props: TextFormProps) {
                           }
                         }}
                         onPaste={() => {
-                          // After paste, auto-run the active tool with minimal delay
+                          // Auto Run only: pasting is input entry, not an explicit
+                          // request to spend a run on it.
+                          if (!autoRunRef.current) return;
                           const ws = workspaceTabs.find((t) => t.id === activeWorkspaceId);
                           if (ws?.type === 'tool' && ws.tool) {
                             setTimeout(() => executeToolAction(ws.tool as ToolDefinition), 150);
@@ -3220,7 +3312,70 @@ export default function TextForm(props: TextFormProps) {
                         }}
                       />
                     </div>
-                    {loading && (
+                    {/* ─── Primary action bar (tool tabs only) ───
+                        Drawer tabs keep their own Apply buttons, so the Run bar
+                        would be a second, conflicting primary action there. */}
+                    {activeTool && (
+                      <div className="tu-run-bar">
+                        <span
+                          className={`tu-run-bar-mode${autoRun ? ' tu-run-bar-mode--auto' : ''}`}
+                        >
+                          {/* Names the feature in both states so users discover
+                              Auto Run exists instead of only learning it is off. */}
+                          <ZapIcon size={12} />
+                          {autoRun
+                            ? `Auto Run is on - runs ${AUTO_RUN_DEBOUNCE_MS / 1000}s after you stop typing`
+                            : 'Auto Run is off'}
+                        </span>
+                        <button
+                          ref={runBtnRef}
+                          type="button"
+                          className="tu-run-btn"
+                          onClick={runActiveTool}
+                          disabled={!canRun}
+                          aria-busy={loading}
+                          aria-keyshortcuts={runShortcutAria}
+                          title={
+                            loading
+                              ? 'Already running...'
+                              : !text.trim()
+                                ? 'Enter some text first'
+                                : `${runLabel} ${activeTool.label}${
+                                    runShortcutParts.length
+                                      ? ` (${runShortcutParts.join('+')})`
+                                      : ''
+                                  }`
+                          }
+                        >
+                          {loading ? (
+                            <>
+                              <span className="tu-run-btn-spinner" aria-hidden="true" />
+                              <span>Running...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                stroke="none"
+                                aria-hidden="true"
+                              >
+                                <polygon points="6 4 20 12 6 20 6 4" />
+                              </svg>
+                              <span>{runLabel}</span>
+                              {runShortcutParts.length > 0 && (
+                                <kbd className="tu-run-btn-kbd">{runShortcutParts.join('')}</kbd>
+                              )}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                    {/* The Run button carries its own spinner, so this strip is
+                        only needed for tabs that have no Run bar (drawers). */}
+                    {loading && !activeTool && (
                       <div className="tu-loading">
                         <div className="tu-spinner" />
                         <span>Processing...</span>
@@ -3262,7 +3417,7 @@ export default function TextForm(props: TextFormProps) {
                           </LazyDrawer>
                         );
                       }
-                      // These render inline in input area — fall through to OutputPanel
+                      // These render inline in input area - fall through to OutputPanel
                       if (
                         [
                           'find',
@@ -3396,7 +3551,7 @@ export default function TextForm(props: TextFormProps) {
                 style={isMobile ? undefined : { height: bottomResize.size }}
               />
 
-              {/* Smart Suggestions — below bottom panel */}
+              {/* Smart Suggestions - below bottom panel */}
               {suggestions.suggestions.length > 0 && (
                 <SmartSuggestions
                   suggestions={suggestions.suggestions}
@@ -3409,7 +3564,7 @@ export default function TextForm(props: TextFormProps) {
         </div>
       </main>
 
-      {/* Mobile: the sidebar is a bottom sheet — this FAB is its always-visible
+      {/* Mobile: the sidebar is a bottom sheet - this FAB is its always-visible
           entry point (the activity bar that opens it on desktop is hidden) */}
       {isMobile && (
         <>
@@ -3488,6 +3643,29 @@ export default function TextForm(props: TextFormProps) {
               </span>
             </button>
 
+            {/* Auto Run - execution mode. Stays open on click so the user can
+                see the switch move and read the helper text underneath. */}
+            <button
+              className="tu-settings-item tu-settings-item--switch"
+              onClick={() => setAutoRun(!autoRun)}
+              role="switch"
+              aria-checked={autoRun}
+              aria-describedby="auto-run-help"
+            >
+              <span className="tu-settings-item-icon">
+                <ZapIcon size={15} />
+              </span>
+              <span className="tu-settings-item-label">Auto Run</span>
+              <span className={`tu-switch${autoRun ? ' tu-switch--on' : ''}`} aria-hidden="true">
+                <span className="tu-switch-knob" />
+              </span>
+            </button>
+            <p className="tu-settings-help" id="auto-run-help">
+              {autoRun
+                ? `On: tools run by themselves ${AUTO_RUN_DEBOUNCE_MS / 1000}s after you stop typing. This can use up your daily usage while you are still editing.`
+                : `Off: tools run only when you press ${runLabel}. Turn this on to run automatically after you stop typing - be aware it can use up your daily usage while you are still editing.`}
+            </p>
+
             {/* Command palette */}
             <button
               className="tu-settings-item"
@@ -3518,7 +3696,7 @@ export default function TextForm(props: TextFormProps) {
               <span className="tu-settings-item-hint">Stats & settings</span>
             </button>
 
-            {/* Upgrade to Pro — shown for authenticated free-tier users */}
+            {/* Upgrade to Pro - shown for authenticated free-tier users */}
             {props.isAuthenticated && subscription && !subscription.isPro && (
               <button
                 className="tu-settings-item tu-settings-item--accent"
@@ -3582,7 +3760,7 @@ export default function TextForm(props: TextFormProps) {
             )}
 
             {/* About */}
-            <div className="tu-settings-footer">FixMyText v1.0 — {TOOLS.length} tools</div>
+            <div className="tu-settings-footer">FixMyText v1.0 - {TOOLS.length} tools</div>
           </div>
         </>
       )}

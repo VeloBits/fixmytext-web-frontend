@@ -50,12 +50,12 @@ jobs:
         run: npm run build -w @velobits/shell
         env:
           VITE_API_URL: http://localhost:8000
-          # Federation remote entry points — Vite bakes these into the host bundle at
+          # Federation remote entry points - Vite bakes these into the host bundle at
           # build time. Use repo vars for the real deployment URLs; fall back to the
           # local router path so the build check still exercises a prefixed (non-localhost)
           # remoteEntry URL rather than the vite.config localhost:3101/3102 defaults.
-          VITE_EDITOR_REMOTE_ENTRY: ${{ vars.VITE_EDITOR_REMOTE_ENTRY || 'http://localhost:3000/remotes/editor/remoteEntry.js' }}
-          VITE_ANALYTICS_REMOTE_ENTRY: ${{ vars.VITE_ANALYTICS_REMOTE_ENTRY || 'http://localhost:3000/remotes/analytics/remoteEntry.js' }}
+          VITE_EDITOR_REMOTE_ENTRY: ${{ vars.VITE_EDITOR_REMOTE_ENTRY || 'http://localhost:3100/remotes/editor/remoteEntry.js' }}
+          VITE_ANALYTICS_REMOTE_ENTRY: ${{ vars.VITE_ANALYTICS_REMOTE_ENTRY || 'http://localhost:3100/remotes/analytics/remoteEntry.js' }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
@@ -134,12 +134,12 @@ jobs:
   federation-smoke:
     name: Federation Smoke (host↔remote contract)
     runs-on: ubuntu-latest
-    # Heavy E2E gate — runs only for `main` (pushes to main + PRs targeting main).
+    # Heavy E2E gate - runs only for `main` (pushes to main + PRs targeting main).
     # Skipped on `develop`: push to develop has github.ref refs/heads/develop;
     # a PR into develop has github.base_ref == 'develop'. Both are excluded here.
     if: github.ref != 'refs/heads/develop' && github.base_ref != 'develop'
     # Fail fast if a step hangs (e.g. a stalled Playwright CDN download) instead of
-    # sitting until GitHub's 6-hour default — which makes the run look permanently stuck.
+    # sitting until GitHub's 6-hour default - which makes the run look permanently stuck.
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -177,7 +177,7 @@ jobs:
         run: npx playwright install-deps chromium
 
       # Bring up the production simulation: built shell + remotes behind the nginx
-      # router on :3000 — the topology that actually exercises the remote `base` paths
+      # router on :3100 - the topology that actually exercises the remote `base` paths
       # and the shell's baked VITE_*_REMOTE_ENTRY URLs (Phase 6.1/6.2). The backend +
       # Keycloak are mocked inside the smoke spec, so no real services are needed.
       - name: Start prod compose stack
@@ -188,7 +188,7 @@ jobs:
       - name: Wait for router (shell at /)
         run: |
           for i in $(seq 1 60); do
-            if curl -sf -o /dev/null http://localhost:3000/; then
+            if curl -sf -o /dev/null http://localhost:3100/; then
               echo "router up"; exit 0
             fi
             sleep 5
@@ -268,5 +268,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Gates on high/critical advisories, minus the reviewed, dated exceptions in
+      # scripts/audit-allowlist.json. See that file for why each one is accepted.
       - name: Audit for vulnerabilities
-        run: npm audit --audit-level=high
+        run: node scripts/audit-allowlist.mjs

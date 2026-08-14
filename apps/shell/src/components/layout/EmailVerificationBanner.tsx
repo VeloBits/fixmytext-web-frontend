@@ -80,7 +80,7 @@ function CloseIcon() {
  * has dismissed the banner within the soft-cooldown window (1 hour).
  *
  * `showAlert` is required and is used to report a fallback when we can't build
- * the Keycloak verification link — the banner itself stays minimal.
+ * the Keycloak verification link - the banner itself stays minimal.
  */
 export interface EmailVerificationBannerProps {
   showAlert: (message: string, type: AlertLevel) => void;
@@ -111,7 +111,7 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
   // account-svc owns the resend: with the realm's blocking verify-email
   // requirement disabled, Keycloak's reset-credentials screen is a plain
   // password reset and would NOT re-send the verification link. The endpoint
-  // calls Keycloak Admin's send-verify-email for the current user instead —
+  // calls Keycloak Admin's send-verify-email for the current user instead -
   // no page navigation, the user stays in the app.
   const handleResend = async () => {
     try {
@@ -124,7 +124,7 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
 
   const handleDismiss = () => {
     try {
-      // Soft-dismiss for an hour — production apps don't want to nag users
+      // Soft-dismiss for an hour - production apps don't want to nag users
       // endlessly, but can't let a dismissal stick forever either.
       localStorage.setItem(DISMISSAL_KEY, String(Date.now() + 60 * 60 * 1000));
     } catch {
@@ -148,7 +148,7 @@ export default function EmailVerificationBanner({ showAlert }: EmailVerification
         <div className="verify-banner__text">
           <strong>Verify your email</strong>
           <span>
-            Link sent to <b>{user.email}</b> — AI tools unlock once you confirm.
+            Link sent to <b>{user.email}</b> - AI tools unlock once you confirm.
           </span>
         </div>
       </div>

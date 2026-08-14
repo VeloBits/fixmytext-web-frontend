@@ -16,7 +16,7 @@ interface Props {
  *
  * generateMetadata() fetches the share record server-side and populates
  * og:title, og:description, and twitter:card with real content from the tool
- * output — so Twitter, LinkedIn, and Slack show rich preview cards.
+ * output - so Twitter, LinkedIn, and Slack show rich preview cards.
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -37,14 +37,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fixmytext.velobits.dev';
 
   return {
-    title: `${toolName} — Shared Result`,
+    title: `${toolName} - Shared Result`,
     description: preview || `Text transformed with ${toolName} on FixMyText.`,
-    // User-generated shared output must not be search-indexed — keeps private
+    // User-generated shared output must not be search-indexed - keeps private
     // shares out of search results / crawlers (FE-SHARE-01). OG/Twitter cards
     // still render for explicit link unfurling.
     robots: { index: false, follow: false },
     openGraph: {
-      title: `${toolName} — Shared via FixMyText`,
+      title: `${toolName} - Shared via FixMyText`,
       description: preview || `Processed with ${toolName}`,
       type: 'website',
       url: `${siteUrl}/share/${id}`,
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary',
-      title: `${toolName} — Shared via FixMyText`,
+      title: `${toolName} - Shared via FixMyText`,
       description: preview || `Processed with ${toolName}`,
     },
   };

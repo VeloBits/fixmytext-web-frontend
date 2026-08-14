@@ -280,7 +280,7 @@ describe('ToolPanel', () => {
   it('renders pinned favorites group when favorites are set', () => {
     const favorites = { favorites: ['uppercase'], toggleFavorite: vi.fn() };
     render(<ToolPanel {...defaultProps} favorites={favorites} />);
-    // 'Pinned' also exists as a view chip — assert on the group header
+    // 'Pinned' also exists as a view chip - assert on the group header
     const headers = Array.from(document.querySelectorAll('.tu-group-label')).map(
       (n) => n.textContent
     );

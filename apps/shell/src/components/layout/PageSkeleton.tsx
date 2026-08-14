@@ -1,7 +1,7 @@
 import '../../assets/css/PageSkeleton.css';
 
 /**
- * PageSkeleton — lightweight shimmer placeholder shown while lazy routes load.
+ * PageSkeleton - lightweight shimmer placeholder shown while lazy routes load.
  */
 export default function PageSkeleton() {
   return (

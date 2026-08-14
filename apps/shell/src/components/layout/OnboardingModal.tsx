@@ -16,7 +16,7 @@ type KitMetaMap = Record<StarterKitId, KitMeta>;
 interface KitItem extends StarterKit, KitMeta {}
 
 // `tools` are display shorthand for the real STARTER_KITS[*].toolIds (the
-// tools seeded into the kit's group) — keep the two lists telling the same story.
+// tools seeded into the kit's group) - keep the two lists telling the same story.
 const KIT_META: KitMetaMap = {
   writer: {
     gradient: 'linear-gradient(135deg, #C586C0 0%, #569CD6 100%)',
@@ -83,7 +83,7 @@ const TypingText = ({ text }: TypingTextProps) => (
 
 export interface OnboardingModalProps {
   /** Called with the picked starter kit, or null when dismissed (X / Esc).
-   * The picker must never trap the user — "no answer" creates nothing. */
+   * The picker must never trap the user - "no answer" creates nothing. */
   onComplete: (kit: StarterKit | null) => void;
 }
 
@@ -133,8 +133,8 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
         <button
           type="button"
           className="tu-onboard-close"
-          aria-label="Skip — explore all tools"
-          title="Skip — explore all tools"
+          aria-label="Skip - explore all tools"
+          title="Skip - explore all tools"
           onClick={() => onComplete(null)}
         >
           <XIcon size={16} />
@@ -159,7 +159,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            Pick a starter kit — we&apos;ll set up your first tool group.
+            Pick a starter kit - we&apos;ll set up your first tool group.
           </motion.p>
         </div>
 
@@ -215,7 +215,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4 }}
         >
-          <span>Your kit becomes an editable group — rename or change it anytime</span>
+          <span>Your kit becomes an editable group - rename or change it anytime</span>
         </motion.div>
       </motion.div>
     </motion.div>

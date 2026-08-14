@@ -37,10 +37,10 @@ function getDefaultBaseUrl(): string {
 }
 
 /**
- * POST /api/v1/auth/session/clear — clear the per-app session cookie.
+ * POST /api/v1/auth/session/clear - clear the per-app session cookie.
  * Called by the frontend on logout BEFORE redirecting to Keycloak end-session.
  * Always sends credentials: 'include' so the browser attaches the cookie
- * (server needs it to know what to clear). Errors are swallowed — clearing
+ * (server needs it to know what to clear). Errors are swallowed - clearing
  * is best-effort; the OIDC logout still runs afterward.
  */
 export async function clearSession(options: { baseUrl?: string } = {}): Promise<void> {

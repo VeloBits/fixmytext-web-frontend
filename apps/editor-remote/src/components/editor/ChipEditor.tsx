@@ -22,7 +22,7 @@ const EDITOR_MAX_HEIGHT = 440;
 const GAP = 8;
 
 interface ChipEditorProps {
-  /** Rect of the trigger button — the popover opens beside/below it. */
+  /** Rect of the trigger button - the popover opens beside/below it. */
   anchor: DOMRect;
   onClose: () => void;
   sidebarChips: SidebarChipsContextValue;
@@ -49,7 +49,7 @@ export default function ChipEditor({
 }: ChipEditorProps) {
   const { chips } = sidebarChips;
   const [query, setQuery] = useState('');
-  // Reorder works on a local draft and commits on drag end — committing every
+  // Reorder works on a local draft and commits on drag end - committing every
   // intermediate onReorder frame would spam whole-list PUTs.
   const [draft, setDraft] = useState<SidebarChip[]>(chips);
   useEffect(() => setDraft(chips), [chips]);
